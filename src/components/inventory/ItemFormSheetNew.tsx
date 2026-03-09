@@ -264,10 +264,27 @@ export function ItemFormSheetNew({
             </div>
           </div>
 
+          {/* Custom Stock Unit Label */}
+          <div className="space-y-2">
+            <Label htmlFor="stockUnitLabel" className="text-base font-medium">
+              Nome da unidade de estoque
+            </Label>
+            <Input
+              id="stockUnitLabel"
+              value={stockUnitLabel}
+              onChange={(e) => setStockUnitLabel(e.target.value)}
+              placeholder={unitType === 'kg' ? 'kg' : unitType === 'litro' ? 'litro' : 'unidade'}
+              className="input-large"
+            />
+            <p className="text-xs text-muted-foreground">
+              Ex: pacote, saco, bandeja, caixa. Deixe vazio para usar "{unitType === 'kg' ? 'kg' : unitType === 'litro' ? 'litro' : 'unidade'}".
+            </p>
+          </div>
+
           {/* Unit Price */}
           <div className="space-y-2">
             <Label htmlFor="unitPrice" className="text-base font-medium">
-              Preço por {unitType === 'kg' ? 'kg' : unitType === 'litro' ? 'litro' : 'unidade'}
+              Preço por {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'litro' ? 'litro' : 'unidade')}
             </Label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
@@ -292,15 +309,46 @@ export function ItemFormSheetNew({
                 variant="outline"
                 className="w-full h-12 justify-between text-base font-medium"
               >
-                <span>⚙️ Configurar para Fichas Técnicas</span>
+                <span>📋 Configurar para Fichas Técnicas</span>
                 {showRecipeSection ? <AppIcon name="ExpandLess" size={20} /> : <AppIcon name="ExpandMore" size={20} />}
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-4 space-y-4">
               <p className="text-sm text-muted-foreground">
-                Configure uma unidade e preço diferente para usar nas fichas técnicas. 
-                Ex: Estoque conta "pacotes", mas ficha usa "kg".
+                Configure a unidade usada nas fichas técnicas e o fator de conversão.
+                {stockUnitLabel.trim() ? ` Ex: cada ${stockUnitLabel.trim()} tem quantas unidades?` : ''}
               </p>
+
+              {stockUnitLabel.trim() && (
+                <div className="space-y-2">
+                  <Label htmlFor="stockToRecipeFactor" className="text-base font-medium">
+                    Quantidades por {stockUnitLabel.trim()}
+                  </Label>
+                  <Input
+                    id="stockToRecipeFactor"
+                    type="number"
+                    value={stockToRecipeFactor}
+                    onChange={(e) => {
+                      setStockToRecipeFactor(e.target.value);
+                      // Auto-calculate recipe_unit_price
+                      const factor = parseFloat(e.target.value);
+                      const price = parseFloat(unitPrice);
+                      if (factor > 0 && price > 0) {
+                        setRecipeUnitPrice((price / factor).toFixed(2));
+                      }
+                    }}
+                    placeholder="Ex: 6"
+                    className="input-large"
+                    step={1}
+                    min={1}
+                  />
+                  {parseFloat(stockToRecipeFactor) > 0 && parseFloat(unitPrice) > 0 && (
+                    <p className="text-sm text-emerald-600 font-medium">
+                      = R$ {(parseFloat(unitPrice) / parseFloat(stockToRecipeFactor)).toFixed(2)} por unidade na ficha
+                    </p>
+                  )}
+                </div>
+              )}
               
               <div className="space-y-2">
                 <Label className="text-base font-medium">Unidade para Fichas</Label>
@@ -319,7 +367,7 @@ export function ItemFormSheetNew({
                 </Select>
               </div>
 
-              {recipeUnitType && recipeUnitType !== '__same__' && (
+              {recipeUnitType && recipeUnitType !== '__same__' && !stockUnitLabel.trim() && (
                 <div className="space-y-2">
                   <Label htmlFor="recipeUnitPrice" className="text-base font-medium">
                     Preço por {recipeUnitType === 'kg' ? 'kg' : recipeUnitType === 'g' ? 'g' : recipeUnitType === 'litro' ? 'L' : recipeUnitType === 'ml' ? 'ml' : 'un'}
@@ -337,6 +385,65 @@ export function ItemFormSheetNew({
                       min={0}
                     />
                   </div>
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Purchase unit section */}
+          <Collapsible open={showPurchaseSection} onOpenChange={setShowPurchaseSection}>
+            <CollapsibleTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-12 justify-between text-base font-medium"
+              >
+                <span>📦 Configurar para Compras/Pedidos</span>
+                {showPurchaseSection ? <AppIcon name="ExpandLess" size={20} /> : <AppIcon name="ExpandMore" size={20} />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-4 space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Configure a unidade usada para pedir ao fornecedor.
+                Ex: você compra por "caixa", cada caixa vem com 8 {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'litro' ? 'litros' : 'unidades')}.
+              </p>
+
+              <div className="space-y-2">
+                <Label htmlFor="purchaseUnitLabel" className="text-base font-medium">
+                  Unidade de compra
+                </Label>
+                <Input
+                  id="purchaseUnitLabel"
+                  value={purchaseUnitLabel}
+                  onChange={(e) => setPurchaseUnitLabel(e.target.value)}
+                  placeholder="Ex: caixa, fardo, engradado"
+                  className="input-large"
+                />
+              </div>
+
+              {purchaseUnitLabel.trim() && (
+                <div className="space-y-2">
+                  <Label htmlFor="purchaseToStockFactor" className="text-base font-medium">
+                    Qtd de {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'litro' ? 'litros' : 'unidades')} por {purchaseUnitLabel.trim()}
+                  </Label>
+                  <Input
+                    id="purchaseToStockFactor"
+                    type="number"
+                    value={purchaseToStockFactor}
+                    onChange={(e) => setPurchaseToStockFactor(e.target.value)}
+                    placeholder="Ex: 8"
+                    className="input-large"
+                    step={1}
+                    min={1}
+                  />
+                  {parseFloat(purchaseToStockFactor) > 0 && parseFloat(unitPrice) > 0 && (
+                    <p className="text-sm text-emerald-600 font-medium">
+                      = R$ {(parseFloat(unitPrice) * parseFloat(purchaseToStockFactor)).toFixed(2)} por {purchaseUnitLabel.trim()}
+                      {parseFloat(stockToRecipeFactor) > 0 && (
+                        <> ({parseFloat(purchaseToStockFactor) * parseFloat(stockToRecipeFactor)} unidades)</>
+                      )}
+                    </p>
+                  )}
                 </div>
               )}
             </CollapsibleContent>
