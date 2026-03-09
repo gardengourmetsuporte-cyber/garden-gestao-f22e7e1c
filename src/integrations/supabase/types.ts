@@ -1596,6 +1596,63 @@ export type Database = {
           },
         ]
       }
+      employee_material_deliveries: {
+        Row: {
+          category: string
+          created_at: string
+          delivered_at: string
+          delivered_by: string
+          employee_id: string
+          id: string
+          item_name: string
+          notes: string | null
+          quantity: number
+          signature_url: string | null
+          unit_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          delivered_at?: string
+          delivered_by: string
+          employee_id: string
+          id?: string
+          item_name: string
+          notes?: string | null
+          quantity?: number
+          signature_url?: string | null
+          unit_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          delivered_at?: string
+          delivered_by?: string
+          employee_id?: string
+          id?: string
+          item_name?: string
+          notes?: string | null
+          quantity?: number
+          signature_url?: string | null
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_material_deliveries_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_material_deliveries_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_payments: {
         Row: {
           advance_deduction: number | null
