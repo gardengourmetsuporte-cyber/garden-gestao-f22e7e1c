@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { InvoiceSheet } from './InvoiceSheet';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -19,6 +20,7 @@ interface Sale {
   status: string;
   source: string;
   customer_name: string | null;
+  customer_phone: string | null;
   customer_document: string | null;
   table_number: number | null;
   paid_at: string | null;
@@ -73,6 +75,7 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('blocks');
   const [filterSource, setFilterSource] = useState<string | null>(null);
+  const [invoiceSale, setInvoiceSale] = useState<Sale | null>(null);
 
   useEffect(() => {
     if (open && activeUnitId) {
@@ -91,7 +94,7 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
       .from('pos_sales')
       .select(`
         id, sale_number, total, subtotal, discount, status, source,
-        customer_name, customer_document, table_number, paid_at, created_at, notes,
+        customer_name, customer_phone, customer_document, table_number, paid_at, created_at, notes,
         pos_sale_items(product_name, quantity, unit_price),
         pos_sale_payments(method, amount)
       `)
@@ -111,6 +114,16 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
 
   const totalSales = sales.filter(s => s.status === 'paid').length;
   const totalRevenue = sales.filter(s => s.status === 'paid').reduce((sum, s) => sum + s.total, 0);
+
+  const handleResendWhatsApp = useCallback((sale: Sale) => {
+    const cleanPhone = (sale.customer_phone || '').replace(/\D/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) return;
+    const itemsList = sale.items.map(i => `• ${i.quantity}x ${i.product_name} - ${formatCurrency(i.quantity * i.unit_price)}`).join('\n');
+    const paymentsList = sale.payments.map(p => `${PAYMENT_LABELS[p.method] || p.method}: ${formatCurrency(p.amount)}`).join(', ');
+    const msg = `🧾 *Nota Fiscal*\n\n${itemsList}\n\n💰 *Total: ${formatCurrency(sale.total)}*\nPagamento: ${paymentsList}\n\nObrigado pela preferência! 🙏`;
+    const phoneFormatted = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
+    window.open(`https://wa.me/${phoneFormatted}?text=${encodeURIComponent(msg)}`, '_blank');
+  }, []);
 
   const paymentSummary = sales.filter(s => s.status === 'paid').reduce((acc, sale) => {
     sale.payments.forEach(p => {
@@ -223,6 +236,32 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
             )}
             {sale.notes && <div className="text-xs text-muted-foreground italic">Obs: {sale.notes}</div>}
             {sale.discount > 0 && <div className="text-xs text-muted-foreground">Desconto: -{formatCurrency(sale.discount)}</div>}
+
+            {/* Action buttons */}
+            {sale.status === 'paid' && (
+              <div className="flex gap-2 pt-2 border-t border-border/30">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 h-8 text-[11px] gap-1.5"
+                  onClick={() => setInvoiceSale(sale)}
+                >
+                  <AppIcon name="Receipt" size={13} />
+                  Nota Fiscal
+                </Button>
+                {sale.customer_phone && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 h-8 text-[11px] gap-1.5 border-emerald-500/30 text-emerald-600"
+                    onClick={() => handleResendWhatsApp(sale)}
+                  >
+                    <AppIcon name="share" size={13} />
+                    Reenviar
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </button>
@@ -353,6 +392,18 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
             </div>
           )}
         </div>
+
+        {invoiceSale && (
+          <InvoiceSheet
+            open={!!invoiceSale}
+            onOpenChange={(open) => { if (!open) setInvoiceSale(null); }}
+            saleId={invoiceSale.id}
+            total={invoiceSale.total}
+            customerName={invoiceSale.customer_name || ''}
+            payments={invoiceSale.payments.map(p => ({ method: p.method, amount: p.amount }))}
+            items={invoiceSale.items.map(i => ({ name: i.product_name, quantity: i.quantity, unit_price: i.unit_price }))}
+          />
+        )}
       </SheetContent>
     </Sheet>
   );
