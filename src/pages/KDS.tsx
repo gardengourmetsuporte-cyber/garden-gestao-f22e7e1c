@@ -427,6 +427,20 @@ export default function KDS() {
       </header>
 
       {/* ── Column headers ── */}
+      {isError && (
+        <div className="mx-2.5 mt-2.5 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 flex items-center justify-between gap-3">
+          <p className="text-xs text-destructive font-medium truncate">
+            {(error as Error)?.message || 'Falha ao carregar pedidos'}
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="h-7 px-2.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold shrink-0"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-4 shrink-0">
         {COLUMNS.map(col => {
           const a = ACCENT_MAP[col.accent];
