@@ -212,6 +212,7 @@ export default function TabletDigitalMenu() {
             cart={cart}
             cartTotal={cartTotal}
             unitId={unitId!}
+            autoConfirm={(unit?.store_info as any)?.auto_confirm?.mesa ?? false}
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
             onClear={clearCart}

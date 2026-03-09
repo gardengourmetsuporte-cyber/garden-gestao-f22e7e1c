@@ -14,13 +14,14 @@ interface Props {
   cart: CartItem[];
   cartTotal: number;
   unitId: string;
+  autoConfirm?: boolean;
   customerUser?: User | null;
   onUpdateQuantity: (index: number, qty: number) => void;
   onRemove: (index: number) => void;
   onClear: () => void;
 }
 
-export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuantity, onRemove, onClear }: Props) {
+export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, onUpdateQuantity, onRemove, onClear }: Props) {
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
 
@@ -149,15 +150,15 @@ export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuanti
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
         .insert({
-          unit_id: unitId,
-          table_number: 0,
-          status: 'awaiting_confirmation',
-          total: grandTotal,
-          source: 'delivery',
-          customer_name: customerName.trim(),
-          customer_phone: customerPhone.replace(/\D/g, ''),
-          customer_address: customerAddress.trim(),
-        })
+        unit_id: unitId,
+        table_number: 0,
+        status: autoConfirm ? 'confirmed' : 'awaiting_confirmation',
+        total: grandTotal,
+        source: 'delivery',
+        customer_name: customerName.trim(),
+        customer_phone: customerPhone.replace(/\D/g, ''),
+        customer_address: customerAddress.trim(),
+      })
         .select('id')
         .single();
 

@@ -153,7 +153,7 @@ export default function TabletRodizio() {
         .insert({
           unit_id: unitId,
           table_number: parseInt(mesa) || 0,
-          status: 'awaiting_confirmation',
+          status: ((unit?.store_info as any)?.auto_confirm?.rodizio) ? 'confirmed' : 'awaiting_confirmation',
           total: 0, // Rodízio — no additional charge
           source: 'mesa',
           customer_name: customerName.trim(),
