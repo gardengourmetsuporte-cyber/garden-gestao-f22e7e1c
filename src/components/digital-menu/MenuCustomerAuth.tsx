@@ -15,7 +15,7 @@ interface Props {
   onEmailLogin?: () => void;
 }
 
-export function MenuCustomerAuth({ unitName, logoUrl, cuisineType, city, isOpen = true, onSkip, onEmailLogin }: Props) {
+export function MenuCustomerAuth({ unitName, logoUrl, cuisineType, city, isOpen = true, bonusPoints = 0, onSkip, onEmailLogin }: Props) {
   const [loading, setLoading] = useState<'google' | 'apple' | null>(null);
 
   const handleOAuth = async (provider: 'google' | 'apple') => {
