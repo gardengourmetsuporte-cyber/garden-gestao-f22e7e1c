@@ -262,6 +262,34 @@ function OrderDetailSheet({
               Cobrar
             </Button>
           </div>
+
+          {/* Contextual status buttons */}
+          {order.status === 'preparing' && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full h-11 rounded-xl text-sm border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
+              onClick={() => onUpdateStatus(order, 'ready')}
+              disabled={updatingStatus === order.id}
+            >
+              <AppIcon name={updatingStatus === order.id ? 'Loader2' : 'CheckCircle'} size={16} className={cn("mr-1.5", updatingStatus === order.id && "animate-spin")} />
+              Marcar como Pronto
+            </Button>
+          )}
+
+          {order.status === 'ready' && !isDelivery && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full h-11 rounded-xl text-sm border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
+              onClick={() => onUpdateStatus(order, 'delivered')}
+              disabled={updatingStatus === order.id}
+            >
+              <AppIcon name={updatingStatus === order.id ? 'Loader2' : 'PackageCheck'} size={16} className={cn("mr-1.5", updatingStatus === order.id && "animate-spin")} />
+              Entregue
+            </Button>
+          )}
+
           {canDispatch && (
             <Button
               size="sm"
@@ -272,6 +300,19 @@ function OrderDetailSheet({
             >
               <AppIcon name={dispatching === order.id ? 'Loader2' : 'Bike'} size={16} className={cn("mr-1.5", dispatching === order.id && "animate-spin")} />
               Despachar
+            </Button>
+          )}
+
+          {!['delivered', 'dispatched', 'cancelled'].includes(order.status) && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="w-full h-9 rounded-xl text-xs text-destructive hover:bg-destructive/10"
+              onClick={() => onUpdateStatus(order, 'cancelled')}
+              disabled={updatingStatus === order.id}
+            >
+              <AppIcon name="X" size={14} className="mr-1" />
+              Cancelar pedido
             </Button>
           )}
         </div>

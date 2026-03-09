@@ -162,7 +162,7 @@ export default function CardapioHub() {
       };
     }
     return null;
-  }, [isPedidos, isDashboard, isConfigFromUrl, cardapioTab, viewMode]);
+  }, [isDashboard, isConfigFromUrl, cardapioTab, viewMode]);
 
   useFabAction(fabAction, [fabAction]);
 
