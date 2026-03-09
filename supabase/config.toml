@@ -68,3 +68,9 @@ verify_jwt = false
 
 [functions.delivery-hub-webhook]
 verify_jwt = false
+
+[functions.marketing-daily-suggestions]
+verify_jwt = false
+
+[functions.marketing-generate-image]
+verify_jwt = false
