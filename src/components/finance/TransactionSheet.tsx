@@ -974,6 +974,7 @@ export function TransactionSheet({
       />
 
       <ListPicker
+        nested
         open={showSupplierPicker}
         onOpenChange={setShowSupplierPicker}
         title="Selecionar fornecedor"
