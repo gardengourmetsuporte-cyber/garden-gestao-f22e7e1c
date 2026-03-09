@@ -85,6 +85,7 @@ export function RecipeSheet({
   const [yieldUnit, setYieldUnit] = useState('unidade');
   const [notes, setNotes] = useState('');
   const [ingredients, setIngredients] = useState<LocalIngredient[]>([]);
+  const [minReadyStock, setMinReadyStock] = useState('0');
   const [pickerOpen, setPickerOpen] = useState(false);
   const [marginPercent, setMarginPercent] = useState(50);
   const [sellingPrice, setSellingPrice] = useState('');
@@ -100,6 +101,7 @@ export function RecipeSheet({
       setYieldQuantity(String(recipe.yield_quantity));
       setYieldUnit(recipe.yield_unit);
       setNotes(recipe.preparation_notes || '');
+      setMinReadyStock(String(recipe.min_ready_stock ?? 0));
       setIngredients(
         (recipe.ingredients || []).map((ing) => ({
           id: ing.id,
@@ -123,6 +125,7 @@ export function RecipeSheet({
       setYieldQuantity('1');
       setYieldUnit('unidade');
       setNotes('');
+      setMinReadyStock('0');
       setIngredients([]);
     }
   }, [recipe, open]);
@@ -257,6 +260,7 @@ export function RecipeSheet({
       category_id: categoryId || null,
       yield_quantity: parseFloat(yieldQuantity) || 1,
       yield_unit: yieldUnit,
+      min_ready_stock: parseInt(minReadyStock) || 0,
       preparation_notes: notes.trim() || null,
       ingredients: ingredients.map((ing) => ({
         ...(ing.id && { id: ing.id }),
@@ -361,6 +365,27 @@ export function RecipeSheet({
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+
+                {/* Min Ready Stock */}
+                <div className="space-y-2">
+                  <Label htmlFor="minReadyStock">Estoque mínimo de produção</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="minReadyStock"
+                      type="number"
+                      value={minReadyStock}
+                      onChange={(e) => setMinReadyStock(e.target.value)}
+                      min="0"
+                      step="1"
+                      placeholder="0"
+                      className="w-24"
+                    />
+                    <span className="text-sm text-muted-foreground">{yieldUnit} prontos</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Defina o mínimo para gerar ordens de produção automaticamente (0 = desativado)
+                  </p>
                 </div>
               </div>
 

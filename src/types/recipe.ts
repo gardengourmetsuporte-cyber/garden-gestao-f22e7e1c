@@ -21,9 +21,11 @@ export type IngredientSourceType = 'inventory' | 'recipe';
    is_active: boolean;
    total_cost: number;
    cost_per_portion: number;
-   cost_updated_at: string | null;
-   created_at: string;
-   updated_at: string;
+    cost_updated_at: string | null;
+    min_ready_stock: number;
+    current_ready_stock: number;
+    created_at: string;
+    updated_at: string;
    // Joined data
    category?: RecipeCategory;
    ingredients?: RecipeIngredient[];

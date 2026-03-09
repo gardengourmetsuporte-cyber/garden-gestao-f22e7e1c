@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import { QuotationList } from '@/components/orders/QuotationList';
 import { useShoppingList } from '@/hooks/useShoppingList';
 import { SupplierProfileSheet } from '@/components/orders/SupplierProfileSheet';
+import { ProductionTab } from '@/components/orders/ProductionTab';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { normalizePhone } from '@/lib/normalizePhone';
 
@@ -45,7 +46,7 @@ export default function OrdersPage() {
   const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
   const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
-  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list' | 'suppliers'>('to-order');
+  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list' | 'suppliers' | 'production'>('to-order');
   const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
   const [cotationStep, setCotationStep] = useState(false);
   const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
@@ -256,6 +257,7 @@ export default function OrdersPage() {
               { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, color: 'text-blue-400', bg: 'bg-blue-500/10' },
               { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, color: 'text-amber-400', bg: 'bg-amber-500/10' },
               { key: 'orders' as const, label: 'Histórico', icon: 'Clock', badge: pendingOrders.length || undefined, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+              { key: 'production' as const, label: 'Produção', icon: 'ChefHat', badge: undefined, color: 'text-orange-400', bg: 'bg-orange-500/10' },
             ];
 
             const renderCard = (tab: { key: string; label: string; icon: string; badge: number | undefined; color: string; bg: string }, large = false) => (
@@ -293,8 +295,8 @@ export default function OrdersPage() {
                   {renderCard(supplierTab, true)}
                   {renderCard(smallTabs[0], true)}
                 </div>
-                {/* Bottom row: Lista, Cotações, Histórico */}
-                <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-3">
+                {/* Bottom row: Lista, Cotações, Histórico, Produção */}
+                <div className="grid grid-cols-4 gap-2 lg:grid-cols-5 lg:gap-3">
                   {smallTabs.slice(1).map(tab => renderCard(tab))}
                 </div>
               </div>
@@ -723,6 +725,9 @@ export default function OrdersPage() {
                 )}
               </div>
             )}
+
+            {/* Produção Tab */}
+            {orderTab === 'production' && <ProductionTab />}
           </div>
         </div>
 
