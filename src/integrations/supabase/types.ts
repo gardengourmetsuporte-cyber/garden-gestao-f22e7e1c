@@ -4935,6 +4935,8 @@ export type Database = {
           error_message: string | null
           id: string
           order_number: number | null
+          payment_change: number | null
+          payment_method: string | null
           pdv_response: Json | null
           retry_count: number | null
           source: string
@@ -4953,6 +4955,8 @@ export type Database = {
           error_message?: string | null
           id?: string
           order_number?: number | null
+          payment_change?: number | null
+          payment_method?: string | null
           pdv_response?: Json | null
           retry_count?: number | null
           source?: string
@@ -4971,6 +4975,8 @@ export type Database = {
           error_message?: string | null
           id?: string
           order_number?: number | null
+          payment_change?: number | null
+          payment_method?: string | null
           pdv_response?: Json | null
           retry_count?: number | null
           source?: string
