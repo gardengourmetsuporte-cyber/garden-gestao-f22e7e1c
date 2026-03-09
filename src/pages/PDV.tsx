@@ -11,7 +11,7 @@ import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { PendingOrdersSheet } from '@/components/pdv/PendingOrdersSheet';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
-import { Drawer } from 'vaul';
+
 
 export default function PDV() {
   const pos = usePOS();
