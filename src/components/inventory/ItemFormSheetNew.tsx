@@ -343,7 +343,7 @@ export function ItemFormSheetNew({
                     min={1}
                   />
                   {parseFloat(stockToRecipeFactor) > 0 && parseFloat(unitPrice) > 0 && (
-                    <p className="text-sm text-emerald-600 font-medium">
+                    <p className="text-sm text-primary font-medium">
                       = R$ {(parseFloat(unitPrice) / parseFloat(stockToRecipeFactor)).toFixed(2)} por unidade na ficha
                     </p>
                   )}
