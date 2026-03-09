@@ -332,7 +332,8 @@ export default function InventoryPage() {
                             {categoryItems.map((item, idx) => (
                               <div
                                 key={item.id}
-                                className="animate-fade-in"
+                                data-item-id={item.id}
+                                className="animate-fade-in transition-all duration-300"
                                 style={{ animationDelay: `${idx * 30}ms` }}
                               >
                                 <ItemCard
