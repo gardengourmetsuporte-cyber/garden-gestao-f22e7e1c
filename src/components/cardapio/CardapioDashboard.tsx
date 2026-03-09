@@ -85,62 +85,131 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
 
   return (
     <div className="px-4 py-4 lg:px-6 space-y-4 pb-28">
-      {/* Revenue highlight card */}
-      <div className="rounded-2xl bg-gradient-to-br from-primary/15 via-primary/5 to-transparent border border-primary/20 p-5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
-              <AppIcon name="TrendingUp" size={18} className="text-primary" />
+      {/* Revenue highlight card — matches finance-hero-card from main dashboard */}
+      <div className="finance-hero-card w-full text-left animate-spring-in spring-stagger-2">
+        <div className="finance-hero-inner p-5 pb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-white/[0.08] flex items-center justify-center border border-white/[0.06]">
+                <AppIcon name="TrendingUp" size={16} style={{ color: 'var(--gp-icon)' }} />
+              </div>
+              <span className="text-[11px] font-semibold tracking-[0.08em] uppercase" style={{ color: 'var(--gp-label)' }}>
+                Faturamento Hoje
+              </span>
             </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Faturamento Hoje</p>
-              <p className="text-2xl font-black text-foreground">{formatPrice(todayStats.revenue)}</p>
+            <button
+              onClick={() => onNavigate('pedidos')}
+              className="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white/[0.08] transition-colors"
+              aria-label="Ver pedidos"
+            >
+              <AppIcon name="ArrowRight" size={15} style={{ color: 'var(--gp-icon)' }} />
+            </button>
+          </div>
+
+          <p
+            className="text-[2.25rem] font-black tracking-[-0.03em] leading-none animate-number-reveal"
+            style={{ color: 'var(--gp-value)' }}
+          >
+            {formatPrice(todayStats.revenue)}
+          </p>
+
+          {/* Stat chips */}
+          <div className="flex gap-2.5 mt-5">
+            <div className="finance-hero-chip">
+              <div className="flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center">
+                  <AppIcon name="CheckCircle" size={11} style={{ color: 'var(--gp-positive)' }} />
+                </div>
+                <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>
+                  Enviados
+                </span>
+              </div>
+              <span className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--gp-positive)' }}>
+                {todayStats.sent}
+              </span>
+            </div>
+            <div className="finance-hero-chip">
+              <div className="flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-amber-500/15 flex items-center justify-center">
+                  <AppIcon name="Clock" size={11} style={{ color: 'var(--gp-negative)' }} />
+                </div>
+                <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>
+                  Pendentes
+                </span>
+              </div>
+              <span className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--gp-negative)' }}>
+                {todayStats.pending}
+              </span>
             </div>
           </div>
-          <button
-            onClick={() => onNavigate('pedidos')}
-            className="text-xs font-semibold text-primary flex items-center gap-1"
-          >
-            Ver pedidos <AppIcon name="ChevronRight" size={14} />
-          </button>
         </div>
       </div>
 
-      {/* Order stats grid */}
+      {/* Order stats grid — matches card-stat-holo from main dashboard */}
       <div className="grid grid-cols-2 gap-3">
         {[
-          { label: 'Pedidos Hoje', value: todayStats.total, icon: 'ShoppingBag', color: 'text-primary', bg: 'bg-primary/10' },
-          { label: 'Enviados PDV', value: todayStats.sent, icon: 'CheckCircle', color: 'text-success', bg: 'bg-success/10' },
-          { label: 'Pendentes', value: todayStats.pending, icon: 'Clock', color: 'text-warning', bg: 'bg-warning/10' },
-          { label: 'Erros', value: todayStats.errors, icon: 'AlertTriangle', color: 'text-destructive', bg: 'bg-destructive/10' },
-        ].map(stat => (
-          <button
-            key={stat.label}
-            onClick={() => onNavigate('pedidos')}
-            className="rounded-2xl bg-card border border-border/30 p-4 text-left active:scale-[0.97] transition-transform"
-          >
-            <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center mb-2', stat.bg)}>
-              <AppIcon name={stat.icon} size={16} className={stat.color} />
-            </div>
-            <p className="text-xl font-black text-foreground">{stat.value}</p>
-            <p className="text-[10px] text-muted-foreground font-medium">{stat.label}</p>
-          </button>
-        ))}
+          { label: 'Pedidos Hoje', value: todayStats.total, icon: 'ShoppingBag', variant: 'primary' as const },
+          { label: 'Enviados PDV', value: todayStats.sent, icon: 'CheckCircle', variant: 'success' as const },
+          { label: 'Pendentes', value: todayStats.pending, icon: 'Clock', variant: 'warning' as const },
+          { label: 'Erros', value: todayStats.errors, icon: 'AlertTriangle', variant: 'destructive' as const },
+        ].map(stat => {
+          const isActive = stat.value > 0;
+          const variantStyles: Record<string, string> = {
+            primary: 'bg-primary/15 text-primary',
+            success: 'bg-success/15 text-success',
+            warning: 'bg-warning/15 text-warning',
+            destructive: 'bg-destructive/15 text-destructive',
+          };
+          const ringStyles: Record<string, string> = {
+            primary: 'ring-primary/20',
+            success: 'ring-success/20',
+            warning: 'ring-warning/20',
+            destructive: 'ring-destructive/20',
+          };
+          return (
+            <button
+              key={stat.label}
+              onClick={() => onNavigate('pedidos')}
+              className={cn(
+                "card-stat-holo text-left transition-all duration-200 active:scale-[0.97]",
+                isActive && "ring-1 ring-inset",
+                isActive && ringStyles[stat.variant],
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className={cn("stat-holo-icon", isActive ? variantStyles[stat.variant] : "bg-secondary text-secondary-foreground")}>
+                  <AppIcon name={stat.icon} size={20} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">{stat.label}</p>
+                  <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>
+                    {stat.value}
+                  </p>
+                </div>
+                <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50" />
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Delivery Time Widget */}
       <DeliveryTimeWidget unitId={unitId} onNavigate={onNavigate} />
 
-      {/* Auto-confirm removed — all orders are auto-confirmed */}
-
       {/* Warnings: Deactivated products */}
       {deactivatedProducts.length > 0 && (
-        <div className="rounded-2xl bg-warning/5 border border-warning/20 p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <AppIcon name="Warning" size={16} className="text-warning" />
-            <p className="text-xs font-bold text-warning">
-              {deactivatedProducts.length} produto{deactivatedProducts.length > 1 ? 's' : ''} desativado{deactivatedProducts.length > 1 ? 's' : ''}
-            </p>
+        <div className="card-stat-holo ring-1 ring-inset ring-warning/20">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="stat-holo-icon bg-warning/15 text-warning">
+              <AppIcon name="Warning" size={20} />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Produtos Desativados</p>
+              <p className="text-lg font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>
+                {deactivatedProducts.length}
+              </p>
+            </div>
+            <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50" />
           </div>
           <div className="space-y-1.5 max-h-32 overflow-y-auto">
             {deactivatedProducts.slice(0, 8).map(p => {
@@ -174,39 +243,44 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
 
       {/* Products without images */}
       {noImageProducts.length > 0 && (
-        <div className="rounded-2xl bg-muted/50 border border-border/30 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <AppIcon name="ImageOff" size={16} className="text-muted-foreground" />
-            <p className="text-xs font-bold text-foreground">
-              {noImageProducts.length} produto{noImageProducts.length > 1 ? 's' : ''} sem foto
-            </p>
+        <button
+          onClick={() => onNavigate('produtos')}
+          className="w-full card-stat-holo text-left transition-all duration-200 active:scale-[0.97]"
+        >
+          <div className="flex items-center gap-3">
+            <div className="stat-holo-icon bg-secondary text-secondary-foreground">
+              <AppIcon name="ImageOff" size={20} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Sem Foto</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>
+                  {noImageProducts.length}
+                </p>
+                <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+                  produto{noImageProducts.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+            <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50" />
           </div>
-          <p className="text-[10px] text-muted-foreground">
-            Produtos com foto vendem até 30% mais. Adicione imagens para melhorar suas vendas.
-          </p>
-          <button
-            onClick={() => onNavigate('produtos')}
-            className="mt-2 text-xs font-semibold text-primary flex items-center gap-1"
-          >
-            Adicionar fotos <AppIcon name="ChevronRight" size={14} />
-          </button>
-        </div>
+        </button>
       )}
 
       {/* Quick stats summary */}
-      <div className="rounded-2xl bg-card border border-border/30 p-4">
-        <p className="text-xs font-bold text-foreground mb-3">Resumo do Cardápio</p>
+      <div className="card-stat-holo">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resumo do Cardápio</p>
         <div className="grid grid-cols-3 gap-3">
           <div className="text-center">
-            <p className="text-lg font-black text-foreground">{products.filter(p => p.is_active).length}</p>
+            <p className="text-lg font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>{products.filter(p => p.is_active).length}</p>
             <p className="text-[10px] text-muted-foreground">Ativos</p>
           </div>
           <div className="text-center">
-            <p className="text-lg font-black text-foreground">{groups.length}</p>
+            <p className="text-lg font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>{groups.length}</p>
             <p className="text-[10px] text-muted-foreground">Grupos</p>
           </div>
           <div className="text-center">
-            <p className="text-lg font-black text-foreground">{products.filter(p => p.is_highlighted).length}</p>
+            <p className="text-lg font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>{products.filter(p => p.is_highlighted).length}</p>
             <p className="text-[10px] text-muted-foreground">Destaques</p>
           </div>
         </div>
