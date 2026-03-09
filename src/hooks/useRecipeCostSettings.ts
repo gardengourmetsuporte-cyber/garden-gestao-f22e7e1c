@@ -61,12 +61,13 @@ const defaultSettings: Omit<RecipeCostSettings, 'id' | 'user_id' | 'created_at' 
        
        if (error) throw error;
        
-       if (data) {
-         return {
-           ...data,
-           fixed_cost_category_ids: data.fixed_cost_category_ids || [],
-         } as RecipeCostSettings;
-       }
+        if (data) {
+          return {
+            ...data,
+            monthly_revenue: (data as any).monthly_revenue ?? 50000,
+            fixed_cost_category_ids: data.fixed_cost_category_ids || [],
+          } as RecipeCostSettings;
+        }
        
        return null;
      },
