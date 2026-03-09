@@ -49,6 +49,7 @@ const SOURCE_CONFIG: Record<string, { icon: string; label: string }> = {
   delivery: { icon: 'Truck', label: 'Delivery' },
   ifood: { icon: 'Truck', label: 'iFood' },
   balcao: { icon: 'Store', label: 'Balcão' },
+  pedido: { icon: 'Store', label: 'Balcão' },
   whatsapp: { icon: 'MessageCircle', label: 'WhatsApp' },
   pedido: { icon: 'ShoppingBag', label: 'Pedido' },
 };
