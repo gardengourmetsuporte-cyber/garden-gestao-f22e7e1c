@@ -14,13 +14,14 @@ interface Props {
   cart: CartItem[];
   cartTotal: number;
   unitId: string;
+  autoConfirm?: boolean;
   customerUser?: User | null;
   onUpdateQuantity: (index: number, qty: number) => void;
   onRemove: (index: number) => void;
   onClear: () => void;
 }
 
-export function MenuCart({ cart, cartTotal, unitId, customerUser, onUpdateQuantity, onRemove, onClear }: Props) {
+export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, onUpdateQuantity, onRemove, onClear }: Props) {
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
 

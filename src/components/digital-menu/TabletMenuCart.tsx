@@ -12,13 +12,14 @@ interface Props {
   cart: CartItem[];
   cartTotal: number;
   unitId: string;
+  autoConfirm?: boolean;
   onUpdateQuantity: (index: number, qty: number) => void;
   onRemove: (index: number) => void;
   onClear: () => void;
   onClose: () => void;
 }
 
-export function TabletMenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRemove, onClear, onClose }: Props) {
+export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, onUpdateQuantity, onRemove, onClear, onClose }: Props) {
   const [tableNumber, setTableNumber] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [sending, setSending] = useState(false);
