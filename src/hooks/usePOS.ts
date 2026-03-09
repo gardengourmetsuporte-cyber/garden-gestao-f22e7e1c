@@ -55,6 +55,9 @@ export function usePOS() {
   const [tableNumber, setTableNumber] = useState<number | null>(null);
   const [discount, setDiscount] = useState(0);
   const [saleNotes, setSaleNotes] = useState('');
+  const [saleSource, setSaleSource] = useState<'balcao' | 'mesa' | 'delivery'>('balcao');
+  const [deliveryPhone, setDeliveryPhone] = useState('');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
 
   // Fetch products
   const fetchProducts = useCallback(async () => {
