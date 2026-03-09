@@ -37,47 +37,108 @@ type CloneKey = (typeof CLONE_OPTIONS)[number]['key'];
 async function cloneTemplates(sourceUnitId: string, targetUnitId: string, options: Set<CloneKey>) {
   const results: string[] = [];
 
+  // Run independent clones in parallel
+  const tasks: Promise<void>[] = [];
+
   if (options.has('categories')) {
-    const { data: cats } = await supabase.from('categories').select('name, color, icon, sort_order').eq('unit_id', sourceUnitId);
-    if (cats && cats.length > 0) {
-      const { error } = await supabase.from('categories').insert(cats.map(c => ({ ...c, unit_id: targetUnitId })));
-      if (error) console.error('Clone categories error:', error.message);
-      else results.push(`${cats.length} categorias`);
-    }
+    tasks.push((async () => {
+      const { data: cats } = await supabase.from('categories').select('name, color, icon, sort_order').eq('unit_id', sourceUnitId);
+      if (cats && cats.length > 0) {
+        const { error } = await supabase.from('categories').insert(cats.map(c => ({ ...c, unit_id: targetUnitId })));
+        if (!error) results.push(`${cats.length} categorias`);
+      }
+    })());
   }
 
   if (options.has('suppliers')) {
-    const { data: supps } = await supabase.from('suppliers').select('name, phone, email, notes').eq('unit_id', sourceUnitId);
-    if (supps && supps.length > 0) {
-      const { error } = await supabase.from('suppliers').insert(supps.map(s => ({ ...s, unit_id: targetUnitId })));
-      if (error) console.error('Clone suppliers error:', error.message);
-      else results.push(`${supps.length} fornecedores`);
-    }
+    tasks.push((async () => {
+      const { data: supps } = await supabase.from('suppliers').select('name, phone, email, notes').eq('unit_id', sourceUnitId);
+      if (supps && supps.length > 0) {
+        const { error } = await supabase.from('suppliers').insert(supps.map(s => ({ ...s, unit_id: targetUnitId })));
+        if (!error) results.push(`${supps.length} fornecedores`);
+      }
+    })());
   }
+
+  if (options.has('finance_categories')) {
+    tasks.push((async () => {
+      const { data: finCats } = await supabase.from('finance_categories')
+        .select('name, type, color, icon, sort_order, is_system, user_id, parent_id')
+        .eq('unit_id', sourceUnitId).is('parent_id', null);
+      if (finCats && finCats.length > 0) {
+        // Insert all parents in parallel
+        const parentInserts = await Promise.all(finCats.map(async (cat) => {
+          const { data: newParent } = await supabase.from('finance_categories')
+            .insert({ name: cat.name, type: cat.type, color: cat.color, icon: cat.icon, sort_order: cat.sort_order, is_system: cat.is_system, user_id: cat.user_id, unit_id: targetUnitId })
+            .select('id').single();
+          return { cat, newParent };
+        }));
+
+        // Get all source parent IDs at once
+        const srcParentIds = finCats.map(c => c.name + '|' + c.type);
+        const { data: srcParents } = await supabase.from('finance_categories')
+          .select('id, name, type').eq('unit_id', sourceUnitId).is('parent_id', null);
+
+        if (srcParents) {
+          const srcMap = new Map(srcParents.map(p => [p.name + '|' + p.type, p.id]));
+          
+          // Fetch all children at once
+          const srcIds = [...srcMap.values()];
+          const { data: allChildren } = await supabase.from('finance_categories')
+            .select('name, type, color, icon, sort_order, is_system, user_id, parent_id')
+            .eq('unit_id', sourceUnitId).in('parent_id', srcIds);
+
+          if (allChildren && allChildren.length > 0) {
+            const childInserts = allChildren.map(ch => {
+              const parentEntry = parentInserts.find(p => p.cat.name + '|' + p.cat.type === 
+                srcParents.find(sp => sp.id === ch.parent_id)?.name + '|' + srcParents.find(sp => sp.id === ch.parent_id)?.type
+              );
+              return parentEntry?.newParent ? { ...ch, parent_id: parentEntry.newParent.id, unit_id: targetUnitId } : null;
+            }).filter(Boolean);
+
+            if (childInserts.length > 0) {
+              await supabase.from('finance_categories').insert(childInserts as any);
+            }
+          }
+        }
+        results.push(`${finCats.length} cat. financeiras`);
+      }
+    })());
+  }
+
+  // Wait for categories/suppliers to finish before inventory (needs mapping)
+  await Promise.all(tasks);
 
   if (options.has('inventory')) {
     let categoryMap = new Map<string, string>();
-    if (options.has('categories')) {
-      const [{ data: srcCats }, { data: tgtCats }] = await Promise.all([
+    let supplierMap = new Map<string, string>();
+
+    const [catResult, suppResult] = await Promise.all([
+      options.has('categories') ? Promise.all([
         supabase.from('categories').select('id, name').eq('unit_id', sourceUnitId),
         supabase.from('categories').select('id, name').eq('unit_id', targetUnitId),
-      ]);
+      ]) : Promise.resolve(null),
+      options.has('suppliers') ? Promise.all([
+        supabase.from('suppliers').select('id, name').eq('unit_id', sourceUnitId),
+        supabase.from('suppliers').select('id, name').eq('unit_id', targetUnitId),
+      ]) : Promise.resolve(null),
+    ]);
+
+    if (catResult) {
+      const [{ data: srcCats }, { data: tgtCats }] = catResult;
       if (srcCats && tgtCats) {
         const tgtByName = new Map(tgtCats.map(c => [c.name, c.id]));
         srcCats.forEach(c => { const t = tgtByName.get(c.name); if (t) categoryMap.set(c.id, t); });
       }
     }
-    let supplierMap = new Map<string, string>();
-    if (options.has('suppliers')) {
-      const [{ data: srcS }, { data: tgtS }] = await Promise.all([
-        supabase.from('suppliers').select('id, name').eq('unit_id', sourceUnitId),
-        supabase.from('suppliers').select('id, name').eq('unit_id', targetUnitId),
-      ]);
+    if (suppResult) {
+      const [{ data: srcS }, { data: tgtS }] = suppResult;
       if (srcS && tgtS) {
         const tgtByName = new Map(tgtS.map(s => [s.name, s.id]));
         srcS.forEach(s => { const t = tgtByName.get(s.name); if (t) supplierMap.set(s.id, t); });
       }
     }
+
     const { data: items } = await supabase.from('inventory_items')
       .select('name, category_id, supplier_id, unit_type, unit_price, min_stock, recipe_unit_type, recipe_unit_price')
       .eq('unit_id', sourceUnitId);
@@ -100,18 +161,23 @@ async function cloneTemplates(sourceUnitId: string, targetUnitId: string, option
     const { data: sectors } = await supabase.from('checklist_sectors').select('id, name, color, icon, sort_order').eq('unit_id', sourceUnitId);
     if (sectors && sectors.length > 0) {
       let totalItems = 0;
-      for (const sector of sectors) {
+      // Process all sectors in parallel
+      await Promise.all(sectors.map(async (sector) => {
         const { data: newSector } = await supabase.from('checklist_sectors')
           .insert({ name: sector.name, color: sector.color, icon: sector.icon, sort_order: sector.sort_order, unit_id: targetUnitId })
           .select('id').single();
-        if (!newSector) continue;
+        if (!newSector) return;
+        
         const { data: subcats } = await supabase.from('checklist_subcategories').select('id, name, sort_order').eq('sector_id', sector.id).eq('unit_id', sourceUnitId);
-        if (!subcats) continue;
-        for (const subcat of subcats) {
+        if (!subcats) return;
+        
+        // Process subcategories in parallel
+        await Promise.all(subcats.map(async (subcat) => {
           const { data: newSubcat } = await supabase.from('checklist_subcategories')
             .insert({ name: subcat.name, sort_order: subcat.sort_order, sector_id: newSector.id, unit_id: targetUnitId })
             .select('id').single();
-          if (!newSubcat) continue;
+          if (!newSubcat) return;
+          
           const { data: checkItems } = await supabase.from('checklist_items')
             .select('name, description, frequency, checklist_type, sort_order, is_active, points')
             .eq('subcategory_id', subcat.id).eq('unit_id', sourceUnitId).is('deleted_at', null);
@@ -119,34 +185,9 @@ async function cloneTemplates(sourceUnitId: string, targetUnitId: string, option
             await supabase.from('checklist_items').insert(checkItems.map(ci => ({ ...ci, subcategory_id: newSubcat.id, unit_id: targetUnitId })));
             totalItems += checkItems.length;
           }
-        }
-      }
+        }));
+      }));
       results.push(`${sectors.length} setores, ${totalItems} itens checklist`);
-    }
-  }
-
-  if (options.has('finance_categories')) {
-    const { data: finCats } = await supabase.from('finance_categories')
-      .select('name, type, color, icon, sort_order, is_system, user_id, parent_id')
-      .eq('unit_id', sourceUnitId).is('parent_id', null);
-    if (finCats && finCats.length > 0) {
-      for (const cat of finCats) {
-        const { data: newParent } = await supabase.from('finance_categories')
-          .insert({ name: cat.name, type: cat.type, color: cat.color, icon: cat.icon, sort_order: cat.sort_order, is_system: cat.is_system, user_id: cat.user_id, unit_id: targetUnitId })
-          .select('id').single();
-        if (newParent) {
-          const { data: srcParent } = await supabase.from('finance_categories').select('id')
-            .eq('unit_id', sourceUnitId).eq('name', cat.name).eq('type', cat.type).is('parent_id', null).single();
-          if (srcParent) {
-            const { data: children } = await supabase.from('finance_categories')
-              .select('name, type, color, icon, sort_order, is_system, user_id').eq('parent_id', srcParent.id).eq('unit_id', sourceUnitId);
-            if (children && children.length > 0) {
-              await supabase.from('finance_categories').insert(children.map(ch => ({ ...ch, parent_id: newParent.id, unit_id: targetUnitId })));
-            }
-          }
-        }
-      }
-      results.push(`${finCats.length} cat. financeiras`);
     }
   }
 
