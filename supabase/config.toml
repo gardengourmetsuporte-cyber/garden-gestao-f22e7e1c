@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.marketing-generate-image]
 verify_jwt = false
+
+[functions.marketing-post-chat]
+verify_jwt = false
