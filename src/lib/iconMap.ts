@@ -176,6 +176,7 @@ export const ICON_MAP: Record<string, string> = {
   Settings2: 'tune',
   Shield: 'shield',
   Lock: 'lock',
+  Unlock: 'lock_open_right',
   LogOut: 'logout',
   Building2: 'apartment',
   Monitor: 'monitor',
