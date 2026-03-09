@@ -43,7 +43,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const canPayWithCoins = allProductsHaveCoinPrice && customerCoins !== null && customerCoins >= coinTotal;
 
   // Fetch customer coins when logged in
-  useState(() => {
+  useEffect(() => {
     if (!customerUser) return;
     const email = customerUser.email;
     if (!email) return;
@@ -56,7 +56,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
       .then(({ data }) => {
         if (data) setCustomerCoins(data.loyalty_points ?? 0);
       });
-  });
+  }, [customerUser, unitId]);
 
   if (orderSent) {
     return (
