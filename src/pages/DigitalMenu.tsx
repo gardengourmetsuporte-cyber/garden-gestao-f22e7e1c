@@ -458,6 +458,7 @@ export default function DigitalMenu() {
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
             onClear={clearCart}
+            onLogin={() => setShowAuth(true)}
           />
         </div>
       )}
