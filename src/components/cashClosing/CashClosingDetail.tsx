@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
 import { exportCashClosingPdf } from '@/lib/exportPdf';
 import { ptBR } from 'date-fns/locale';
@@ -10,6 +10,7 @@ import { AppIcon } from '@/components/ui/app-icon';
  import { Input } from '@/components/ui/input';
  import { Label } from '@/components/ui/label';
  import { ScrollArea } from '@/components/ui/scroll-area';
+ import { supabase } from '@/integrations/supabase/client';
  import {
    AlertDialog,
    AlertDialogAction,
