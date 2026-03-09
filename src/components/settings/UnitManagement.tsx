@@ -128,11 +128,18 @@ async function cloneTemplates(sourceUnitId: string, targetUnitId: string, option
       const [{ data: srcCats }, { data: tgtCats }] = catResult;
       if (srcCats && tgtCats) {
         const tgtByName = new Map(tgtCats.map(c => [c.name, c.id]));
-        srcCats.forEach(c => { const t = tgtByName.get(c.name); if (t) categoryMap.set(String(c.id), String(t) if (suppResult) {
+        srcCats.forEach(c => { const t = tgtByName.get(c.name); if (t) categoryMap.set(String(c.id), String(t)); });
+      }
+    }
+    if (suppResult) {
       const [{ data: srcS }, { data: tgtS }] = suppResult;
       if (srcS && tgtS) {
         const tgtByName = new Map(tgtS.map(s => [s.name, s.id]));
-        srcS.forEach(s => { const t = tgtByName.get(s.name); if (t)  as string, t as stringpsupplierMap.set(String(s.id), String(t)  const { data: items } = await supabase.from('inventory_items')
+        srcS.forEach(s => { const t = tgtByName.get(s.name); if (t) supplierMap.set(String(s.id), String(t)); });
+      }
+    }
+
+    const { data: items } = await supabase.from('inventory_items')
       .select('name, category_id, supplier_id, unit_type, unit_price, min_stock, recipe_unit_type, recipe_unit_price')
       .eq('unit_id', sourceUnitId);
     if (items && items.length > 0) {
