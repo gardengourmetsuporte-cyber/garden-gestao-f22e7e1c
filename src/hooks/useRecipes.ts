@@ -187,8 +187,9 @@ import { useUnit } from '@/contexts/UnitContext';
        name: string;
        category_id: string | null;
        yield_quantity: number;
-       yield_unit: string;
-       preparation_notes?: string;
+        yield_unit: string;
+        min_ready_stock?: number;
+        preparation_notes?: string;
        ingredients: Array<{
          id?: string;
         item_id: string | null;
