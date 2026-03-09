@@ -1,0 +1,2 @@
+ALTER TABLE public.audit_logs DROP CONSTRAINT audit_logs_unit_id_fkey;
+ALTER TABLE public.audit_logs ADD CONSTRAINT audit_logs_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id) ON DELETE CASCADE;
