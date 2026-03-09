@@ -17,6 +17,7 @@ import { useUnit } from '@/contexts/UnitContext';
 interface TabDef {
   key: string;
   icon: string;
+  customIcon?: string;
   label: string;
   path: string;
   moduleKey: string;
