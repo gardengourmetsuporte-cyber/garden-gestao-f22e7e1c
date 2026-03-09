@@ -570,7 +570,14 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
                     !isCancel && "shadow-lg shadow-primary/20",
                     isCancel && "flex-[0.5]"
                   )}
-                  onClick={() => handleUpdateStatus(ns)}
+                  onClick={() => {
+                    if (isCancel) {
+                      setPendingCancelOrderId(order.id);
+                      setShowPinDialog(true);
+                    } else {
+                      handleUpdateStatus(ns);
+                    }
+                  }}
                   disabled={updating}
                 >
                   {updating ? (
@@ -584,6 +591,31 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
             })}
           </div>
         )}
+
+        {/* PIN Dialog for cancellation */}
+        <PinDialog
+          open={showPinDialog}
+          onOpenChange={(open) => {
+            setShowPinDialog(open);
+            if (!open) setPendingCancelOrderId(null);
+          }}
+          title="PIN para cancelar"
+          subtitle="Permissão necessária para cancelar pedido"
+          onSubmit={async (pin) => {
+            const { authorized, userName } = await validatePinWithPermission(pin, 'menu-admin.pdv-cancel');
+            if (authorized) {
+              setShowPinDialog(false);
+              setPendingCancelOrderId(null);
+              handleUpdateStatus('cancelled');
+              return true;
+            } else {
+              if (userName) {
+                toast.error(`${userName} não tem permissão para cancelar`);
+              }
+              return false;
+            }
+          }}
+        />
       </SheetContent>
     </Sheet>
   );
