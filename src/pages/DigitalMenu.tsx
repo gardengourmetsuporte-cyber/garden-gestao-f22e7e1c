@@ -11,6 +11,7 @@ import { MenuSearch } from '@/components/digital-menu/MenuSearch';
 import { MenuCustomerAuth } from '@/components/digital-menu/MenuCustomerAuth';
 import { MenuCustomerProfile } from '@/components/digital-menu/MenuCustomerProfile';
 import { MenuAccount } from '@/components/digital-menu/MenuAccount';
+import { CustomerLeaderboard } from '@/components/digital-menu/CustomerLeaderboard';
 import { SlotMachine } from '@/components/gamification/SlotMachine';
 import { PrizeResult } from '@/components/gamification/PrizeResult';
 import { AppIcon } from '@/components/ui/app-icon';
