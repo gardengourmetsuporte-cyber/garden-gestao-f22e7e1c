@@ -179,7 +179,17 @@ export default function CardapioHub() {
   const openEditOG = (og: MenuOptionGroup) => { setEditingOG(og); setOgSheetOpen(true); };
   const openLinkProducts = (og: MenuOptionGroup) => { setLinkingOG(og); setLinkDialogOpen(true); };
 
-  // ==================== DASHBOARD VIEW ====================
+  // FAB actions — contextual per active tab
+  useFabActions(
+    isProdutos && cardapioTab === 'produtos'
+      ? [{ icon: viewMode === 'menu' ? 'RecipeBook' : 'Eye', label: viewMode === 'menu' ? 'Ficha Técnica' : 'Cardápio', onClick: () => setViewMode(v => v === 'menu' ? 'ficha' : 'menu') }]
+      : isProdutos && cardapioTab === 'opcionais'
+        ? [{ icon: 'Plus', label: 'Novo Opcional', onClick: openNewOG }]
+        : [],
+    [isProdutos, cardapioTab, viewMode]
+  );
+
+
   if (isDashboard) {
     const handleDashboardNavigate = (tab: string) => {
       if (tab === 'pedidos') {
