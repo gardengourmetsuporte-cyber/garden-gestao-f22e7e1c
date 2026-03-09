@@ -991,6 +991,7 @@ export function TransactionSheet({
       />
 
       <ListPicker
+        nested
         open={showEmployeePicker}
         onOpenChange={setShowEmployeePicker}
         title="Selecionar funcionário"

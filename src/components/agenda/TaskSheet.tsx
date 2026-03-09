@@ -216,6 +216,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
         </SheetContent>
       </Sheet>
       <ListPicker
+        nested
         open={showCategoryPicker}
         onOpenChange={setShowCategoryPicker}
         title="Categoria"

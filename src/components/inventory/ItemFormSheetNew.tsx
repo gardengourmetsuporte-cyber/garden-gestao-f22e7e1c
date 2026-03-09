@@ -356,6 +356,7 @@ export function ItemFormSheetNew({
       />
 
       <ListPicker
+        nested
         open={supplierPickerOpen}
         onOpenChange={setSupplierPickerOpen}
         title="Selecionar Fornecedor"
