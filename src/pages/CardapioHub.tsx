@@ -1,12 +1,10 @@
-import { useState, useMemo, useRef, useCallback, useEffect, lazy, Suspense } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+import { useState, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useUnit } from '@/contexts/UnitContext';
 import { useFabAction } from '@/contexts/FabActionContext';
-import { useRodizioSettings } from '@/hooks/useRodizioSettings';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
