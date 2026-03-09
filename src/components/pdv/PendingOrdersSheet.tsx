@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -331,6 +332,7 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
+  const queryClient = useQueryClient();
 
   const sortedOrders = [...orders].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   const numberedOrders = sortedOrders.map((order, idx) => ({ ...order, sequentialNumber: idx + 1 }));
@@ -379,6 +381,9 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
 
       toast.success('Entrega despachada!');
       setSelectedOrder(null);
+      // Invalidate deliveries cache so the Entregas module shows the new delivery
+      queryClient.invalidateQueries({ queryKey: ['deliveries', activeUnitId] });
+      queryClient.invalidateQueries({ queryKey: ['delivery-pending-orders', activeUnitId] });
     } catch (err: any) {
       toast.error('Erro ao despachar: ' + (err.message || 'erro'));
     } finally {
