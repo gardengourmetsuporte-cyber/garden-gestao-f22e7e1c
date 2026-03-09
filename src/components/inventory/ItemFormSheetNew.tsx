@@ -112,6 +112,10 @@ export function ItemFormSheetNew({
       unit_price: unitPrice ? parseFloat(unitPrice) : null,
       recipe_unit_type: recipeUnitType && recipeUnitType !== '__same__' ? recipeUnitType : null,
       recipe_unit_price: recipeUnitPrice ? parseFloat(recipeUnitPrice) : null,
+      stock_unit_label: stockUnitLabel.trim() || null,
+      stock_to_recipe_factor: stockToRecipeFactor ? parseFloat(stockToRecipeFactor) : null,
+      purchase_unit_label: purchaseUnitLabel.trim() || null,
+      purchase_to_stock_factor: purchaseToStockFactor ? parseFloat(purchaseToStockFactor) : null,
     });
     
     onOpenChange(false);
