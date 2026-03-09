@@ -51,7 +51,7 @@ export const NAV_ITEMS: NavItem[] = [
 
   // ── Gestão ──
   { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão', badge: 'Beta' },
-  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'gestao', groupLabel: 'Gestão', badge: 'Beta' },
+  
 ];
 
 /**
