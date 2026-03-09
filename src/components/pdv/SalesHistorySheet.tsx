@@ -225,6 +225,32 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
             )}
             {sale.notes && <div className="text-xs text-muted-foreground italic">Obs: {sale.notes}</div>}
             {sale.discount > 0 && <div className="text-xs text-muted-foreground">Desconto: -{formatCurrency(sale.discount)}</div>}
+
+            {/* Action buttons */}
+            {sale.status === 'paid' && (
+              <div className="flex gap-2 pt-2 border-t border-border/30">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 h-8 text-[11px] gap-1.5"
+                  onClick={() => setInvoiceSale(sale)}
+                >
+                  <AppIcon name="Receipt" size={13} />
+                  Nota Fiscal
+                </Button>
+                {sale.customer_phone && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 h-8 text-[11px] gap-1.5 border-emerald-500/30 text-emerald-600"
+                    onClick={() => handleResendWhatsApp(sale)}
+                  >
+                    <AppIcon name="share" size={13} />
+                    Reenviar
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </button>
