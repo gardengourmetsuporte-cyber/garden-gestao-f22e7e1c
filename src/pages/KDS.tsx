@@ -309,15 +309,15 @@ export default function KDS() {
           new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout ao carregar pedidos do KDS')), ms)),
         ]);
 
-      const { data, error } = await withTimeout(
-        supabase
+      const { data, error } = await withTimeout((async () => {
+        return supabase
           .from('tablet_orders')
           .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
           .eq('unit_id', unitId)
           .in('status', ACTIVE_STATUSES)
           .order('created_at', { ascending: true })
-          .limit(50)
-      );
+          .limit(50);
+      })());
       if (error) throw error;
       return (data as unknown as KDSOrder[]) || [];
     },
