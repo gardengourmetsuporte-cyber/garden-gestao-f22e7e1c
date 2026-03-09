@@ -38,13 +38,13 @@ export default function TabletHome() {
 
       try {
         const [unitRes, rodizioRes] = await withTimeout(Promise.all([
-          supabase.from('units').select('name, store_info').eq('id', unitId).single(),
-          supabase
+          Promise.resolve(supabase.from('units').select('name, store_info').eq('id', unitId).single()),
+          Promise.resolve(supabase
             .from('rodizio_settings')
             .select('is_active, price, description, time_limit_minutes')
             .eq('unit_id', unitId)
             .eq('is_active', true)
-            .maybeSingle(),
+            .maybeSingle()),
         ]));
 
         if (unitRes.error) throw unitRes.error;
@@ -55,6 +55,7 @@ export default function TabletHome() {
           rodizio: (rodizioRes.data as RodizioSettings | null) ?? null,
         };
       } catch (err: any) {
+        console.error('[TabletHome] Fetch error:', err?.name, err?.message);
         const msg = String(err?.message || '');
         const isAbort = err?.name === 'AbortError' || msg.toLowerCase().includes('abort');
         if (isAbort) throw new Error('Conexão instável. Tente novamente.');
