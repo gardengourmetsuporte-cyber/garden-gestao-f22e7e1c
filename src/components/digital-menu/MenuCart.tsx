@@ -146,7 +146,23 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
     if (!customerAddress.trim()) { toast.error('Informe seu endereço de entrega'); return; }
     if (feeResult?.out_of_range) { toast.error('Endereço fora da área de entrega'); return; }
 
+
     setSending(true);
+
+    // Resolve live auto-confirm from unit store_info (avoid stale cache on long-open menus)
+    let shouldAutoConfirm = autoConfirm;
+    try {
+      const { data: unitRow } = await supabase
+        .from('units')
+        .select('store_info')
+        .eq('id', unitId)
+        .maybeSingle();
+      const live = (unitRow as any)?.store_info?.auto_confirm?.delivery;
+      if (typeof live === 'boolean') shouldAutoConfirm = live;
+    } catch {
+      // keep prop fallback
+    }
+
     try {
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
