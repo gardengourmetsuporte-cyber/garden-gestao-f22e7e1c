@@ -6,52 +6,34 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
-import { useProductionOrders, ProductionRecipe } from '@/hooks/useProductionOrders';
+import { useProductionOrders, ProductionItem } from '@/hooks/useProductionOrders';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export function ProductionTab() {
   const {
-    productionRecipes, needsProduction, history,
-    isLoading, produce, isProducing, updateReadyStock,
+    productionItems, needsProduction, history,
+    isLoading, produce, isProducing, productionCategory, ensureCategory,
   } = useProductionOrders();
 
   const [showHistory, setShowHistory] = useState(false);
   const [produceSheet, setProduceSheet] = useState(false);
-  const [selectedRecipe, setSelectedRecipe] = useState<ProductionRecipe | null>(null);
+  const [selectedItem, setSelectedItem] = useState<ProductionItem | null>(null);
   const [produceQty, setProduceQty] = useState(0);
   const [produceNotes, setProduceNotes] = useState('');
 
-  const handleOpenProduce = (recipe: ProductionRecipe) => {
-    setSelectedRecipe(recipe);
-    const deficit = Math.max(0, (recipe.min_ready_stock ?? 0) - (recipe.current_ready_stock ?? 0));
+  const handleOpenProduce = (item: ProductionItem) => {
+    setSelectedItem(item);
+    const deficit = Math.max(0, item.min_stock - item.current_stock);
     setProduceQty(deficit);
     setProduceNotes('');
     setProduceSheet(true);
   };
 
   const handleConfirmProduce = async () => {
-    if (!selectedRecipe || produceQty <= 0) return;
-    await produce(selectedRecipe.id, produceQty, produceNotes || undefined);
+    if (!selectedItem || produceQty <= 0) return;
+    await produce(selectedItem.id, produceQty, produceNotes || undefined);
     setProduceSheet(false);
-  };
-
-  // Check if ingredients have enough stock
-  const getIngredientStatus = (recipe: ProductionRecipe, qty: number) => {
-    const multiplier = qty / recipe.yield_quantity;
-    return recipe.ingredients
-      .filter(i => i.source_type === 'inventory' && i.item)
-      .map(ing => {
-        const needed = ing.quantity * multiplier;
-        const available = ing.item?.current_stock ?? 0;
-        return {
-          name: ing.item?.name || '',
-          needed: Math.round(needed * 100) / 100,
-          available: Math.round(available * 100) / 100,
-          unit: ing.unit_type,
-          sufficient: available >= needed,
-        };
-      });
   };
 
   if (isLoading) {
@@ -98,14 +80,14 @@ export function ProductionTab() {
               <div key={order.id} className="bg-card rounded-2xl border border-border p-4">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
-                    <p className="font-semibold text-foreground truncate">{order.recipe?.name}</p>
+                    <p className="font-semibold text-foreground truncate">{order.item?.name || '—'}</p>
                     <p className="text-xs text-muted-foreground">
                       {format(new Date(order.created_at), "dd MMM, HH:mm", { locale: ptBR })}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-primary">+{order.quantity}</span>
-                    <span className="text-xs text-muted-foreground">{order.recipe?.yield_unit}</span>
+                    <span className="text-xs text-muted-foreground">{order.item?.unit_type || ''}</span>
                   </div>
                 </div>
                 {order.notes && (
@@ -117,24 +99,40 @@ export function ProductionTab() {
         )
       ) : (
         /* Production List */
-        productionRecipes.length === 0 ? (
+        !productionCategory ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center">
+              <AppIcon name="ChefHat" size={28} className="text-amber-400" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">Categoria "Produção" não encontrada</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Crie uma categoria chamada <strong>Produção</strong> no estoque e adicione os itens que você produz internamente.
+              </p>
+            </div>
+            <Button onClick={() => ensureCategory()} className="gap-2 rounded-xl">
+              <AppIcon name="Plus" size={14} />
+              Criar categoria Produção
+            </Button>
+          </div>
+        ) : productionItems.length === 0 ? (
           <EmptyState
-            icon="ChefHat"
-            title="Nenhuma receita configurada"
-            subtitle="Configure o estoque mínimo de produção nas fichas técnicas"
+            icon="Package"
+            title="Nenhum item de produção"
+            subtitle="Adicione itens à categoria 'Produção' no estoque com estoque mínimo configurado"
           />
         ) : (
           <div className="space-y-2">
-            {productionRecipes.map((recipe, i) => {
-              const current = recipe.current_ready_stock ?? 0;
-              const min = recipe.min_ready_stock ?? 0;
+            {productionItems.map((item, i) => {
+              const current = item.current_stock;
+              const min = item.min_stock;
               const deficit = Math.max(0, min - current);
               const isBelowMin = current < min;
               const percentage = min > 0 ? Math.min(100, (current / min) * 100) : 100;
 
               return (
                 <div
-                  key={recipe.id}
+                  key={item.id}
                   className={cn(
                     "bg-card rounded-2xl border overflow-hidden transition-all animate-fade-in",
                     isBelowMin ? "border-amber-500/30" : "border-border"
@@ -144,15 +142,7 @@ export function ProductionTab() {
                   <div className="p-4">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          {recipe.category && (
-                            <span
-                              className="w-2 h-2 rounded-full shrink-0"
-                              style={{ backgroundColor: recipe.category.color }}
-                            />
-                          )}
-                          <p className="font-semibold text-foreground truncate">{recipe.name}</p>
-                        </div>
+                        <p className="font-semibold text-foreground truncate">{item.name}</p>
                         <div className="flex items-center gap-3 mt-1">
                           <span className={cn(
                             "text-sm font-bold tabular-nums",
@@ -160,14 +150,14 @@ export function ProductionTab() {
                           )}>
                             {current} / {min}
                           </span>
-                          <span className="text-xs text-muted-foreground">{recipe.yield_unit}</span>
+                          <span className="text-xs text-muted-foreground">{item.unit_type}</span>
                         </div>
                       </div>
 
                       {isBelowMin ? (
                         <Button
                           size="sm"
-                          onClick={() => handleOpenProduce(recipe)}
+                          onClick={() => handleOpenProduce(item)}
                           className="gap-1.5 rounded-xl shadow-lg shadow-primary/20 shrink-0"
                         >
                           <AppIcon name="Plus" size={14} />
@@ -203,14 +193,26 @@ export function ProductionTab() {
       <Sheet open={produceSheet} onOpenChange={setProduceSheet}>
         <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto">
           <SheetHeader>
-            <SheetTitle className="text-left">Produzir: {selectedRecipe?.name}</SheetTitle>
+            <SheetTitle className="text-left">Produzir: {selectedItem?.name}</SheetTitle>
           </SheetHeader>
 
-          {selectedRecipe && (
+          {selectedItem && (
             <div className="space-y-4 mt-4">
+              {/* Current status */}
+              <div className="bg-secondary/50 rounded-xl p-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Estoque atual</span>
+                  <span className="font-bold text-foreground">{selectedItem.current_stock} {selectedItem.unit_type}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm mt-1">
+                  <span className="text-muted-foreground">Estoque mínimo</span>
+                  <span className="font-bold text-foreground">{selectedItem.min_stock} {selectedItem.unit_type}</span>
+                </div>
+              </div>
+
               {/* Quantity */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Quantidade a produzir</label>
+                <label className="text-sm font-medium text-foreground">Quantidade produzida</label>
                 <div className="flex items-center gap-3">
                   <Button
                     variant="outline" size="icon"
@@ -230,35 +232,9 @@ export function ProductionTab() {
                   >
                     <AppIcon name="Plus" size={16} />
                   </Button>
-                  <span className="text-sm text-muted-foreground">{selectedRecipe.yield_unit}</span>
+                  <span className="text-sm text-muted-foreground">{selectedItem.unit_type}</span>
                 </div>
               </div>
-
-              {/* Ingredients check */}
-              {produceQty > 0 && (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-foreground">Ingredientes necessários</p>
-                  <div className="bg-secondary/50 rounded-xl p-3 space-y-2">
-                    {getIngredientStatus(selectedRecipe, produceQty).map((ing, i) => (
-                      <div key={i} className="flex items-center justify-between text-sm">
-                        <span className="text-foreground truncate">{ing.name}</span>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className={cn(
-                            "font-medium tabular-nums",
-                            ing.sufficient ? "text-emerald-400" : "text-destructive"
-                          )}>
-                            {ing.available}
-                          </span>
-                          <span className="text-muted-foreground">/</span>
-                          <span className="font-medium tabular-nums text-foreground">{ing.needed}</span>
-                          <span className="text-xs text-muted-foreground">{ing.unit}</span>
-                          {!ing.sufficient && <AppIcon name="AlertTriangle" size={12} className="text-destructive" />}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Notes */}
               <div className="space-y-2">
@@ -278,7 +254,7 @@ export function ProductionTab() {
                 disabled={isProducing || produceQty <= 0}
               >
                 <AppIcon name="ChefHat" size={18} />
-                {isProducing ? 'Registrando...' : `Confirmar Produção (+${produceQty} ${selectedRecipe.yield_unit})`}
+                {isProducing ? 'Registrando...' : `Confirmar Produção (+${produceQty} ${selectedItem.unit_type})`}
               </Button>
             </div>
           )}
