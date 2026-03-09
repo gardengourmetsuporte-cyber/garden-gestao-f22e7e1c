@@ -63,7 +63,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   if (isSigningOut) {
     return (
       <div className="animate-fade-in">
-        <PageLoader />
+        <PageLoader logoUrl={customLogo} />
       </div>
     );
   }
