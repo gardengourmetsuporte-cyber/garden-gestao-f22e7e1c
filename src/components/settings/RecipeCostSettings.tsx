@@ -46,13 +46,14 @@ import { AppIcon } from '@/components/ui/app-icon';
    };
  
    const handleSave = () => {
-     saveSettings({
-       monthly_products_sold: parseFloat(monthlyProductsSold) || 1000,
-       tax_percentage: parseFloat(taxPercentage) || 0,
-       card_fee_percentage: parseFloat(cardFeePercentage) || 0,
-       packaging_cost_per_unit: parseFloat(packagingCostPerUnit) || 0,
-       fixed_cost_category_ids: selectedCategoryIds,
-     });
+      saveSettings({
+        monthly_products_sold: parseFloat(monthlyProductsSold) || 1000,
+        monthly_revenue: parseFloat(monthlyRevenue) || 50000,
+        tax_percentage: parseFloat(taxPercentage) || 0,
+        card_fee_percentage: parseFloat(cardFeePercentage) || 0,
+        packaging_cost_per_unit: parseFloat(packagingCostPerUnit) || 0,
+        fixed_cost_category_ids: selectedCategoryIds,
+      });
    };
  
    const costPerProduct = parseFloat(monthlyProductsSold) > 0
