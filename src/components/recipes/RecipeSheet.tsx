@@ -163,9 +163,10 @@ export function RecipeSheet({
   const portions = parseFloat(yieldQuantity) || 1;
   const costPerPortion = ingredientsCost / portions;
 
+  const currentSellingPrice = parseFloat(sellingPrice) || 0;
   const operationalCosts = useMemo(
-    () => calculateOperationalCosts(costPerPortion),
-    [costPerPortion, settings]
+    () => calculateOperationalCosts(costPerPortion, currentSellingPrice > 0 ? currentSellingPrice : undefined),
+    [costPerPortion, currentSellingPrice, settings]
   );
 
   const variableCost = costPerPortion + operationalCosts.packagingCost;

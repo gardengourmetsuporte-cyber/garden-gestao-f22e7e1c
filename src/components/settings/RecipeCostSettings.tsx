@@ -162,17 +162,27 @@ import { AppIcon } from '@/components/ui/app-icon';
                )}
              </div>
  
-             {/* Resumo do Custo Fixo */}
-             <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-               <div className="flex justify-between text-sm">
-                 <span className="text-muted-foreground">Custo Fixo Mensal:</span>
-                 <span className="font-medium">{formatCurrency(monthlyFixedCost)}</span>
-               </div>
-               <div className="flex justify-between text-sm">
-                 <span className="text-muted-foreground">Custo por Produto:</span>
-                 <span className="font-bold text-primary">{formatCurrency(costPerProduct)}</span>
-               </div>
-             </div>
+              {/* Resumo do Custo Fixo */}
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Custo Fixo Mensal:</span>
+                  <span className="font-medium">{formatCurrency(monthlyFixedCost)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Faturamento Estimado:</span>
+                  <span className="font-medium">{formatCurrency(revenue)}</span>
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <p className="text-xs text-muted-foreground mb-1">Exemplo de rateio proporcional:</p>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Produto de R$ {examplePrice}:</span>
+                    <span className="font-bold text-primary">{formatCurrency(costPerProduct)}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground italic">
+                  Fórmula: (Preço do Produto ÷ Faturamento Mensal) × Custo Fixo
+                </p>
+              </div>
            </CardContent>
          </Card>
  
