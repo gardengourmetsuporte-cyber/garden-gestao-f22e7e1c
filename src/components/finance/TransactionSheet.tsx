@@ -964,6 +964,7 @@ export function TransactionSheet({
       />
 
       <ListPicker
+        nested
         open={showToAccountPicker}
         onOpenChange={setShowToAccountPicker}
         title="Conta de destino"
