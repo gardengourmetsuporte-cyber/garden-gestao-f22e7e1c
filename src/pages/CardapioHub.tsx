@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
+import { useState, useMemo, useRef, useCallback, lazy, Suspense, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
