@@ -242,7 +242,7 @@ export default function CopilotPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 overscroll-contain">
+        <div className="flex-1 overflow-y-auto px-4 py-4 pb-2 space-y-3 overscroll-contain">
           <BriefingCard stats={stats} contextStats={contextStats} visible={messages.length <= 2} />
 
           {messages.map((msg, i) => {
