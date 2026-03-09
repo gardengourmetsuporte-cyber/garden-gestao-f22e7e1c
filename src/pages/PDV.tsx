@@ -261,11 +261,24 @@ export default function PDV() {
                           Cobrar
                         </Button>
                       </>
-                    ) : (
-                      <Button size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
-                        <AppIcon name="Send" size={14} className="mr-1" />
-                        Enviar Pedido
+                    ) : activeOrderId && !hasNewItems ? (
+                      <Button size="sm" onClick={() => setPaymentOpen(true)}>
+                        <AppIcon name="Banknote" size={14} className="mr-1" />
+                        Cobrar
                       </Button>
+                    ) : (
+                      <>
+                        {activeOrderId && hasNewItems && (
+                          <Button variant="outline" size="sm" onClick={() => setPaymentOpen(true)}>
+                            <AppIcon name="Banknote" size={14} className="mr-1" />
+                            Cobrar
+                          </Button>
+                        )}
+                        <Button size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
+                          <AppIcon name="Send" size={14} className="mr-1" />
+                          Enviar Pedido
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
