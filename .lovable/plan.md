@@ -1,15 +1,17 @@
+## Plano: Central de Configurações do Cardápio ✅
 
+### Implementado
 
-## Ajuste do layout do chat do Copiloto
+A aba "Pedidos" no bottom nav do Cardápio foi transformada em **Central de Configurações** com seções colapsáveis (Accordion):
 
-### Problema
-O container do chat usa `h-[calc(100vh-3.5rem)]` que não desconta a altura da barra de navegação inferior (mobile). O `pb-20` na barra de input tenta compensar, mas cria espaço morto e o input fica parcialmente coberto pela tab bar.
+- **Solução Delivery**: Sobre, delivery & retirada, áreas e taxas, pagamento, horários
+- **Solução Tablet**: Integração PDV, mesas & QR codes, chave Pix
+- **QR Code Balcão**: Link externo (`/m/:unitId?source=qrcode`) para cliente escanear e pedir pelo celular
+- **Gamificação**: Roleta de prêmios e probabilidades
+- **Rodízio**: Preço fixo, regras e categorias
 
-### Solução
-1. **Ajustar altura do container** para descontar a tab bar no mobile: `h-[calc(100vh-3.5rem-5rem)]` (mobile) e manter `lg:h-[calc(100vh)]` (desktop sem tab bar)
-2. **Remover o `pb-20`** excessivo da barra de input e usar `pb-3` uniforme
-3. **Adicionar `pb-2`** na área de mensagens para breathing room antes do input
-
-### Arquivo editado
-- `src/pages/Copilot.tsx` — ajustar classes do container principal e da barra de input
-
+### Arquivos alterados
+- `src/components/layout/BottomTabBar.tsx` — Tab renomeado de "Pedidos" (ShoppingBag) para "Config" (Settings)
+- `src/components/cardapio/CardapioConfigHub.tsx` — **Novo** — Hub de configurações com Accordion
+- `src/pages/CardapioHub.tsx` — Renderiza CardapioConfigHub quando `?tab=pedidos`
+- `src/components/settings/CardapioSettings.tsx` — Prop `embedded` para uso inline sem hub/back button

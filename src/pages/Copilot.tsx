@@ -169,7 +169,7 @@ export default function CopilotPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-[calc(100vh-3.5rem)] lg:h-screen">
+      <div className="flex flex-col h-[calc(100vh-3.5rem-5rem)] lg:h-screen">
         {/* Toolbar */}
         <div className="shrink-0 border-b border-border/20 bg-card/60 backdrop-blur-sm">
           <div className="flex items-center gap-3 h-12 px-4">
@@ -242,7 +242,7 @@ export default function CopilotPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 overscroll-contain">
+        <div className="flex-1 overflow-y-auto px-4 py-4 pb-2 space-y-3 overscroll-contain">
           <BriefingCard stats={stats} contextStats={contextStats} visible={messages.length <= 2} />
 
           {messages.map((msg, i) => {
@@ -336,7 +336,7 @@ export default function CopilotPage() {
         />
 
         {/* Input bar — pb-20 to clear bottom tab bar on mobile */}
-        <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3 pb-20 lg:pb-3">
+        <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3">
           <form onSubmit={handleSubmit} className="flex gap-2 items-center">
             <Button
               type="button"
