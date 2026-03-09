@@ -295,8 +295,8 @@ export default function OrdersPage() {
                   {renderCard(supplierTab, true)}
                   {renderCard(smallTabs[0], true)}
                 </div>
-                {/* Bottom row: Lista, Cotações, Histórico */}
-                <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-3">
+                {/* Bottom row: Lista, Cotações, Histórico, Produção */}
+                <div className="grid grid-cols-4 gap-2 lg:grid-cols-5 lg:gap-3">
                   {smallTabs.slice(1).map(tab => renderCard(tab))}
                 </div>
               </div>
