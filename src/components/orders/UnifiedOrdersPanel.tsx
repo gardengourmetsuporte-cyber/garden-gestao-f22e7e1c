@@ -16,6 +16,7 @@ const formatPrice = (v: number) => v.toLocaleString('pt-BR', { style: 'currency'
 
 const statusColor: Record<string, string> = {
   draft: 'bg-secondary text-muted-foreground',
+  pending: 'bg-warning/15 text-warning',
   awaiting_confirmation: 'bg-warning/15 text-warning',
   confirmed: 'bg-primary/15 text-primary',
   preparing: 'bg-amber-500/15 text-amber-500',
@@ -31,6 +32,7 @@ const statusColor: Record<string, string> = {
 
 const statusLabel: Record<string, string> = {
   draft: 'Rascunho',
+  pending: 'Pendente',
   awaiting_confirmation: 'Aguardando',
   confirmed: 'Confirmado',
   preparing: 'Preparando',
@@ -54,6 +56,13 @@ const platformLabel: Record<string, string> = {
 
 // Status flow for tablet delivery orders
 const TABLET_STATUS_FLOW: Record<string, { next: string[]; labels: Record<string, { label: string; icon: string; variant: 'default' | 'destructive' | 'outline' }> }> = {
+  pending: {
+    next: ['confirmed', 'cancelled'],
+    labels: {
+      confirmed: { label: 'Aceitar pedido', icon: 'check_circle', variant: 'default' },
+      cancelled: { label: 'Recusar', icon: 'cancel', variant: 'destructive' },
+    },
+  },
   awaiting_confirmation: {
     next: ['confirmed', 'cancelled'],
     labels: {
@@ -96,7 +105,7 @@ interface Props {
 export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
   const {
     activeTab, setActiveTab,
-    comandas, deliveryOrders, hubOrders,
+    balcaoOrders, comandas, deliveryOrders, hubOrders,
     hubUpdateStatus, hubGetNextStatuses,
     isLoading, stats,
   } = useUnifiedOrders(unitId);
@@ -104,15 +113,16 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
   const [selectedOrder, setSelectedOrder] = useState<TabletOrder | null>(null);
 
   const tabs: { id: UnifiedTab; label: string; icon: string; count: number; badge?: number }[] = [
+    { id: 'balcao', label: 'Balcão', icon: 'Store', count: stats.balcao, badge: stats.balcaoPending },
     { id: 'comandas', label: 'Comandas', icon: 'Receipt', count: stats.comandas, badge: stats.comandasPending },
     { id: 'delivery', label: 'Delivery', icon: 'Truck', count: stats.delivery, badge: stats.deliveryPending },
-    { id: 'ifood', label: 'iFood/Rappi', icon: 'Store', count: stats.ifood, badge: stats.ifoodNew },
+    { id: 'ifood', label: 'iFood/Rappi', icon: 'ShoppingBag', count: stats.ifood, badge: stats.ifoodNew },
   ];
 
   return (
     <div className="space-y-3">
       {/* Tab cards */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -147,6 +157,10 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
       </div>
 
       {/* Content */}
+      {activeTab === 'balcao' && (
+        <TabletOrderList orders={balcaoOrders} emptyIcon="Store" emptyTitle="Nenhum pedido no balcão" emptySubtitle="Pedidos para retirada aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
+      )}
+
       {activeTab === 'comandas' && (
         <TabletOrderList orders={comandas} emptyIcon="QrCode" emptyTitle="Nenhuma comanda" emptySubtitle="Pedidos feitos nas mesas aparecerão aqui" onRetryPDV={onRetryPDV} showTable onOpenOrder={setSelectedOrder} />
       )}

@@ -3,8 +3,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useDeliveryHub, HubOrder } from './useDeliveryHub';
 
-export type OrderSource = 'mesa' | 'delivery';
-export type UnifiedTab = 'comandas' | 'delivery' | 'ifood';
+export type OrderSource = 'mesa' | 'delivery' | 'balcao';
+export type UnifiedTab = 'balcao' | 'comandas' | 'delivery' | 'ifood';
 
 export interface TabletOrder {
   id: string;
@@ -63,6 +63,11 @@ export function useUnifiedOrders(unitId: string | undefined) {
   // Delivery hub (iFood/Rappi)
   const deliveryHub = useDeliveryHub(unitId);
 
+  const balcaoOrders = useMemo(() =>
+    tabletOrders.filter(o => o.source === 'balcao'),
+    [tabletOrders]
+  );
+
   const comandas = useMemo(() =>
     tabletOrders.filter(o => (o.source || 'mesa') === 'mesa'),
     [tabletOrders]
@@ -74,17 +79,20 @@ export function useUnifiedOrders(unitId: string | undefined) {
   );
 
   const stats = useMemo(() => ({
+    balcao: balcaoOrders.length,
     comandas: comandas.length,
     delivery: deliveryOrders.length,
     ifood: deliveryHub.stats.total,
+    balcaoPending: balcaoOrders.filter(o => ['awaiting_confirmation', 'confirmed', 'pending'].includes(o.status)).length,
     comandasPending: comandas.filter(o => ['awaiting_confirmation', 'confirmed'].includes(o.status)).length,
     deliveryPending: deliveryOrders.filter(o => ['awaiting_confirmation', 'confirmed'].includes(o.status)).length,
     ifoodNew: deliveryHub.stats.new,
-  }), [comandas, deliveryOrders, deliveryHub.stats]);
+  }), [balcaoOrders, comandas, deliveryOrders, deliveryHub.stats]);
 
   return {
     activeTab,
     setActiveTab,
+    balcaoOrders,
     comandas,
     deliveryOrders,
     hubOrders: deliveryHub.orders,
