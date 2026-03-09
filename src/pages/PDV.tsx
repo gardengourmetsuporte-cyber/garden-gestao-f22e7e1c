@@ -366,55 +366,6 @@ export default function PDV() {
                   ))}
                 </div>
 
-                {/* Source selector */}
-                <div className="flex gap-1.5">
-                  {([
-                    { key: 'balcao', label: 'Balcão', icon: 'Store' },
-                    { key: 'mesa', label: 'Mesa', icon: 'UtensilsCrossed' },
-                    { key: 'delivery', label: 'Delivery', icon: 'two_wheeler' },
-                  ] as const).map(s => (
-                    <button
-                      key={s.key}
-                      onClick={() => pos.setSaleSource(s.key)}
-                      className={cn(
-                        'flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all',
-                        pos.saleSource === s.key
-                          ? 'bg-primary/15 text-primary border border-primary/30'
-                          : 'bg-secondary/50 text-muted-foreground border border-transparent'
-                      )}
-                    >
-                      <AppIcon name={s.icon} size={12} />
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Context fields */}
-                {pos.saleSource === 'balcao' && (
-                  <div className="flex gap-1.5">
-                    <Input placeholder="Nome do cliente" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1 rounded-xl" />
-                    <Input placeholder="CPF" value={pos.customerDocument} onChange={e => pos.setCustomerDocument(e.target.value)} className="h-8 text-xs w-28 rounded-xl" />
-                  </div>
-                )}
-                {pos.saleSource === 'mesa' && (
-                  <div className="flex gap-1.5">
-                    <Input type="number" placeholder="Nº mesa" value={pos.tableNumber ?? ''} onChange={e => pos.setTableNumber(e.target.value ? Number(e.target.value) : null)} className="h-8 text-xs w-20 rounded-xl" inputMode="numeric" />
-                    <Input placeholder="Nome (opcional)" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1 rounded-xl" />
-                  </div>
-                )}
-                {pos.saleSource === 'delivery' && (
-                  <div className="space-y-1.5">
-                    <div className="flex gap-1.5">
-                      <Input placeholder="Nome do cliente" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1 rounded-xl" />
-                      <Input placeholder="Telefone" value={pos.deliveryPhone} onChange={e => pos.setDeliveryPhone(e.target.value)} className="h-8 text-xs w-28 rounded-xl" inputMode="tel" />
-                    </div>
-                    <PDVDeliveryAddress
-                      value={pos.deliveryAddress}
-                      onChange={pos.setDeliveryAddress}
-                    />
-                  </div>
-                )}
-
                 {/* Footer: total + actions */}
                 <div className="space-y-2 pt-0.5">
                   <div className="flex items-center justify-between">
