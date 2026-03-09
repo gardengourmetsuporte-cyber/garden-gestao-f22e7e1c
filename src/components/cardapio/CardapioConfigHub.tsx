@@ -50,11 +50,23 @@ export function CardapioConfigHub() {
                 <QRCodeBalcaoSection url={qrCodeUrl} />
               ) : section.id === 'tablet' ? (
                 <Suspense fallback={<SectionSkeleton />}>
-                  <CardapioSettings initialTab="pdv" />
+                  <CardapioSettings initialTab="pdv" embedded />
+                </Suspense>
+              ) : section.id === 'delivery' ? (
+                <Suspense fallback={<SectionSkeleton />}>
+                  <CardapioSettings initialTab="config" embedded />
+                </Suspense>
+              ) : section.id === 'gamificacao' ? (
+                <Suspense fallback={<SectionSkeleton />}>
+                  <CardapioSettings initialTab="roleta" embedded />
+                </Suspense>
+              ) : section.id === 'rodizio' ? (
+                <Suspense fallback={<SectionSkeleton />}>
+                  <CardapioSettings initialTab="rodizio" embedded />
                 </Suspense>
               ) : (
                 <Suspense fallback={<SectionSkeleton />}>
-                  <CardapioSettings initialTab={section.settingsTab} />
+                  <CardapioSettings initialTab={section.settingsTab} embedded />
                 </Suspense>
               )}
             </AccordionContent>
