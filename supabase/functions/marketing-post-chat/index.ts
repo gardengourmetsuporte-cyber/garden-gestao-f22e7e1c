@@ -84,9 +84,11 @@ REGRAS:
 5. Use o nome "${unitName}" nos posts quando apropriado.
 6. Gere legendas prontas para copiar/colar com hashtags relevantes.
 7. Sugira horários ideais para publicação.
-8. Inclua um prompt de imagem em inglês para geração de arte quando usar create_post.`;
+8. Inclua um prompt de imagem em inglês para geração de arte quando usar create_post.
+9. Quando o usuário enviar uma IMAGEM de referência (criativo, arte, post de concorrente, etc.), analise o layout, estilo visual, cores, tipografia e tom da mensagem. Em seguida, REPRODUZA o conceito adaptado para "${unitName}" usando APENAS os dados reais (produtos, preços, marca). Descreva o que identificou na imagem e gere o post correspondente.`;
 
-    const aiMessages = [
+    // Build AI messages - support multimodal content (images)
+    const aiMessages: any[] = [
       { role: "system", content: systemPrompt },
       ...messages,
     ];
