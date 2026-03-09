@@ -145,6 +145,7 @@ export const ALL_MODULES: ModuleDef[] = [
       { key: 'menu-admin.orders', label: 'Pedidos em tempo real', icon: 'ShoppingCart' },
       { key: 'menu-admin.tables', label: 'Mesas e QR Codes', icon: 'QrCode' },
       { key: 'menu-admin.pdv', label: 'Conexão PDV (Colibri)', icon: 'Monitor' },
+      { key: 'menu-admin.pdv-cancel', label: 'Cancelar pedidos no PDV', icon: 'Ban' },
       { key: 'menu-admin.game', label: 'Roleta / Gamificação', icon: 'Dices' },
     ],
   },

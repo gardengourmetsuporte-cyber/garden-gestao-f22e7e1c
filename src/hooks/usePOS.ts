@@ -355,6 +355,75 @@ export function usePOS() {
     }
   }, [activeUnitId, user, cart, saleSource, customerName, deliveryPhone, deliveryAddress, tableNumber, total, clearCart, fetchPendingOrders]);
 
+  // Cancel order
+  const cancelOrder = useCallback(async (orderId: string) => {
+    if (!activeUnitId) return false;
+    try {
+      // Cancel the tablet order
+      const { error: orderErr } = await supabase
+        .from('tablet_orders')
+        .update({ status: 'cancelled' })
+        .eq('id', orderId);
+      if (orderErr) throw orderErr;
+
+      // Cancel linked pos_sale if exists
+      await supabase
+        .from('pos_sales')
+        .update({ status: 'cancelled' })
+        .eq('source_order_id', orderId)
+        .eq('unit_id', activeUnitId);
+
+      toast.success('Pedido cancelado!');
+      clearCart();
+      fetchPendingOrders();
+      return true;
+    } catch (err: any) {
+      toast.error('Erro ao cancelar: ' + err.message);
+      return false;
+    }
+  }, [activeUnitId, clearCart, fetchPendingOrders]);
+
+  // Validate PIN and check permission
+  const validatePinWithPermission = useCallback(async (pin: string, requiredModule: string): Promise<{ authorized: boolean; userName: string }> => {
+    if (!activeUnitId) return { authorized: false, userName: '' };
+
+    // Find employee by PIN
+    const { data: emp } = await supabase
+      .from('employees')
+      .select('user_id, full_name')
+      .eq('unit_id', activeUnitId)
+      .eq('quick_pin', pin)
+      .eq('is_active', true)
+      .not('user_id', 'is', null)
+      .maybeSingle();
+
+    if (!emp?.user_id) return { authorized: false, userName: '' };
+
+    // Check access level
+    const { data: uu } = await supabase
+      .from('user_units')
+      .select('access_level_id, role')
+      .eq('user_id', emp.user_id)
+      .eq('unit_id', activeUnitId)
+      .maybeSingle();
+
+    // Owner/admin always authorized
+    if (uu?.role === 'owner' || uu?.role === 'admin') {
+      return { authorized: true, userName: emp.full_name };
+    }
+
+    if (!uu?.access_level_id) return { authorized: false, userName: emp.full_name };
+
+    const { data: al } = await supabase
+      .from('access_levels')
+      .select('modules')
+      .eq('id', uu.access_level_id)
+      .maybeSingle();
+
+    const hasPermission = al?.modules?.includes(requiredModule) ?? false;
+    return { authorized: hasPermission, userName: emp.full_name };
+  }, [activeUnitId]);
+
   return {
     products, categories, cart, pendingOrders,
     loadingProducts, loadingOrders, savingSale,
@@ -369,5 +438,6 @@ export function usePOS() {
     subtotal, total,
     addToCart, updateCartItem, removeFromCart, clearCart,
     loadOrderIntoCart, finalizeSale, sendOrder, fetchPendingOrders,
+    cancelOrder, validatePinWithPermission,
   };
 }
