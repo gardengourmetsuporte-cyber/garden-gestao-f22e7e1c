@@ -98,7 +98,11 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
       toast.error('Informe o número da mesa');
       return;
     }
-    if (!customerName.trim()) {
+    // Use logged-in user name or manual input
+    const finalName = customerUser
+      ? (customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || customerUser.email || 'Cliente')
+      : customerName.trim();
+    if (!finalName) {
       toast.error('Informe seu nome');
       return;
     }
