@@ -40,17 +40,17 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Truck', customIcon: '/icons/motocicleta.png', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Monitor', label: 'PDV', href: '/pdv', group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'BookOpen', customIcon: '/icons/cardapio-digital.png', label: 'Cardápio Digital', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
+  { icon: 'MessageCircle', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
 
   // ── Pessoas ──
   { icon: 'Users', customIcon: '/icons/funcionarios.png', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Gift', customIcon: '/icons/gift.png', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Trophy', customIcon: '/icons/trophy.png', label: 'Ranking', href: '/ranking', group: 'pessoas', groupLabel: 'Pessoas' },
 
-  // ── Em Desenvolvimento ──
-  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'premium', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
-  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'premium', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
-  { icon: 'BookOpen', customIcon: '/icons/cardapio-digital.png', label: 'Cardápio Digital', href: '/cardapio', adminOnly: true, group: 'premium', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
-  { icon: 'MessageCircle', label: 'WhatsApp', href: '/whatsapp', adminOnly: true, group: 'premium', groupLabel: 'Em Desenvolvimento', badge: 'Beta' },
+  // ── Gestão ──
+  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão', badge: 'Beta' },
+  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'gestao', groupLabel: 'Gestão', badge: 'Beta' },
 ];
 
 /**
