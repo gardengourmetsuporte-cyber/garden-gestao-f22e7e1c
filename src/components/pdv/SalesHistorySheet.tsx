@@ -392,6 +392,18 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
             </div>
           )}
         </div>
+
+        {invoiceSale && (
+          <InvoiceSheet
+            open={!!invoiceSale}
+            onOpenChange={(open) => { if (!open) setInvoiceSale(null); }}
+            saleId={invoiceSale.id}
+            total={invoiceSale.total}
+            customerName={invoiceSale.customer_name || ''}
+            payments={invoiceSale.payments.map(p => ({ method: p.method, amount: p.amount }))}
+            items={invoiceSale.items.map(i => ({ name: i.product_name, quantity: i.quantity, unit_price: i.unit_price }))}
+          />
+        )}
       </SheetContent>
     </Sheet>
   );
