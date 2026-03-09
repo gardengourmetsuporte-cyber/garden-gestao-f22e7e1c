@@ -14,7 +14,6 @@ const tabs: { key: MenuTab; icon: string; iconFilled: string; label: string }[] 
   { key: 'menu', icon: 'RestaurantMenu', iconFilled: 'RestaurantMenu', label: 'Cardápio' },
   { key: 'ranking', icon: 'EmojiEvents', iconFilled: 'EmojiEvents', label: 'Ranking' },
   { key: 'cart', icon: 'ShoppingBag', iconFilled: 'ShoppingBag', label: 'Pedido' },
-  { key: 'game', icon: 'Casino', iconFilled: 'Casino', label: 'Roleta' },
 ];
 
 export function MenuBottomNav({ active, onTabChange, cartCount }: Props) {
