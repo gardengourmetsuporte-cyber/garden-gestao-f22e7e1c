@@ -122,12 +122,12 @@ export default function TabletHome() {
       },
       {
         id: 'conta',
-        icon: 'User',
+        icon: 'Receipt',
         label: 'Minha Conta',
-        subtitle: 'Seus dados e pedidos',
+        subtitle: 'Fechar conta da mesa',
         color: 'hsl(var(--muted-foreground))',
         bgColor: 'hsl(var(--secondary))',
-        onClick: () => {},
+        onClick: () => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`),
       },
     ];
   }, [mesa, navigate, rodizio, unitId]);

@@ -4736,6 +4736,60 @@ export type Database = {
           },
         ]
       }
+      table_bills: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          id: string
+          paid_at: string | null
+          payment_method: string | null
+          status: string
+          table_number: number
+          total: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string
+          table_number: number
+          total?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string
+          table_number?: number
+          total?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "table_bills_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "table_bills_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tablet_order_items: {
         Row: {
           created_at: string

@@ -1,59 +1,45 @@
 
 
-## Plano: Sistema de Fechamento de Conta no Tablet + Fundação de Moedas/Cashback
+## Plano: Substituir saudação por header contextual integrado ao top bar
 
-### Escopo Fase 1 (agora)
-Sistema de fechamento de conta na mesa via tablet: o cliente vê o resumo dos pedidos da mesa, escolhe forma de pagamento (Pix com QR code no tablet, ou pagamento online via login), e um garçom finaliza.
+### O que muda
 
-### Escopo Fase 2 (futuro, fundação agora)
-Sistema de moedas internas (coins) — cashback por compra, bônus por cadastro, feedback, etc. O cliente acumula moedas e troca por produtos. A fundação será o campo `loyalty_points` já existente no `customers`, renomeado conceitualmente para "moedas".
+A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
 
----
+### Conceito visual
 
-### Mudanças
+```text
+┌──────────────────────────────────┐
+│  [logo]          [bell] [avatar] │  ← top bar (já existe)
+├──────────────────────────────────┤
+│                                  │
+│  Olá, Bruno                      │  ← greeting inline, menor
+│  ┌────────┐ ┌────────┐ ┌──────┐ │
+│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
+│  │pendente│ │tarefas │ │alertas│ │     dados do dia
+│  └────────┘ └────────┘ └──────┘ │
+│                                  │
+└──────────────────────────────────┘
+```
 
-**1. Migração DB**
-- Adicionar campo `pix_key` (text) na `store_info` JSON da unidade (configurável nas settings)
-- Adicionar campo `pix_key_type` (text: cpf, cnpj, email, telefone, aleatoria)
-- Criar tabela `table_bills` para agrupar pedidos de uma mesa em uma conta:
-  - `id`, `unit_id`, `table_number`, `customer_id` (nullable), `status` (open/paid/cancelled), `total`, `payment_method`, `paid_at`, `created_at`
-- Ou reutilizar a lógica existente de `tablet_orders` agrupando por mesa + status
+### Implementação
 
-**2. Nova página: `/tablet/:unitId/bill` — Fechamento de Conta**
-- Acesso via botão "Minha Conta" no TabletHome (que hoje não faz nada)
-- Busca todos os `tablet_orders` da mesa atual com status `confirmed`/`preparing`/`ready`
-- Exibe resumo: lista de itens agrupados, subtotal, total
-- Opções de pagamento:
-  - **Pix**: gera QR code usando `qrcode.react` (já instalado) com payload Pix estático (chave da loja configurada em `store_info.pix_key`)
-  - **Chamar garçom**: marca a conta como "aguardando pagamento" para o garçom receber na mesa (dinheiro, cartão, etc.)
-  - **Pagar com saldo/moedas**: se logado e tiver saldo suficiente, desconta dos pontos
-- Após pagamento confirmado, marca os pedidos como `paid`
+1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
 
-**3. TabletHome — Ativar botão "Minha Conta"**
-- Navegar para `/tablet/:unitId/bill?mesa=X`
-- Mostrar badge com quantidade de pedidos abertos na mesa
+2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
+   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
+   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
+     - Contas a vencer (se houver)
+     - Checklists pendentes
+     - Pedidos pendentes
+     - Tarefas da agenda
+   - Cada pill é clicável e navega para o módulo correspondente
+   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
+   - Sem data, sem frase motivacional — informação pura e acionável
 
-**4. Configurações — Chave Pix**
-- Adicionar campo de chave Pix nas configurações do cardápio/loja (`CardapioSettings` ou `StoreSettings`)
-- Salvar em `store_info.pix_key` e `store_info.pix_key_type`
+3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
 
-**5. Componente `TabletBillPage`**
-- Resumo visual dos pedidos da mesa (cards com itens, quantidades, preços)
-- Seção de pagamento com 3 opções (chips):
-  - 🟢 Pix → mostra QR code inline
-  - 🔵 Chamar garçom → envia notificação/marca status
-  - 🟡 Pagar com moedas → (se logado, mostra saldo e botão de confirmar)
-- Botão de login rápido se não estiver logado (reutiliza CustomerAuthBanner)
+### Resultado
 
-### Arquivos a Criar/Editar
-| Arquivo | Ação |
-|---|---|
-| `src/pages/TabletBill.tsx` | Criar — página de fechamento de conta |
-| `src/pages/TabletHome.tsx` | Editar — ativar botão "Minha Conta" com navegação |
-| `src/App.tsx` | Editar — adicionar rota `/tablet/:unitId/bill` |
-| Migração SQL | Criar — campo pix_key no store_info (via docs/settings) |
-| Settings (CardapioSettings ou Store) | Editar — input de chave Pix |
-
-### Geração do QR Code Pix
-Usa o padrão BR Code (Pix estático) com a chave da loja. O payload será construído em código (sem API externa) usando o formato EMV padrão do Banco Central. O `QRCodeSVG` já instalado renderiza o QR.
+Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
 
