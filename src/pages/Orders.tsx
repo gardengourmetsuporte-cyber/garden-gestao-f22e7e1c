@@ -264,7 +264,7 @@ export default function OrdersPage() {
                 onClick={() => setOrderTab(tab.key as any)}
                 className={cn(
                   "relative flex flex-col items-center justify-center gap-2 rounded-2xl border transition-all duration-200 active:scale-[0.97]",
-                  large ? "p-5" : "p-4",
+                  large ? "p-5 h-full" : "p-4",
                   orderTab === tab.key
                     ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
                     : "bg-card border-border hover:border-primary/20"
