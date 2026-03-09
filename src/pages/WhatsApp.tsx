@@ -1,132 +1,109 @@
-import { useState } from 'react';
-import { useScrollToTopOnChange } from '@/components/ScrollToTop';
-import { AppIcon } from '@/components/ui/app-icon';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ConversationList } from '@/components/whatsapp/ConversationList';
-import { ConversationChat } from '@/components/whatsapp/ConversationChat';
-import { WhatsAppSettings } from '@/components/whatsapp/WhatsAppSettings';
-import { WhatsAppOrders } from '@/components/whatsapp/WhatsAppOrders';
-import { WhatsAppLogs } from '@/components/whatsapp/WhatsAppLogs';
-import { WhatsAppKnowledge } from '@/components/whatsapp/WhatsAppKnowledge';
-import { useWhatsAppConversations } from '@/hooks/useWhatsApp';
-import { useAuth } from '@/contexts/AuthContext';
+import { AppIcon } from '@/components/ui/app-icon';
+import { useWhatsAppChannels, useWhatsAppConversations, useWhatsAppOrders } from '@/hooks/useWhatsApp';
 import { cn } from '@/lib/utils';
 
-const tabs = [
-  { key: 'conversations', label: 'Conversas', icon: 'MessageSquare' },
-  { key: 'orders', label: 'Pedidos', icon: 'ShoppingBag' },
-  { key: 'knowledge', label: 'Base', icon: 'BookOpen' },
-  { key: 'logs', label: 'Logs IA', icon: 'Brain' },
-  { key: 'settings', label: 'Config', icon: 'Settings' },
+const sections = [
+  { key: 'chats', label: 'Conversas', icon: 'MessageSquare', desc: 'Atendimentos ativos e histórico', href: '/whatsapp/chats', color: 'text-emerald-500' },
+  { key: 'orders', label: 'Pedidos', icon: 'ShoppingBag', desc: 'Pedidos recebidos via WhatsApp', href: '/whatsapp/orders', color: 'text-blue-500' },
+  { key: 'knowledge', label: 'Base de Conhecimento', icon: 'BookOpen', desc: 'Respostas e informações da IA', href: '/whatsapp/knowledge', color: 'text-purple-500' },
+  { key: 'logs', label: 'Logs IA', icon: 'Brain', desc: 'Histórico de interações da IA', href: '/whatsapp/logs', color: 'text-orange-500' },
 ];
 
-export default function WhatsAppPage() {
-  const [activeTab, setActiveTab] = useState('conversations');
-  useScrollToTopOnChange(activeTab);
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedConvId, setSelectedConvId] = useState<string | null>(null);
-  const { conversations, isLoading, updateStatus } = useWhatsAppConversations(statusFilter);
-  const { user } = useAuth();
+export default function WhatsAppHub() {
+  const navigate = useNavigate();
+  const { channels, isLoading: channelsLoading } = useWhatsAppChannels();
+  const { conversations } = useWhatsAppConversations('all');
+  const { orders } = useWhatsAppOrders();
 
-  const selectedConv = conversations.find(c => c.id === selectedConvId) || null;
+  const activeChannel = channels.find(c => c.is_active);
+  const isConnected = !!activeChannel;
+  const activeConvs = conversations.filter(c => c.status !== 'closed').length;
+  const pendingOrders = orders.filter(o => o.status === 'draft' || o.status === 'pending').length;
 
-  const handleStatusChange = (status: string) => {
-    if (!selectedConvId) return;
-    updateStatus.mutate({
-      id: selectedConvId,
-      status,
-      assigned_to: status === 'human_active' ? user?.id : null,
-    });
+  const counters: Record<string, number> = {
+    chats: activeConvs,
+    orders: pendingOrders,
   };
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-[calc(100vh-3.5rem)] lg:h-screen">
-        {/* Tab bar */}
-        <div className="shrink-0">
-          <div className="px-4 py-2">
-            <div className="tab-command">
-              {tabs.map(tab => (
-                <button
-                  key={tab.key}
-                  onClick={() => { setActiveTab(tab.key); setSelectedConvId(null); }}
-                  className={cn(
-                    'tab-command-item text-xs gap-1.5',
-                    activeTab === tab.key ? 'tab-command-active' : 'tab-command-inactive'
-                  )}
-                >
-                  <AppIcon name={tab.icon} size={14} />
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </button>
-              ))}
-            </div>
+      <div className="p-4 space-y-4 max-w-2xl mx-auto pb-24">
+        {/* Connection Status Card */}
+        <div
+          className={cn(
+            "rounded-2xl border p-4 flex items-center gap-4 cursor-pointer active:scale-[0.98] transition-all",
+            isConnected
+              ? "border-emerald-500/30 bg-emerald-500/5"
+              : "border-border/30 bg-card"
+          )}
+          onClick={() => navigate('/whatsapp/settings')}
+        >
+          <div className={cn(
+            "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0",
+            isConnected ? "bg-emerald-500/15" : "bg-secondary"
+          )}>
+            {isConnected ? (
+              <AppIcon name="Wifi" size={22} className="text-emerald-500" />
+            ) : (
+              <AppIcon name="WifiOff" size={22} className="text-muted-foreground" />
+            )}
           </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">
+              {channelsLoading ? 'Verificando...' : isConnected ? 'WhatsApp Conectado' : 'WhatsApp Desconectado'}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {isConnected
+                ? `${activeChannel?.provider?.toUpperCase()} • ${activeChannel?.phone_number || 'Sem número'}`
+                : 'Toque para configurar a conexão'
+              }
+            </p>
+          </div>
+          <AppIcon name="ChevronRight" size={18} className="text-muted-foreground shrink-0" />
         </div>
-        {/* Content */}
-        <div className="flex-1 overflow-hidden">
-          {activeTab === 'conversations' && (
-            <div className="flex h-full">
-              {/* Left: list */}
-              <div className={cn(
-                'w-full lg:w-[340px] lg:border-r border-border/20 h-full overflow-hidden',
-                selectedConvId ? 'hidden lg:block' : ''
-              )}>
-                <ConversationList
-                  conversations={conversations}
-                  selectedId={selectedConvId}
-                  onSelect={setSelectedConvId}
-                  statusFilter={statusFilter}
-                  onFilterChange={setStatusFilter}
-                  isLoading={isLoading}
-                />
-              </div>
-              {/* Right: chat */}
-              <div className={cn(
-                'flex-1 h-full',
-                !selectedConvId ? 'hidden lg:flex' : 'flex'
-              )}>
-                {selectedConv ? (
-                  <div className="w-full h-full flex flex-col">
-                    {/* Back on mobile */}
-                    <button
-                      onClick={() => setSelectedConvId(null)}
-                      className="lg:hidden p-3 text-xs text-primary font-medium"
-                    >
-                      ← Voltar
-                    </button>
-                    <div className="flex-1 overflow-hidden">
-                      <ConversationChat conversation={selectedConv} onStatusChange={handleStatusChange} />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
-                    Selecione uma conversa
-                  </div>
+
+        {/* Section Grid */}
+        <div className="grid grid-cols-2 gap-3">
+          {sections.map(s => (
+            <button
+              key={s.key}
+              onClick={() => navigate(s.href)}
+              className="card-command p-4 text-left space-y-3 active:scale-[0.97] transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center bg-secondary", s.color)}>
+                  <AppIcon name={s.icon} size={20} />
+                </div>
+                {(counters[s.key] ?? 0) > 0 && (
+                  <span className="text-[10px] font-bold bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                    {counters[s.key]}
+                  </span>
                 )}
               </div>
-            </div>
-          )}
-          {activeTab === 'orders' && (
-            <div className="h-full overflow-y-auto">
-              <WhatsAppOrders />
-            </div>
-          )}
-          {activeTab === 'knowledge' && (
-            <div className="h-full overflow-y-auto">
-              <WhatsAppKnowledge />
-            </div>
-          )}
-          {activeTab === 'logs' && (
-            <div className="h-full overflow-y-auto">
-              <WhatsAppLogs />
-            </div>
-          )}
-          {activeTab === 'settings' && (
-            <div className="h-full overflow-y-auto">
-              <WhatsAppSettings />
-            </div>
-          )}
+              <div>
+                <p className="text-sm font-semibold text-foreground">{s.label}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{s.desc}</p>
+              </div>
+            </button>
+          ))}
         </div>
+
+        {/* Settings Card */}
+        <button
+          onClick={() => navigate('/whatsapp/settings')}
+          className="card-command p-4 w-full text-left flex items-center gap-3 active:scale-[0.98] transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-secondary text-muted-foreground">
+            <AppIcon name="Settings" size={20} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">Configurações</p>
+            <p className="text-[10px] text-muted-foreground">Conexão, IA, horários e personalidade</p>
+          </div>
+          <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
+        </button>
       </div>
     </AppLayout>
   );

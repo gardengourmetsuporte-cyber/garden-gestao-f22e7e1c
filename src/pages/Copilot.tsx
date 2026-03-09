@@ -12,6 +12,7 @@ import CopilotSuggestionChips from '@/components/copilot/CopilotSuggestionChips'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AppLayout } from '@/components/layout/AppLayout';
 
 function BriefingCard({ stats, contextStats, visible }: {
   stats: ReturnType<typeof useDashboardStats>['stats'];
@@ -19,7 +20,6 @@ function BriefingCard({ stats, contextStats, visible }: {
   visible: boolean;
 }) {
   if (!visible || (!stats && !contextStats)) return null;
-  // pendingExpenses in stats is total R$, use > 0 as boolean. Count comes from contextStats.
   const hasPendingExp = contextStats ? contextStats.pendingExpensesCount > 0 : (stats?.pendingExpenses ?? 0) > 0;
   const pendingExpCount = contextStats?.pendingExpensesCount ?? null;
   const lowStock = contextStats?.lowStockCount ?? (stats?.criticalItems ?? 0);
@@ -168,217 +168,204 @@ export default function CopilotPage() {
   const showChips = messages.length <= 2 && !isLoading;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-background">
-      {/* Header */}
-      <header
-        className="shrink-0 border-b border-border/30 bg-card"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
-      >
-        <div className="flex items-center gap-3 h-14 px-4">
-          <button
-            onClick={() => navigate('/')}
-            className="p-2 -ml-2 rounded-xl hover:bg-secondary transition-colors"
-          >
-            <AppIcon name="ArrowLeft" size={20} className="text-foreground" />
-          </button>
-          <img
-            src={mascotImg}
-            alt="Garden Copiloto"
-            className="w-9 h-9 rounded-xl object-cover border border-primary/20"
-          />
-          <div className="flex-1 min-w-0">
-            <h1 className="text-sm font-bold text-foreground leading-none">Copiloto IA</h1>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Seu assistente de gestão</p>
-          </div>
-          <div className="flex items-center gap-1">
-            {messages.length > 2 && (
-              <button
-                onClick={clearHistory}
-                className="text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg hover:bg-secondary transition-colors"
-              >
-                Limpar
-              </button>
-            )}
-            <button
-              onClick={() => {
-                newConversation();
-              }}
-              className="p-2 rounded-xl hover:bg-secondary transition-colors"
-              title="Nova conversa"
-            >
-              <AppIcon name="Plus" size={18} className="text-muted-foreground" />
-            </button>
-            <Sheet open={showHistory} onOpenChange={setShowHistory}>
-              <SheetTrigger asChild>
-                <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
-                  <AppIcon name="Clock" size={18} className="text-muted-foreground" />
+    <AppLayout>
+      <div className="flex flex-col h-[calc(100vh-3.5rem)] lg:h-screen">
+        {/* Toolbar */}
+        <div className="shrink-0 border-b border-border/20 bg-card/60 backdrop-blur-sm">
+          <div className="flex items-center gap-3 h-12 px-4">
+            <img
+              src={mascotImg}
+              alt="Copiloto"
+              className="w-8 h-8 rounded-xl object-cover border border-primary/20"
+            />
+            <div className="flex-1 min-w-0">
+              <h1 className="text-sm font-bold text-foreground leading-none">Copiloto IA</h1>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-[10px] text-muted-foreground">Online</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-0.5">
+              {messages.length > 2 && (
+                <button
+                  onClick={clearHistory}
+                  className="text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg hover:bg-secondary transition-colors"
+                >
+                  Limpar
                 </button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] p-0">
-                <SheetHeader className="p-4 border-b border-border/30">
-                  <SheetTitle className="text-sm">Conversas</SheetTitle>
-                </SheetHeader>
-                <div className="overflow-y-auto max-h-[calc(100vh-80px)]">
-                  {conversations.length === 0 ? (
-                    <p className="text-xs text-muted-foreground p-4 text-center">Nenhuma conversa</p>
-                  ) : (
-                    conversations.map((conv) => (
-                      <button
-                        key={conv.id}
-                        onClick={() => {
-                          switchConversation(conv.id);
-                          setShowHistory(false);
-                        }}
-                        className={cn(
-                          "w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/50 transition-colors",
-                          conv.id === conversationId && "bg-primary/10"
-                        )}
-                      >
-                        <p className="text-sm font-medium truncate">{conv.title || 'Conversa'}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {format(new Date(conv.created_at), "dd MMM, HH:mm", { locale: ptBR })}
-                        </p>
-                      </button>
-                    ))
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
+              )}
+              <button
+                onClick={newConversation}
+                className="p-2 rounded-xl hover:bg-secondary transition-colors"
+                title="Nova conversa"
+              >
+                <AppIcon name="Plus" size={16} className="text-muted-foreground" />
+              </button>
+              <Sheet open={showHistory} onOpenChange={setShowHistory}>
+                <SheetTrigger asChild>
+                  <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
+                    <AppIcon name="Clock" size={16} className="text-muted-foreground" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] p-0">
+                  <SheetHeader className="p-4 border-b border-border/30">
+                    <SheetTitle className="text-sm">Conversas</SheetTitle>
+                  </SheetHeader>
+                  <div className="overflow-y-auto max-h-[calc(100vh-80px)]">
+                    {conversations.length === 0 ? (
+                      <p className="text-xs text-muted-foreground p-4 text-center">Nenhuma conversa</p>
+                    ) : (
+                      conversations.map((conv) => (
+                        <button
+                          key={conv.id}
+                          onClick={() => {
+                            switchConversation(conv.id);
+                            setShowHistory(false);
+                          }}
+                          className={cn(
+                            "w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/50 transition-colors",
+                            conv.id === conversationId && "bg-primary/10"
+                          )}
+                        >
+                          <p className="text-sm font-medium truncate">{conv.title || 'Conversa'}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            {format(new Date(conv.created_at), "dd MMM, HH:mm", { locale: ptBR })}
+                          </p>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
-      </header>
 
-      {/* Messages */}
-      <div
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-3 overscroll-contain"
-        onTouchMove={(e) => e.stopPropagation()}
-      >
-        {/* Briefing card — usa stats (sync) com fallback para contextStats */}
-        <BriefingCard stats={stats} contextStats={contextStats} visible={messages.length <= 2} />
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 overscroll-contain">
+          <BriefingCard stats={stats} contextStats={contextStats} visible={messages.length <= 2} />
 
-        {messages.map((msg, i) => {
-          const isAction = msg.role === 'assistant' && isActionMessage(msg.content);
-          const displayContent = isAction ? stripActionMarker(msg.content) : msg.content;
-          const navAction = isAction ? getActionNavigation(displayContent) : null;
+          {messages.map((msg, i) => {
+            const isAction = msg.role === 'assistant' && isActionMessage(msg.content);
+            const displayContent = isAction ? stripActionMarker(msg.content) : msg.content;
+            const navAction = isAction ? getActionNavigation(displayContent) : null;
 
-          return (
-            <div
-              key={i}
-              className={cn(
-                "flex flex-col",
-                msg.role === 'user' ? "items-end" : "items-start"
-              )}
-            >
-              {msg.imageUrl && (
-                <img
-                  src={msg.imageUrl}
-                  alt="Imagem enviada"
-                  className="max-w-[200px] max-h-[200px] rounded-xl mb-1 object-cover border border-border/30"
-                />
-              )}
-              {isAction ? (
-                <div className="max-w-[85%] space-y-2">
-                  <div className="rounded-2xl px-4 py-3 text-sm leading-relaxed bg-primary/10 border border-primary/20 text-foreground rounded-tl-md">
-                    <CopilotMessageContent content={displayContent} />
+            return (
+              <div
+                key={i}
+                className={cn(
+                  "flex flex-col",
+                  msg.role === 'user' ? "items-end" : "items-start"
+                )}
+              >
+                {msg.imageUrl && (
+                  <img
+                    src={msg.imageUrl}
+                    alt="Imagem enviada"
+                    className="max-w-[200px] max-h-[200px] rounded-xl mb-1 object-cover border border-border/30"
+                  />
+                )}
+                {isAction ? (
+                  <div className="max-w-[85%] space-y-2">
+                    <div className="rounded-2xl px-4 py-3 text-sm leading-relaxed bg-primary/10 border border-primary/20 text-foreground rounded-tl-md">
+                      <CopilotMessageContent content={displayContent} />
+                    </div>
+                    {navAction && (
+                      <button
+                        onClick={() => navigate(navAction.href)}
+                        className="flex items-center gap-1.5 text-xs text-primary font-medium px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+                      >
+                        <AppIcon name={navAction.icon as any} size={12} />
+                        {navAction.label} →
+                      </button>
+                    )}
                   </div>
-                  {navAction && (
-                    <button
-                      onClick={() => navigate(navAction.href)}
-                      className="flex items-center gap-1.5 text-xs text-primary font-medium px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
-                    >
-                      <AppIcon name={navAction.icon as any} size={12} />
-                      {navAction.label} →
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div
-                  className={cn(
-                    "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-                    msg.role === 'assistant'
-                      ? "bg-secondary/60 text-foreground rounded-tl-md"
-                      : "bg-primary text-primary-foreground rounded-tr-md"
-                  )}
-                >
-                  {msg.role === 'assistant' ? (
-                    <CopilotMessageContent content={displayContent} />
-                  ) : (
-                    displayContent
-                  )}
-                </div>
-              )}
+                ) : (
+                  <div
+                    className={cn(
+                      "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+                      msg.role === 'assistant'
+                        ? "bg-card border border-border/30 text-foreground rounded-tl-md border-l-2 border-l-primary"
+                        : "bg-primary text-primary-foreground rounded-tr-md"
+                    )}
+                  >
+                    {msg.role === 'assistant' ? (
+                      <CopilotMessageContent content={displayContent} />
+                    ) : (
+                      displayContent
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-card border border-border/30 rounded-2xl rounded-tl-md px-4 py-3 flex items-center gap-2">
+                {isExecuting ? (
+                  <>
+                    <AppIcon name="Loader2" size={14} className="text-primary animate-spin" />
+                    <span className="text-xs text-muted-foreground">Executando ação...</span>
+                  </>
+                ) : (
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                )}
+              </div>
             </div>
-          );
-        })}
+          )}
 
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-secondary/60 rounded-2xl rounded-tl-md px-4 py-3 flex items-center gap-2">
-              {isExecuting ? (
-                <>
-                  <AppIcon name="Loader2" size={14} className="text-primary animate-spin" />
-                  <span className="text-xs text-muted-foreground">Executando ação...</span>
-                </>
-              ) : (
-                <div className="flex gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+          {showChips && (
+            <CopilotSuggestionChips onChipClick={handleChipClick} contextStats={contextStats} quickStats={stats} />
+          )}
 
-        {showChips && (
-          <CopilotSuggestionChips onChipClick={handleChipClick} contextStats={contextStats} quickStats={stats} />
-        )}
+          <div ref={messagesEndRef} />
+        </div>
 
-        <div ref={messagesEndRef} />
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageUpload}
+        />
+
+        {/* Input bar — pb-20 to clear bottom tab bar on mobile */}
+        <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3 pb-20 lg:pb-3">
+          <form onSubmit={handleSubmit} className="flex gap-2 items-center">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-11 w-11 p-0 rounded-full shrink-0"
+              disabled={isLoading}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <AppIcon name="Camera" size={18} className="text-muted-foreground" />
+            </Button>
+            <Input
+              value={question}
+              onChange={e => setQuestion(e.target.value)}
+              placeholder="Pergunte ao Copiloto..."
+              className="h-11 text-sm rounded-full bg-secondary/50 border-border/30"
+              disabled={isLoading}
+            />
+            <Button
+              type="submit"
+              size="sm"
+              className="h-11 w-11 p-0 rounded-full shrink-0"
+              disabled={isLoading || !question.trim()}
+            >
+              <AppIcon name="Send" size={16} />
+            </Button>
+          </form>
+        </div>
       </div>
-
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleImageUpload}
-      />
-
-      {/* Input */}
-      <div
-        className="shrink-0 border-t border-border/30 bg-card px-4 py-3"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
-      >
-        <form onSubmit={handleSubmit} className="flex gap-2 items-center">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-11 w-11 p-0 rounded-full shrink-0"
-            disabled={isLoading}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <AppIcon name="Camera" size={18} className="text-muted-foreground" />
-          </Button>
-          <Input
-            value={question}
-            onChange={e => setQuestion(e.target.value)}
-            placeholder="Pergunte ao Copiloto..."
-            className="h-11 text-sm rounded-full bg-secondary/50 border-border/30"
-            disabled={isLoading}
-          />
-          <Button
-            type="submit"
-            size="sm"
-            className="h-11 w-11 p-0 rounded-full shrink-0"
-            disabled={isLoading || !question.trim()}
-          >
-            <AppIcon name="Send" size={16} />
-          </Button>
-        </form>
-      </div>
-    </div>
+    </AppLayout>
   );
 }
