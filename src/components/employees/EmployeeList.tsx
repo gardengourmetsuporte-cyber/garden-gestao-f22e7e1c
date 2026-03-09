@@ -173,9 +173,12 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <AppIcon name="MoreVertical" size={16} />
-                      </Button>
+                      <button
+                        className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-secondary/60 touch-manipulation"
+                        onTouchMove={(e) => e.preventDefault()}
+                      >
+                        <AppIcon name="MoreVertical" size={16} className="text-muted-foreground" />
+                      </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(employee); }}>
