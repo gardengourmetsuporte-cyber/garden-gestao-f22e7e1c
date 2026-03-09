@@ -55,6 +55,13 @@ const platformLabel: Record<string, string> = {
 
 // Status flow for tablet delivery orders
 const TABLET_STATUS_FLOW: Record<string, { next: string[]; labels: Record<string, { label: string; icon: string; variant: 'default' | 'destructive' | 'outline' }> }> = {
+  pending: {
+    next: ['confirmed', 'cancelled'],
+    labels: {
+      confirmed: { label: 'Aceitar pedido', icon: 'check_circle', variant: 'default' },
+      cancelled: { label: 'Recusar', icon: 'cancel', variant: 'destructive' },
+    },
+  },
   awaiting_confirmation: {
     next: ['confirmed', 'cancelled'],
     labels: {
