@@ -228,6 +228,7 @@ export const ICON_MAP: Record<string, string> = {
   Gem: 'diamond',
   Medal: 'military_tech',
   Award: 'workspace_premium',
+  WorkspacePremium: 'workspace_premium',
   PartyPopper: 'celebration',
   FlaskConical: 'science',
   Calculator: 'calculate',
