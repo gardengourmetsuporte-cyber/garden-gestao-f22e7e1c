@@ -1,7 +1,7 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 
-export type MenuTab = 'home' | 'menu' | 'cart' | 'account' | 'game';
+export type MenuTab = 'home' | 'menu' | 'cart' | 'account' | 'game' | 'ranking';
 
 interface Props {
   active: MenuTab;
