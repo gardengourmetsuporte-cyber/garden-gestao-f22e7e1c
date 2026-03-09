@@ -294,6 +294,7 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
   const tabs: { key: AccountTab; label: string; icon: string }[] = [
     { key: 'overview', label: 'Resumo', icon: 'Home' },
     { key: 'orders', label: 'Pedidos', icon: 'Receipt' },
+    { key: 'addresses', label: 'Endereços', icon: 'MapPin' },
     { key: 'history', label: 'Moedas', icon: 'History' },
     { key: 'data', label: 'Dados', icon: 'User' },
   ];
