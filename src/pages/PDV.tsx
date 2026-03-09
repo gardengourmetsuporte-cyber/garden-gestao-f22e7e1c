@@ -249,7 +249,7 @@ export default function PDV() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-muted-foreground">{format(new Date(order.created_at), 'HH:mm')}</span>
-                    <span className="text-sm font-bold text-primary">{formatPrice(order.total)}</span>
+                    <span className="text-sm font-bold text-primary">{formatCurrency(order.total)}</span>
                   </div>
                   {order.items.length > 0 && (
                     <div className="mt-1.5 text-[10px] text-muted-foreground space-y-0.5">
