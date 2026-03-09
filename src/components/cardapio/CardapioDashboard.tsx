@@ -12,6 +12,7 @@ import { useDeliveryZones } from '@/hooks/useDeliveryZones';
 import { formatCurrency } from '@/lib/format';
 import type { MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
 import type { TabletOrderAdmin } from '@/hooks/useTabletAdmin';
+import { AutoConfirmWidget } from './AutoConfirmWidget';
 
 interface Props {
   onNavigate: (tab: string) => void;
