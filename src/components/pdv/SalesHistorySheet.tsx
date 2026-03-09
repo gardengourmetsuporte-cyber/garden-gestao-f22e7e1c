@@ -74,6 +74,7 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('blocks');
   const [filterSource, setFilterSource] = useState<string | null>(null);
+  const [invoiceSale, setInvoiceSale] = useState<Sale | null>(null);
 
   useEffect(() => {
     if (open && activeUnitId) {
