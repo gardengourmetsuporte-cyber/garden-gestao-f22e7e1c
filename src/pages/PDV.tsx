@@ -53,10 +53,26 @@ export default function PDV() {
 
   const handleFinalize = async (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string }) => {
     if (options.notes) pos.setSaleNotes(options.notes);
+    // Capture cart before finalize clears it
+    const cartSnapshot = pos.cart.map(i => ({
+      name: i.product.name,
+      quantity: i.quantity,
+      unit_price: i.unit_price,
+    }));
+    const totalSnapshot = pos.total;
     const saleId = await pos.finalizeSale(payments, activeOrderId || undefined);
     if (saleId) {
       setPaymentOpen(false);
       setActiveOrderId(null);
+      // Open invoice sheet if emitInvoice
+      if (options.emitInvoice) {
+        setInvoiceData({
+          saleId,
+          total: totalSnapshot,
+          payments: payments.map(p => ({ method: p.method, amount: p.amount })),
+          items: cartSnapshot,
+        });
+      }
     }
   };
 
