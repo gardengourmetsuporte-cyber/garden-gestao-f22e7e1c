@@ -310,18 +310,23 @@ export default function KDS() {
         ]);
 
       try {
-        const { data, error } = await withTimeout((async () => {
-          return supabase
+        const res = await withTimeout(
+          supabase
             .from('tablet_orders')
             .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
             .eq('unit_id', unitId)
             .in('status', ACTIVE_STATUSES)
             .order('created_at', { ascending: true })
-            .limit(50);
-        })());
-        if (error) throw error;
-        return (data as unknown as KDSOrder[]) || [];
+            .limit(50)
+        );
+        console.log('[KDS] Query result:', { data: res.data?.length, error: res.error });
+        if (res.error) {
+          console.error('[KDS] Supabase error:', res.error);
+          throw res.error;
+        }
+        return (res.data as unknown as KDSOrder[]) || [];
       } catch (err: any) {
+        console.error('[KDS] Fetch error:', err?.name, err?.message, err);
         const msg = String(err?.message || '');
         const isAbort = err?.name === 'AbortError' || msg.toLowerCase().includes('abort');
         if (isAbort) throw new Error('Conexão instável. Tente novamente.');
