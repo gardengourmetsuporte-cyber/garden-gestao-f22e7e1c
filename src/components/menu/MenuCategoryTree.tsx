@@ -81,6 +81,7 @@ export function MenuCategoryTree({
   categories, groups, selectedGroupId,
   onSelectGroup, onSaveCategory, onDeleteCategory,
   onSaveGroup, onDeleteGroup, getProductCount, renderGroupContent,
+  viewMode = 'menu', getProductsByGroup,
 }: Props) {
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
   const [catDialog, setCatDialog] = useState(false);
