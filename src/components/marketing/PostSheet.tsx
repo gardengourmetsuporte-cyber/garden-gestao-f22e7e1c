@@ -128,14 +128,50 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
     return `${String(h).padStart(2, '0')}:${m}`;
   });
 
-  return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    const handleApplyPost = (data: { title: string; caption: string; tags: string[]; image_prompt: string; best_time?: string }) => {
+      setTitle(data.title);
+      setCaption(data.caption);
+      setTags(data.tags.join(', '));
+      if (data.best_time) {
+        setScheduledTime(data.best_time);
+        if (!scheduledAt) setScheduledAt(new Date());
+      }
+      setMode('manual');
+    };
+
+    return (
+    <Sheet open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setMode('manual'); }}>
       <SheetContent side="bottom" className="space-y-4 max-h-[90vh] overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{post ? 'Editar Post' : 'Novo Post'}</SheetTitle>
           <SheetDescription>Planeje seu conteúdo de marketing</SheetDescription>
         </SheetHeader>
 
+        {/* Mode toggle - only for new posts */}
+        {!post && (
+          <div className="flex gap-1 p-1 rounded-xl bg-secondary/40 border border-border/30">
+            <button
+              onClick={() => setMode('manual')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                mode === 'manual' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <AppIcon name="PenLine" size={14} /> Manual
+            </button>
+            <button
+              onClick={() => setMode('ai')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                mode === 'ai' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <AppIcon name="Sparkles" size={14} /> Criar com IA
+            </button>
+          </div>
+        )}
+
+        {mode === 'ai' && activeUnitId ? (
+          <PostAIChat unitId={activeUnitId} onApplyPost={handleApplyPost} />
+        ) : (
         <div className="space-y-4">
           <div>
             <Label>Título</Label>
