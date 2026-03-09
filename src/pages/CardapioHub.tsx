@@ -242,7 +242,7 @@ export default function CardapioHub() {
             </div>
 
             {orders.length === 0 ? (
-              <EmptyState icon="ShoppingBag" title="Nenhum pedido" description="Os pedidos do cardápio digital aparecerão aqui." />
+              <EmptyState icon="ShoppingBag" title="Nenhum pedido" subtitle="Os pedidos do cardápio digital aparecerão aqui." />
             ) : (
               <>
                 {todayOrders.length > 0 && (
