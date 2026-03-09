@@ -5,29 +5,74 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 
 async function copyToClipboard(text: string) {
-  try { await navigator.clipboard.writeText(text); toast.success('Legenda copiada!'); } catch { toast.error('Erro ao copiar legenda'); }
+  try { await navigator.clipboard.writeText(text); } catch { /* silent */ }
 }
 
-function shareViaWebShare(post: MarketingPost, channel: 'instagram' | 'whatsapp_status') {
-  if (post.caption) copyToClipboard(post.caption);
+async function downloadImage(url: string) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `post-${Date.now()}.jpg`;
+    a.click();
+    URL.revokeObjectURL(blobUrl);
+  } catch { /* silent */ }
+}
+
+async function shareToInstagram(post: MarketingPost) {
+  // 1. Copy caption
+  if (post.caption) await copyToClipboard(post.caption);
+
+  // 2. Download image so user has it in gallery
+  if (post.media_urls.length > 0) {
+    await downloadImage(post.media_urls[0]);
+  }
+
+  // 3. Open Instagram app directly (Stories camera as entry point)
+  toast.success('Legenda copiada! Imagem salva. Abrindo Instagram...');
+
+  // Try Instagram deep link — works on iOS/Android
+  setTimeout(() => {
+    window.location.href = 'instagram://camera';
+    // Fallback to web if app not installed
+    setTimeout(() => {
+      window.open('https://instagram.com', '_blank');
+    }, 1500);
+  }, 300);
+}
+
+async function shareToWhatsApp(post: MarketingPost) {
+  if (post.caption) await copyToClipboard(post.caption);
+  const text = encodeURIComponent(post.caption || '');
+
+  // Try native share with file for WhatsApp (this works well since WhatsApp appears in share sheet)
   if (navigator.share && post.media_urls.length > 0) {
-    fetch(post.media_urls[0]).then(r => r.blob()).then(blob => {
+    try {
+      const res = await fetch(post.media_urls[0]);
+      const blob = await res.blob();
       const file = new File([blob], 'post.jpg', { type: blob.type });
-      navigator.share({ title: post.title, text: post.caption, files: [file] }).catch(() => openDeepLink(post, channel));
-    }).catch(() => openDeepLink(post, channel));
-  } else { openDeepLink(post, channel); }
-}
+      await navigator.share({ text: post.caption || '', files: [file] });
+      return;
+    } catch { /* fall through */ }
+  }
 
-function openDeepLink(post: MarketingPost, channel: 'instagram' | 'whatsapp_status') {
-  if (channel === 'instagram') window.open('instagram://camera', '_blank');
-  else { const text = encodeURIComponent(post.caption || ''); window.open(`whatsapp://send?text=${text}`, '_blank'); }
+  window.open(`whatsapp://send?text=${text}`, '_blank');
 }
 
 interface PublishActionsProps { post: MarketingPost | null; open: boolean; onOpenChange: (open: boolean) => void; onConfirmPublished: (id: string) => void; }
 
 export function PublishActions({ post, open, onOpenChange, onConfirmPublished }: PublishActionsProps) {
   if (!post) return null;
-  const handlePublish = (channel: 'instagram' | 'whatsapp_status') => { shareViaWebShare(post, channel); };
+
+  const handlePublish = (channel: 'instagram' | 'whatsapp_status') => {
+    if (channel === 'instagram') {
+      shareToInstagram(post);
+    } else {
+      shareToWhatsApp(post);
+    }
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -37,7 +82,7 @@ export function PublishActions({ post, open, onOpenChange, onConfirmPublished }:
           {post.channels.includes('instagram') && (
             <Button variant="outline" className="w-full justify-start gap-3 h-14 border-pink-500/30 hover:bg-pink-500/10" onClick={() => handlePublish('instagram')}>
               <AppIcon name="photo_camera" size={20} className="text-pink-400" />
-              <div className="text-left"><p className="text-sm font-medium">Instagram</p><p className="text-[10px] text-muted-foreground">Abre o app + copia legenda</p></div>
+              <div className="text-left"><p className="text-sm font-medium">Instagram</p><p className="text-[10px] text-muted-foreground">Salva imagem + copia legenda + abre Instagram</p></div>
             </Button>
           )}
           {post.channels.includes('whatsapp_status') && (

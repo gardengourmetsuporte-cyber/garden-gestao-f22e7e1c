@@ -56,35 +56,31 @@ export function AISuggestionCard({ suggestion, onSchedule, onGenerateImage }: Pr
     try {
       const fullCaption = `${caption}\n\n${suggestion.hashtags}`;
 
-      if (navigator.share && imageUrl) {
-        // Try sharing with image
+      // Copy caption to clipboard
+      try { await navigator.clipboard.writeText(fullCaption); } catch { /* silent */ }
+
+      // Download image so user has it in gallery
+      if (imageUrl) {
         try {
           const response = await fetch(imageUrl);
           const blob = await response.blob();
-          const file = new File([blob], 'post.png', { type: blob.type });
-
-          await navigator.share({
-            text: fullCaption,
-            files: [file],
-          });
-        } catch {
-          // Fallback: share without image
-          await navigator.share({ text: fullCaption });
-        }
-      } else if (navigator.share) {
-        await navigator.share({ text: fullCaption });
-      } else {
-        // Desktop fallback: copy caption + download image
-        await navigator.clipboard.writeText(fullCaption);
-        toast.success('Legenda copiada! Baixe a imagem para postar.');
-
-        if (imageUrl) {
+          const blobUrl = URL.createObjectURL(blob);
           const a = document.createElement('a');
-          a.href = imageUrl;
+          a.href = blobUrl;
           a.download = `post-${Date.now()}.png`;
           a.click();
-        }
+          URL.revokeObjectURL(blobUrl);
+        } catch { /* silent */ }
       }
+
+      // Open Instagram directly
+      toast.success('Legenda copiada! Imagem salva. Abrindo Instagram...');
+      setTimeout(() => {
+        window.location.href = 'instagram://camera';
+        setTimeout(() => {
+          window.open('https://instagram.com', '_blank');
+        }, 1500);
+      }, 300);
 
       // Schedule as published
       onSchedule({
