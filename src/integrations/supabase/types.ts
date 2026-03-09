@@ -2440,8 +2440,12 @@ export type Database = {
           id: string
           min_stock: number
           name: string
+          purchase_to_stock_factor: number | null
+          purchase_unit_label: string | null
           recipe_unit_price: number | null
           recipe_unit_type: string | null
+          stock_to_recipe_factor: number | null
+          stock_unit_label: string | null
           supplier_id: string | null
           unit_id: string | null
           unit_price: number | null
@@ -2456,8 +2460,12 @@ export type Database = {
           id?: string
           min_stock?: number
           name: string
+          purchase_to_stock_factor?: number | null
+          purchase_unit_label?: string | null
           recipe_unit_price?: number | null
           recipe_unit_type?: string | null
+          stock_to_recipe_factor?: number | null
+          stock_unit_label?: string | null
           supplier_id?: string | null
           unit_id?: string | null
           unit_price?: number | null
@@ -2472,8 +2480,12 @@ export type Database = {
           id?: string
           min_stock?: number
           name?: string
+          purchase_to_stock_factor?: number | null
+          purchase_unit_label?: string | null
           recipe_unit_price?: number | null
           recipe_unit_type?: string | null
+          stock_to_recipe_factor?: number | null
+          stock_unit_label?: string | null
           supplier_id?: string | null
           unit_id?: string | null
           unit_price?: number | null

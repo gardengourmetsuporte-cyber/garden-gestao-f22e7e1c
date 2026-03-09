@@ -13,6 +13,10 @@ export interface AutoOrderItem {
   avgDailyConsumption: number;
   suggestedQuantity: number;
   daysUntilEmpty: number | null;
+  purchaseUnitLabel: string | null;
+  purchaseToStockFactor: number | null;
+  suggestedPurchaseQty: number | null;
+  stockUnitLabel: string | null;
 }
 
 export interface AutoOrderSuggestion {
@@ -91,6 +95,10 @@ export function useAutoOrderSuggestion() {
       const consumptionBased = avgDaily > 0 ? Math.ceil(avgDaily * 7) : 0;
       const suggestedQuantity = Math.max(deficit, consumptionBased);
 
+      const finalQty = suggestedQuantity > 0 ? suggestedQuantity : item.min_stock;
+      const purchaseFactor = (item as any).purchase_to_stock_factor || null;
+      const purchaseLabel = (item as any).purchase_unit_label || null;
+
       bySupplier[sid].items.push({
         itemId: item.id,
         itemName: item.name,
@@ -98,8 +106,12 @@ export function useAutoOrderSuggestion() {
         minStock: item.min_stock,
         deficit,
         avgDailyConsumption: avgDaily,
-        suggestedQuantity: suggestedQuantity > 0 ? suggestedQuantity : item.min_stock,
+        suggestedQuantity: finalQty,
         daysUntilEmpty: pred?.daysUntilEmpty ?? null,
+        purchaseUnitLabel: purchaseLabel,
+        purchaseToStockFactor: purchaseFactor,
+        suggestedPurchaseQty: purchaseFactor && purchaseFactor > 0 ? Math.ceil(finalQty / purchaseFactor) : null,
+        stockUnitLabel: (item as any).stock_unit_label || null,
       });
     });
 
