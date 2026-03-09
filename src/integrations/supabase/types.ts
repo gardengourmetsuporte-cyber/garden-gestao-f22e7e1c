@@ -3544,6 +3544,79 @@ export type Database = {
           },
         ]
       }
+      packaging_template_items: {
+        Row: {
+          cost: number
+          created_at: string
+          id: string
+          name: string
+          quantity: number
+          sort_order: number
+          template_id: string
+        }
+        Insert: {
+          cost?: number
+          created_at?: string
+          id?: string
+          name: string
+          quantity?: number
+          sort_order?: number
+          template_id: string
+        }
+        Update: {
+          cost?: number
+          created_at?: string
+          id?: string
+          name?: string
+          quantity?: number
+          sort_order?: number
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packaging_template_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "packaging_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      packaging_templates: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          unit_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          unit_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packaging_templates_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_method_settings: {
         Row: {
           account_id: string | null
@@ -4377,6 +4450,7 @@ export type Database = {
           is_active: boolean
           min_ready_stock: number | null
           name: string
+          packaging_template_id: string | null
           preparation_notes: string | null
           total_cost: number
           updated_at: string
@@ -4393,6 +4467,7 @@ export type Database = {
           is_active?: boolean
           min_ready_stock?: number | null
           name: string
+          packaging_template_id?: string | null
           preparation_notes?: string | null
           total_cost?: number
           updated_at?: string
@@ -4409,6 +4484,7 @@ export type Database = {
           is_active?: boolean
           min_ready_stock?: number | null
           name?: string
+          packaging_template_id?: string | null
           preparation_notes?: string | null
           total_cost?: number
           updated_at?: string
@@ -4421,6 +4497,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "recipe_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipes_packaging_template_id_fkey"
+            columns: ["packaging_template_id"]
+            isOneToOne: false
+            referencedRelation: "packaging_templates"
             referencedColumns: ["id"]
           },
         ]
