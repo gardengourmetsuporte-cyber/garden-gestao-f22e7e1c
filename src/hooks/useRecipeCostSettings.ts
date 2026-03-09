@@ -33,13 +33,14 @@ export interface RecipeCostSettings {
    parent_id: string | null;
  }
  
- const defaultSettings: Omit<RecipeCostSettings, 'id' | 'user_id' | 'created_at' | 'updated_at'> = {
-   monthly_products_sold: 1000,
-   tax_percentage: 0,
-   card_fee_percentage: 0,
-   packaging_cost_per_unit: 0,
-   fixed_cost_category_ids: [],
- };
+const defaultSettings: Omit<RecipeCostSettings, 'id' | 'user_id' | 'created_at' | 'updated_at'> = {
+    monthly_products_sold: 1000,
+    monthly_revenue: 50000,
+    tax_percentage: 0,
+    card_fee_percentage: 0,
+    packaging_cost_per_unit: 0,
+    fixed_cost_category_ids: [],
+  };
  
  export function useRecipeCostSettings() {
   const { user } = useAuth();
