@@ -27,6 +27,8 @@ export interface PendingOrder {
   id: string;
   source: string;
   customer_name: string | null;
+  customer_phone: string | null;
+  customer_address: string | null;
   table_number: number | null;
   total: number;
   status: string;
