@@ -190,6 +190,13 @@ export function usePOS() {
 
   // Load order into cart
   const loadOrderIntoCart = useCallback((order: PendingOrder) => {
+    const normalizeSource = (source: string): 'balcao' | 'mesa' | 'delivery' => {
+      const s = (source || '').toLowerCase();
+      if (s === 'balcao') return 'balcao';
+      if (s === 'delivery' || s === 'ifood' || s === 'aiqfome' || s === 'anota_ai') return 'delivery';
+      return 'mesa';
+    };
+
     setCart(order.items.map(item => ({
       id: crypto.randomUUID(),
       product: { id: '', name: item.name, price: item.unit_price, image_url: null, category: '', codigo_pdv: null, is_active: true },
@@ -198,6 +205,7 @@ export function usePOS() {
       discount: 0,
       notes: '',
     })));
+    setSaleSource(normalizeSource(order.source));
     setCustomerName(order.customer_name || '');
     setTableNumber(order.table_number);
   }, []);
