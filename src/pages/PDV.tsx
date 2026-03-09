@@ -5,22 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type CartItem, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
+import { PaymentSheet } from '@/components/pdv/PaymentSheet';
+import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
-
-const PAYMENT_METHODS = [
-  { key: 'cash', label: 'Dinheiro', icon: 'Banknote' },
-  { key: 'debit', label: 'Débito', icon: 'CreditCard' },
-  { key: 'credit', label: 'Crédito', icon: 'CreditCard' },
-  { key: 'pix', label: 'Pix', icon: 'QrCode' },
-  { key: 'meal_voucher', label: 'Vale Refeição', icon: 'Ticket' },
-] as const;
-
-function formatPrice(v: number) {
-  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
 
 export default function PDV() {
   const pos = usePOS();
