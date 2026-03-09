@@ -34,6 +34,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
   const { earned: earnedPoints } = usePoints();
   const rank = useMemo(() => getRank(earnedPoints), [earnedPoints]);
   const [tabPickerOpen, setTabPickerOpen] = useState(false);
+  const [unitSelectorOpen, setUnitSelectorOpen] = useState(false);
 
   const hasAccessLevel = allowedModules !== null && allowedModules !== undefined;
 
