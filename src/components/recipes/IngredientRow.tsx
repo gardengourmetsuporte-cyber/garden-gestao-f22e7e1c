@@ -18,6 +18,8 @@ import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calcula
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 
+type KDSStationOption = { id: string; name: string; color: string };
+
 interface IngredientRowProps {
   ingredient: {
     source_type: IngredientSourceType;
@@ -32,11 +34,13 @@ interface IngredientRowProps {
     quantity: number;
     unit_type: RecipeUnitType;
     total_cost: number;
+    kds_station_id?: string | null;
   };
   onChange: (updates: Partial<IngredientRowProps['ingredient']>) => void;
   onRemove: () => void;
   onUpdateGlobalPrice?: (itemId: string, newPrice: number) => Promise<void>;
   onUpdateItemUnit?: (itemId: string, unitType: string) => Promise<void>;
+  kdsStations?: KDSStationOption[];
 }
 
 const UNIT_OPTIONS: { value: RecipeUnitType; label: string }[] = [
