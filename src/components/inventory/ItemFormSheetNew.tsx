@@ -265,6 +265,7 @@ export function ItemFormSheetNew({
                 type="number"
                 value={minStock}
                 onChange={(e) => setMinStock(e.target.value)}
+                onFocus={handleInputFocus}
                 placeholder="0"
                 className="input-large"
                 step={unitType === 'unidade' ? 1 : 0.1}
