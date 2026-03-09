@@ -249,6 +249,7 @@ export function ItemFormSheetNew({
                 type="number"
                 value={currentStock}
                 onChange={(e) => setCurrentStock(e.target.value)}
+                onFocus={handleInputFocus}
                 placeholder="0"
                 className="input-large"
                 step={unitType === 'unidade' ? 1 : 0.1}
