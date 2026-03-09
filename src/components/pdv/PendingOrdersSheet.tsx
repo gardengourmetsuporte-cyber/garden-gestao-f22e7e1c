@@ -381,7 +381,9 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
 
       toast.success('Entrega despachada!');
       setSelectedOrder(null);
-    } catch (err: any) {
+      // Invalidate deliveries cache so the Entregas module shows the new delivery
+      queryClient.invalidateQueries({ queryKey: ['deliveries', activeUnitId] });
+      queryClient.invalidateQueries({ queryKey: ['delivery-pending-orders', activeUnitId] });
       toast.error('Erro ao despachar: ' + (err.message || 'erro'));
     } finally {
       setDispatching(null);
