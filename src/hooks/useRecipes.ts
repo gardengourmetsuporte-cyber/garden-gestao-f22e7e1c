@@ -161,8 +161,9 @@ import { useUnit } from '@/contexts/UnitContext';
                unit_cost: ing.unit_cost,
                total_cost: ing.total_cost,
                sort_order: index,
-              source_type: ing.source_type,
-              source_recipe_id: ing.source_recipe_id,
+               source_type: ing.source_type,
+               source_recipe_id: ing.source_recipe_id,
+               kds_station_id: ing.kds_station_id || null,
              }))
            );
          
