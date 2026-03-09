@@ -1,45 +1,54 @@
 
 
-## Plano: Substituir saudação por header contextual integrado ao top bar
+## Plano: Transformar aba "Pedidos" em Central de Configurações
 
-### O que muda
+A aba "Pedidos" no bottom nav do Cardápio atualmente apenas espelha o cardápio. Vamos transformá-la em um hub de configurações organizado por solução (similar ao iFood), com seções colapsáveis.
 
-A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
-
-### Conceito visual
+### Estrutura da nova aba
 
 ```text
-┌──────────────────────────────────┐
-│  [logo]          [bell] [avatar] │  ← top bar (já existe)
-├──────────────────────────────────┤
-│                                  │
-│  Olá, Bruno                      │  ← greeting inline, menor
-│  ┌────────┐ ┌────────┐ ┌──────┐ │
-│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
-│  │pendente│ │tarefas │ │alertas│ │     dados do dia
-│  └────────┘ └────────┘ └──────┘ │
-│                                  │
-└──────────────────────────────────┘
+┌─────────────────────────────┐
+│  ⚙️  Configurações          │
+├─────────────────────────────┤
+│  🛵 Solução Delivery    ▾   │
+│    • Sobre (nome, descrição)│
+│    • Delivery & Retirada    │
+│    • Áreas e Taxas          │
+│    • Formas de Pagamento    │
+│    • Horários               │
+├─────────────────────────────┤
+│  📱 Solução em Tablet   ▾   │
+│    • Integração PDV         │
+│    • Mesas & QR Codes       │
+│    • Chave Pix              │
+├─────────────────────────────┤
+│  📷 QR Code Balcão     ▾   │
+│    • Link externo p/ cliente│
+│    • QR Code gerado         │
+│    • Configurações          │
+│    (novo source: 'qrcode')  │
+├─────────────────────────────┤
+│  🎰 Gamificação        ▾   │
+│    • Roleta / Prêmios       │
+│  ♾️ Rodízio             ▾   │
+│    • Configurações rodízio  │
+└─────────────────────────────┘
 ```
 
-### Implementação
+### Alterações por arquivo
 
-1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
+| Arquivo | O que muda |
+|---|---|
+| `src/pages/CardapioHub.tsx` | Detectar `?tab=pedidos` e renderizar novo componente `CardapioConfigHub` em vez do cardápio. Renomear o bottom tab de "Pedidos" para "Config" |
+| `src/components/layout/BottomTabBar.tsx` | Alterar label/icon do tab "pedidos" de `ShoppingBag`/"Pedidos" para `Settings`/"Config" |
+| `src/components/cardapio/CardapioConfigHub.tsx` | **Novo arquivo** — Hub de configurações com seções colapsáveis (Accordion). Reutiliza os componentes existentes do `CardapioSettings` (PDV, Mesas, Delivery, Gamificação, Rodízio) reorganizados por "Solução". Adiciona seção "QR Code Balcão" com link externo para o cliente escanear e pedir pelo celular (`/m/:unitId?source=qrcode`). |
 
-2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
-   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
-   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
-     - Contas a vencer (se houver)
-     - Checklists pendentes
-     - Pedidos pendentes
-     - Tarefas da agenda
-   - Cada pill é clicável e navega para o módulo correspondente
-   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
-   - Sem data, sem frase motivacional — informação pura e acionável
+### Seção "QR Code Balcão" (novo canal)
+- Gera QR code apontando para `/m/:unitId?source=qrcode`
+- O cliente escaneia no celular, faz o pedido pelo cardápio digital
+- Pedido entra no sistema com `source: 'qrcode'` (diferenciando de mesa/delivery/balcão)
+- O QR é genérico (sem mesa), cliente informa nome no checkout
 
-3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
-
-### Resultado
-
-Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
+### O que é reutilizado
+Todo o conteúdo de configuração já existe em `CardapioSettings.tsx`. O novo componente reorganiza as mesmas funcionalidades em seções por "Solução" usando Accordion, sem duplicar código — importando sub-componentes ou extraindo seções.
 
