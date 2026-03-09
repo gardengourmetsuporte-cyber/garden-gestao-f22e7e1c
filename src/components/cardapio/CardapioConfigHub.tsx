@@ -171,7 +171,7 @@ function QRCodeBalcaoSection({ url }: { url: string }) {
       <div className="flex items-center gap-4 p-3 rounded-xl bg-secondary/30 border border-border/30">
         <QRCodeSVG value={url} size={96} bgColor="transparent" fgColor="currentColor" className="text-foreground shrink-0" />
         <div className="flex-1 min-w-0 space-y-2">
-          <p className="text-sm font-semibold text-foreground">QR Code Balcão</p>
+          <p className="text-sm font-semibold text-foreground">Solução QR Code</p>
           <p className="text-[10px] text-muted-foreground truncate">{url.replace(/^https?:\/\//, '')}</p>
           <div className="flex gap-2">
             <Button
