@@ -170,25 +170,35 @@ const defaultSettings: Omit<RecipeCostSettings, 'id' | 'user_id' | 'created_at' 
      },
    });
  
-   // Calcular custos operacionais para um custo de ingredientes específico
-   const calculateOperationalCosts = (ingredientCost: number): OperationalCosts => {
-     const effectiveSettings = settings || defaultSettings;
-     const monthlyProducts = effectiveSettings.monthly_products_sold || 1000;
-     
-     const fixedCostPerProduct = monthlyProducts > 0 ? monthlyFixedCost / monthlyProducts : 0;
-     const taxAmount = ingredientCost * (effectiveSettings.tax_percentage / 100);
-     const cardFeeAmount = ingredientCost * (effectiveSettings.card_fee_percentage / 100);
-     const packagingCost = effectiveSettings.packaging_cost_per_unit;
-     
-     return {
-       fixedCostPerProduct,
-       taxAmount,
-       cardFeeAmount,
-       packagingCost,
-       totalOperational: fixedCostPerProduct + taxAmount + cardFeeAmount + packagingCost,
-       monthlyFixedCost,
-     };
-   };
+    // Calcular custos operacionais para um custo de ingredientes específico
+    // sellingPrice: preço de venda do produto para rateio proporcional de custos fixos
+    const calculateOperationalCosts = (ingredientCost: number, sellingPrice?: number): OperationalCosts => {
+      const effectiveSettings = settings || defaultSettings;
+      const monthlyRevenue = effectiveSettings.monthly_revenue || 50000;
+      
+      // Rateio proporcional: (preço de venda / receita mensal) × custo fixo mensal
+      let fixedCostPerProduct: number;
+      if (sellingPrice && sellingPrice > 0 && monthlyRevenue > 0) {
+        fixedCostPerProduct = (sellingPrice / monthlyRevenue) * monthlyFixedCost;
+      } else {
+        // Fallback: divisão simples por quantidade de produtos
+        const monthlyProducts = effectiveSettings.monthly_products_sold || 1000;
+        fixedCostPerProduct = monthlyProducts > 0 ? monthlyFixedCost / monthlyProducts : 0;
+      }
+      
+      const taxAmount = ingredientCost * (effectiveSettings.tax_percentage / 100);
+      const cardFeeAmount = ingredientCost * (effectiveSettings.card_fee_percentage / 100);
+      const packagingCost = effectiveSettings.packaging_cost_per_unit;
+      
+      return {
+        fixedCostPerProduct,
+        taxAmount,
+        cardFeeAmount,
+        packagingCost,
+        totalOperational: fixedCostPerProduct + taxAmount + cardFeeAmount + packagingCost,
+        monthlyFixedCost,
+      };
+    };
  
    return {
      settings: settings || defaultSettings,
