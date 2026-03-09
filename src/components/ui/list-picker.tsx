@@ -39,6 +39,7 @@ export function ListPicker({
   onCreateNew,
   createLabel = 'Criar novo',
   createPlaceholder = 'Nome...',
+  nested = false,
 }: ListPickerProps) {
   const [search, setSearch] = useState('');
   const [newName, setNewName] = useState('');
