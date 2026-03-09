@@ -150,15 +150,15 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
         .insert({
-          unit_id: unitId,
-          table_number: 0,
-          status: 'awaiting_confirmation',
-          total: grandTotal,
-          source: 'delivery',
-          customer_name: customerName.trim(),
-          customer_phone: customerPhone.replace(/\D/g, ''),
-          customer_address: customerAddress.trim(),
-        })
+        unit_id: unitId,
+        table_number: 0,
+        status: autoConfirm ? 'confirmed' : 'awaiting_confirmation',
+        total: grandTotal,
+        source: 'delivery',
+        customer_name: customerName.trim(),
+        customer_phone: customerPhone.replace(/\D/g, ''),
+        customer_address: customerAddress.trim(),
+      })
         .select('id')
         .single();
 

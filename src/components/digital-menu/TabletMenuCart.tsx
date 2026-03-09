@@ -113,7 +113,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, o
               .insert({
                 unit_id: unitId,
                 table_number: parseInt(tableNumber) || 0,
-                status: 'awaiting_confirmation',
+                status: autoConfirm ? 'confirmed' : 'awaiting_confirmation',
                 total: cartTotal,
                 source: 'mesa',
                 customer_name: customerName.trim(),

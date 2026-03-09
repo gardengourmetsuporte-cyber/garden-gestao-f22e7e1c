@@ -435,6 +435,7 @@ export default function DigitalMenu() {
             cart={cart}
             cartTotal={cartTotal}
             unitId={unitId}
+            autoConfirm={(unit?.store_info as any)?.auto_confirm?.delivery ?? false}
             customerUser={customerUser}
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
