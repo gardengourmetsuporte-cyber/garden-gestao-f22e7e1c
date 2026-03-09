@@ -140,7 +140,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
                 total: cartTotal,
                 source: 'mesa',
-                customer_name: customerName.trim(),
+                customer_name: finalName,
               })
               .select('id')
               .single(),
