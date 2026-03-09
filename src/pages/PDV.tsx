@@ -22,6 +22,7 @@ export default function PDV() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [cartExpanded, setCartExpanded] = useState(true);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [originalCartSize, setOriginalCartSize] = useState(0);
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
