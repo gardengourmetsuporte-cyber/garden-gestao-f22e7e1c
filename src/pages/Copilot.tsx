@@ -336,7 +336,7 @@ export default function CopilotPage() {
         />
 
         {/* Input bar — pb-20 to clear bottom tab bar on mobile */}
-        <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3 pb-20 lg:pb-3">
+        <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3">
           <form onSubmit={handleSubmit} className="flex gap-2 items-center">
             <Button
               type="button"
