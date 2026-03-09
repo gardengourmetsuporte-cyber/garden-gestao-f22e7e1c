@@ -209,7 +209,7 @@ export default function Agenda() {
           </div>
           <p className="text-foreground text-base font-semibold">Tudo em dia! 🎉</p>
           <Button variant="link" className="mt-2 text-primary font-medium hover:text-primary/80" onClick={() => setTaskSheetOpen(true)}>
-            Criar novo lembrete
+            Criar nova tarefa
           </Button>
         </div>
       ) : (
