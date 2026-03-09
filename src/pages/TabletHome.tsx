@@ -25,12 +25,18 @@ export default function TabletHome() {
   const [searchParams] = useSearchParams();
   const mesa = searchParams.get('mesa') || '1';
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['tablet-home', unitId],
     queryFn: async () => {
       if (!unitId) return { unit: null, rodizio: null as RodizioSettings | null };
 
-      const [unitRes, rodizioRes] = await Promise.all([
+      const withTimeout = <T,>(promise: Promise<T>, ms = 12000) =>
+        Promise.race<T>([
+          promise,
+          new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout ao carregar página')), ms)),
+        ]);
+
+      const [unitRes, rodizioRes] = await withTimeout(Promise.all([
         supabase.from('units').select('name, store_info').eq('id', unitId).single(),
         supabase
           .from('rodizio_settings')
@@ -38,7 +44,7 @@ export default function TabletHome() {
           .eq('unit_id', unitId)
           .eq('is_active', true)
           .maybeSingle(),
-      ]);
+      ]));
 
       if (unitRes.error) throw unitRes.error;
       if (rodizioRes.error) throw rodizioRes.error;
@@ -52,6 +58,8 @@ export default function TabletHome() {
     staleTime: 3 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   const unit = data?.unit ?? null;
@@ -123,6 +131,24 @@ export default function TabletHome() {
           <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
         </div>
         <p className="text-sm font-semibold text-foreground">Carregando...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-4 px-6 text-center">
+        <AppIcon name="WifiOff" size={34} className="text-destructive" />
+        <div>
+          <p className="text-base font-bold text-foreground">Falha ao abrir o tablet</p>
+          <p className="text-sm text-muted-foreground mt-1">{(error as Error)?.message || 'Erro de conexão'}</p>
+        </div>
+        <button
+          onClick={() => refetch()}
+          className="h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   }

@@ -298,17 +298,26 @@ export default function KDS() {
   const [selectedOrder, setSelectedOrder] = useState<KDSOrder | null>(null);
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
 
-  const { data: orders = [], isPending, isFetching } = useQuery({
+  const { data: orders = [], isPending, isError, error, refetch } = useQuery({
     queryKey: ['kds-orders', unitId],
     queryFn: async () => {
       if (!unitId) return [];
-      const { data, error } = await supabase
-        .from('tablet_orders')
-        .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
-        .eq('unit_id', unitId)
-        .in('status', ACTIVE_STATUSES)
-        .order('created_at', { ascending: true })
-        .limit(50);
+
+      const withTimeout = <T,>(promise: Promise<T>, ms = 12000) =>
+        Promise.race<T>([
+          promise,
+          new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout ao carregar pedidos do KDS')), ms)),
+        ]);
+
+      const { data, error } = await withTimeout((async () => {
+        return supabase
+          .from('tablet_orders')
+          .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
+          .eq('unit_id', unitId)
+          .in('status', ACTIVE_STATUSES)
+          .order('created_at', { ascending: true })
+          .limit(50);
+      })());
       if (error) throw error;
       return (data as unknown as KDSOrder[]) || [];
     },
@@ -418,6 +427,20 @@ export default function KDS() {
       </header>
 
       {/* ── Column headers ── */}
+      {isError && (
+        <div className="mx-2.5 mt-2.5 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 flex items-center justify-between gap-3">
+          <p className="text-xs text-destructive font-medium truncate">
+            {(error as Error)?.message || 'Falha ao carregar pedidos'}
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="h-7 px-2.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold shrink-0"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-4 shrink-0">
         {COLUMNS.map(col => {
           const a = ACCENT_MAP[col.accent];
@@ -459,7 +482,7 @@ export default function KDS() {
       )}
 
       {/* Loading */}
-      {(isPending || (isFetching && orders.length === 0)) && (
+      {(isPending && !isError) && (
         <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50">
           <RefreshCw className="w-8 h-8 animate-spin text-emerald-400" />
         </div>
