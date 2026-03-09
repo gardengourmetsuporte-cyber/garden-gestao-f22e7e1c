@@ -16,20 +16,23 @@ interface Props {
   unitId: string;
   autoConfirm?: boolean;
   customerUser?: User | null;
+  source?: string;
   onUpdateQuantity: (index: number, qty: number) => void;
   onRemove: (index: number) => void;
   onClear: () => void;
 }
 
-export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, onUpdateQuantity, onRemove, onClear }: Props) {
+export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, source, onUpdateQuantity, onRemove, onClear }: Props) {
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
   const [sentAutoConfirmed, setSentAutoConfirmed] = useState(false);
+  const isQrCode = source === 'qrcode';
 
   // Delivery fields — pre-fill from logged-in user + saved customer data
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+  const [tableNumber, setTableNumber] = useState('');
   const [saveAddress, setSaveAddress] = useState(true);
 
   // Fee calculation
@@ -109,12 +112,16 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         </div>
         <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
           <div className="flex items-center gap-3 text-sm">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/12 flex items-center justify-center shrink-0">
-              <AppIcon name="Schedule" size={20} className="text-amber-500" />
+            <div className={`w-10 h-10 rounded-xl ${isQrCode ? 'bg-primary/12' : 'bg-amber-500/12'} flex items-center justify-center shrink-0`}>
+              <AppIcon name={isQrCode ? 'HourglassEmpty' : 'Schedule'} size={20} className={isQrCode ? 'text-primary' : 'text-amber-500'} />
             </div>
             <div className="text-left">
-              <p className="font-semibold text-foreground">Aguardando preparo</p>
-              <p className="text-xs text-muted-foreground">Seu pedido foi confirmado automaticamente</p>
+              <p className="font-semibold text-foreground">
+                {isQrCode ? 'Aguardando aprovação' : 'Aguardando preparo'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {isQrCode ? 'Seu pedido será confirmado pelo restaurante' : 'Seu pedido foi confirmado automaticamente'}
+              </p>
             </div>
           </div>
         </div>
@@ -142,26 +149,42 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
 
   const handleSend = async () => {
     if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
-    if (!customerPhone.trim()) { toast.error('Informe seu telefone'); return; }
-    if (!customerAddress.trim()) { toast.error('Informe seu endereço de entrega'); return; }
-    if (feeResult?.out_of_range) { toast.error('Endereço fora da área de entrega'); return; }
-
+    if (isQrCode) {
+      if (!tableNumber.trim() || parseInt(tableNumber) <= 0) { toast.error('Informe o número da mesa'); return; }
+    } else {
+      if (!customerPhone.trim()) { toast.error('Informe seu telefone'); return; }
+      if (!customerAddress.trim()) { toast.error('Informe seu endereço de entrega'); return; }
+      if (feeResult?.out_of_range) { toast.error('Endereço fora da área de entrega'); return; }
+    }
 
     setSending(true);
 
     try {
+      const orderData = isQrCode
+        ? {
+            unit_id: unitId,
+            table_number: parseInt(tableNumber),
+            status: 'awaiting_confirmation',
+            total: cartTotal,
+            source: 'qrcode' as string,
+            customer_name: customerName.trim(),
+            customer_phone: null as string | null,
+            customer_address: null as string | null,
+          }
+        : {
+            unit_id: unitId,
+            table_number: 0,
+            status: 'confirmed',
+            total: grandTotal,
+            source: 'delivery' as string,
+            customer_name: customerName.trim(),
+            customer_phone: customerPhone.replace(/\D/g, ''),
+            customer_address: customerAddress.trim(),
+          };
+
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
-        .insert({
-        unit_id: unitId,
-        table_number: 0,
-        status: 'confirmed',
-        total: grandTotal,
-        source: 'delivery',
-        customer_name: customerName.trim(),
-        customer_phone: customerPhone.replace(/\D/g, ''),
-        customer_address: customerAddress.trim(),
-      })
+        .insert(orderData)
         .select('id')
         .single();
 
@@ -178,21 +201,23 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
-      // Auto send to PDV
-      try {
-        await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            },
-            body: JSON.stringify({ order_id: (order as any).id }),
-          }
-        );
-      } catch (e) {
-        console.warn('[MenuCart] send-to-pdv failed:', e);
+      // Auto send to PDV (skip for qrcode — needs manual approval)
+      if (!isQrCode) {
+        try {
+          await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              },
+              body: JSON.stringify({ order_id: (order as any).id }),
+            }
+          );
+        } catch (e) {
+          console.warn('[MenuCart] send-to-pdv failed:', e);
+        }
       }
 
       // Save address to customer record (fire-and-forget, don't block order)
@@ -241,45 +266,59 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           <span className="text-sm font-semibold text-foreground">{formatPrice(cartTotal)}</span>
         </div>
 
-        {/* Delivery fee line */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground flex items-center gap-1">
-            Taxa de entrega
-            {calculating && <AppIcon name="Loader2" size={12} className="animate-spin text-muted-foreground" />}
-          </span>
-          {feeResult?.out_of_range ? (
-            <span className="text-xs font-medium text-destructive">Fora da área</span>
-          ) : feeResult && feeResult.fee !== null ? (
-            <span className="text-sm font-semibold text-foreground">
-              {feeResult.fee === 0 ? 'Grátis' : formatPrice(feeResult.fee)}
-            </span>
-          ) : (
-            <span className="text-xs text-muted-foreground">—</span>
-          )}
-        </div>
+        {/* Delivery fee line — hide for QR Code */}
+        {!isQrCode && (
+          <>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                Taxa de entrega
+                {calculating && <AppIcon name="Loader2" size={12} className="animate-spin text-muted-foreground" />}
+              </span>
+              {feeResult?.out_of_range ? (
+                <span className="text-xs font-medium text-destructive">Fora da área</span>
+              ) : feeResult && feeResult.fee !== null ? (
+                <span className="text-sm font-semibold text-foreground">
+                  {feeResult.fee === 0 ? 'Grátis' : formatPrice(feeResult.fee)}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )}
+            </div>
 
-        {/* Distance info */}
-        {feeResult && !feeResult.out_of_range && (
-          <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-            <AppIcon name="MapPin" size={10} />
-            <span>{feeResult.distance_km} km · {feeResult.duration}</span>
-            {feeResult.zone_name && <span>· {feeResult.zone_name}</span>}
-          </div>
+            {/* Distance info */}
+            {feeResult && !feeResult.out_of_range && (
+              <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                <AppIcon name="MapPin" size={10} />
+                <span>{feeResult.distance_km} km · {feeResult.duration}</span>
+                {feeResult.zone_name && <span>· {feeResult.zone_name}</span>}
+              </div>
+            )}
+          </>
         )}
 
         <div className="border-t border-border/30" />
         <div className="flex items-center justify-between">
           <span className="font-bold text-foreground">Total</span>
-          <span className="text-xl font-bold text-primary">{formatPrice(grandTotal)}</span>
+          <span className="text-xl font-bold text-primary">{formatPrice(isQrCode ? cartTotal : grandTotal)}</span>
         </div>
       </div>
 
       {/* Out of range warning */}
-      {feeResult?.out_of_range && (
+      {!isQrCode && feeResult?.out_of_range && (
         <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 flex items-center gap-2">
           <AppIcon name="AlertTriangle" size={16} className="text-destructive shrink-0" />
           <p className="text-xs text-destructive">
             Infelizmente não entregamos neste endereço ({feeResult.distance_km} km). Tente um endereço mais próximo.
+          </p>
+        </div>
+      )}
+
+      {/* QR Code dine-in info */}
+      {isQrCode && (
+        <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 flex items-center gap-2">
+          <AppIcon name="RestaurantMenu" size={16} className="text-primary shrink-0" />
+          <p className="text-xs text-muted-foreground">
+            Pedido para <span className="font-semibold text-foreground">comer no restaurante</span>. Será confirmado pelo atendente.
           </p>
         </div>
       )}
@@ -300,11 +339,11 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         </div>
       )}
 
-      {/* Delivery fields */}
+      {/* Customer fields */}
       <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
         <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-          <AppIcon name="Bike" size={16} className="text-primary" />
-          Dados para entrega
+          <AppIcon name={isQrCode ? 'RestaurantMenu' : 'Bike'} size={16} className="text-primary" />
+          {isQrCode ? 'Dados para o pedido' : 'Dados para entrega'}
         </h3>
         <Input
           placeholder="Seu nome *"
@@ -312,44 +351,58 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           onChange={e => setCustomerName(e.target.value)}
           className="h-12 rounded-xl"
         />
-        <Input
-          placeholder="Telefone *"
-          value={customerPhone}
-          onChange={e => setCustomerPhone(formatPhone(e.target.value))}
-          className="h-12 rounded-xl"
-          inputMode="tel"
-        />
-        <Textarea
-          placeholder="Endereço completo * (rua, número, bairro, cidade)"
-          value={customerAddress}
-          onChange={e => handleAddressChange(e.target.value)}
-          className="rounded-xl resize-none"
-          rows={2}
-        />
-        {customerUser && (
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={saveAddress}
-              onChange={e => setSaveAddress(e.target.checked)}
-              className="w-4 h-4 rounded border-border accent-primary"
+        {isQrCode ? (
+          <Input
+            placeholder="Número da mesa *"
+            value={tableNumber}
+            onChange={e => setTableNumber(e.target.value.replace(/\D/g, ''))}
+            className="h-12 rounded-xl"
+            inputMode="numeric"
+            type="number"
+            min={1}
+          />
+        ) : (
+          <>
+            <Input
+              placeholder="Telefone *"
+              value={customerPhone}
+              onChange={e => setCustomerPhone(formatPhone(e.target.value))}
+              className="h-12 rounded-xl"
+              inputMode="tel"
             />
-            <span className="text-xs text-muted-foreground">Salvar endereço para próximos pedidos</span>
-          </label>
+            <Textarea
+              placeholder="Endereço completo * (rua, número, bairro, cidade)"
+              value={customerAddress}
+              onChange={e => handleAddressChange(e.target.value)}
+              className="rounded-xl resize-none"
+              rows={2}
+            />
+            {customerUser && (
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={saveAddress}
+                  onChange={e => setSaveAddress(e.target.checked)}
+                  className="w-4 h-4 rounded border-border accent-primary"
+                />
+                <span className="text-xs text-muted-foreground">Salvar endereço para próximos pedidos</span>
+              </label>
+            )}
+          </>
         )}
       </div>
 
       <Button
         className="w-full h-14 text-base font-bold rounded-xl"
         onClick={handleSend}
-        disabled={sending || feeResult?.out_of_range}
+        disabled={sending || (!isQrCode && feeResult?.out_of_range)}
       >
         {sending ? (
           <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
         ) : (
           <AppIcon name="Send" size={20} className="mr-2" />
         )}
-        Finalizar Pedido • {formatPrice(grandTotal)}
+        {isQrCode ? `Enviar Pedido • ${formatPrice(cartTotal)}` : `Finalizar Pedido • ${formatPrice(grandTotal)}`}
       </Button>
     </div>
   );

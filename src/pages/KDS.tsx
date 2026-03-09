@@ -113,11 +113,13 @@ function OrderCard({
         <div className="flex items-center gap-1.5">
           {source === 'delivery' ? (
             <Truck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+          ) : source === 'qrcode' ? (
+            <Hash className="w-3.5 h-3.5 text-purple-400 shrink-0" />
           ) : (
             <UtensilsCrossed className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
           )}
           <span className="text-xs font-semibold text-white/70 truncate">
-            {source === 'delivery' ? 'Delivery' : `Mesa ${order.table_number}`}
+            {source === 'delivery' ? 'Delivery' : source === 'qrcode' ? `QR · Mesa ${order.table_number}` : `Mesa ${order.table_number}`}
           </span>
           {order.customer_name && (
             <span className="text-[10px] text-white/40 truncate ml-auto">{order.customer_name}</span>
@@ -208,9 +210,9 @@ function OrderDetail({
       {/* ── Info bar ── */}
       <div className="flex items-center gap-4 px-4 sm:px-6 py-2.5 border-b border-white/[0.06] bg-white/[0.02] shrink-0 text-sm">
         <div className="flex items-center gap-1.5">
-          {source === 'delivery' ? <Truck className="w-4 h-4 text-blue-400" /> : <UtensilsCrossed className="w-4 h-4 text-emerald-400" />}
+          {source === 'delivery' ? <Truck className="w-4 h-4 text-blue-400" /> : source === 'qrcode' ? <Hash className="w-4 h-4 text-purple-400" /> : <UtensilsCrossed className="w-4 h-4 text-emerald-400" />}
           <span className="font-bold text-white/80">
-            {source === 'delivery' ? 'Delivery' : `Mesa ${order.table_number}`}
+            {source === 'delivery' ? 'Delivery' : source === 'qrcode' ? `QR Code · Mesa ${order.table_number}` : `Mesa ${order.table_number}`}
           </span>
         </div>
         {order.customer_name && (
