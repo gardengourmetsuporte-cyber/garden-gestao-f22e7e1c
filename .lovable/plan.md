@@ -1,39 +1,45 @@
 
 
-## Plano: Tela de Nota Fiscal com cadastro rápido de cliente
+## Plano: Substituir saudação por header contextual integrado ao top bar
 
-### Fluxo
-1. Usuário finaliza venda com "Emitir nota fiscal" ativado
-2. Após `finalizeSale` retornar o `saleId`, abre um **InvoiceSheet** (bottom sheet)
-3. Nessa tela o operador pode:
-   - **Cadastrar cliente rápido**: nome + telefone (mínimo). Busca por telefone se já existe
-   - **Enviar nota**: via WhatsApp (link) ou apenas registrar
-   - Cliente já ganha pontos de fidelidade automaticamente (trigger existente `auto_update_customer_loyalty`)
-4. Se o cliente já foi identificado pelo telefone, mostra os dados e linka a venda
+### O que muda
 
-### Mudanças
+A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
 
-**1. Novo componente `src/components/pdv/InvoiceSheet.tsx`**
-- Bottom sheet que abre após finalização quando `emitInvoice = true`
-- Campo de telefone com busca automática no banco (debounce 500ms)
-  - Se encontrar cliente: mostra nome, segmento, pontos acumulados
-  - Se não encontrar: formulário rápido (nome + telefone, ambos obrigatórios)
-- Botão "Cadastrar e Vincular" ou "Vincular Cliente"
-- Ao vincular: atualiza `pos_sales.customer_name` e `pos_sales.customer_document` com o telefone
-- Chama `registrarCompra` do `customerService.ts` para incrementar dados do cliente
-- Exibe resumo da nota (itens, total, forma de pagamento)
-- Botão "Compartilhar via WhatsApp" que gera link `wa.me/{phone}?text=...`
-- Botão "Concluir" para fechar
+### Conceito visual
 
-**2. Alteração em `src/pages/PDV.tsx`**
-- Adicionar estado `invoiceData` com `{ saleId, total, emitInvoice }` 
-- No `handleFinalize`: se `emitInvoice`, armazenar dados e abrir `InvoiceSheet` após sucesso
-- Passar `customerName` existente como valor inicial
+```text
+┌──────────────────────────────────┐
+│  [logo]          [bell] [avatar] │  ← top bar (já existe)
+├──────────────────────────────────┤
+│                                  │
+│  Olá, Bruno                      │  ← greeting inline, menor
+│  ┌────────┐ ┌────────┐ ┌──────┐ │
+│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
+│  │pendente│ │tarefas │ │alertas│ │     dados do dia
+│  └────────┘ └────────┘ └──────┘ │
+│                                  │
+└──────────────────────────────────┘
+```
 
-**3. Atualizar tipo Customer origin**
-- Adicionar `'pdv'` como origin (já existe no tipo, perfeito)
+### Implementação
 
-### Arquivos afetados
-- `src/components/pdv/InvoiceSheet.tsx` — novo componente
-- `src/pages/PDV.tsx` — integrar sheet pós-venda
+1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
+
+2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
+   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
+   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
+     - Contas a vencer (se houver)
+     - Checklists pendentes
+     - Pedidos pendentes
+     - Tarefas da agenda
+   - Cada pill é clicável e navega para o módulo correspondente
+   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
+   - Sem data, sem frase motivacional — informação pura e acionável
+
+3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
+
+### Resultado
+
+Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
 

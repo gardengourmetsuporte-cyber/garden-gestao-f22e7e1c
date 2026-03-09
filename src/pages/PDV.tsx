@@ -8,6 +8,7 @@ import { usePOS, type POSProduct, type PaymentLine, type PendingOrder } from '@/
 import { useCashRegister } from '@/hooks/useCashRegister';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
 import { DeliveryPaymentSheet } from '@/components/pdv/DeliveryPaymentSheet';
+import { InvoiceSheet } from '@/components/pdv/InvoiceSheet';
 import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { PendingOrdersSheet } from '@/components/pdv/PendingOrdersSheet';
 import { CashRegisterOpenDialog } from '@/components/pdv/CashRegisterOpenDialog';
@@ -33,6 +34,12 @@ export default function PDV() {
   const [openRegisterDialog, setOpenRegisterDialog] = useState(false);
   const [closeRegisterSheet, setCloseRegisterSheet] = useState(false);
   const [deliveryPaymentOpen, setDeliveryPaymentOpen] = useState(false);
+  const [invoiceData, setInvoiceData] = useState<{
+    saleId: string;
+    total: number;
+    payments: { method: string; amount: number }[];
+    items: { name: string; quantity: number; unit_price: number }[];
+  } | null>(null);
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
@@ -46,10 +53,26 @@ export default function PDV() {
 
   const handleFinalize = async (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string }) => {
     if (options.notes) pos.setSaleNotes(options.notes);
+    // Capture cart before finalize clears it
+    const cartSnapshot = pos.cart.map(i => ({
+      name: i.product.name,
+      quantity: i.quantity,
+      unit_price: i.unit_price,
+    }));
+    const totalSnapshot = pos.total;
     const saleId = await pos.finalizeSale(payments, activeOrderId || undefined);
     if (saleId) {
       setPaymentOpen(false);
       setActiveOrderId(null);
+      // Open invoice sheet if emitInvoice
+      if (options.emitInvoice) {
+        setInvoiceData({
+          saleId,
+          total: totalSnapshot,
+          payments: payments.map(p => ({ method: p.method, amount: p.amount })),
+          items: cartSnapshot,
+        });
+      }
     }
   };
 
@@ -438,6 +461,18 @@ export default function PDV() {
           if (orderId) setDeliveryPaymentOpen(false);
         }}
       />
+
+      {invoiceData && (
+        <InvoiceSheet
+          open={!!invoiceData}
+          onOpenChange={(open) => { if (!open) setInvoiceData(null); }}
+          saleId={invoiceData.saleId}
+          total={invoiceData.total}
+          customerName={pos.customerName}
+          payments={invoiceData.payments}
+          items={invoiceData.items}
+        />
+      )}
 
       <PinDialog
         open={cancelPinOpen}
