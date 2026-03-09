@@ -207,6 +207,7 @@ interface Props {
 
 export interface DeliveryMapHandle {
   focusDelivery: (deliveryId: string) => void;
+  centerOnMyLocation: () => void;
 }
 
 export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function DeliveryMap(
