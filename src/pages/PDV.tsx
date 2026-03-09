@@ -350,7 +350,7 @@ export default function PDV() {
                         Fechar
                       </button>
                     )}
-                    {/* Cancel existing order (requires PIN) */}
+                    {/* Cancel existing order (requires PIN) — only for orders already sent */}
                     {activeOrderId && (
                       <button onClick={handleCancelClick} className="h-9 px-3 rounded-xl bg-destructive/10 text-destructive text-xs font-semibold flex items-center gap-1 active:scale-95">
                         <AppIcon name="Ban" size={13} />
@@ -365,17 +365,15 @@ export default function PDV() {
                       </button>
                     )}
 
-                    {/* Send order */}
-                    {(pos.saleSource !== 'balcao' || pos.saleSource === 'balcao') && (
-                      <button
-                        onClick={() => pos.sendOrder()}
-                        disabled={pos.savingSale}
-                        className="h-9 px-3 rounded-xl bg-secondary/60 border border-border/30 text-foreground text-xs font-semibold flex items-center gap-1 active:scale-95 disabled:opacity-50"
-                      >
-                        <AppIcon name="Send" size={13} />
-                        Enviar
-                      </button>
-                    )}
+                    {/* Send order — disabled if loaded order has no new items added */}
+                    <button
+                      onClick={() => pos.sendOrder()}
+                      disabled={pos.savingSale || pos.cart.length === 0 || (!!activeOrderId && pos.cart.length <= originalCartSize)}
+                      className="h-9 px-3 rounded-xl bg-secondary/60 border border-border/30 text-foreground text-xs font-semibold flex items-center gap-1 active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
+                    >
+                      <AppIcon name="Send" size={13} />
+                      Enviar
+                    </button>
 
                     {/* Finalize / Cobrar */}
                     <button
