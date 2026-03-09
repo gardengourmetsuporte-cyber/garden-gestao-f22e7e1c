@@ -20,6 +20,7 @@ export default function PDV() {
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [cartExpanded, setCartExpanded] = useState(true);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
 
   const filteredProducts = useMemo(() => {
