@@ -412,6 +412,17 @@ export function usePOS() {
       return { authorized: true, userName: emp.full_name };
     }
 
+    // Check global super_admin role
+    const { data: globalRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', emp.user_id)
+      .in('role', ['admin', 'super_admin'])
+      .maybeSingle();
+    if (globalRole) {
+      return { authorized: true, userName: emp.full_name };
+    }
+
     if (!uu?.access_level_id) return { authorized: false, userName: emp.full_name };
 
     const { data: al } = await supabase
