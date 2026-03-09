@@ -27,13 +27,14 @@ import { AppIcon } from '@/components/ui/app-icon';
  
    // Carregar valores quando settings mudar
    useEffect(() => {
-     if (settings && 'id' in settings) {
-       setMonthlyProductsSold(String(settings.monthly_products_sold || 1000));
-       setTaxPercentage(String(settings.tax_percentage || 0));
-       setCardFeePercentage(String(settings.card_fee_percentage || 0));
-       setPackagingCostPerUnit(String(settings.packaging_cost_per_unit || 0));
-       setSelectedCategoryIds(settings.fixed_cost_category_ids || []);
-     }
+      if (settings && 'id' in settings) {
+        setMonthlyProductsSold(String(settings.monthly_products_sold || 1000));
+        setMonthlyRevenue(String((settings as any).monthly_revenue || 50000));
+        setTaxPercentage(String(settings.tax_percentage || 0));
+        setCardFeePercentage(String(settings.card_fee_percentage || 0));
+        setPackagingCostPerUnit(String(settings.packaging_cost_per_unit || 0));
+        setSelectedCategoryIds(settings.fixed_cost_category_ids || []);
+      }
    }, [settings]);
  
    const handleToggleCategory = (categoryId: string) => {
