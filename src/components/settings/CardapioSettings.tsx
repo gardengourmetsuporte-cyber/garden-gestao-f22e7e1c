@@ -416,6 +416,8 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
             </Button>
           </div>
 
+          <PixKeyConfig />
+
           <div className="card-base p-4 space-y-3">
             <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
               <AppIcon name="CreditCard" size={16} className="text-primary" /> Pagamento no Cardápio
