@@ -64,8 +64,7 @@ export default function CardapioHub() {
   const tabletAdmin = useTabletAdmin();
   const { orders, pdvConfig, retryPDV } = tabletAdmin;
 
-  // Rodízio settings
-  const { settings: rodizioSettings, loading: rodizioLoading } = useRodizioSettings();
+  // Recipe sync
 
   // Recipe sync
   const recipeSync = useRecipeMenuSync(products, groups, () => {
