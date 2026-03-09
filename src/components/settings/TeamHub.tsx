@@ -241,15 +241,18 @@ function MembersTab() {
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1 shrink-0 min-w-0">
               {/* Access level picker button */}
               <button
                 onClick={() => setPickerUserId(u.user_id)}
-                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-background border border-border text-[11px] font-medium hover:bg-secondary transition-colors max-w-[100px] truncate"
+                className="h-9 w-[128px] sm:w-[160px] flex items-center justify-between gap-2 px-2.5 rounded-lg bg-background border border-border text-[11px] font-medium hover:bg-secondary transition-colors overflow-hidden"
                 title="Nível de acesso"
               >
-                <AppIcon name="Shield" size={12} className="text-muted-foreground shrink-0" />
-                <span className="truncate">{getAccessLevelLabel(u.user_id)}</span>
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <AppIcon name="Shield" size={12} className="text-muted-foreground shrink-0" />
+                  <span className="truncate">{getAccessLevelLabel(u.user_id)}</span>
+                </span>
+                <AppIcon name="ChevronDown" size={12} className="text-muted-foreground/80 shrink-0" />
               </button>
               <button
                 onClick={() => { setPasswordDialogUser(u); setNewPassword(''); setShowPassword(true); }}
