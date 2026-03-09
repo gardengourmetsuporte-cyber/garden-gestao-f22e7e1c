@@ -44,6 +44,7 @@ export function ItemFormSheetNew({
   onOpenChange, 
   onSave, 
   onDelete,
+  onCreateSupplier,
   isAdmin 
 }: ItemFormSheetProps) {
   const [name, setName] = useState('');
