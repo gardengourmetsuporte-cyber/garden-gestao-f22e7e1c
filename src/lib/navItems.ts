@@ -32,14 +32,13 @@ export const NAV_ITEMS: NavItem[] = [
   // ── Gestão ──
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'UserSearch', label: 'Clientes', href: '/customers', group: 'gestao', groupLabel: 'Gestão' },
-  
+  { icon: 'Handshake', label: 'Fornecedores', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
 
   // ── Operação ──
   { icon: 'ClipboardCheck', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Truck', customIcon: '/icons/motocicleta.png', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'ShoppingCart', label: 'Pedidos', href: '/orders', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Monitor', label: 'PDV', href: '/pdv', group: 'operacao', groupLabel: 'Operação' },
 
   // ── Pessoas ──
