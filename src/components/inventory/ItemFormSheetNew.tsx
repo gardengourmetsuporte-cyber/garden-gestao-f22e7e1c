@@ -75,6 +75,11 @@ export function ItemFormSheetNew({
       setRecipeUnitType(item.recipe_unit_type || '');
       setRecipeUnitPrice(item.recipe_unit_price?.toString() || '');
       setShowRecipeSection(!!item.recipe_unit_type || !!item.recipe_unit_price);
+      setStockUnitLabel(item.stock_unit_label || '');
+      setStockToRecipeFactor(item.stock_to_recipe_factor?.toString() || '');
+      setPurchaseUnitLabel(item.purchase_unit_label || '');
+      setPurchaseToStockFactor(item.purchase_to_stock_factor?.toString() || '');
+      setShowPurchaseSection(!!item.purchase_unit_label || !!item.purchase_to_stock_factor);
     } else {
       setName('');
       setCategoryId('');
