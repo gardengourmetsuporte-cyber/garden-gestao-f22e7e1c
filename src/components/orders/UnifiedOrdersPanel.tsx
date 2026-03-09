@@ -113,7 +113,7 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
   return (
     <div className="space-y-3">
       {/* Tab cards */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         {tabs.map(tab => (
           <button
             key={tab.id}
