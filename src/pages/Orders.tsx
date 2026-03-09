@@ -46,7 +46,7 @@ export default function OrdersPage() {
   const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
   const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
-  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list' | 'suppliers'>('to-order');
+  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list' | 'suppliers' | 'production'>('to-order');
   const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
   const [cotationStep, setCotationStep] = useState(false);
   const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
