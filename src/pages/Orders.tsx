@@ -22,13 +22,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { QuotationList } from '@/components/orders/QuotationList';
 import { useShoppingList } from '@/hooks/useShoppingList';
+import { SupplierProfileSheet } from '@/components/orders/SupplierProfileSheet';
+import { useFabAction } from '@/contexts/FabActionContext';
+import { normalizePhone } from '@/lib/normalizePhone';
 
 export default function OrdersPage() {
   const { isAdmin } = useAuth();
   const { items, registerMovement } = useInventoryDB();
-  const { suppliers } = useSuppliers();
+  const { suppliers, addSupplier, updateSupplier, deleteSupplier } = useSuppliers();
   const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
-  const { addInvoice } = useSupplierInvoices();
+  const { addInvoice, invoices } = useSupplierInvoices();
   const { createQuotation } = useQuotations();
   const { items: shoppingListItems, removeFromList, clearList, isLoading: shoppingListLoading } = useShoppingList();
 
@@ -42,11 +45,53 @@ export default function OrdersPage() {
   const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
   const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
-  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list'>('to-order');
+  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list' | 'suppliers'>('to-order');
   const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
   const [cotationStep, setCotationStep] = useState(false);
   const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
   const [isCreatingQuotation, setIsCreatingQuotation] = useState(false);
+
+  // Supplier profile states
+  const [profileSheetOpen, setProfileSheetOpen] = useState(false);
+  const [profileSupplier, setProfileSupplier] = useState<Supplier | null>(null);
+  const [isNewSupplier, setIsNewSupplier] = useState(false);
+  const [supplierSearch, setSupplierSearch] = useState('');
+
+  const handleOpenProfile = (supplier: Supplier) => {
+    setProfileSupplier(supplier);
+    setIsNewSupplier(false);
+    setProfileSheetOpen(true);
+  };
+
+  const handleNewSupplier = () => {
+    setProfileSupplier(null);
+    setIsNewSupplier(true);
+    setProfileSheetOpen(true);
+  };
+
+  const handleSaveProfile = async (data: { name: string; phone?: string; email?: string; delivery_frequency?: string }) => {
+    if (isNewSupplier) {
+      const created = await addSupplier(data as any);
+      setProfileSupplier(created);
+      setIsNewSupplier(false);
+    } else if (profileSupplier) {
+      await updateSupplier(profileSupplier.id, data as any);
+      setProfileSupplier({ ...profileSupplier, ...data } as Supplier);
+    }
+  };
+
+  const handleDeleteProfile = async (id: string) => {
+    await deleteSupplier(id);
+    setProfileSheetOpen(false);
+  };
+
+  useFabAction(orderTab === 'suppliers' ? { icon: 'Plus', label: 'Novo Fornecedor', onClick: handleNewSupplier } : null, [orderTab]);
+
+  const filteredSuppliers = useMemo(() => {
+    if (!supplierSearch.trim()) return suppliers;
+    const q = supplierSearch.toLowerCase();
+    return suppliers.filter(s => s.name.toLowerCase().includes(q) || s.phone?.includes(q) || s.email?.toLowerCase().includes(q));
+  }, [suppliers, supplierSearch]);
 
   const lowStockItems = useMemo(() => items.filter(item => item.current_stock <= item.min_stock), [items]);
 
@@ -204,12 +249,13 @@ export default function OrdersPage() {
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
           {/* Navigation Cards 2x2 */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-3">
             {([
               { key: 'to-order' as const, label: 'Sugestões', icon: 'Package', badge: lowStockItems.length, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
               { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, color: 'text-blue-400', bg: 'bg-blue-500/10' },
               { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, color: 'text-amber-400', bg: 'bg-amber-500/10' },
               { key: 'orders' as const, label: 'Histórico', icon: 'Clock', badge: pendingOrders.length || undefined, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+              { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: suppliers.length || undefined, color: 'text-primary', bg: 'bg-primary/10' },
             ]).map((tab) => (
               <button
                 key={tab.key}
@@ -590,8 +636,86 @@ export default function OrdersPage() {
                 </div>
               )
             )}
+
+            {/* Fornecedores Tab */}
+            {orderTab === 'suppliers' && (
+              <div className="space-y-3">
+                <Input
+                  value={supplierSearch}
+                  onChange={e => setSupplierSearch(e.target.value)}
+                  placeholder="Buscar fornecedor..."
+                  className="h-11"
+                />
+                {filteredSuppliers.length === 0 ? (
+                  <EmptyState
+                    icon="Truck"
+                    title="Nenhum fornecedor"
+                    subtitle="Cadastre fornecedores para gerenciar pedidos"
+                  />
+                ) : (
+                  <div className="space-y-2">
+                    {filteredSuppliers.map((supplier, index) => {
+                      const supplierOrderCount = orders.filter(o => o.supplier_id === supplier.id).length;
+                      const hasWa = supplier.phone ? !!normalizePhone(supplier.phone) : false;
+                      return (
+                        <button
+                          key={supplier.id}
+                          onClick={() => handleOpenProfile(supplier)}
+                          className="w-full text-left bg-card rounded-2xl border border-border p-4 flex items-center gap-3 transition-all hover:border-primary/25 active:scale-[0.98] animate-fade-in"
+                          style={{ animationDelay: `${index * 30}ms` }}
+                        >
+                          <div className={cn(
+                            "w-11 h-11 rounded-xl flex items-center justify-center shrink-0",
+                            (supplier as any).delivery_frequency === 'daily' ? "bg-primary/15" : "bg-secondary"
+                          )}>
+                            <AppIcon name="Truck" size={20} className={cn(
+                              (supplier as any).delivery_frequency === 'daily' ? "text-primary" : "text-muted-foreground"
+                            )} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-foreground truncate">{supplier.name}</span>
+                              {(supplier as any).delivery_frequency === 'daily' && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold shrink-0">Diário</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 mt-0.5">
+                              {supplier.phone && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <AppIcon name="Phone" size={11} />
+                                  {supplier.phone}
+                                  {hasWa && <span className="text-success">✓</span>}
+                                </span>
+                              )}
+                              {supplierOrderCount > 0 && (
+                                <span className="text-xs text-muted-foreground">
+                                  {supplierOrderCount} pedido{supplierOrderCount !== 1 ? 's' : ''}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Supplier Profile Sheet */}
+        <SupplierProfileSheet
+          open={profileSheetOpen}
+          onOpenChange={setProfileSheetOpen}
+          supplier={profileSupplier}
+          orders={orders}
+          invoices={invoices}
+          onSave={handleSaveProfile}
+          onDelete={handleDeleteProfile}
+          isNew={isNewSupplier}
+        />
 
         {/* Sheets */}
         <ReceiveOrderSheet

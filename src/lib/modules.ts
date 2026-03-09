@@ -72,6 +72,7 @@ export const ALL_MODULES: ModuleDef[] = [
       { key: 'orders.create', label: 'Criar/enviar pedidos', icon: 'PenSquare' },
       { key: 'orders.receive', label: 'Receber pedidos', icon: 'PackageCheck' },
       { key: 'orders.quotations', label: 'Cotações', icon: 'FileSearch' },
+      { key: 'orders.suppliers', label: 'Fornecedores', icon: 'Truck' },
     ],
   },
   {
