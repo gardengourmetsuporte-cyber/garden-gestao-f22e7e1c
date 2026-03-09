@@ -133,8 +133,8 @@ function ProductCard({ product, onSelect }: { product: DMProduct; onSelect: (p: 
         <div className="flex items-center gap-2 mt-2">
           <p className="text-sm font-bold text-primary">{formatPrice(product.price)}</p>
           {product.coin_price != null && product.coin_price > 0 && (
-            <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 text-[11px] font-bold">
-              <AppIcon name="Coins" size={12} />
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/12 text-amber-500 text-[11px] font-bold">
+              <span className="text-[10px]">🪙</span>
               {product.coin_price}
             </span>
           )}

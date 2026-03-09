@@ -110,10 +110,11 @@ export function MenuProductDetail({ product, optionGroups, open, onClose, onAddT
               <div className="flex items-center gap-2.5 mt-3">
                 <p className="text-lg font-bold text-primary">{formatPrice(product.price)}</p>
                 {product.coin_price != null && product.coin_price > 0 && (
-                  <span className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/10 text-amber-600 text-sm font-bold">
-                    <AppIcon name="Coins" size={14} />
-                    {product.coin_price} moedas
-                  </span>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/12 border border-amber-500/20">
+                    <span className="text-sm">🪙</span>
+                    <span className="text-sm font-bold text-amber-500">{product.coin_price}</span>
+                    <span className="text-xs text-amber-500/70">moedas</span>
+                  </div>
                 )}
               </div>
             </div>

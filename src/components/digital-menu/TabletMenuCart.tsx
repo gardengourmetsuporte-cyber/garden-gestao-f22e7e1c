@@ -170,8 +170,9 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 total: payWithCoins ? 0 : cartTotal,
                 source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
                 customer_name: finalName,
+                customer_email: customerUser?.email || null,
                 notes: orderNotes,
-              })
+              } as any)
               .select('id')
               .single(),
             requestTimeoutMs,
