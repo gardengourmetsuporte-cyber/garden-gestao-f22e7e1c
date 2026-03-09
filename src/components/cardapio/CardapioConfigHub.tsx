@@ -108,7 +108,9 @@ export function CardapioConfigHub() {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-0">
-                {section.id === 'qrcode' ? (
+                {section.id === 'kds-stations' ? (
+                  <KDSStationsManager />
+                ) : section.id === 'qrcode' ? (
                   <QRCodeBalcaoSection url={activeUnit ? `${baseUrl}/m/${activeUnit.id}?source=qrcode` : ''} />
                 ) : (
                   <Suspense fallback={<SectionSkeleton />}>
