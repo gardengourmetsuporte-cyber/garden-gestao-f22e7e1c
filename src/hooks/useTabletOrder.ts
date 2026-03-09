@@ -89,7 +89,7 @@ export function useTabletOrder(unitId: string) {
         .insert({
           unit_id: unitId,
           table_number: tableNumber,
-          status: 'awaiting_confirmation',
+          status: 'confirmed',
           total: cartTotal,
         })
         .select()
