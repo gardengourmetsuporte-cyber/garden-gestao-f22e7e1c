@@ -5132,6 +5132,7 @@ export type Database = {
           customer_phone: string | null
           error_message: string | null
           id: string
+          notes: string | null
           order_number: number | null
           payment_change: number | null
           payment_method: string | null
@@ -5152,6 +5153,7 @@ export type Database = {
           customer_phone?: string | null
           error_message?: string | null
           id?: string
+          notes?: string | null
           order_number?: number | null
           payment_change?: number | null
           payment_method?: string | null
@@ -5172,6 +5174,7 @@ export type Database = {
           customer_phone?: string | null
           error_message?: string | null
           id?: string
+          notes?: string | null
           order_number?: number | null
           payment_change?: number | null
           payment_method?: string | null
