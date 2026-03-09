@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { MaterialDeliveries } from '@/components/employees/MaterialDeliveries';
 import { useEmployeePayments } from '@/hooks/useEmployees';
 import { Employee, EmployeePayment, PAYMENT_TYPE_LABELS, PAYMENT_TYPE_COLORS, MONTHS } from '@/types/employee';
 import { supabase } from '@/integrations/supabase/client';
@@ -143,6 +144,10 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
 
 
 
+      {/* Material Deliveries Section */}
+      <div className="mt-6 pt-4 border-t border-border/30">
+        <MaterialDeliveries employeeId={employee.id} compact />
+      </div>
 
       {sortedGroups.map((group) => (
         <div key={`${group.year}-${group.month}`} className="space-y-2">
