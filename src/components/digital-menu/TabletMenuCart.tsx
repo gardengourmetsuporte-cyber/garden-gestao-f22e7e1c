@@ -148,16 +148,34 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, o
             unit_price: c.product.price + c.selectedOptions.reduce((s, o) => s + o.price, 0),
           }));
 
-          const { error: itemsError } = await withTimeout(
-            supabase.from('tablet_order_items').insert(items),
-            requestTimeoutMs,
-            'create_items'
-          );
-          if (itemsError) throw new Error(itemsError.message);
+           const { error: itemsError } = await withTimeout(
+             supabase.from('tablet_order_items').insert(items),
+             requestTimeoutMs,
+             'create_items'
+           );
+           if (itemsError) throw new Error(itemsError.message);
 
-          toast.success('Pedido enviado com sucesso!');
-          setOrderSent((order as any).id.slice(0, 8));
-          return; // Success — exit
+           if (shouldAutoConfirm) {
+             try {
+               await fetch(
+                 `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+                 {
+                   method: 'POST',
+                   headers: {
+                     'Content-Type': 'application/json',
+                     apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                   },
+                   body: JSON.stringify({ order_id: (order as any).id }),
+                 }
+               );
+             } catch (e) {
+               console.warn('[TabletMenuCart] send-to-pdv failed:', e);
+             }
+           }
+
+           toast.success('Pedido enviado com sucesso!');
+           setOrderSent((order as any).id.slice(0, 8));
+           return; // Success — exit
         } catch (err: any) {
           lastError = err;
 

@@ -192,6 +192,24 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
+      if (shouldAutoConfirm) {
+        try {
+          await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              },
+              body: JSON.stringify({ order_id: (order as any).id }),
+            }
+          );
+        } catch (e) {
+          console.warn('[MenuCart] send-to-pdv failed:', e);
+        }
+      }
+
       // Save address to customer record (fire-and-forget, don't block order)
       if (saveAddress && customerUser?.email && customerAddress.trim()) {
         supabase
@@ -208,6 +226,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       }
 
       toast.success('Pedido enviado com sucesso!');
+      setSentAutoConfirmed(shouldAutoConfirm);
       setOrderSent((order as any).id.slice(0, 8));
     } catch (err: any) {
       toast.error(err.message || 'Erro ao enviar pedido');
