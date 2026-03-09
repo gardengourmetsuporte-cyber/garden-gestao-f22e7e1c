@@ -217,23 +217,59 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<Record<string, any>>({});
+  const myLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+  const myMarkerRef = useRef<any>(null);
   const geocodeRunningRef = useRef(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const [locating, setLocating] = useState(false);
+
+  const centerOnMyLocation = useCallback(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (myLocationRef.current) {
+      map.flyTo([myLocationRef.current.lat, myLocationRef.current.lng], 16, { duration: 0.5 });
+      return;
+    }
+
+    if (!('geolocation' in navigator)) {
+      toast.error('Geolocalização não disponível');
+      return;
+    }
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        myLocationRef.current = { lat: latitude, lng: longitude };
+        map.flyTo([latitude, longitude], 16, { duration: 0.5 });
+
+        // Update marker position if exists
+        if (myMarkerRef.current) {
+          myMarkerRef.current.setLatLng([latitude, longitude]);
+        }
+        setLocating(false);
+      },
+      () => {
+        toast.error('Não foi possível obter sua localização');
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  }, []);
 
   useImperativeHandle(ref, () => ({
     focusDelivery(deliveryId: string) {
       const marker = markersRef.current[deliveryId];
       const map = mapInstanceRef.current;
       if (!marker || !map) return;
-
-      // Scroll map container into view on mobile
       mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
       setTimeout(() => {
         map.flyTo(marker.getLatLng(), 16, { duration: 0.6 });
         marker.openPopup();
       }, 300);
     },
+    centerOnMyLocation,
   }));
 
   const withCoords = deliveries.filter(d => d.address?.lat && d.address?.lng);
