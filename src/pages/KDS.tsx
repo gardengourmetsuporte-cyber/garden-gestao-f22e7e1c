@@ -326,7 +326,7 @@ export default function KDS() {
       try {
         const query = supabase
           .from('tablet_orders')
-          .select('id, unit_id, table_number, order_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
+          .select('id, unit_id, table_number, order_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv, recipes(recipe_ingredients(quantity, unit_type, kds_station_id, kds_stations(name, color), inventory_items(name)))))')
           .eq('unit_id', unitId)
           .in('status', ACTIVE_STATUSES)
           .order('created_at', { ascending: true })
