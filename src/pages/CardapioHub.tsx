@@ -230,16 +230,7 @@ export default function CardapioHub() {
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
           <div className="px-4 py-3 lg:px-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-foreground">Pedidos</h2>
-              <button
-                onClick={() => setSearchParams({ section: 'config' })}
-                className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <AppIcon name="Settings" size={14} />
-                Configurações
-              </button>
-            </div>
+            <h2 className="text-lg font-bold text-foreground">Pedidos</h2>
 
             {orders.length === 0 ? (
               <EmptyState icon="ShoppingBag" title="Nenhum pedido" subtitle="Os pedidos do cardápio digital aparecerão aqui." />
