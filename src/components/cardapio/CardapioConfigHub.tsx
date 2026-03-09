@@ -23,8 +23,7 @@ const SECTIONS = [
   { id: 'kds-stations', icon: 'ChefHat', label: 'Pistas da Cozinha (KDS)', description: 'Setores configuráveis para agrupar ingredientes no KDS', settingsTab: null },
   { id: 'delivery', icon: 'Truck', label: 'Solução Delivery', description: 'Sobre, delivery & retirada, áreas, pagamento, horários', settingsTab: 'config' as const },
   { id: 'tablet', icon: 'Tablet', label: 'Solução Tablet', description: 'Integração PDV, mesas, QR codes e chave Pix', settingsTab: 'pdv' as const },
-  { id: 'qrcode', icon: 'QrCode', label: 'QR Code Balcão', description: 'Link externo para pedidos via celular do cliente', settingsTab: null },
-  { id: 'gamificacao', icon: 'Dices', label: 'Gamificação', description: 'Roleta de prêmios e probabilidades', settingsTab: 'roleta' as const },
+  { id: 'qrcode', icon: 'QrCode', label: 'Solução QR Code', description: 'Link externo para pedidos via celular do cliente', settingsTab: null },
   { id: 'rodizio', icon: 'all_inclusive', label: 'Rodízio', description: 'Preço fixo, regras e categorias', settingsTab: 'rodizio' as const },
 ];
 
