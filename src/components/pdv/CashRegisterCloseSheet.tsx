@@ -15,12 +15,17 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { CashRegister, CashRegisterSummary } from '@/hooks/useCashRegister';
 
+interface ExpenseItem {
+  description: string;
+  amount: number;
+}
+
 interface CashRegisterCloseSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   register: CashRegister;
   saving: boolean;
-  onClose: (finalCash: number, notes?: string) => Promise<boolean>;
+  onClose: (finalCash: number, notes?: string, expenses?: ExpenseItem[]) => Promise<boolean>;
   fetchSummary: () => Promise<CashRegisterSummary>;
 }
 
@@ -39,6 +44,9 @@ export function CashRegisterCloseSheet({ open, onOpenChange, register, saving, o
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [finalCash, setFinalCash] = useState('');
   const [notes, setNotes] = useState('');
+  const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
+  const [newExpDesc, setNewExpDesc] = useState('');
+  const [newExpAmount, setNewExpAmount] = useState('');
 
   useEffect(() => {
     if (open) {
@@ -49,15 +57,31 @@ export function CashRegisterCloseSheet({ open, onOpenChange, register, saving, o
       });
       setFinalCash('');
       setNotes('');
+      setExpenses([]);
+      setNewExpDesc('');
+      setNewExpAmount('');
     }
   }, [open, fetchSummary]);
 
+  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   const finalCashValue = parseFloat(finalCash.replace(',', '.')) || 0;
-  const expectedCash = (register?.initial_cash || 0) + (summary?.total_cash || 0);
+  const expectedCash = (register?.initial_cash || 0) + (summary?.total_cash || 0) - totalExpenses;
   const difference = finalCashValue - expectedCash;
 
+  const addExpense = () => {
+    const amount = parseFloat(newExpAmount.replace(',', '.')) || 0;
+    if (!newExpDesc.trim() || amount <= 0) return;
+    setExpenses(prev => [...prev, { description: newExpDesc.trim(), amount }]);
+    setNewExpDesc('');
+    setNewExpAmount('');
+  };
+
+  const removeExpense = (index: number) => {
+    setExpenses(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleClose = async () => {
-    const success = await onClose(finalCashValue, notes || undefined);
+    const success = await onClose(finalCashValue, notes || undefined, expenses.length > 0 ? expenses : undefined);
     if (success) {
       onOpenChange(false);
     }
@@ -68,7 +92,7 @@ export function CashRegisterCloseSheet({ open, onOpenChange, register, saving, o
       <SheetContent side="bottom" className="rounded-t-2xl max-h-[90vh] flex flex-col">
         <SheetHeader className="pb-3 border-b border-border">
           <SheetTitle className="flex items-center gap-2 text-base">
-            <AppIcon name="Lock" size={18} className="text-destructive" />
+            <AppIcon name="LockKeyhole" size={18} className="text-destructive" />
             Fechar Caixa
           </SheetTitle>
           <p className="text-xs text-muted-foreground">
@@ -131,6 +155,65 @@ export function CashRegisterCloseSheet({ open, onOpenChange, register, saving, o
                 </div>
               </div>
 
+              {/* Expenses section */}
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <AppIcon name="Receipt" size={14} className="text-muted-foreground" />
+                  Gastos do Dia (opcional)
+                </p>
+
+                {expenses.map((expense, index) => (
+                  <div key={index} className="flex items-center gap-2 p-2 bg-secondary/30 rounded-lg">
+                    <span className="flex-1 text-sm truncate">{expense.description}</span>
+                    <span className="text-sm font-medium text-destructive shrink-0">
+                      - {formatCurrency(expense.amount)}
+                    </span>
+                    <button
+                      onClick={() => removeExpense(index)}
+                      className="p-1 rounded hover:bg-destructive/10 transition-colors shrink-0"
+                    >
+                      <AppIcon name="Trash2" size={13} className="text-destructive" />
+                    </button>
+                  </div>
+                ))}
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Ex: Geladeira"
+                    value={newExpDesc}
+                    onChange={e => setNewExpDesc(e.target.value)}
+                    className="flex-1 h-9 text-sm"
+                  />
+                  <div className="relative w-24">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">R$</span>
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      className="pl-7 text-right h-9 text-sm"
+                      value={newExpAmount}
+                      onChange={e => setNewExpAmount(e.target.value)}
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-9 w-9 shrink-0"
+                    onClick={addExpense}
+                    disabled={!newExpDesc.trim() || !(parseFloat(newExpAmount.replace(',', '.')) > 0)}
+                  >
+                    <AppIcon name="Plus" size={14} />
+                  </Button>
+                </div>
+
+                {expenses.length > 0 && (
+                  <div className="flex justify-between text-sm border-t border-border pt-2">
+                    <span className="text-muted-foreground">Total de gastos:</span>
+                    <span className="font-medium text-destructive">- {formatCurrency(totalExpenses)}</span>
+                  </div>
+                )}
+              </div>
+
               {/* Final cash input */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Dinheiro em caixa (R$)</label>
@@ -187,7 +270,7 @@ export function CashRegisterCloseSheet({ open, onOpenChange, register, saving, o
             {saving ? (
               <AppIcon name="Loader2" size={16} className="mr-2 animate-spin" />
             ) : (
-              <AppIcon name="Lock" size={16} className="mr-2" />
+              <AppIcon name="LockKeyhole" size={16} className="mr-2" />
             )}
             Fechar Caixa e Enviar para Aprovação
           </Button>

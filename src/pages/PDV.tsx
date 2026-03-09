@@ -183,24 +183,9 @@ export default function PDV() {
               )}
             </button>
             <button onClick={() => setCloseRegisterSheet(true)} className="w-9 h-9 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center shrink-0">
-              <AppIcon name="Lock" size={16} className="text-destructive" />
+              <AppIcon name="LockKeyhole" size={15} className="text-destructive" />
             </button>
           </div>
-
-          {/* Register status */}
-          {cashRegister.currentRegister && (
-            <div className="flex items-center justify-between bg-primary/5 border border-primary/15 rounded-xl px-3 py-1.5">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[11px] text-muted-foreground">
-                  Aberto {format(new Date(cashRegister.currentRegister.opened_at), "HH:mm", { locale: ptBR })}
-                </span>
-              </div>
-              <span className="text-[11px] font-semibold text-primary">
-                Troco: {formatCurrency(cashRegister.currentRegister.initial_cash)}
-              </span>
-            </div>
-          )}
 
           {/* Categories */}
           <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-3 px-3">
