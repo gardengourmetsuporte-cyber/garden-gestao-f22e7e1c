@@ -291,6 +291,7 @@ export function RecipeSheet({
       yield_quantity: parseFloat(yieldQuantity) || 1,
       yield_unit: yieldUnit,
       min_ready_stock: parseInt(minReadyStock) || 0,
+      packaging_template_id: packagingTemplateId || null,
       preparation_notes: notes.trim() || null,
       ingredients: ingredients.map((ing) => ({
         ...(ing.id && { id: ing.id }),
