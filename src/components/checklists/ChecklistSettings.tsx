@@ -900,7 +900,8 @@ export function ChecklistSettings({
                       <span>{sectors.find(s => s.id === itemSectorId)?.subcategories?.find(sub => sub.id === selectedSubcategoryId)?.name || 'Selecione'}</span>
                       <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
                     </button>
-                    <ListPicker
+                     <ListPicker
+                       nested
                       open={itemSubcategoryPickerOpen}
                       onOpenChange={setItemSubcategoryPickerOpen}
                       title="Subcategoria"
