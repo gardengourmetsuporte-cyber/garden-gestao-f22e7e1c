@@ -79,6 +79,7 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
   const [optionGroups, setOptionGroups] = useState<DMOptionGroup[]>([]);
   const [productOptionLinks, setProductOptionLinks] = useState<{ product_id: string; option_group_id: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasVisibleProducts, setHasVisibleProducts] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const fetchAll = useCallback(async () => {
