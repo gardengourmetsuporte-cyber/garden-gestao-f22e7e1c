@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface DMCategory {
@@ -71,97 +72,151 @@ export interface CartItem {
   selectedOptions: { groupId: string; optionId: string; name: string; price: number }[];
 }
 
+type DigitalMenuData = {
+  unit: DMUnit | null;
+  categories: DMCategory[];
+  groups: DMGroup[];
+  products: DMProduct[];
+  optionGroups: DMOptionGroup[];
+  productOptionLinks: { product_id: string; option_group_id: string }[];
+  hasVisibleProducts: boolean;
+};
+
+const EMPTY_DATA: DigitalMenuData = {
+  unit: null,
+  categories: [],
+  groups: [],
+  products: [],
+  optionGroups: [],
+  productOptionLinks: [],
+  hasVisibleProducts: false,
+};
+
+async function fetchDigitalMenuData(unitId: string, channel: 'tablet' | 'delivery'): Promise<DigitalMenuData> {
+  // Batch 1: core data in parallel
+  const [unitRes, catRes, grpRes, prodRes, ogRes] = await Promise.all([
+    supabase.from('units').select('id, name, store_info').eq('id', unitId).maybeSingle(),
+    supabase.from('menu_categories').select('id, name, icon, color, sort_order').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
+    supabase.from('menu_groups').select('id, category_id, name, description, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
+    supabase.from('tablet_products').select('id, name, price, image_url, description, group_id, category, is_highlighted, price_type, custom_prices, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
+    supabase.from('menu_option_groups').select('id, title, min_selections, max_selections, allow_repeat').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
+  ]);
+
+  if (unitRes.error) throw unitRes.error;
+  if (catRes.error) throw catRes.error;
+  if (grpRes.error) throw grpRes.error;
+  if (prodRes.error) throw prodRes.error;
+  if (ogRes.error) throw ogRes.error;
+
+  const unit = (unitRes.data as DMUnit | null) ?? null;
+  const categories = (catRes.data as DMCategory[]) ?? [];
+
+  const allGroups = (grpRes.data as any[]) ?? [];
+  const groups = allGroups.filter((g) => {
+    const avail = g.availability || { tablet: true, delivery: true };
+    return avail[channel] !== false;
+  }) as DMGroup[];
+
+  const allProducts = (prodRes.data as any[]) ?? [];
+  const products = allProducts.filter((p) => {
+    const avail = p.availability || { tablet: true, delivery: true };
+    return avail[channel] !== false;
+  }) as DMProduct[];
+
+  const productIds = products.map((p) => p.id);
+  const optionGroupsRaw = ((ogRes.data as any[]) ?? []) as DMOptionGroup[];
+  const optionGroupIds = optionGroupsRaw.map((og) => og.id);
+
+  // Batch 2: dependent lookups in parallel
+  const [optRes, linksRes] = await Promise.all([
+    optionGroupIds.length
+      ? supabase
+          .from('menu_options')
+          .select('id, option_group_id, name, price, image_url, sort_order')
+          .in('option_group_id', optionGroupIds)
+          .eq('is_active', true)
+          .order('sort_order')
+      : Promise.resolve({ data: [] as DMOption[], error: null }),
+    productIds.length
+      ? supabase
+          .from('menu_product_option_groups')
+          .select('product_id, option_group_id')
+          .in('product_id', productIds)
+      : Promise.resolve({ data: [] as { product_id: string; option_group_id: string }[], error: null }),
+  ]);
+
+  if (optRes.error) throw optRes.error;
+  if (linksRes.error) throw linksRes.error;
+
+  const options = (optRes.data as DMOption[]) ?? [];
+  const optionGroups = optionGroupsRaw.map((og) => ({
+    ...og,
+    options: options.filter((o) => o.option_group_id === og.id),
+  }));
+
+  return {
+    unit,
+    categories,
+    groups,
+    products,
+    optionGroups,
+    productOptionLinks: (linksRes.data as { product_id: string; option_group_id: string }[]) ?? [],
+    hasVisibleProducts: products.length > 0,
+  };
+}
+
 export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | 'delivery' = 'delivery') {
-  const [unit, setUnit] = useState<DMUnit | null>(null);
-  const [categories, setCategories] = useState<DMCategory[]>([]);
-  const [groups, setGroups] = useState<DMGroup[]>([]);
-  const [products, setProducts] = useState<DMProduct[]>([]);
-  const [optionGroups, setOptionGroups] = useState<DMOptionGroup[]>([]);
-  const [productOptionLinks, setProductOptionLinks] = useState<{ product_id: string; option_group_id: string }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [hasVisibleProducts, setHasVisibleProducts] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  const fetchAll = useCallback(async () => {
-    if (!unitId) {
-      setUnit(null);
-      setCategories([]);
-      setGroups([]);
-      setProducts([]);
-      setOptionGroups([]);
-      setProductOptionLinks([]);
-      setLoading(false);
-      return;
+  const { data, isLoading } = useQuery({
+    queryKey: ['digital-menu', unitId, channel],
+    queryFn: async () => {
+      if (!unitId) return EMPTY_DATA;
+      return fetchDigitalMenuData(unitId, channel);
+    },
+    enabled: !!unitId,
+    staleTime: 3 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    refetchOnMount: false,
+  });
+
+  const menuData = data ?? EMPTY_DATA;
+
+  const productOptionGroupIdsByProduct = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const link of menuData.productOptionLinks) {
+      const current = map.get(link.product_id);
+      if (current) current.push(link.option_group_id);
+      else map.set(link.product_id, [link.option_group_id]);
     }
-    setLoading(true);
-    try {
-      // Fetch ALL data in a single parallel batch (no waterfall)
-      const [unitRes, catRes, grpRes, prodRes, ogRes] = await Promise.all([
-        supabase.from('units').select('id, name, store_info').eq('id', unitId).maybeSingle(),
-        supabase.from('menu_categories').select('id, name, icon, color, sort_order').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-        supabase.from('menu_groups').select('id, category_id, name, description, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-        supabase.from('tablet_products').select('id, name, price, image_url, description, group_id, category, is_highlighted, price_type, custom_prices, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-        supabase.from('menu_option_groups').select('id, title, min_selections, max_selections, allow_repeat').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
-      ]);
+    return map;
+  }, [menuData.productOptionLinks]);
 
-      const unitData = (unitRes.data as any) || null;
-      setUnit(unitData);
-      setCategories((catRes.data as DMCategory[]) || []);
+  const optionGroupsById = useMemo(() => {
+    return new Map(menuData.optionGroups.map((og) => [og.id, og]));
+  }, [menuData.optionGroups]);
 
-      // Filter by channel availability (client-side, very fast on small arrays)
-      const allGroups = (grpRes.data as any[]) || [];
-      const filteredGroups = allGroups.filter(g => {
-        const avail = g.availability || { tablet: true, delivery: true };
-        return avail[channel] !== false;
-      });
-      setGroups(filteredGroups as DMGroup[]);
-
-      const allProducts = (prodRes.data as any[]) || [];
-      const filteredProducts = allProducts.filter(p => {
-        const avail = p.availability || { tablet: true, delivery: true };
-        return avail[channel] !== false;
-      });
-      setProducts(filteredProducts as DMProduct[]);
-
-      const productIds = filteredProducts.map(p => p.id);
-      const ogs = (ogRes.data as any[]) || [];
-      const optionGroupIds = ogs.map(og => og.id);
-
-      // Second parallel batch for options + links (depends on IDs from first batch)
-      const [{ data: optData }, { data: linkData }] = await Promise.all([
-        optionGroupIds.length
-          ? supabase.from('menu_options').select('id, option_group_id, name, price, image_url, sort_order').in('option_group_id', optionGroupIds).eq('is_active', true).order('sort_order')
-          : Promise.resolve({ data: [] as DMOption[] } as any),
-        productIds.length
-          ? supabase.from('menu_product_option_groups').select('product_id, option_group_id').in('product_id', productIds)
-          : Promise.resolve({ data: [] as { product_id: string; option_group_id: string }[] } as any),
-      ]);
-
-      const opts = (optData as DMOption[]) || [];
-      ogs.forEach((og: any) => {
-        og.options = opts.filter(o => o.option_group_id === og.id);
-      });
-
-      setOptionGroups(ogs);
-      setProductOptionLinks((linkData as any[]) || []);
-      setHasVisibleProducts(filteredProducts.length > 0);
-    } catch (err) {
-      console.error('[useDigitalMenu] Error fetching:', err);
-    } finally {
-      setLoading(false);
+  const productsByGroup = useMemo(() => {
+    const map = new Map<string, DMProduct[]>();
+    for (const product of menuData.products) {
+      if (!product.group_id) continue;
+      const current = map.get(product.group_id) ?? [];
+      current.push(product);
+      map.set(product.group_id, current);
     }
-  }, [unitId, channel]);
-
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+    return map;
+  }, [menuData.products]);
 
   const getProductOptionGroups = useCallback((productId: string) => {
-    const linkedIds = productOptionLinks.filter(l => l.product_id === productId).map(l => l.option_group_id);
-    return optionGroups.filter(og => linkedIds.includes(og.id));
-  }, [productOptionLinks, optionGroups]);
+    const linkedIds = productOptionGroupIdsByProduct.get(productId) ?? [];
+    return linkedIds
+      .map((id) => optionGroupsById.get(id))
+      .filter((og): og is DMOptionGroup => Boolean(og));
+  }, [productOptionGroupIdsByProduct, optionGroupsById]);
 
   const getGroupProducts = useCallback((groupId: string) => {
-    return products.filter(p => p.group_id === groupId);
-  }, [products]);
+    return productsByGroup.get(groupId) ?? [];
+  }, [productsByGroup]);
 
   const addToCart = useCallback((item: CartItem) => {
     setCart(prev => {
@@ -195,8 +250,21 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return {
-    unit, categories, groups, products, loading, hasVisibleProducts,
-    getProductOptionGroups, getGroupProducts,
-    cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
+    unit: menuData.unit,
+    categories: menuData.categories,
+    groups: menuData.groups,
+    products: menuData.products,
+    loading: isLoading,
+    hasVisibleProducts: menuData.hasVisibleProducts,
+    getProductOptionGroups,
+    getGroupProducts,
+    cart,
+    addToCart,
+    removeFromCart,
+    updateCartQuantity,
+    clearCart,
+    cartTotal,
+    cartCount,
   };
 }
+

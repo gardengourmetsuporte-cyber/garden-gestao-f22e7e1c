@@ -304,7 +304,7 @@ export default function KDS() {
       if (!unitId) return [];
       const { data, error } = await supabase
         .from('tablet_orders')
-        .select('*, tablet_order_items(*, tablet_products(name, codigo_pdv))')
+        .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
         .eq('unit_id', unitId)
         .in('status', ACTIVE_STATUSES)
         .order('created_at', { ascending: true })
@@ -313,6 +313,7 @@ export default function KDS() {
       return (data as unknown as KDSOrder[]) || [];
     },
     enabled: !!unitId,
+    staleTime: 5_000,
     refetchInterval: 10_000,
   });
 
