@@ -1,17 +1,19 @@
-## Plano: Cashback 10% — 1 ponto a cada R$10 gastos ✅
+## Plano: Rateio Proporcional de Custos Fixos ✅
 
 ### Implementado
 
-A regra de acúmulo de Garden Coins foi atualizada de **1:1** (R$1 = 1 moeda) para **1 ponto a cada R$10 gastos** (cashback de 10%).
+O cálculo de custos fixos foi alterado de **divisão igualitária** para **rateio proporcional por preço de venda**.
 
-- Pedido de R$100 → 10 pontos
-- Pedido de R$45 → 4 pontos  
-- Pedido de R$8 → 0 pontos (abaixo de R$10)
+**Fórmula anterior:** `Custo Fixo / Nº Produtos = valor igual para todos`  
+**Fórmula nova:** `(Preço do Produto / Faturamento Mensal) × Custo Fixo Mensal`
+
+Exemplo (custo fixo = R$ 6.974, faturamento = R$ 50.000):
+- Água (R$ 5): R$ 0,70 de custo fixo
+- Lanche (R$ 45): R$ 6,28 de custo fixo
 
 ### Arquivos alterados
-- Migration SQL: `auto_register_customer_on_order` e `auto_register_customer_on_order_insert` — `floor(NEW.total)` → `floor(NEW.total / 10)`
-
-### O que NÃO mudou
-- `coin_price` dos produtos (preço em pontos = preço em reais)
-- Checkout com moedas no cardápio digital
-- Pontos já acumulados (não retroativo)
+- Migration: adicionada coluna `monthly_revenue` em `recipe_cost_settings`
+- `src/hooks/useRecipeCostSettings.ts` — `calculateOperationalCosts` agora aceita `sellingPrice` opcional
+- `src/components/settings/RecipeCostSettings.tsx` — campo "Faturamento mensal estimado" no lugar de "Média de produtos vendidos"
+- `src/components/recipes/RecipeSheet.tsx` — passa preço de venda para cálculo proporcional
+- `src/hooks/useRecipeMenuSync.ts` — usa preço do produto vinculado no cardápio
