@@ -140,15 +140,19 @@ export default function InventoryPage() {
   };
 
   const scrollToItem = (itemId: string) => {
-    const el = document.querySelector(`[data-item-id="${itemId}"]`);
-    if (el) {
-      // Expand parent category if collapsed
-      el.closest('[data-category-group]')?.querySelector('button')?.click;
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Brief highlight
-      el.classList.add('ring-2', 'ring-primary/50', 'rounded-2xl');
-      setTimeout(() => el.classList.remove('ring-2', 'ring-primary/50', 'rounded-2xl'), 2000);
-    }
+    // Find item's category and ensure it's expanded
+    const item = items.find(i => i.id === itemId);
+    const catName = item?.category?.name || 'Sem Categoria';
+    setExpandedCategories(prev => new Set([...prev, catName]));
+
+    setTimeout(() => {
+      const el = document.querySelector(`[data-item-id="${itemId}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-primary/50', 'rounded-2xl');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-primary/50', 'rounded-2xl'), 2000);
+      }
+    }, 350);
   };
 
   const handleDeleteItem = async (id: string) => {

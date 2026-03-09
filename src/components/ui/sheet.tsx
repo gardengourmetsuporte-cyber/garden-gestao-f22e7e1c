@@ -140,7 +140,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
           <DrawerPrimitive.Content
             ref={ref as React.Ref<HTMLDivElement>}
             className={cn(
-              "fixed inset-x-0 bottom-0 z-[90] mt-24 flex h-auto min-h-[55vh] max-h-[96vh] flex-col rounded-t-3xl border border-border bg-card",
+              "fixed inset-x-0 bottom-0 z-[90] mt-24 flex h-auto min-h-[55vh] max-h-[96dvh] flex-col rounded-t-3xl border border-border bg-card overscroll-contain",
               className,
             )}
             {...(props as any)}
