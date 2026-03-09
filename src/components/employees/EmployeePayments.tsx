@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { MaterialDeliveries } from '@/components/employees/MaterialDeliveries';
 import { useEmployeePayments } from '@/hooks/useEmployees';
 import { Employee, EmployeePayment, PAYMENT_TYPE_LABELS, PAYMENT_TYPE_COLORS, MONTHS } from '@/types/employee';
 import { supabase } from '@/integrations/supabase/client';
