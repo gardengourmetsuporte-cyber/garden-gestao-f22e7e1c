@@ -375,7 +375,7 @@ export default function PDV() {
                     </div>
                     {/* Finalize / Cobrar */}
                     <button
-                      onClick={() => setPaymentOpen(true)}
+                      onClick={() => { setSaleSourceAction('charge'); setSaleSourceOpen(true); }}
                       className="h-10 px-5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center gap-1.5 active:scale-95 shadow-sm shrink-0"
                     >
                       <AppIcon name="Banknote" size={16} />
