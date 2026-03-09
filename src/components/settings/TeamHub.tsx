@@ -731,10 +731,14 @@ function LevelsTab() {
         </div>
       )}
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={isCreating} onOpenChange={setIsCreating}>
-        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md max-h-[85vh] overflow-y-auto rounded-2xl left-1/2 -translate-x-1/2">
-          <DialogHeader><DialogTitle>{editingLevel ? 'Editar Nível' : 'Novo Nível de Acesso'}</DialogTitle></DialogHeader>
+      {/* Create/Edit Sheet */}
+      <Sheet open={isCreating} onOpenChange={setIsCreating}>
+        <SheetContent side="bottom" className="h-[90dvh] rounded-t-3xl flex flex-col p-0">
+          <div className="w-10 h-1 bg-border rounded-full mx-auto mt-3 mb-1 shrink-0" />
+          <SheetHeader className="px-5 pb-3 border-b border-border/30 shrink-0">
+            <SheetTitle>{editingLevel ? 'Editar Nível' : 'Novo Nível de Acesso'}</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label>Nome</Label>
