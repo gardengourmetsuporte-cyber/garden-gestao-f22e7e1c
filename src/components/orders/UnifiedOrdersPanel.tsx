@@ -31,6 +31,7 @@ const statusColor: Record<string, string> = {
 
 const statusLabel: Record<string, string> = {
   draft: 'Rascunho',
+  pending: 'Pendente',
   awaiting_confirmation: 'Aguardando',
   confirmed: 'Confirmado',
   preparing: 'Preparando',
