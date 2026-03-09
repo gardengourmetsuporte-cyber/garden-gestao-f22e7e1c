@@ -120,6 +120,7 @@ export function RecipeSheet({
           quantity: ing.quantity,
           unit_type: ing.unit_type,
           total_cost: ing.total_cost,
+          kds_station_id: (ing as any).kds_station_id || null,
         }))
       );
     } else {
