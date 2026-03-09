@@ -3372,6 +3372,96 @@ export type Database = {
           },
         ]
       }
+      pos_cash_registers: {
+        Row: {
+          cash_closing_id: string | null
+          cash_difference: number | null
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          final_cash: number | null
+          id: string
+          initial_cash: number
+          notes: string | null
+          opened_at: string
+          opened_by: string
+          sales_count: number | null
+          status: string
+          total_cash: number | null
+          total_credit: number | null
+          total_debit: number | null
+          total_delivery: number | null
+          total_meal_voucher: number | null
+          total_pix: number | null
+          total_sales: number | null
+          total_signed_account: number | null
+          unit_id: string
+        }
+        Insert: {
+          cash_closing_id?: string | null
+          cash_difference?: number | null
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          final_cash?: number | null
+          id?: string
+          initial_cash?: number
+          notes?: string | null
+          opened_at?: string
+          opened_by: string
+          sales_count?: number | null
+          status?: string
+          total_cash?: number | null
+          total_credit?: number | null
+          total_debit?: number | null
+          total_delivery?: number | null
+          total_meal_voucher?: number | null
+          total_pix?: number | null
+          total_sales?: number | null
+          total_signed_account?: number | null
+          unit_id: string
+        }
+        Update: {
+          cash_closing_id?: string | null
+          cash_difference?: number | null
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          final_cash?: number | null
+          id?: string
+          initial_cash?: number
+          notes?: string | null
+          opened_at?: string
+          opened_by?: string
+          sales_count?: number | null
+          status?: string
+          total_cash?: number | null
+          total_credit?: number | null
+          total_debit?: number | null
+          total_delivery?: number | null
+          total_meal_voucher?: number | null
+          total_pix?: number | null
+          total_sales?: number | null
+          total_signed_account?: number | null
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_cash_registers_cash_closing_id_fkey"
+            columns: ["cash_closing_id"]
+            isOneToOne: false
+            referencedRelation: "cash_closings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_cash_registers_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pos_sale_items: {
         Row: {
           created_at: string
