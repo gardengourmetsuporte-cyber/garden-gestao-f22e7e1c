@@ -59,7 +59,7 @@ const Rewards = lazy(() => lazyRetry(() => import("./pages/Rewards")));
 const Settings = lazy(() => lazyRetry(() => import("./pages/Settings")));
 const NotFound = lazy(() => lazyRetry(() => import("./pages/NotFound")));
 const CashClosing = lazy(() => lazyRetry(() => import("./pages/CashClosing")));
-const Recipes = lazy(() => lazyRetry(() => import("./pages/Recipes")));
+
 const Employees = lazy(() => lazyRetry(() => import("./pages/Employees")));
 const TabletConfirm = lazy(() => lazyRetry(() => import("./pages/TabletConfirm")));
 const CardapioHub = lazy(() => lazyRetry(() => import("./pages/CardapioHub")));
@@ -71,6 +71,7 @@ const BrandCore = lazy(() => lazyRetry(() => import("./pages/BrandCore")));
 const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
 const Deliveries = lazy(() => lazyRetry(() => import("./pages/Deliveries")));
 const DeliveryHub = lazy(() => lazyRetry(() => import("./pages/DeliveryHub")));
+const PDV = lazy(() => lazyRetry(() => import("./pages/PDV")));
 
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
 const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
@@ -83,8 +84,10 @@ const CalendarFull = lazy(() => lazyRetry(() => import("./pages/CalendarFull")))
 const Customers = lazy(() => lazyRetry(() => import("./pages/Customers")));
 const DigitalMenu = lazy(() => lazyRetry(() => import("./pages/DigitalMenu")));
 const TabletDigitalMenu = lazy(() => lazyRetry(() => import("./pages/TabletDigitalMenu")));
+const SupplierPortal = lazy(() => lazyRetry(() => import("./pages/SupplierPortal")));
 const TabletHome = lazy(() => lazyRetry(() => import("./pages/TabletHome")));
 const TabletRodizio = lazy(() => lazyRetry(() => import("./pages/TabletRodizio")));
+const TabletBill = lazy(() => lazyRetry(() => import("./pages/TabletBill")));
 const KDS = lazy(() => lazyRetry(() => import("./pages/KDS")));
 const Notifications = lazy(() => lazyRetry(() => import("./pages/Notifications")));
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
@@ -181,6 +184,16 @@ function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function PublicWithAuth({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+      <UnitProvider>
+        {children}
+      </UnitProvider>
+    </AuthProvider>
+  );
+}
+
 function PublicRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
@@ -189,12 +202,14 @@ function PublicRoutes() {
         <Route path="/tablet/:unitId" element={<TabletHome />} />
         <Route path="/tablet/:unitId/menu" element={<TabletDigitalMenu />} />
         <Route path="/tablet/:unitId/rodizio" element={<TabletRodizio />} />
+        <Route path="/tablet/:unitId/bill" element={<TabletBill />} />
         <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
         <Route path="/kds/:unitId" element={<KDS />} />
         <Route path="/gamification/:unitId" element={<DigitalMenu />} />
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
+        <Route path="/fornecedor/:token" element={<SupplierPortal />} />
         <Route path="/landing" element={<Landing />} />
-        <Route path="/invite" element={<Invite />} />
+        <Route path="/invite" element={<PublicWithAuth><RouteErrorBoundary><Invite /></RouteErrorBoundary></PublicWithAuth>} />
         <Route path="/share-receipt" element={<ShareReceiptHandler />} />
         <Route path="/docs" element={<Documentation />} />
         <Route path="*" element={<AuthenticatedApp />} />
@@ -238,7 +253,7 @@ function AuthenticatedRoutes() {
           <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/cash-closing" element={<ProtectedRoute><CashClosing /></ProtectedRoute>} />
-          <Route path="/recipes" element={<ProtectedRoute><Recipes /></ProtectedRoute>} />
+          <Route path="/recipes" element={<Navigate to="/cardapio" replace />} />
           <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
           <Route path="/tablet-admin" element={<Navigate to="/cardapio" replace />} />
           <Route path="/cardapio" element={<ProtectedRoute><CardapioHub /></ProtectedRoute>} />
@@ -248,6 +263,7 @@ function AuthenticatedRoutes() {
           <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
           <Route path="/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />
           <Route path="/delivery-hub" element={<ProtectedRoute><DeliveryHub /></ProtectedRoute>} />
+          <Route path="/pdv" element={<ProtectedRoute><PDV /></ProtectedRoute>} />
           <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
           <Route path="/gamification" element={<Navigate to="/cardapio" replace />} />

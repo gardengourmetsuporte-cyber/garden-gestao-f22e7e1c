@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useGamificationAdmin } from '@/hooks/useGamificationAdmin';
 import { useUnit } from '@/contexts/UnitContext';
@@ -25,6 +26,72 @@ interface CardapioSettingsProps {
   initialTab?: SettingsTab | null;
 }
 
+function PixKeyConfig() {
+  const { activeUnit } = useUnit();
+  const storeInfo = (activeUnit as any)?.store_info as Record<string, any> | null;
+  const [pixKey, setPixKey] = useState(storeInfo?.pix_key || '');
+  const [pixKeyType, setPixKeyType] = useState(storeInfo?.pix_key_type || 'aleatoria');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!activeUnit) return;
+    setSaving(true);
+    try {
+      const updated = { ...storeInfo, pix_key: pixKey, pix_key_type: pixKeyType };
+      const { error } = await supabase.from('units').update({ store_info: updated }).eq('id', activeUnit.id);
+      if (error) throw error;
+      toast.success('Chave Pix salva!');
+    } catch {
+      toast.error('Erro ao salvar chave Pix');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const PIX_TYPES = [
+    { value: 'cpf', label: 'CPF' },
+    { value: 'cnpj', label: 'CNPJ' },
+    { value: 'email', label: 'E-mail' },
+    { value: 'telefone', label: 'Telefone' },
+    { value: 'aleatoria', label: 'Chave aleatória' },
+  ];
+
+  return (
+    <div className="card-base p-4 space-y-3">
+      <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
+        <AppIcon name="QrCode" size={16} className="text-primary" /> Chave Pix (Fechamento de Conta)
+      </h3>
+      <p className="text-[11px] text-muted-foreground">Clientes poderão pagar via QR Code Pix direto no tablet.</p>
+      <div>
+        <Label className="text-xs">Tipo de chave</Label>
+        <div className="flex flex-wrap gap-1.5 mt-1">
+          {PIX_TYPES.map(t => (
+            <button
+              key={t.value}
+              onClick={() => setPixKeyType(t.value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                pixKeyType === t.value
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <Label className="text-xs">Chave Pix</Label>
+        <Input placeholder="Sua chave Pix..." value={pixKey} onChange={e => setPixKey(e.target.value)} />
+      </div>
+      <Button onClick={handleSave} disabled={!pixKey || saving} className="w-full" size="sm">
+        {saving ? <AppIcon name="Loader2" size={14} className="animate-spin mr-1" /> : <AppIcon name="Save" size={14} className="mr-1" />}
+        Salvar Chave Pix
+      </Button>
+    </div>
+  );
+}
+
 export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
   const { activeUnit } = useUnit();
   const tabletAdmin = useTabletAdmin();
@@ -33,6 +100,9 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
 
   const [activeTab, setActiveTab] = useState<SettingsTab | null>(initialTab);
   const [newTableNum, setNewTableNum] = useState('');
+
+  // Use the current origin so the generated links always point to the currently deployed environment
+  const basePublicUrl = window.location.origin;
 
   // PDV form
   const [hubUrl, setHubUrl] = useState('');
@@ -179,15 +249,28 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
                 <AppIcon name="QrCode" size={16} className="text-primary" /> QR Codes
               </h3>
               <div className="flex items-center gap-4 p-3 rounded-xl bg-secondary/30 border border-border/30">
-                <QRCodeSVG value={`${window.location.origin}/m/${activeUnit.id}`} size={80} bgColor="transparent" fgColor="currentColor" className="text-foreground shrink-0" />
+                <QRCodeSVG value={`${basePublicUrl}/m/${activeUnit.id}`} size={80} bgColor="transparent" fgColor="currentColor" className="text-foreground shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-foreground">QR Genérico</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">Balcão / Delivery</p>
                   <div className="flex gap-2 mt-2">
-                    <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}`); toast.success('Link copiado!'); }}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${basePublicUrl}/m/${activeUnit.id}`);
+                        toast.success('Link copiado!');
+                      }}
+                    >
                       <AppIcon name="Copy" size={12} className="mr-1" /> Copiar
                     </Button>
-                    <a href={`/m/${activeUnit.id}`} target="_blank" rel="noopener" className="inline-flex items-center gap-1 text-xs text-primary font-medium">
+                    <a
+                      href={`${basePublicUrl}/m/${activeUnit.id}`}
+                      target="_blank"
+                      rel="noopener"
+                      className="inline-flex items-center gap-1 text-xs text-primary font-medium"
+                    >
                       <AppIcon name="ExternalLink" size={12} /> Abrir
                     </a>
                   </div>
@@ -199,10 +282,18 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
                   <div className="grid grid-cols-2 gap-2">
                     {tables.map(t => (
                       <div key={t.id} className="flex items-center gap-2 p-2 rounded-xl bg-secondary/20 border border-border/20">
-                        <QRCodeSVG value={`${window.location.origin}/m/${activeUnit.id}?mesa=${t.number}`} size={48} bgColor="transparent" fgColor="currentColor" className="text-foreground shrink-0" />
+                        <QRCodeSVG value={`${basePublicUrl}/m/${activeUnit.id}?mesa=${t.number}`} size={48} bgColor="transparent" fgColor="currentColor" className="text-foreground shrink-0" />
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-foreground">Mesa {t.number}</p>
-                          <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}?mesa=${t.number}`); toast.success(`Link mesa ${t.number} copiado!`); }} className="text-[10px] text-primary font-medium mt-0.5">Copiar link</button>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${basePublicUrl}/m/${activeUnit.id}?mesa=${t.number}`);
+                              toast.success(`Link mesa ${t.number} copiado!`);
+                            }}
+                            className="text-[10px] text-primary font-medium mt-0.5"
+                          >
+                            Copiar link
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -252,19 +343,26 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
             onUpdate={handleSettingsUpdate}
           />
 
-          {activeUnit && (
-            <Card className="p-3">
-              <p className="text-xs text-muted-foreground mb-1">Link do cardápio digital (com roleta)</p>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 text-xs bg-muted px-2 py-1.5 rounded truncate">
-                  {`${window.location.origin}/m/${activeUnit.id}`}
-                </code>
-                <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}`); toast.success('Link copiado!'); }}>
-                  <AppIcon name="Copy" size={14} />
-                </Button>
-              </div>
-            </Card>
-          )}
+            {activeUnit && (
+              <Card className="p-3">
+                <p className="text-xs text-muted-foreground mb-1">Link do cardápio digital (com roleta)</p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-xs bg-muted px-2 py-1.5 rounded truncate">
+                    {`${basePublicUrl}/m/${activeUnit.id}`}
+                  </code>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${basePublicUrl}/m/${activeUnit.id}`);
+                      toast.success('Link copiado!');
+                    }}
+                  >
+                    <AppIcon name="Copy" size={14} />
+                  </Button>
+                </div>
+              </Card>
+            )}
 
           <GamificationMetrics
             playsToday={gamAdmin.metrics.playsToday}
@@ -384,6 +482,8 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
               <AppIcon name="Save" size={14} className="mr-1" /> Salvar horários
             </Button>
           </div>
+
+          <PixKeyConfig />
 
           <div className="card-base p-4 space-y-3">
             <h3 className="font-bold text-foreground text-sm flex items-center gap-2">

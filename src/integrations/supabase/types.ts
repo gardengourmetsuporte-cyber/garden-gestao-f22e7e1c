@@ -1136,6 +1136,10 @@ export type Database = {
       }
       customers: {
         Row: {
+          address: string | null
+          address_lat: number | null
+          address_lng: number | null
+          address_reference: string | null
           birthday: string | null
           created_at: string | null
           created_by: string | null
@@ -1158,6 +1162,10 @@ export type Database = {
           visit_frequency_days: number | null
         }
         Insert: {
+          address?: string | null
+          address_lat?: number | null
+          address_lng?: number | null
+          address_reference?: string | null
           birthday?: string | null
           created_at?: string | null
           created_by?: string | null
@@ -1180,6 +1188,10 @@ export type Database = {
           visit_frequency_days?: number | null
         }
         Update: {
+          address?: string | null
+          address_lat?: number | null
+          address_lng?: number | null
+          address_reference?: string | null
           birthday?: string | null
           created_at?: string | null
           created_by?: string | null
@@ -1474,6 +1486,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "delivery_hub_orders_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_ocr_operations: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          image_data: string | null
+          image_type: string | null
+          result: Json | null
+          status: string
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          image_data?: string | null
+          image_type?: string | null
+          result?: Json | null
+          status?: string
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          image_data?: string | null
+          image_type?: string | null
+          result?: Json | null
+          status?: string
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_ocr_operations_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "units"
@@ -3313,6 +3372,270 @@ export type Database = {
           },
         ]
       }
+      pos_cash_registers: {
+        Row: {
+          cash_closing_id: string | null
+          cash_difference: number | null
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          final_cash: number | null
+          id: string
+          initial_cash: number
+          notes: string | null
+          opened_at: string
+          opened_by: string
+          sales_count: number | null
+          status: string
+          total_cash: number | null
+          total_credit: number | null
+          total_debit: number | null
+          total_delivery: number | null
+          total_meal_voucher: number | null
+          total_pix: number | null
+          total_sales: number | null
+          total_signed_account: number | null
+          unit_id: string
+        }
+        Insert: {
+          cash_closing_id?: string | null
+          cash_difference?: number | null
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          final_cash?: number | null
+          id?: string
+          initial_cash?: number
+          notes?: string | null
+          opened_at?: string
+          opened_by: string
+          sales_count?: number | null
+          status?: string
+          total_cash?: number | null
+          total_credit?: number | null
+          total_debit?: number | null
+          total_delivery?: number | null
+          total_meal_voucher?: number | null
+          total_pix?: number | null
+          total_sales?: number | null
+          total_signed_account?: number | null
+          unit_id: string
+        }
+        Update: {
+          cash_closing_id?: string | null
+          cash_difference?: number | null
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          final_cash?: number | null
+          id?: string
+          initial_cash?: number
+          notes?: string | null
+          opened_at?: string
+          opened_by?: string
+          sales_count?: number | null
+          status?: string
+          total_cash?: number | null
+          total_credit?: number | null
+          total_debit?: number | null
+          total_delivery?: number | null
+          total_meal_voucher?: number | null
+          total_pix?: number | null
+          total_sales?: number | null
+          total_signed_account?: number | null
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_cash_registers_cash_closing_id_fkey"
+            columns: ["cash_closing_id"]
+            isOneToOne: false
+            referencedRelation: "cash_closings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_cash_registers_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sale_items: {
+        Row: {
+          created_at: string
+          discount: number
+          id: string
+          notes: string | null
+          product_code: string | null
+          product_id: string | null
+          product_name: string
+          quantity: number
+          sale_id: string
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          discount?: number
+          id?: string
+          notes?: string | null
+          product_code?: string | null
+          product_id?: string | null
+          product_name: string
+          quantity?: number
+          sale_id: string
+          total_price?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          discount?: number
+          id?: string
+          notes?: string | null
+          product_code?: string | null
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          sale_id?: string
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sale_payments: {
+        Row: {
+          amount: number
+          change_amount: number
+          created_at: string
+          id: string
+          method: string
+          sale_id: string
+        }
+        Insert: {
+          amount?: number
+          change_amount?: number
+          created_at?: string
+          id?: string
+          method: string
+          sale_id: string
+        }
+        Update: {
+          amount?: number
+          change_amount?: number
+          created_at?: string
+          id?: string
+          method?: string
+          sale_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sale_payments_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sales: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          customer_document: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          discount: number
+          fiscal_error: string | null
+          fiscal_key: string | null
+          fiscal_number: string | null
+          fiscal_status: string | null
+          fiscal_xml: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          sale_number: number
+          source: string
+          source_order_id: string | null
+          status: string
+          subtotal: number
+          table_number: number | null
+          total: number
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          customer_document?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          fiscal_error?: string | null
+          fiscal_key?: string | null
+          fiscal_number?: string | null
+          fiscal_status?: string | null
+          fiscal_xml?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          sale_number?: number
+          source?: string
+          source_order_id?: string | null
+          status?: string
+          subtotal?: number
+          table_number?: number | null
+          total?: number
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          customer_document?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          fiscal_error?: string | null
+          fiscal_key?: string | null
+          fiscal_number?: string | null
+          fiscal_status?: string | null
+          fiscal_xml?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          sale_number?: number
+          source?: string
+          source_order_id?: string | null
+          status?: string
+          subtotal?: number
+          table_number?: number | null
+          total?: number
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sales_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -4424,6 +4747,7 @@ export type Database = {
           name: string
           notes: string | null
           phone: string | null
+          portal_token: string
           unit_id: string | null
           updated_at: string
         }
@@ -4435,6 +4759,7 @@ export type Database = {
           name: string
           notes?: string | null
           phone?: string | null
+          portal_token?: string
           unit_id?: string | null
           updated_at?: string
         }
@@ -4446,6 +4771,7 @@ export type Database = {
           name?: string
           notes?: string | null
           phone?: string | null
+          portal_token?: string
           unit_id?: string | null
           updated_at?: string
         }
@@ -4500,13 +4826,67 @@ export type Database = {
           },
         ]
       }
+      table_bills: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          id: string
+          paid_at: string | null
+          payment_method: string | null
+          status: string
+          table_number: number
+          total: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string
+          table_number: number
+          total?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string
+          table_number?: number
+          total?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "table_bills_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "table_bills_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tablet_order_items: {
         Row: {
           created_at: string
           id: string
           notes: string | null
           order_id: string
-          product_id: string
+          product_id: string | null
           quantity: number
           unit_price: number
         }
@@ -4515,7 +4895,7 @@ export type Database = {
           id?: string
           notes?: string | null
           order_id: string
-          product_id: string
+          product_id?: string | null
           quantity?: number
           unit_price?: number
         }
@@ -4524,7 +4904,7 @@ export type Database = {
           id?: string
           notes?: string | null
           order_id?: string
-          product_id?: string
+          product_id?: string | null
           quantity?: number
           unit_price?: number
         }
@@ -4549,6 +4929,7 @@ export type Database = {
         Row: {
           created_at: string
           customer_address: string | null
+          customer_email: string | null
           customer_name: string | null
           customer_phone: string | null
           error_message: string | null
@@ -4565,6 +4946,7 @@ export type Database = {
         Insert: {
           created_at?: string
           customer_address?: string | null
+          customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
           error_message?: string | null
@@ -4581,6 +4963,7 @@ export type Database = {
         Update: {
           created_at?: string
           customer_address?: string | null
+          customer_email?: string | null
           customer_name?: string | null
           customer_phone?: string | null
           error_message?: string | null
@@ -4650,6 +5033,7 @@ export type Database = {
           availability: Json
           category: string
           codigo_pdv: string | null
+          coin_price: number | null
           cost_per_portion: number | null
           created_at: string
           custom_prices: Json | null
@@ -4674,6 +5058,7 @@ export type Database = {
           availability?: Json
           category?: string
           codigo_pdv?: string | null
+          coin_price?: number | null
           cost_per_portion?: number | null
           created_at?: string
           custom_prices?: Json | null
@@ -4698,6 +5083,7 @@ export type Database = {
           availability?: Json
           category?: string
           codigo_pdv?: string | null
+          coin_price?: number | null
           cost_per_portion?: number | null
           created_at?: string
           custom_prices?: Json | null
@@ -5574,6 +5960,7 @@ export type Database = {
         Args: { p_token: string }
         Returns: {
           accepted_at: string
+          access_level_id: string
           email: string
           expires_at: string
           id: string
@@ -5596,6 +5983,10 @@ export type Database = {
       get_sector_points_summary: { Args: { p_unit_id: string }; Returns: Json }
       get_unit_plan: { Args: { p_unit_id: string }; Returns: string }
       get_user_unit_ids: { Args: { _user_id: string }; Returns: string[] }
+      grant_signup_bonus: {
+        Args: { p_customer_id: string; p_unit_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -5640,6 +6031,16 @@ export type Database = {
           p_unit_id: string
         }
         Returns: number
+      }
+      upsert_menu_customer: {
+        Args: {
+          p_birthday?: string
+          p_email?: string
+          p_name: string
+          p_phone?: string
+          p_unit_id: string
+        }
+        Returns: string
       }
       user_has_unit_access: {
         Args: { _unit_id: string; _user_id: string }

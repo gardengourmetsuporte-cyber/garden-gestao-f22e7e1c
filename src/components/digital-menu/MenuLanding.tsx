@@ -1,13 +1,16 @@
 import { DMUnit } from '@/hooks/useDigitalMenu';
 import { AppIcon } from '@/components/ui/app-icon';
 import gardenLogo from '@/assets/logo.png';
+import type { User } from '@supabase/supabase-js';
 
 interface Props {
   unit: DMUnit | null;
   unitInitials?: string;
+  customerUser?: User | null;
+  onProfileClick?: () => void;
 }
 
-export function MenuLanding({ unit, unitInitials = '?' }: Props) {
+export function MenuLanding({ unit, unitInitials = '?', customerUser, onProfileClick }: Props) {
   if (!unit) return null;
 
   const info = unit.store_info;
@@ -29,8 +32,41 @@ export function MenuLanding({ unit, unitInitials = '?' }: Props) {
     ? info.opening_hours.map(h => `${h.open} – ${h.close}`).join(' | ')
     : null;
 
+  const userInitials = customerUser
+    ? (customerUser.user_metadata?.full_name || customerUser.email || '?')
+        .split(' ')
+        .slice(0, 2)
+        .map((w: string) => w[0])
+        .join('')
+        .toUpperCase()
+    : null;
+
   return (
     <div className="relative">
+      {/* Profile button - top right */}
+      {onProfileClick && (
+        <div className="absolute top-3 right-3 z-20">
+          <button
+            onClick={onProfileClick}
+            className="flex items-center gap-2 h-10 rounded-full bg-card/80 backdrop-blur-xl border border-border/40 shadow-lg px-3 active:scale-95 transition-transform"
+          >
+            {customerUser ? (
+              <>
+                <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
+                  <span className="text-[11px] font-bold text-primary">{userInitials}</span>
+                </div>
+                <span className="text-xs font-semibold text-foreground pr-0.5">Minha conta</span>
+              </>
+            ) : (
+              <>
+                <AppIcon name="Person" size={18} className="text-foreground" />
+                <span className="text-xs font-semibold text-foreground pr-0.5">Entrar</span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
+
       {/* Banner */}
       <div className="h-44 md:h-56 w-full overflow-hidden relative">
         {bannerUrl ? (
@@ -46,7 +82,6 @@ export function MenuLanding({ unit, unitInitials = '?' }: Props) {
       {/* Logo + Info */}
       <div className="px-5 md:px-8 -mt-14 relative z-10">
         <div className="flex items-end gap-4">
-          {/* Logo container */}
           <div className="w-[88px] h-[88px] md:w-24 md:h-24 rounded-2xl bg-card border-[3px] border-background shadow-xl overflow-hidden flex items-center justify-center shrink-0">
             {logoUrl ? (
               <img src={logoUrl} alt={unit.name} className="w-full h-full object-cover" />

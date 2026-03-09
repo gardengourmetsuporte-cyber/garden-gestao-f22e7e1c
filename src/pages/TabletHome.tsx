@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
 import { formatCurrency } from '@/lib/format';
+import { CustomerLeaderboard } from '@/components/digital-menu/CustomerLeaderboard';
 import gardenLogo from '@/assets/logo.png';
 
 interface StoreInfo {
@@ -24,25 +26,114 @@ export default function TabletHome() {
   const [searchParams] = useSearchParams();
   const mesa = searchParams.get('mesa') || '1';
 
-  const [unit, setUnit] = useState<{ name: string; store_info: StoreInfo | null } | null>(null);
-  const [rodizio, setRodizio] = useState<RodizioSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['tablet-home', unitId],
+    queryFn: async () => {
+      if (!unitId) return { unit: null, rodizio: null as RodizioSettings | null };
 
-  useEffect(() => {
-    if (!unitId) return;
-    const fetch = async () => {
-      const [unitRes, rodizioRes] = await Promise.all([
-        supabase.from('units').select('name, store_info').eq('id', unitId).single(),
-        supabase.from('rodizio_settings').select('is_active, price, description, time_limit_minutes').eq('unit_id', unitId).eq('is_active', true).maybeSingle(),
-      ]);
-      setUnit(unitRes.data as any);
-      setRodizio(rodizioRes.data as any);
-      setLoading(false);
-    };
-    fetch();
-  }, [unitId]);
+      const withTimeout = <T,>(promise: Promise<T>, ms = 12000) =>
+        Promise.race<T>([
+          promise,
+          new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout ao carregar página')), ms)),
+        ]);
 
-  if (loading) {
+      try {
+        const [unitRes, rodizioRes] = await withTimeout(Promise.all([
+          Promise.resolve(supabase.from('units').select('name, store_info').eq('id', unitId).single()),
+          Promise.resolve(supabase
+            .from('rodizio_settings')
+            .select('is_active, price, description, time_limit_minutes')
+            .eq('unit_id', unitId)
+            .eq('is_active', true)
+            .maybeSingle()),
+        ]));
+
+        if (unitRes.error) throw unitRes.error;
+        if (rodizioRes.error) throw rodizioRes.error;
+
+        return {
+          unit: (unitRes.data as { name: string; store_info: StoreInfo | null }) ?? null,
+          rodizio: (rodizioRes.data as RodizioSettings | null) ?? null,
+        };
+      } catch (err: any) {
+        console.error('[TabletHome] Fetch error:', err?.name, err?.message);
+        const msg = String(err?.message || '');
+        const isAbort = err?.name === 'AbortError' || msg.toLowerCase().includes('abort');
+        if (isAbort) throw new Error('Conexão instável. Tente novamente.');
+        throw err;
+      }
+    },
+    enabled: !!unitId,
+    staleTime: 3 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
+  const unit = data?.unit ?? null;
+  const rodizio = data?.rodizio ?? null;
+
+  const menuItems = useMemo(() => {
+    return [
+      {
+        id: 'cardapio',
+        icon: 'Restaurant',
+        label: 'Cardápio',
+        subtitle: 'Veja nosso menu completo',
+        color: 'hsl(var(--primary))',
+        bgColor: 'hsl(var(--primary) / 0.1)',
+        onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
+      },
+      ...(rodizio?.is_active ? [{
+        id: 'rodizio',
+        icon: 'AllInclusive',
+        label: 'Rodízio',
+        subtitle: `${formatCurrency(rodizio.price)} • ${rodizio.time_limit_minutes}min`,
+        color: 'hsl(45 100% 50%)',
+        bgColor: 'hsl(45 100% 50% / 0.1)',
+        onClick: () => navigate(`/tablet/${unitId}/rodizio?mesa=${mesa}`),
+      }] : []),
+      {
+        id: 'mural',
+        icon: 'Newspaper',
+        label: 'Mural da Casa',
+        subtitle: 'Novidades e avisos',
+        color: 'hsl(var(--accent-foreground))',
+        bgColor: 'hsl(var(--accent) / 0.5)',
+        onClick: () => {},
+      },
+      {
+        id: 'avalie',
+        icon: 'Star',
+        label: 'Avalie o Local',
+        subtitle: 'Deixe sua avaliação',
+        color: 'hsl(45 100% 50%)',
+        bgColor: 'hsl(45 100% 50% / 0.1)',
+        onClick: () => {},
+      },
+      {
+        id: 'jogos',
+        icon: 'Gamepad2',
+        label: 'Jogos',
+        subtitle: 'Divirta-se enquanto espera',
+        color: 'hsl(280 80% 60%)',
+        bgColor: 'hsl(280 80% 60% / 0.1)',
+        onClick: () => {},
+      },
+      {
+        id: 'conta',
+        icon: 'Receipt',
+        label: 'Minha Conta',
+        subtitle: 'Fechar conta da mesa',
+        color: 'hsl(var(--muted-foreground))',
+        bgColor: 'hsl(var(--secondary))',
+        onClick: () => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`),
+      },
+    ];
+  }, [mesa, navigate, rodizio, unitId]);
+
+  if (isLoading) {
     return (
       <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
         <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3 animate-pulse" style={{ animationDuration: '2s' }}>
@@ -53,68 +144,28 @@ export default function TabletHome() {
     );
   }
 
-  const logoUrl = (unit?.store_info as any)?.logo_url;
+  if (isError) {
+    return (
+      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-4 px-6 text-center">
+        <AppIcon name="WifiOff" size={34} className="text-destructive" />
+        <div>
+          <p className="text-base font-bold text-foreground">Falha ao abrir o tablet</p>
+          <p className="text-sm text-muted-foreground mt-1">{(error as Error)?.message || 'Erro de conexão'}</p>
+        </div>
+        <button
+          onClick={() => refetch()}
+          className="h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
-  const menuItems = [
-    {
-      id: 'cardapio',
-      icon: 'Restaurant',
-      label: 'Cardápio',
-      subtitle: 'Veja nosso menu completo',
-      color: 'hsl(var(--primary))',
-      bgColor: 'hsl(var(--primary) / 0.1)',
-      onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
-    },
-    ...(rodizio?.is_active ? [{
-      id: 'rodizio',
-      icon: 'AllInclusive',
-      label: 'Rodízio',
-      subtitle: `${formatCurrency(rodizio.price)} • ${rodizio.time_limit_minutes}min`,
-      color: 'hsl(45 100% 50%)',
-      bgColor: 'hsl(45 100% 50% / 0.1)',
-      onClick: () => navigate(`/tablet/${unitId}/rodizio?mesa=${mesa}`),
-    }] : []),
-    {
-      id: 'mural',
-      icon: 'Newspaper',
-      label: 'Mural da Casa',
-      subtitle: 'Novidades e avisos',
-      color: 'hsl(var(--accent-foreground))',
-      bgColor: 'hsl(var(--accent) / 0.5)',
-      onClick: () => {},
-    },
-    {
-      id: 'avalie',
-      icon: 'Star',
-      label: 'Avalie o Local',
-      subtitle: 'Deixe sua avaliação',
-      color: 'hsl(45 100% 50%)',
-      bgColor: 'hsl(45 100% 50% / 0.1)',
-      onClick: () => {},
-    },
-    {
-      id: 'jogos',
-      icon: 'Gamepad2',
-      label: 'Jogos',
-      subtitle: 'Divirta-se enquanto espera',
-      color: 'hsl(280 80% 60%)',
-      bgColor: 'hsl(280 80% 60% / 0.1)',
-      onClick: () => {},
-    },
-    {
-      id: 'conta',
-      icon: 'User',
-      label: 'Minha Conta',
-      subtitle: 'Seus dados e pedidos',
-      color: 'hsl(var(--muted-foreground))',
-      bgColor: 'hsl(var(--secondary))',
-      onClick: () => {},
-    },
-  ];
+  const logoUrl = unit?.store_info?.logo_url;
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
-      {/* Header with logo */}
       <header className="flex flex-col items-center pt-10 pb-6 px-6">
         <div className="w-24 h-24 rounded-3xl overflow-hidden border-2 border-border/30 bg-white flex items-center justify-center shadow-lg mb-4">
           {logoUrl ? (
@@ -127,7 +178,6 @@ export default function TabletHome() {
         <p className="text-sm text-muted-foreground mt-1">Mesa {mesa}</p>
       </header>
 
-      {/* Menu grid */}
       <main className="flex-1 px-6 pb-10">
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl mx-auto">
           {menuItems.map(item => (
@@ -149,6 +199,20 @@ export default function TabletHome() {
             </button>
           ))}
         </div>
+
+        {/* Customer leaderboard widget */}
+        {unitId && (
+          <div className="max-w-2xl mx-auto mt-6">
+            <div className="rounded-3xl bg-card border border-border/30 p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <AppIcon name="EmojiEvents" size={20} style={{ color: 'hsl(45 100% 50%)' }} />
+                <h2 className="text-base font-bold text-foreground">🪙 Ranking de Clientes</h2>
+              </div>
+              <p className="text-[11px] text-muted-foreground mb-3">Clientes com mais moedas Garden</p>
+              <CustomerLeaderboard unitId={unitId} compact />
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -90,7 +90,7 @@ export function useTabletAdmin() {
       .from('tablet_pdv_config')
       .select('*')
       .eq('unit_id', activeUnitId)
-      .single();
+      .maybeSingle();
     setPdvConfig(data as TabletPDVConfig | null);
   }, [activeUnitId]);
 

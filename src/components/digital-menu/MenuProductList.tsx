@@ -130,7 +130,15 @@ function ProductCard({ product, onSelect }: { product: DMProduct; onSelect: (p: 
         {product.description && (
           <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{product.description}</p>
         )}
-        <p className="text-sm font-bold text-primary mt-2">{formatPrice(product.price)}</p>
+        <div className="flex items-center gap-2 mt-2">
+          <p className="text-sm font-bold text-primary">{formatPrice(product.price)}</p>
+          {product.coin_price != null && product.coin_price > 0 && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/12 text-amber-500 text-[11px] font-bold">
+              <span className="text-[10px]">🪙</span>
+              {product.coin_price}
+            </span>
+          )}
+        </div>
       </div>
 
       {product.image_url ? (

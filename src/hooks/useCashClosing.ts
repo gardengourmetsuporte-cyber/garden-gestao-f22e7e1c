@@ -90,7 +90,7 @@ export function useCashClosing() {
 
   const createClosingMut = useMutation({
     mutationFn: async (formData: CashClosingFormData) => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('cash_closings' as any)
         .insert({
           date: formData.date, unit_name: formData.unit_name, unit_id: activeUnitId,
@@ -100,15 +100,32 @@ export function useCashClosing() {
           delivery_amount: formData.delivery_amount, signed_account_amount: formData.signed_account_amount || 0, cash_difference: formData.cash_difference,
           receipt_url: formData.receipt_url || '', notes: formData.notes,
           expenses: formData.expenses || [], user_id: user!.id,
-        } as any);
+          financial_integrated: true, // Mark as integrated immediately
+        } as any)
+        .select()
+        .single();
       if (error) {
         if (error.code === '23505') throw new Error('Já existe um fechamento para esta data e unidade');
         throw error;
       }
+      // Return the closing data for financial integration
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: async (data: any) => {
+      // Integrate with financial immediately after creating
+      if (data) {
+        try {
+          await integrateWithFinancial(data as CashClosing);
+        } catch (err) {
+          console.error('Financial integration error:', err);
+          // Don't fail the closing if financial integration fails
+        }
+      }
       invalidate();
-      toast.success('Fechamento de caixa enviado com sucesso! ✅');
+      // Invalidate finance queries to refresh dashboard
+      queryClient.invalidateQueries({ queryKey: ['finance'] });
+      queryClient.invalidateQueries({ queryKey: ['finance-transactions'] });
+      toast.success('Fechamento de caixa enviado e lançamentos criados! ✅');
     },
     onError: (err: Error) => {
       console.error('Cash closing error:', err);

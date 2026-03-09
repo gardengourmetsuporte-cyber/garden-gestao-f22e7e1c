@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState, useMemo, useImperativeHandle, forwardRef } from 'react';
-import { Loader2, Map } from 'lucide-react';
+import { Loader2, Map, LocateFixed } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Delivery, DeliveryStatus } from '@/hooks/useDeliveries';
@@ -207,6 +207,7 @@ interface Props {
 
 export interface DeliveryMapHandle {
   focusDelivery: (deliveryId: string) => void;
+  centerOnMyLocation: () => void;
 }
 
 export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function DeliveryMap(
@@ -216,23 +217,59 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<Record<string, any>>({});
+  const myLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+  const myMarkerRef = useRef<any>(null);
   const geocodeRunningRef = useRef(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const [locating, setLocating] = useState(false);
+
+  const centerOnMyLocation = useCallback(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (myLocationRef.current) {
+      map.flyTo([myLocationRef.current.lat, myLocationRef.current.lng], 16, { duration: 0.5 });
+      return;
+    }
+
+    if (!('geolocation' in navigator)) {
+      toast.error('Geolocalização não disponível');
+      return;
+    }
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        myLocationRef.current = { lat: latitude, lng: longitude };
+        map.flyTo([latitude, longitude], 16, { duration: 0.5 });
+
+        // Update marker position if exists
+        if (myMarkerRef.current) {
+          myMarkerRef.current.setLatLng([latitude, longitude]);
+        }
+        setLocating(false);
+      },
+      () => {
+        toast.error('Não foi possível obter sua localização');
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  }, []);
 
   useImperativeHandle(ref, () => ({
     focusDelivery(deliveryId: string) {
       const marker = markersRef.current[deliveryId];
       const map = mapInstanceRef.current;
       if (!marker || !map) return;
-
-      // Scroll map container into view on mobile
       mapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
       setTimeout(() => {
         map.flyTo(marker.getLatLng(), 16, { duration: 0.6 });
         marker.openPopup();
       }, 300);
     },
+    centerOnMyLocation,
   }));
 
   const withCoords = deliveries.filter(d => d.address?.lat && d.address?.lng);
@@ -361,11 +398,12 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
           (pos) => {
             if (cancelled || !mapInstanceRef.current) return;
             const { latitude, longitude } = pos.coords;
+            myLocationRef.current = { lat: latitude, lng: longitude };
             const motoIcon = L.divIcon({
               className: '',
               html: `
                 <div style="position:relative;width:48px;height:48px;">
-                  <div style="width:44px;height:44px;background:rgba(34,197,94,0.15);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+                  <div style="width:44px;height:44px;background:rgba(34,197,94,0.15);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse-ring 2s infinite;"></div>
                   <div style="width:36px;height:36px;background:#ffffff;border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,0.2);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
                     <img src="/icons/motocicleta.png" alt="" style="width:22px;height:22px;object-fit:contain;display:block;" />
                   </div>
@@ -375,6 +413,7 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
             });
             const myMarker = L.marker([latitude, longitude], { icon: motoIcon, zIndexOffset: 1000 }).addTo(map);
             myMarker.bindPopup('<div style="font-family:system-ui;font-size:12px;font-weight:600;text-align:center;padding:4px 0;">🏍️ Você está aqui</div>');
+            myMarkerRef.current = myMarker;
 
             if (bounds.length > 0) {
               bounds.push([latitude, longitude]);
@@ -471,6 +510,20 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
           <p className="text-[11px] text-muted-foreground">Localizando endereços no mapa…</p>
         </div>
       )}
+
+      {/* My Location button */}
+      <button
+        type="button"
+        onClick={centerOnMyLocation}
+        className="absolute bottom-4 right-4 z-[500] w-10 h-10 rounded-full bg-card border border-border/30 shadow-lg flex items-center justify-center hover:bg-secondary/80 active:scale-95 transition-all"
+        title="Minha localização"
+      >
+        {locating ? (
+          <Loader2 className="w-5 h-5 text-primary animate-spin" />
+        ) : (
+          <LocateFixed className="w-5 h-5 text-primary" />
+        )}
+      </button>
 
       {/* Map fills parent */}
       <div

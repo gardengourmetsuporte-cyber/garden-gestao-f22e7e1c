@@ -3,6 +3,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -11,6 +12,7 @@ import { useDeliveryZones } from '@/hooks/useDeliveryZones';
 import { formatCurrency } from '@/lib/format';
 import type { MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
 import type { TabletOrderAdmin } from '@/hooks/useTabletAdmin';
+import { AutoConfirmWidget } from './AutoConfirmWidget';
 
 interface Props {
   onNavigate: (tab: string) => void;
@@ -128,6 +130,9 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
 
       {/* Delivery Time Widget */}
       <DeliveryTimeWidget unitId={unitId} onNavigate={onNavigate} />
+
+      {/* Auto-confirm Settings */}
+      <AutoConfirmWidget unitId={unitId} storeInfo={storeInfo} />
 
       {/* Warnings: Deactivated products */}
       {deactivatedProducts.length > 0 && (

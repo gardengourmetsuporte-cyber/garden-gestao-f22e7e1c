@@ -132,6 +132,8 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
     const isMobile = React.useContext(SheetMobileContext);
 
     if (isMobile) {
+      // Extract padding from className to apply to inner wrapper
+      const hasCustomPadding = className && /\bp-0\b/.test(className);
       return (
         <DrawerPrimitive.Portal>
           <DrawerPrimitive.Overlay className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm" />
@@ -144,7 +146,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
             {...(props as any)}
           >
             <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-muted-foreground/20" />
-            <div className="flex flex-1 flex-col overflow-y-auto p-6">{children}</div>
+            <div className={cn("flex flex-1 flex-col overflow-y-auto", !hasCustomPadding && "p-6")}>{children}</div>
           </DrawerPrimitive.Content>
         </DrawerPrimitive.Portal>
       );

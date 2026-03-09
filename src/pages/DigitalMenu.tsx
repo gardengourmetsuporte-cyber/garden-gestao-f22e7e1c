@@ -11,6 +11,7 @@ import { MenuSearch } from '@/components/digital-menu/MenuSearch';
 import { MenuCustomerAuth } from '@/components/digital-menu/MenuCustomerAuth';
 import { MenuCustomerProfile } from '@/components/digital-menu/MenuCustomerProfile';
 import { MenuAccount } from '@/components/digital-menu/MenuAccount';
+import { CustomerLeaderboard } from '@/components/digital-menu/CustomerLeaderboard';
 import { SlotMachine } from '@/components/gamification/SlotMachine';
 import { PrizeResult } from '@/components/gamification/PrizeResult';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -29,7 +30,7 @@ export default function DigitalMenu() {
   const initialTab = (searchParams.get('tab') as MenuTab) || 'home';
 
   const {
-    unit, categories, groups, products, loading,
+    unit, categories, groups, products, loading, hasVisibleProducts,
     getProductOptionGroups, getGroupProducts,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
   } = useDigitalMenu(unitId);
@@ -45,13 +46,11 @@ export default function DigitalMenu() {
   const [showAuth, setShowAuth] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState<MenuTab | null>(null);
-  const [menuEntered, setMenuEntered] = useState(false);
 
   // Check auth state on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setCustomerUser(session?.user ?? null);
-      if (session?.user) setMenuEntered(true);
       setAuthChecked(true);
     });
 
@@ -63,7 +62,6 @@ export default function DigitalMenu() {
       // After OAuth login, check if customer profile is complete
       if (user && unitId && _event === 'SIGNED_IN') {
         setShowAuth(false);
-        setMenuEntered(true);
         const needsProfile = await checkNeedsProfile(user, unitId);
         if (needsProfile) {
           setShowProfile(true);
@@ -75,16 +73,10 @@ export default function DigitalMenu() {
         }
         await ensureCustomerRecord(user, unitId);
       }
-
-      // If user already logged in (page refresh), just proceed
-      if (user && !showAuth && pendingTabAfterAuth && _event !== 'SIGNED_IN') {
-        setActiveTab(pendingTabAfterAuth);
-        setPendingTabAfterAuth(null);
-      }
     });
 
     return () => subscription.unsubscribe();
-  }, [unitId, pendingTabAfterAuth, showAuth]);
+  }, [unitId, pendingTabAfterAuth]);
 
   // Check if customer needs to complete their profile (no phone)
   const checkNeedsProfile = async (user: User, unitId: string): Promise<boolean> => {
@@ -97,61 +89,66 @@ export default function DigitalMenu() {
         .eq('unit_id', unitId)
         .eq('email', email)
         .maybeSingle();
-      // If no customer record or no phone, needs profile
       return !data || !data.phone;
     } catch {
       return true;
     }
   };
 
-  // Create/update customer record from OAuth user data
+  // Signup bonus points from store_info
+  const signupBonus = (unit?.store_info as any)?.signup_bonus_points ?? 0;
+
+  // Create/update customer record using RPC (bypasses RLS)
   const ensureCustomerRecord = async (user: User, unitId: string) => {
     try {
       const email = user.email;
       const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email?.split('@')[0] || 'Cliente';
-
       if (!email) return;
 
-      // Check if customer already exists by email
-      const { data: existing } = await supabase
-        .from('customers')
-        .select('id')
-        .eq('unit_id', unitId)
-        .eq('email', email)
-        .maybeSingle();
+      const { data: customerId } = await supabase.rpc('upsert_menu_customer', {
+        p_unit_id: unitId,
+        p_name: fullName,
+        p_email: email,
+        p_phone: user.phone || null,
+        p_birthday: null,
+      });
 
-      if (!existing) {
-        const { error } = await supabase.from('customers').insert({
-          unit_id: unitId,
-          name: fullName,
-          email,
-          phone: user.phone || null,
-          origin: 'whatsapp' as any,
-          score: 0,
-          segment: 'new',
-          loyalty_points: 0,
-          total_spent: 0,
-          total_orders: 0,
+      // Grant signup bonus (fire-and-forget)
+      if (customerId) {
+        supabase.rpc('grant_signup_bonus', {
+          p_customer_id: customerId,
+          p_unit_id: unitId,
+        }).then(({ data: pts }) => {
+          if (pts && pts > 0) {
+            toast.success(`🎁 Você ganhou ${pts} pontos de boas-vindas!`);
+          }
         });
-        // Ignore unique constraint violations (phone already exists)
-        if (error && !error.message?.includes('duplicate')) {
-          console.error('[DigitalMenu] Failed to create customer:', error);
-        }
       }
     } catch (err) {
       console.error('[DigitalMenu] Failed to ensure customer record:', err);
     }
   };
 
-  // Intercept tab changes — require auth for cart
+  // Tab changes — no auth gate, allow free browsing
   const handleTabChange = (tab: MenuTab) => {
-    if ((tab === 'cart' || tab === 'account') && !customerUser && authChecked) {
-      setPendingTabAfterAuth(tab);
-      setShowAuth(true);
-      return;
+    if (tab === 'account') {
+      // Account tab triggers auth modal if not logged in
+      if (!customerUser && authChecked) {
+        setShowAuth(true);
+        return;
+      }
     }
     setActiveTab(tab);
     setSearchOpen(false);
+  };
+
+  // Open account/profile — triggered from landing header icon
+  const handleProfileClick = () => {
+    if (!customerUser) {
+      setShowAuth(true);
+    } else {
+      setActiveTab('account');
+    }
   };
 
   // Gamification
@@ -217,160 +214,41 @@ export default function DigitalMenu() {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
 
-  // Compute open/closed status for welcome screen
-  const isOpen = (() => {
-    const hours = unit?.store_info?.opening_hours;
-    if (!hours?.length) return true;
-    const now = new Date();
-    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    return hours.some(h => currentTime >= h.open && currentTime <= h.close);
-  })();
+  // Profile completion handler
+  const handleProfileComplete = async (data: { name: string; phone: string; birthday: string | null }) => {
+    if (!unitId || !customerUser) return;
+    const withTimeout = async <T,>(fn: () => PromiseLike<T>, ms = 8000): Promise<T> =>
+      Promise.race([
+        Promise.resolve(fn()),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+      ]);
 
-  // Welcome gate: show auth/entry screen before entering the menu
-  if (!menuEntered && !showProfile && authChecked && !customerUser) {
-    return (
-      <MenuCustomerAuth
-        unitName={unit?.name}
-        logoUrl={unit?.store_info?.logo_url}
-        cuisineType={unit?.store_info?.cuisine_type}
-        city={unit?.store_info?.city}
-        isOpen={isOpen}
-        onSkip={() => setMenuEntered(true)}
-        onEmailLogin={() => {
-          setShowAuth(false);
-          setMenuEntered(true);
-          setActiveTab('account');
-        }}
-      />
-    );
-  }
-
-  // Show auth screen (from cart/account requiring login)
-  if (showAuth) {
-    return (
-      <MenuCustomerAuth
-        unitName={unit?.name}
-        logoUrl={unit?.store_info?.logo_url}
-        cuisineType={unit?.store_info?.cuisine_type}
-        city={unit?.store_info?.city}
-        isOpen={isOpen}
-        onSkip={() => {
-          setShowAuth(false);
-          if (pendingTabAfterAuth) {
-            setActiveTab(pendingTabAfterAuth);
-            setPendingTabAfterAuth(null);
-          }
-        }}
-      />
-    );
-  }
-
-  // Show profile completion screen
-  if (showProfile && customerUser) {
-    const handleProfileComplete = async (data: { name: string; phone: string; birthday: string | null }) => {
-      if (!unitId) return;
-      
-      // Timeout wrapper to prevent hanging
-      // Timeout wrapper to prevent hanging queries
-      const withTimeout = async <T,>(fn: () => PromiseLike<T>, ms = 8000): Promise<T> =>
-        Promise.race([
-          Promise.resolve(fn()),
-          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
-        ]);
-
-      try {
-        const email = customerUser.email || '';
-        
-        // Try to find existing customer by email or phone
-        let existing: { id: string } | null = null;
-        
-        if (email) {
-          const { data: byEmail } = await withTimeout(() =>
-            supabase
-              .from('customers')
-              .select('id')
-              .eq('unit_id', unitId)
-              .eq('email', email)
-              .maybeSingle()
-          );
-          existing = byEmail;
-        }
-        
-        if (!existing && data.phone) {
-          const { data: byPhone } = await withTimeout(() =>
-            supabase
-              .from('customers')
-              .select('id')
-              .eq('unit_id', unitId)
-              .eq('phone', data.phone)
-              .maybeSingle()
-          );
-          existing = byPhone;
-        }
-
-        if (existing) {
-          const { error } = await withTimeout(() =>
-            supabase.from('customers').update({
-              name: data.name,
-              phone: data.phone,
-              birthday: data.birthday,
-              email: email || undefined,
-            }).eq('id', existing!.id)
-          );
-          if (error) throw error;
-        } else {
-          const { error } = await withTimeout(() =>
-            supabase.from('customers').insert({
-              unit_id: unitId,
-              name: data.name,
-              email: email || null,
-              phone: data.phone,
-              birthday: data.birthday,
-              origin: 'digital_menu' as any,
-              score: 0,
-              segment: 'new',
-              loyalty_points: 0,
-              total_spent: 0,
-              total_orders: 0,
-            })
-          );
-          if (error) throw error;
-        }
-
-        setShowProfile(false);
-        if (pendingTabAfterAuth) {
-          setActiveTab(pendingTabAfterAuth);
-          setPendingTabAfterAuth(null);
-        }
-        toast.success('Cadastro completo!');
-      } catch (err: any) {
-        console.error('[DigitalMenu] Profile save error:', err);
-        if (err?.message === 'timeout') {
-          toast.error('Conexão lenta. Tente novamente.');
-        } else {
-          toast.error('Erro ao salvar dados. Tente novamente.');
-        }
-        // Don't re-throw — let the child reset saving state gracefully
+    try {
+      const { error } = await withTimeout(() =>
+        supabase.rpc('upsert_menu_customer', {
+          p_unit_id: unitId,
+          p_name: data.name,
+          p_email: customerUser.email || null,
+          p_phone: data.phone || null,
+          p_birthday: data.birthday,
+        })
+      );
+      if (error) throw error;
+      setShowProfile(false);
+      if (pendingTabAfterAuth) {
+        setActiveTab(pendingTabAfterAuth);
+        setPendingTabAfterAuth(null);
       }
-    };
-
-    return (
-      <MenuCustomerProfile
-        unitName={unit?.name}
-        logoUrl={unit?.store_info?.logo_url}
-        defaultName={customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || ''}
-        defaultEmail={customerUser.email}
-        onComplete={handleProfileComplete}
-        onBack={() => {
-          setShowProfile(false);
-          if (pendingTabAfterAuth) {
-            setActiveTab(pendingTabAfterAuth);
-            setPendingTabAfterAuth(null);
-          }
-        }}
-      />
-    );
-  }
+      toast.success('Cadastro completo!');
+    } catch (err: any) {
+      console.error('[DigitalMenu] Profile save error:', err);
+      if (err?.message === 'timeout') {
+        toast.error('Conexão lenta. Tente novamente.');
+      } else {
+        toast.error('Erro ao salvar dados. Tente novamente.');
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -390,6 +268,32 @@ export default function DigitalMenu() {
     );
   }
 
+  // Se não há produtos visíveis, mostrar tela de cardápio indisponível
+  if (!hasVisibleProducts) {
+    return (
+      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5 px-8">
+        <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3">
+          <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
+        </div>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <AppIcon name="UtensilsCrossed" size={44} className="text-muted-foreground/30" />
+          <div>
+            <p className="text-lg font-bold text-foreground">Cardápio temporariamente indisponível</p>
+            <p className="text-sm text-muted-foreground mt-1">Nosso cardápio está sendo atualizado. Volte em breve!</p>
+          </div>
+          <div className="mt-4 flex flex-col gap-2 text-sm text-muted-foreground">
+            {unit?.store_info?.opening_hours && (
+              <p>🕒 Horários: {unit.store_info.opening_hours.map((h: any) => `${h.open} - ${h.close}`).join(', ')}</p>
+            )}
+            {unit?.store_info?.address && (
+              <p>📍 {unit.store_info.address}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const unitInitials = unit?.name
     ?.split(' ')
     .slice(0, 2)
@@ -399,10 +303,50 @@ export default function DigitalMenu() {
 
   return (
     <div className="min-h-[100dvh] bg-background max-w-4xl mx-auto relative">
+      {/* Auth modal (sheet overlay) */}
+      {showAuth && (
+        <MenuCustomerAuth
+          unitName={unit?.name}
+          logoUrl={unit?.store_info?.logo_url}
+          cuisineType={unit?.store_info?.cuisine_type}
+          city={unit?.store_info?.city}
+          isOpen={true}
+          bonusPoints={signupBonus}
+          onSkip={() => setShowAuth(false)}
+          onEmailLogin={() => {
+            setShowAuth(false);
+            setActiveTab('account');
+          }}
+        />
+      )}
+
+      {/* Profile completion modal */}
+      {showProfile && customerUser && (
+        <MenuCustomerProfile
+          unitName={unit?.name}
+          logoUrl={unit?.store_info?.logo_url}
+          defaultName={customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || ''}
+          defaultEmail={customerUser.email}
+          onComplete={handleProfileComplete}
+          onBack={() => {
+            setShowProfile(false);
+            if (pendingTabAfterAuth) {
+              setActiveTab(pendingTabAfterAuth);
+              setPendingTabAfterAuth(null);
+            }
+          }}
+        />
+      )}
+
       {/* Home tab */}
       {activeTab === 'home' && (
         <div>
-          <MenuLanding unit={unit} unitInitials={unitInitials} />
+          <MenuLanding
+            unit={unit}
+            unitInitials={unitInitials}
+            customerUser={customerUser}
+            onProfileClick={handleProfileClick}
+          />
 
           {/* Quick search bar */}
           <div className="px-5 md:px-8 mt-5">
@@ -508,6 +452,7 @@ export default function DigitalMenu() {
             cart={cart}
             cartTotal={cartTotal}
             unitId={unitId}
+            autoConfirm={(unit?.store_info as any)?.auto_confirm?.delivery ?? false}
             customerUser={customerUser}
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
@@ -524,10 +469,7 @@ export default function DigitalMenu() {
             unitId={unitId}
             unitName={unit?.name}
             logoUrl={unit?.store_info?.logo_url}
-            onLogin={() => {
-              setPendingTabAfterAuth('account');
-              setShowAuth(true);
-            }}
+            onLogin={() => setShowAuth(true)}
             onLogout={() => {
               setCustomerUser(null);
               setActiveTab('home');
@@ -536,10 +478,23 @@ export default function DigitalMenu() {
         </div>
       )}
 
+      {/* Ranking tab */}
+      {activeTab === 'ranking' && unitId && (
+        <div className="pt-6 px-5 md:px-8 pb-28">
+          <div className="flex items-center gap-2 mb-4">
+            <AppIcon name="EmojiEvents" size={22} style={{ color: 'hsl(45 100% 50%)' }} />
+            <h2 className="text-lg font-bold text-foreground">Ranking de Clientes</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            Os clientes que mais acumularam moedas Garden 🪙
+          </p>
+          <CustomerLeaderboard unitId={unitId} />
+        </div>
+      )}
+
       {/* Game tab */}
       {activeTab === 'game' && (
         <div className="px-5 pt-6 pb-28 flex flex-col items-center gap-6">
-          {/* Unit logo */}
           <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-border/30 shadow-lg bg-white flex items-center justify-center p-2">
             {unit?.store_info?.logo_url ? (
               <img src={unit.store_info.logo_url} alt={unit.name} className="w-full h-full object-cover rounded-xl" />
