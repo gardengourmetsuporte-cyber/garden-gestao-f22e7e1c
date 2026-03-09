@@ -195,7 +195,7 @@ export default function PDV() {
                   <AppIcon name="Trash2" size={14} className="mr-1" />
                   Limpar
                 </Button>
-                <Button size="sm" onClick={() => { setPayments([]); setPaymentOpen(true); }}>
+                <Button size="sm" onClick={() => setPaymentOpen(true)}>
                   <AppIcon name="Banknote" size={14} className="mr-1" />
                   Cobrar
                 </Button>
