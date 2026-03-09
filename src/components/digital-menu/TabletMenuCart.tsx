@@ -137,7 +137,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
 
     setSending(true);
 
-    const requestTimeoutMs = 12000;
+    const requestTimeoutMs = 20000;
     const maxRetries = 3;
 
     // Resolve live auto-confirm from unit store_info (avoid stale cache on long-open tablets)
