@@ -398,11 +398,12 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
           (pos) => {
             if (cancelled || !mapInstanceRef.current) return;
             const { latitude, longitude } = pos.coords;
+            myLocationRef.current = { lat: latitude, lng: longitude };
             const motoIcon = L.divIcon({
               className: '',
               html: `
                 <div style="position:relative;width:48px;height:48px;">
-                  <div style="width:44px;height:44px;background:rgba(34,197,94,0.15);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+                  <div style="width:44px;height:44px;background:rgba(34,197,94,0.15);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse-ring 2s infinite;"></div>
                   <div style="width:36px;height:36px;background:#ffffff;border-radius:50%;box-shadow:0 2px 12px rgba(0,0,0,0.2);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
                     <img src="/icons/motocicleta.png" alt="" style="width:22px;height:22px;object-fit:contain;display:block;" />
                   </div>
@@ -412,6 +413,7 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
             });
             const myMarker = L.marker([latitude, longitude], { icon: motoIcon, zIndexOffset: 1000 }).addTo(map);
             myMarker.bindPopup('<div style="font-family:system-ui;font-size:12px;font-weight:600;text-align:center;padding:4px 0;">🏍️ Você está aqui</div>');
+            myMarkerRef.current = myMarker;
 
             if (bounds.length > 0) {
               bounds.push([latitude, longitude]);
