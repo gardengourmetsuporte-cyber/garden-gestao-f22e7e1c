@@ -341,6 +341,16 @@ export default function CardapioHub() {
             </div>
           )}
 
+          {/* ==================== OPCIONAIS ==================== */}
+          {cardapioTab === 'opcionais' && (
+            <OptionGroupList
+              optionGroups={optionGroups}
+              onNew={openNewOG}
+              onEdit={openEditOG}
+              onDelete={deleteOptionGroup}
+              onLinkProducts={openLinkProducts}
+            />
+          )}
         </div>
       </div>
 
