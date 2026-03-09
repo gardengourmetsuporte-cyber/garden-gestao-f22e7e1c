@@ -213,7 +213,36 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
              }
            }
 
-           toast.success('Pedido enviado com sucesso!');
+           // Deduct coins if paying with coins
+           if (payWithCoins && customerUser?.email) {
+             try {
+               const { data: cust } = await supabase
+                 .from('customers')
+                 .select('id, loyalty_points')
+                 .eq('unit_id', unitId)
+                 .eq('email', customerUser.email)
+                 .maybeSingle();
+               if (cust) {
+                 await supabase
+                   .from('customers')
+                   .update({ loyalty_points: Math.max(0, (cust.loyalty_points ?? 0) - coinTotal) })
+                   .eq('id', cust.id);
+                 // Log redemption event
+                 await supabase.from('loyalty_events').insert({
+                   customer_id: cust.id,
+                   unit_id: unitId,
+                   type: 'redeemed',
+                   points: -coinTotal,
+                   description: 'Pedido #' + (order as any).id.slice(0, 8) + ' pago com moedas',
+                 });
+                 setCustomerCoins(Math.max(0, (cust.loyalty_points ?? 0) - coinTotal));
+               }
+             } catch (e) {
+               console.warn('[TabletMenuCart] coin deduction failed:', e);
+             }
+           }
+
+           toast.success(payWithCoins ? 'Pedido enviado! Moedas debitadas ✨' : 'Pedido enviado com sucesso!');
            setOrderSent((order as any).id.slice(0, 8));
            return; // Success — exit
         } catch (err: any) {
