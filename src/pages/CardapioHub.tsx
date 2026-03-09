@@ -220,8 +220,95 @@ export default function CardapioHub() {
     );
   }
 
-  // ==================== CONFIG HUB VIEW ====================
+  // ==================== PEDIDOS (ORDERS) VIEW ====================
   if (isPedidosConfig) {
+    const today = new Date().toISOString().slice(0, 10);
+    const todayOrders = orders.filter(o => o.created_at.slice(0, 10) === today);
+    const olderOrders = orders.filter(o => o.created_at.slice(0, 10) !== today);
+
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background pb-24">
+          <div className="px-4 py-3 lg:px-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-foreground">Pedidos</h2>
+              <button
+                onClick={() => setSearchParams({ section: 'config' })}
+                className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <AppIcon name="Settings" size={14} />
+                Configurações
+              </button>
+            </div>
+
+            {orders.length === 0 ? (
+              <EmptyState icon="ShoppingBag" title="Nenhum pedido" subtitle="Os pedidos do cardápio digital aparecerão aqui." />
+            ) : (
+              <>
+                {todayOrders.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50">Hoje</p>
+                    {todayOrders.map(order => (
+                      <div key={order.id} className="card-stat-holo">
+                        <div className="flex items-center gap-3">
+                          <div className={cn("stat-holo-icon", statusColor[order.status] || 'bg-secondary text-secondary-foreground')}>
+                            <AppIcon name={order.status === 'error' ? 'AlertTriangle' : order.status === 'sent_to_pdv' ? 'CheckCircle' : 'ShoppingBag'} size={18} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-bold text-foreground">Mesa {order.table_number}</p>
+                              <span className={cn("text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full", statusColor[order.status] || 'bg-secondary text-muted-foreground')}>
+                                {statusLabel[order.status] || order.status}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground">
+                              {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                              {order.tablet_order_items && ` · ${order.tablet_order_items.length} item(s)`}
+                            </p>
+                          </div>
+                          <p className="text-sm font-extrabold text-foreground tabular-nums">{formatPrice(order.total)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {olderOrders.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50">Anteriores</p>
+                    {olderOrders.slice(0, 20).map(order => (
+                      <div key={order.id} className="card-stat-holo">
+                        <div className="flex items-center gap-3">
+                          <div className={cn("stat-holo-icon", statusColor[order.status] || 'bg-secondary text-secondary-foreground')}>
+                            <AppIcon name={order.status === 'error' ? 'AlertTriangle' : order.status === 'sent_to_pdv' ? 'CheckCircle' : 'ShoppingBag'} size={18} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-bold text-foreground">Mesa {order.table_number}</p>
+                              <span className={cn("text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full", statusColor[order.status] || 'bg-secondary text-muted-foreground')}>
+                                {statusLabel[order.status] || order.status}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground">
+                              {new Date(order.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} · {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                          <p className="text-sm font-extrabold text-foreground tabular-nums">{formatPrice(order.total)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // ==================== CONFIG HUB VIEW (via section=config) ====================
+  if (isConfigFromUrl) {
     return (
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
