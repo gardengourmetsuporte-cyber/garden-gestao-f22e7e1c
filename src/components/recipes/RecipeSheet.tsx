@@ -97,7 +97,8 @@ export function RecipeSheet({
   const [marginMode, setMarginMode] = useState<'margin' | 'price'>('margin');
 
   const { activeUnit } = useUnit();
-  const { settings, calculateOperationalCosts } = useRecipeCostSettings();
+   const { settings, calculateOperationalCosts } = useRecipeCostSettings();
+   const { templates: packagingTemplates, getTemplateCost } = usePackagingTemplates();
 
   // Load KDS stations
   const { data: kdsStations = [] } = useQuery({
