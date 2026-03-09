@@ -113,7 +113,7 @@ export default function Agenda() {
     if (!canAccessAgenda) navigate('/');
   }, [canAccessAgenda, navigate]);
 
-  useFabAction({ icon: 'Plus', label: 'Novo Lembrete', onClick: () => { setEditingTask(null); setTaskSheetOpen(true); } }, []);
+  useFabAction({ icon: 'Plus', label: 'Nova Tarefa', onClick: () => { setEditingTask(null); setTaskSheetOpen(true); } }, []);
 
   // Stats
   const pendingCount = useCountUp(displayTasks.filter(t => !t.is_completed).length);
