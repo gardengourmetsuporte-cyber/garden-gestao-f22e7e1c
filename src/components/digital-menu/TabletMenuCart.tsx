@@ -418,13 +418,19 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         )}
       </div>
 
-      <Button className="w-full h-14 text-base font-bold rounded-xl" onClick={handleSend} disabled={sending}>
+      <Button
+        className={`w-full h-14 text-base font-bold rounded-xl ${payWithCoins ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
+        onClick={handleSend}
+        disabled={sending || (payWithCoins && !canPayWithCoins)}
+      >
         {sending ? (
           <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
+        ) : payWithCoins ? (
+          <AppIcon name="Coins" size={20} className="mr-2" />
         ) : (
           <AppIcon name="Send" size={20} className="mr-2" />
         )}
-        Enviar Pedido • {formatPrice(cartTotal)}
+        {payWithCoins ? `Pagar com ${coinTotal} moedas` : `Enviar Pedido • ${formatPrice(cartTotal)}`}
       </Button>
     </div>
   );
