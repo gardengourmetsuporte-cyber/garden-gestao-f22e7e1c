@@ -140,7 +140,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 table_number: parseInt(tableNumber) || 0,
                 status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
                 total: cartTotal,
-                source: 'mesa',
+                source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
                 customer_name: finalName,
               })
               .select('id')
