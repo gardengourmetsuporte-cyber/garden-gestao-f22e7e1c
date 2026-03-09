@@ -20,6 +20,8 @@ interface ViaCepResult {
 interface NominatimResult {
   display_name: string;
   place_id: number;
+  lat: string;
+  lon: string;
 }
 
 export function PDVDeliveryAddress({ value, onChange }: PDVDeliveryAddressProps) {
