@@ -310,6 +310,7 @@ export default function DigitalMenu() {
           cuisineType={unit?.store_info?.cuisine_type}
           city={unit?.store_info?.city}
           isOpen={true}
+          bonusPoints={signupBonus}
           onSkip={() => setShowAuth(false)}
           onEmailLogin={() => {
             setShowAuth(false);
