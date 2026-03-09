@@ -234,30 +234,55 @@ export default function CardapioHub() {
         {(
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2">
             {activeUnit && <MenuPublishBar unitId={activeUnit.id} products={products} groups={groups} />}
-            <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-full">
-              {([
-                { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
-                { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
-              ]).map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setCardapioTab(tab.id)}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-sm font-medium transition-all",
-                    cardapioTab === tab.id
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 flex-1 min-w-0">
+                {([
+                  { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
+                  { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
+                ]).map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setCardapioTab(tab.id)}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-sm font-medium transition-all",
+                      cardapioTab === tab.id
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <AppIcon name={tab.icon} size={15} fill={cardapioTab === tab.id ? 1 : 0} />
+                    <span className="truncate">{tab.label}</span>
+                    {tab.count !== undefined && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary shrink-0">
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Inline action button */}
+              {cardapioTab === 'produtos' && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="shrink-0 gap-1.5 rounded-xl h-9"
+                  onClick={() => setViewMode(v => v === 'menu' ? 'ficha' : 'menu')}
                 >
-                  <AppIcon name={tab.icon} size={15} fill={cardapioTab === tab.id ? 1 : 0} />
-                  <span className="truncate">{tab.label}</span>
-                  {tab.count !== undefined && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary shrink-0">
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              ))}
+                  <AppIcon name={viewMode === 'menu' ? 'RecipeBook' : 'Eye'} size={16} />
+                  <span className="hidden sm:inline">{viewMode === 'menu' ? 'Ficha Técnica' : 'Cardápio'}</span>
+                </Button>
+              )}
+              {cardapioTab === 'opcionais' && (
+                <Button
+                  size="sm"
+                  className="shrink-0 gap-1.5 rounded-xl h-9"
+                  onClick={openNewOG}
+                >
+                  <AppIcon name="Plus" size={16} />
+                  <span className="hidden sm:inline">Novo</span>
+                </Button>
+              )}
             </div>
           </div>
         )}
