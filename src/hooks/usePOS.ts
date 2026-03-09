@@ -27,6 +27,8 @@ export interface PendingOrder {
   id: string;
   source: string;
   customer_name: string | null;
+  customer_phone: string | null;
+  customer_address: string | null;
   table_number: number | null;
   total: number;
   status: string;
@@ -85,7 +87,7 @@ export function usePOS() {
     // Tablet orders
     const { data: tabletData } = await supabase
       .from('tablet_orders')
-      .select('id, source, customer_name, table_number, total, status, created_at, tablet_order_items(quantity, unit_price, tablet_products(name))')
+      .select('id, source, customer_name, customer_phone, customer_address, table_number, total, status, created_at, tablet_order_items(quantity, unit_price, tablet_products(name))')
       .eq('unit_id', activeUnitId)
       .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
       .order('created_at', { ascending: false });
@@ -93,7 +95,7 @@ export function usePOS() {
     // Delivery hub orders
     const { data: deliveryData } = await supabase
       .from('delivery_hub_orders')
-      .select('id, customer_name, customer_phone, total, status, created_at, platform')
+      .select('id, customer_name, customer_phone, customer_address, total, status, created_at, platform')
       .eq('unit_id', activeUnitId)
       .in('status', ['new', 'accepted', 'preparing', 'ready'])
       .order('created_at', { ascending: false });
@@ -105,6 +107,8 @@ export function usePOS() {
         id: o.id,
         source: o.source || 'mesa',
         customer_name: o.customer_name,
+        customer_phone: o.customer_phone || null,
+        customer_address: o.customer_address || null,
         table_number: o.table_number,
         total: o.total,
         status: o.status,
@@ -122,6 +126,8 @@ export function usePOS() {
         id: o.id,
         source: o.platform || 'delivery',
         customer_name: o.customer_name,
+        customer_phone: o.customer_phone || null,
+        customer_address: o.customer_address || null,
         table_number: null,
         total: o.total,
         status: o.status,
