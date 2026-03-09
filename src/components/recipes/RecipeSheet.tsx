@@ -446,6 +446,7 @@ export function RecipeSheet({
                         onRemove={() => handleRemoveIngredient(index)}
                         onUpdateGlobalPrice={onUpdateItemPrice}
                         onUpdateItemUnit={onUpdateItemUnit}
+                        kdsStations={kdsStations}
                       />
                     ))}
                   </div>
