@@ -142,14 +142,23 @@ export function OrdersTab({
     
     const phone = formatPhoneForWhatsApp(order.supplier.phone);
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    
-    window.open(whatsappUrl, '_blank');
+
+    // Update status BEFORE opening WhatsApp to avoid losing state on iOS
     try {
       await onSendOrder(order.id);
     } catch (err) {
       console.error('Erro ao atualizar status do pedido:', err);
       toast.error('Pedido enviado mas houve erro ao atualizar o status');
     }
+    
+    // Use anchor click for reliable mobile behavior (avoids blank page on iOS return)
+    const a = document.createElement('a');
+    a.href = whatsappUrl;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => document.body.removeChild(a), 100);
   };
 
   const getStatusBadge = (status: Order['status']) => {
