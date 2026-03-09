@@ -1136,6 +1136,10 @@ export type Database = {
       }
       customers: {
         Row: {
+          address: string | null
+          address_lat: number | null
+          address_lng: number | null
+          address_reference: string | null
           birthday: string | null
           created_at: string | null
           created_by: string | null
@@ -1158,6 +1162,10 @@ export type Database = {
           visit_frequency_days: number | null
         }
         Insert: {
+          address?: string | null
+          address_lat?: number | null
+          address_lng?: number | null
+          address_reference?: string | null
           birthday?: string | null
           created_at?: string | null
           created_by?: string | null
@@ -1180,6 +1188,10 @@ export type Database = {
           visit_frequency_days?: number | null
         }
         Update: {
+          address?: string | null
+          address_lat?: number | null
+          address_lng?: number | null
+          address_reference?: string | null
           birthday?: string | null
           created_at?: string | null
           created_by?: string | null
