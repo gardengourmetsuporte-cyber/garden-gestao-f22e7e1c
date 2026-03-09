@@ -36,6 +36,8 @@ export default function PDV() {
   const [openRegisterDialog, setOpenRegisterDialog] = useState(false);
   const [closeRegisterSheet, setCloseRegisterSheet] = useState(false);
   const [deliveryPaymentOpen, setDeliveryPaymentOpen] = useState(false);
+  const [saleSourceOpen, setSaleSourceOpen] = useState(false);
+  const [saleSourceAction, setSaleSourceAction] = useState<'send' | 'charge'>('send');
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingNotes, setEditingNotes] = useState('');
   const [invoiceData, setInvoiceData] = useState<{
