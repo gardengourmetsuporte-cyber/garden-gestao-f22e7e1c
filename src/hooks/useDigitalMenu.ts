@@ -95,17 +95,20 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
     }
     setLoading(true);
     try {
-      const [unitRes, catRes, grpRes, prodRes] = await Promise.all([
+      // Fetch ALL data in a single parallel batch (no waterfall)
+      const [unitRes, catRes, grpRes, prodRes, ogRes] = await Promise.all([
         supabase.from('units').select('id, name, store_info').eq('id', unitId).maybeSingle(),
         supabase.from('menu_categories').select('id, name, icon, color, sort_order').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
         supabase.from('menu_groups').select('id, category_id, name, description, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
         supabase.from('tablet_products').select('id, name, price, image_url, description, group_id, category, is_highlighted, price_type, custom_prices, sort_order, availability').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
+        supabase.from('menu_option_groups').select('id, title, min_selections, max_selections, allow_repeat').eq('unit_id', unitId).eq('is_active', true).order('sort_order'),
       ]);
 
       const unitData = (unitRes.data as any) || null;
       setUnit(unitData);
       setCategories((catRes.data as DMCategory[]) || []);
 
+      // Filter by channel availability (client-side, very fast on small arrays)
       const allGroups = (grpRes.data as any[]) || [];
       const filteredGroups = allGroups.filter(g => {
         const avail = g.availability || { tablet: true, delivery: true };
@@ -121,29 +124,18 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
       setProducts(filteredProducts as DMProduct[]);
 
       const productIds = filteredProducts.map(p => p.id);
-
-      const { data: ogData, error: ogError } = await supabase
-        .from('menu_option_groups')
-        .select('id, title, min_selections, max_selections, allow_repeat')
-        .eq('unit_id', unitId)
-        .eq('is_active', true)
-        .order('sort_order');
-      if (ogError) throw ogError;
-
-      const ogs = (ogData as any[]) || [];
+      const ogs = (ogRes.data as any[]) || [];
       const optionGroupIds = ogs.map(og => og.id);
 
-      const [{ data: optData, error: optError }, { data: linkData, error: linkError }] = await Promise.all([
+      // Second parallel batch for options + links (depends on IDs from first batch)
+      const [{ data: optData }, { data: linkData }] = await Promise.all([
         optionGroupIds.length
           ? supabase.from('menu_options').select('id, option_group_id, name, price, image_url, sort_order').in('option_group_id', optionGroupIds).eq('is_active', true).order('sort_order')
-          : Promise.resolve({ data: [] as DMOption[], error: null } as any),
+          : Promise.resolve({ data: [] as DMOption[] } as any),
         productIds.length
           ? supabase.from('menu_product_option_groups').select('product_id, option_group_id').in('product_id', productIds)
-          : Promise.resolve({ data: [] as { product_id: string; option_group_id: string }[], error: null } as any),
+          : Promise.resolve({ data: [] as { product_id: string; option_group_id: string }[] } as any),
       ]);
-
-      if (optError) throw optError;
-      if (linkError) throw linkError;
 
       const opts = (optData as DMOption[]) || [];
       ogs.forEach((og: any) => {
@@ -152,10 +144,7 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
 
       setOptionGroups(ogs);
       setProductOptionLinks((linkData as any[]) || []);
-      
-      // Check if we have visible products
-      const hasProducts = filteredProducts.length > 0;
-      setHasVisibleProducts(hasProducts);
+      setHasVisibleProducts(filteredProducts.length > 0);
     } catch (err) {
       console.error('[useDigitalMenu] Error fetching:', err);
     } finally {
