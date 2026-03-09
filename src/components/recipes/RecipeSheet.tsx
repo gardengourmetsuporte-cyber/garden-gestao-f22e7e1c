@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -13,6 +15,7 @@ import { IngredientRow } from './IngredientRow';
 import { IngredientPicker } from './IngredientPicker';
 import { formatCurrency, calculateIngredientCost, calculateSubRecipeCost, type Recipe, type RecipeCategory, type RecipeUnitType, type IngredientSourceType } from '@/types/recipe';
 import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
+import { useUnit } from '@/contexts/UnitContext';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 
@@ -30,6 +33,7 @@ interface LocalIngredient {
   quantity: number;
   unit_type: RecipeUnitType;
   total_cost: number;
+  kds_station_id?: string | null;
 }
 
 interface InventoryItem {
@@ -91,7 +95,24 @@ export function RecipeSheet({
   const [sellingPrice, setSellingPrice] = useState('');
   const [marginMode, setMarginMode] = useState<'margin' | 'price'>('margin');
 
+  const { activeUnit } = useUnit();
   const { settings, calculateOperationalCosts } = useRecipeCostSettings();
+
+  // Load KDS stations
+  const { data: kdsStations = [] } = useQuery({
+    queryKey: ['kds-stations', activeUnit?.id],
+    queryFn: async () => {
+      if (!activeUnit) return [];
+      const { data, error } = await supabase
+        .from('kds_stations')
+        .select('id, name, color')
+        .eq('unit_id', activeUnit.id)
+        .order('sort_order');
+      if (error) throw error;
+      return data as { id: string; name: string; color: string }[];
+    },
+    enabled: !!activeUnit && open,
+  });
 
   // Reset form when recipe changes
   useEffect(() => {
@@ -117,6 +138,7 @@ export function RecipeSheet({
           quantity: ing.quantity,
           unit_type: ing.unit_type,
           total_cost: ing.total_cost,
+          kds_station_id: (ing as any).kds_station_id || null,
         }))
       );
     } else {
@@ -271,6 +293,7 @@ export function RecipeSheet({
         total_cost: ing.total_cost,
         source_type: ing.source_type,
         source_recipe_id: ing.source_recipe_id,
+        kds_station_id: ing.kds_station_id || null,
       })),
     };
 
@@ -423,6 +446,7 @@ export function RecipeSheet({
                         onRemove={() => handleRemoveIngredient(index)}
                         onUpdateGlobalPrice={onUpdateItemPrice}
                         onUpdateItemUnit={onUpdateItemUnit}
+                        kdsStations={kdsStations}
                       />
                     ))}
                   </div>

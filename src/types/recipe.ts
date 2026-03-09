@@ -43,6 +43,7 @@ export type IngredientSourceType = 'inventory' | 'recipe';
    created_at: string;
   source_type: IngredientSourceType;
   source_recipe_id: string | null;
+  kds_station_id?: string | null;
    // Joined data
    item?: {
      id: string;

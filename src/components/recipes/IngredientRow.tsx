@@ -18,6 +18,8 @@ import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calcula
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 
+type KDSStationOption = { id: string; name: string; color: string };
+
 interface IngredientRowProps {
   ingredient: {
     source_type: IngredientSourceType;
@@ -32,11 +34,13 @@ interface IngredientRowProps {
     quantity: number;
     unit_type: RecipeUnitType;
     total_cost: number;
+    kds_station_id?: string | null;
   };
   onChange: (updates: Partial<IngredientRowProps['ingredient']>) => void;
   onRemove: () => void;
   onUpdateGlobalPrice?: (itemId: string, newPrice: number) => Promise<void>;
   onUpdateItemUnit?: (itemId: string, unitType: string) => Promise<void>;
+  kdsStations?: KDSStationOption[];
 }
 
 const UNIT_OPTIONS: { value: RecipeUnitType; label: string }[] = [
@@ -47,7 +51,7 @@ const UNIT_OPTIONS: { value: RecipeUnitType; label: string }[] = [
   { value: 'ml', label: 'ml' },
 ];
 
-export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPrice, onUpdateItemUnit }: IngredientRowProps) {
+export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPrice, onUpdateItemUnit, kdsStations = [] }: IngredientRowProps) {
   const [editingPrice, setEditingPrice] = useState(false);
   const [newPriceValue, setNewPriceValue] = useState('');
   const [showGlobalWarning, setShowGlobalWarning] = useState(false);
@@ -327,6 +331,32 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
           <p className="text-[11px] text-muted-foreground italic">
             Conversão: {ingredient.quantity} {UNIT_OPTIONS.find(u => u.value === ingredient.unit_type)?.label} → {displayUnit} (automática)
           </p>
+        )}
+
+        {/* KDS Station selector */}
+        {kdsStations.length > 0 && (
+          <div className="space-y-1">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">Pista KDS</Label>
+            <Select
+              value={ingredient.kds_station_id || 'none'}
+              onValueChange={(v) => onChange({ kds_station_id: v === 'none' ? null : v })}
+            >
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue placeholder="Nenhuma pista" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nenhuma pista</SelectItem>
+                {kdsStations.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    <span className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                      {s.name}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         )}
       </div>
 

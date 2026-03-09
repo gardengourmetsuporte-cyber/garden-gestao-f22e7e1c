@@ -124,7 +124,8 @@ import { useUnit } from '@/contexts/UnitContext';
          unit_cost: number;
          total_cost: number;
         source_type: IngredientSourceType;
-        source_recipe_id: string | null;
+         source_recipe_id: string | null;
+         kds_station_id?: string | null;
        }>;
      }) => {
        const { ingredients, ...recipeData } = data;
@@ -161,8 +162,9 @@ import { useUnit } from '@/contexts/UnitContext';
                unit_cost: ing.unit_cost,
                total_cost: ing.total_cost,
                sort_order: index,
-              source_type: ing.source_type,
-              source_recipe_id: ing.source_recipe_id,
+               source_type: ing.source_type,
+               source_recipe_id: ing.source_recipe_id,
+               kds_station_id: ing.kds_station_id || null,
              }))
            );
          
@@ -198,7 +200,8 @@ import { useUnit } from '@/contexts/UnitContext';
          unit_cost: number;
          total_cost: number;
         source_type: IngredientSourceType;
-        source_recipe_id: string | null;
+         source_recipe_id: string | null;
+         kds_station_id?: string | null;
        }>;
      }) => {
        const { id, ingredients, ...recipeData } = data;
@@ -241,8 +244,9 @@ import { useUnit } from '@/contexts/UnitContext';
                unit_cost: ing.unit_cost,
                total_cost: ing.total_cost,
                sort_order: index,
-              source_type: ing.source_type,
-              source_recipe_id: ing.source_recipe_id,
+               source_type: ing.source_type,
+               source_recipe_id: ing.source_recipe_id,
+               kds_station_id: ing.kds_station_id || null,
              }))
            );
          
