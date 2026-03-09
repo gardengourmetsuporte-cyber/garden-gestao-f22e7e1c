@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -11,6 +11,8 @@ import { useUnifiedOrders, UnifiedTab, TabletOrder } from '@/hooks/useUnifiedOrd
 import type { HubOrder, HubOrderStatus } from '@/hooks/useDeliveryHub';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { PinDialog } from '@/components/checklists/PinDialog';
+import { usePOS } from '@/hooks/usePOS';
 
 const formatPrice = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
