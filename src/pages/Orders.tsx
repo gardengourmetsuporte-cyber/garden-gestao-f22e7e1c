@@ -197,13 +197,24 @@ export default function OrdersPage() {
     }).join('\n');
     const message = `*Pedido de Compra*\n\nOlá! Gostaria de fazer o seguinte pedido:\n\n${itemsList}\n\n${order.notes ? `Obs: ${order.notes}` : ''}`;
     const phone = formatPhoneForWhatsApp(order.supplier.phone);
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+    // Update status BEFORE opening WhatsApp to avoid losing state on iOS
     try {
       await updateOrderStatus(order.id, 'sent');
     } catch (err) {
       console.error('Erro ao atualizar status do pedido:', err);
       toast.error('Pedido enviado mas houve erro ao atualizar o status');
     }
+
+    // Use anchor click for reliable mobile behavior (avoids blank page on iOS return)
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => document.body.removeChild(a), 100);
   };
 
   const handleReceiveOrder = async (orderId: string, receivedItems: { itemId: string; quantity: number }[]) => {
