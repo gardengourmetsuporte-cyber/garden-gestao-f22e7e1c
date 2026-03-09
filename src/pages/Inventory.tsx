@@ -40,7 +40,7 @@ export default function InventoryPage() {
   } = useInventoryDB();
 
   const { categories } = useCategories();
-  const { suppliers } = useSuppliers();
+  const { suppliers, addSupplier } = useSuppliers();
   const [search, setSearch] = useState('');
   const [view, setView] = useState<View>('items');
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
