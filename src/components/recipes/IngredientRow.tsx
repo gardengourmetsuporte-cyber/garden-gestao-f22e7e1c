@@ -376,9 +376,9 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isSavingPrice}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleSaveGlobalPrice} disabled={isSavingPrice}>
+            <Button onClick={handleSaveGlobalPrice} disabled={isSavingPrice}>
               {isSavingPrice ? 'Atualizando...' : 'Confirmar alteração'}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
