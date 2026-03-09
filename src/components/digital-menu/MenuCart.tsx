@@ -16,6 +16,7 @@ interface Props {
   unitId: string;
   autoConfirm?: boolean;
   customerUser?: User | null;
+  source?: string;
   onUpdateQuantity: (index: number, qty: number) => void;
   onRemove: (index: number) => void;
   onClear: () => void;
