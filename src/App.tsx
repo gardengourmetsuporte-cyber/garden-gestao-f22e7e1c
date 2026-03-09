@@ -93,6 +93,7 @@ const Notifications = lazy(() => lazyRetry(() => import("./pages/Notifications")
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
 const ShareReceiptHandler = lazy(() => lazyRetry(() => import("./pages/ShareReceiptHandler")));
 const Documentation = lazy(() => lazyRetry(() => import("./pages/Documentation")));
+const Compliance = lazy(() => lazyRetry(() => import("./pages/Compliance")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -271,6 +272,7 @@ function AuthenticatedRoutes() {
           <Route path="/calendar" element={<ProtectedRoute><CalendarFull /></ProtectedRoute>} />
           <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
           <Route path="/personal-finance" element={<ProtectedRoute><PersonalFinance /></ProtectedRoute>} />
+          <Route path="/compliance" element={<ProtectedRoute><Compliance /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>

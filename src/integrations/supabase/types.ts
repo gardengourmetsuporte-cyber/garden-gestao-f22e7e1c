@@ -2552,6 +2552,65 @@ export type Database = {
           },
         ]
       }
+      legal_obligations: {
+        Row: {
+          alert_days_before: number
+          category: string
+          created_at: string
+          created_by: string
+          description: string | null
+          document_url: string | null
+          expiry_date: string | null
+          id: string
+          issue_date: string | null
+          notes: string | null
+          status: string
+          title: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          alert_days_before?: number
+          category?: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          document_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          notes?: string | null
+          status?: string
+          title: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          alert_days_before?: number
+          category?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          document_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          notes?: string | null
+          status?: string
+          title?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_obligations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loyalty_events: {
         Row: {
           created_at: string

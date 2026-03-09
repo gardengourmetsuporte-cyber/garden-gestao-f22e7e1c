@@ -136,6 +136,10 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
+    key: 'compliance', label: 'Obrigações Legais', icon: 'ShieldCheck', route: '/compliance', routes: ['/compliance'], group: 'Gestão',
+    children: [],
+  },
+  {
     key: 'menu-admin', label: 'Cardápio Digital', icon: 'UtensilsCrossed', route: '/cardapio', routes: ['/cardapio', '/menu-admin', '/tablet-admin', '/gamification'], group: 'Operação',
     children: [
       { key: 'menu-admin.view', label: 'Ver cardápio', icon: 'Eye' },
