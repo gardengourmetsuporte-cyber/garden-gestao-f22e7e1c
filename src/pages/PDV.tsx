@@ -63,7 +63,7 @@ export default function PDV() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
+      <div className="flex flex-col h-[calc(100vh-4rem)] overflow-hidden pb-[calc(72px+env(safe-area-inset-bottom,0px))] lg:pb-0">
         {/* Top bar */}
         <div className="px-4 pt-3 pb-2 flex items-center gap-2">
           <div className="relative flex-1">
