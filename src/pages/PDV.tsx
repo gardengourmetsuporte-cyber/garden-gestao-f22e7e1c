@@ -60,12 +60,26 @@ export default function PDV() {
   };
 
   const handleFinalize = async () => {
-    if (paymentTotal < pos.total) return;
-    // Adjust last payment for change
-    const adjusted = [...payments];
-    if (change > 0 && adjusted.length > 0) {
-      adjusted[adjusted.length - 1] = { ...adjusted[adjusted.length - 1], change_amount: change };
+    // If user didn't add payments, assume the remaining amount on the selected method.
+    let effectivePayments = payments;
+    let effectivePaymentTotal = paymentTotal;
+
+    if (effectivePaymentTotal < pos.total) {
+      const autoAmount = pos.total - effectivePaymentTotal;
+      if (autoAmount <= 0) return;
+      effectivePayments = [...effectivePayments, { method: payMethod, amount: autoAmount, change_amount: 0 }];
+      effectivePaymentTotal += autoAmount;
+      // Keep UI in sync (useful if finalize fails and the sheet stays open)
+      setPayments(effectivePayments);
     }
+
+    // Adjust last payment for change
+    const effectiveChange = Math.max(0, effectivePaymentTotal - pos.total);
+    const adjusted = [...effectivePayments];
+    if (effectiveChange > 0 && adjusted.length > 0) {
+      adjusted[adjusted.length - 1] = { ...adjusted[adjusted.length - 1], change_amount: effectiveChange };
+    }
+
     const saleId = await pos.finalizeSale(adjusted, activeOrderId || undefined);
     if (saleId) {
       setPaymentOpen(false);
