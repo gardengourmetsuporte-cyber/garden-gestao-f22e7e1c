@@ -4,7 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useUnit } from '@/contexts/UnitContext';
-import { useFabAction } from '@/contexts/FabActionContext';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
