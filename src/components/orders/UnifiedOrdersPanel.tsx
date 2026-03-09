@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -11,6 +11,8 @@ import { useUnifiedOrders, UnifiedTab, TabletOrder } from '@/hooks/useUnifiedOrd
 import type { HubOrder, HubOrderStatus } from '@/hooks/useDeliveryHub';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { PinDialog } from '@/components/checklists/PinDialog';
+import { usePOS } from '@/hooks/usePOS';
 
 const formatPrice = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -112,6 +114,11 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
   } = useUnifiedOrders(unitId);
 
   const [selectedOrder, setSelectedOrder] = useState<TabletOrder | null>(null);
+  const [showCancelled, setShowCancelled] = useState(false);
+
+  // Filter out cancelled orders unless toggle is on
+  const filterOrders = (orders: TabletOrder[]) =>
+    showCancelled ? orders : orders.filter(o => o.status !== 'cancelled');
 
   const tabs: { id: UnifiedTab; label: string; icon: string; count: number; badge?: number }[] = [
     { id: 'balcao', label: 'Balcão', icon: 'Store', count: stats.balcao, badge: stats.balcaoPending },
@@ -157,17 +164,35 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
         ))}
       </div>
 
+      {/* Cancelled toggle */}
+      {activeTab !== 'ifood' && (
+        <div className="flex items-center justify-end">
+          <button
+            onClick={() => setShowCancelled(prev => !prev)}
+            className={cn(
+              "text-xs px-3 py-1.5 rounded-full font-semibold transition-colors",
+              showCancelled
+                ? "bg-destructive/15 text-destructive"
+                : "bg-secondary text-muted-foreground"
+            )}
+          >
+            <AppIcon name="Ban" size={12} className="mr-1 inline" />
+            {showCancelled ? 'Ocultando cancelados' : 'Ver cancelados'}
+          </button>
+        </div>
+      )}
+
       {/* Content */}
       {activeTab === 'balcao' && (
-        <TabletOrderList orders={balcaoOrders} emptyIcon="Store" emptyTitle="Nenhum pedido no balcão" emptySubtitle="Pedidos para retirada aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
+        <TabletOrderList orders={filterOrders(balcaoOrders)} emptyIcon="Store" emptyTitle="Nenhum pedido no balcão" emptySubtitle="Pedidos para retirada aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
       )}
 
       {activeTab === 'comandas' && (
-        <TabletOrderList orders={comandas} emptyIcon="QrCode" emptyTitle="Nenhuma comanda" emptySubtitle="Pedidos feitos nas mesas aparecerão aqui" onRetryPDV={onRetryPDV} showTable onOpenOrder={setSelectedOrder} />
+        <TabletOrderList orders={filterOrders(comandas)} emptyIcon="QrCode" emptyTitle="Nenhuma comanda" emptySubtitle="Pedidos feitos nas mesas aparecerão aqui" onRetryPDV={onRetryPDV} showTable onOpenOrder={setSelectedOrder} />
       )}
 
       {activeTab === 'delivery' && (
-        <TabletOrderList orders={deliveryOrders} emptyIcon="Truck" emptyTitle="Nenhum pedido delivery" emptySubtitle="Pedidos do cardápio digital aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
+        <TabletOrderList orders={filterOrders(deliveryOrders)} emptyIcon="Truck" emptyTitle="Nenhum pedido delivery" emptySubtitle="Pedidos do cardápio digital aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
       )}
 
       {activeTab === 'ifood' && (
@@ -281,6 +306,9 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
   onStatusUpdated: (order: TabletOrder) => void;
 }) {
   const [updating, setUpdating] = useState(false);
+  const [showPinDialog, setShowPinDialog] = useState(false);
+  const [pendingCancelOrderId, setPendingCancelOrderId] = useState<string | null>(null);
+  const { validatePinWithPermission } = usePOS();
 
   if (!order) return null;
 
@@ -542,7 +570,14 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
                     !isCancel && "shadow-lg shadow-primary/20",
                     isCancel && "flex-[0.5]"
                   )}
-                  onClick={() => handleUpdateStatus(ns)}
+                  onClick={() => {
+                    if (isCancel) {
+                      setPendingCancelOrderId(order.id);
+                      setShowPinDialog(true);
+                    } else {
+                      handleUpdateStatus(ns);
+                    }
+                  }}
                   disabled={updating}
                 >
                   {updating ? (
@@ -556,6 +591,31 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
             })}
           </div>
         )}
+
+        {/* PIN Dialog for cancellation */}
+        <PinDialog
+          open={showPinDialog}
+          onOpenChange={(open) => {
+            setShowPinDialog(open);
+            if (!open) setPendingCancelOrderId(null);
+          }}
+          title="PIN para cancelar"
+          subtitle="Permissão necessária para cancelar pedido"
+          onSubmit={async (pin) => {
+            const { authorized, userName } = await validatePinWithPermission(pin, 'menu-admin.pdv-cancel');
+            if (authorized) {
+              setShowPinDialog(false);
+              setPendingCancelOrderId(null);
+              handleUpdateStatus('cancelled');
+              return true;
+            } else {
+              if (userName) {
+                toast.error(`${userName} não tem permissão para cancelar`);
+              }
+              return false;
+            }
+          }}
+        />
       </SheetContent>
     </Sheet>
   );

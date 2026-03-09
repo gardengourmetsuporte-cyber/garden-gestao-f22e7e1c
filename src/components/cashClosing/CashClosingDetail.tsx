@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
 import { exportCashClosingPdf } from '@/lib/exportPdf';
 import { ptBR } from 'date-fns/locale';
@@ -10,6 +10,7 @@ import { AppIcon } from '@/components/ui/app-icon';
  import { Input } from '@/components/ui/input';
  import { Label } from '@/components/ui/label';
  import { ScrollArea } from '@/components/ui/scroll-area';
+ import { supabase } from '@/integrations/supabase/client';
  import {
    AlertDialog,
    AlertDialogAction,
@@ -39,7 +40,41 @@ import { AppIcon } from '@/components/ui/app-icon';
    const [divergentNotes, setDivergentNotes] = useState('');
    const [showReceipt, setShowReceipt] = useState(false);
 
-   // Edit mode
+    // Cancelled orders for this closing date
+    const [cancelledOrders, setCancelledOrders] = useState<{ source: string; customer_name: string | null; total: number; created_at: string }[]>([]);
+    const [cancelledTotal, setCancelledTotal] = useState(0);
+
+    useEffect(() => {
+      async function fetchCancelled() {
+        if (!closing.unit_id) return;
+        const dateStr = closing.date;
+
+        // Fetch cancelled tablet_orders
+        const { data: tabletCancelled } = await supabase
+          .from('tablet_orders')
+          .select('source, customer_name, total, created_at')
+          .eq('unit_id', closing.unit_id)
+          .eq('status', 'cancelled')
+          .gte('created_at', `${dateStr}T00:00:00`)
+          .lt('created_at', `${dateStr}T23:59:59.999`);
+
+        // Fetch cancelled pos_sales
+        const { data: salesCancelled } = await supabase
+          .from('pos_sales')
+          .select('source, customer_name, total, created_at')
+          .eq('unit_id', closing.unit_id)
+          .eq('status', 'cancelled')
+          .gte('created_at', `${dateStr}T00:00:00`)
+          .lt('created_at', `${dateStr}T23:59:59.999`);
+
+        const all = [...(tabletCancelled || []), ...(salesCancelled || [])];
+        setCancelledOrders(all);
+        setCancelledTotal(all.reduce((s, o) => s + (o.total || 0), 0));
+      }
+      fetchCancelled();
+    }, [closing.unit_id, closing.date]);
+
+    // Edit mode
    const [isEditing, setIsEditing] = useState(false);
    const [isSaving, setIsSaving] = useState(false);
    const [editDate, setEditDate] = useState(closing.date);
@@ -411,6 +446,44 @@ import { AppIcon } from '@/components/ui/app-icon';
            </CardContent>
          </Card>
  
+         {/* Cancelled Orders */}
+         {cancelledOrders.length > 0 && (
+           <Card className="card-unified border-destructive/30">
+             <CardContent className="p-4 space-y-3">
+               <div className="flex items-center gap-2">
+                 <AppIcon name="Ban" className="w-5 h-5 text-destructive" />
+                 <h3 className="font-semibold text-destructive">Vendas Canceladas</h3>
+                 <Badge variant="outline" className="ml-auto text-destructive border-destructive/30 text-xs">
+                   {cancelledOrders.length}
+                 </Badge>
+               </div>
+               
+               {cancelledOrders.map((co, i) => (
+                 <div key={i} className="flex items-center justify-between text-sm">
+                   <div>
+                     <span className="text-foreground">{co.customer_name || 'Sem nome'}</span>
+                     <span className="text-[10px] text-muted-foreground ml-2">
+                       {co.source || 'pedido'} • {new Date(co.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                     </span>
+                   </div>
+                   <span className="font-medium text-destructive">
+                     R$ {(co.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                   </span>
+                 </div>
+               ))}
+
+               <div className="border-t border-destructive/20 pt-2 mt-2">
+                 <div className="flex items-center justify-between">
+                   <span className="text-sm font-semibold text-destructive">Total cancelado</span>
+                   <span className="font-bold text-destructive">
+                     R$ {cancelledTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                   </span>
+                 </div>
+               </div>
+             </CardContent>
+           </Card>
+         )}
+
          {/* Notes */}
          {closing.notes && (
            <Card className="card-unified">
