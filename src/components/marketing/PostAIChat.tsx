@@ -14,9 +14,13 @@ interface PostData {
   best_time?: string;
 }
 
+// Content can be string or multimodal array
+type MessageContent = string | Array<{ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } }>;
+
 interface ChatMessage {
   role: 'user' | 'assistant';
-  content: string;
+  content: MessageContent;
+  imagePreview?: string; // local preview for user messages with images
   postData?: PostData;
 }
 
@@ -34,12 +38,29 @@ const QUICK_PROMPTS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/marketing-post-chat`;
 
+function getTextContent(content: MessageContent): string {
+  if (typeof content === 'string') return content;
+  const textPart = content.find(p => p.type === 'text');
+  return textPart && 'text' in textPart ? textPart.text : '';
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -47,13 +68,45 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
     }
   }, [messages]);
 
-  const sendMessage = async (content: string) => {
-    if (!content.trim() || isLoading) return;
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Selecione uma imagem');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Imagem muito grande (máx 10MB)');
+      return;
+    }
+    const base64 = await fileToBase64(file);
+    setPendingImage(base64);
+    inputRef.current?.focus();
+    if (imageInputRef.current) imageInputRef.current.value = '';
+  };
 
-    const userMsg: ChatMessage = { role: 'user', content };
+  const sendMessage = async (text: string) => {
+    if ((!text.trim() && !pendingImage) || isLoading) return;
+
+    const hasImage = !!pendingImage;
+    const messageText = text.trim() || (hasImage ? 'Analise este criativo e reproduza um post similar usando os dados da minha marca.' : '');
+
+    // Build content - multimodal if image attached
+    let content: MessageContent;
+    if (hasImage) {
+      content = [
+        { type: 'text', text: messageText },
+        { type: 'image_url', image_url: { url: pendingImage! } },
+      ];
+    } else {
+      content = messageText;
+    }
+
+    const userMsg: ChatMessage = { role: 'user', content, imagePreview: pendingImage || undefined };
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     setInput('');
+    setPendingImage(null);
     setIsLoading(true);
 
     let assistantContent = '';
@@ -130,7 +183,6 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
         }
       }
 
-      // Process tool call result
       if (isToolCall && toolCallArgs) {
         try {
           const postData: PostData = JSON.parse(toolCallArgs);
@@ -156,10 +208,10 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
   return (
     <div className="flex flex-col h-full min-h-[400px]">
       {/* Quick prompts */}
-      {messages.length === 0 && (
+      {messages.length === 0 && !pendingImage && (
         <div className="space-y-3 mb-4">
           <p className="text-sm text-muted-foreground text-center">
-            Escolha um tipo de post ou converse livremente
+            Escolha um tipo de post, envie uma foto de referência ou converse
           </p>
           <div className="grid grid-cols-2 gap-2">
             {QUICK_PROMPTS.map((qp) => (
@@ -188,12 +240,18 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-card border border-border/40'
               }`}>
+                {/* Image preview for user messages */}
+                {msg.imagePreview && (
+                  <div className="mb-2 rounded-lg overflow-hidden">
+                    <img src={msg.imagePreview} alt="Referência" className="w-full max-h-40 object-cover rounded-lg" />
+                  </div>
+                )}
                 {msg.role === 'assistant' ? (
                   <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-1 [&>p:last-child]:mb-0">
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    <ReactMarkdown>{getTextContent(msg.content)}</ReactMarkdown>
                   </div>
                 ) : (
-                  <p>{msg.content}</p>
+                  <p>{getTextContent(msg.content)}</p>
                 )}
                 {msg.postData && (
                   <Button
@@ -222,13 +280,42 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
         </div>
       </ScrollArea>
 
+      {/* Pending image preview */}
+      {pendingImage && (
+        <div className="mt-2 relative inline-block">
+          <img src={pendingImage} alt="Preview" className="h-20 rounded-lg border border-border/40 object-cover" />
+          <button
+            onClick={() => setPendingImage(null)}
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center text-xs"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Input */}
       <div className="flex gap-2 mt-3 pt-3 border-t border-border/40">
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageSelect}
+        />
+        <Button
+          variant="outline"
+          size="icon"
+          className="shrink-0"
+          onClick={() => imageInputRef.current?.click()}
+          disabled={isLoading}
+        >
+          <AppIcon name="Image" size={16} />
+        </Button>
         <Input
           ref={inputRef}
           value={input}
           onChange={e => setInput(e.target.value)}
-          placeholder="Descreva o post que deseja..."
+          placeholder={pendingImage ? "Descreva o que quer reproduzir..." : "Descreva o post que deseja..."}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
           disabled={isLoading}
           className="flex-1"
@@ -236,7 +323,7 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
         <Button
           size="icon"
           onClick={() => sendMessage(input)}
-          disabled={!input.trim() || isLoading}
+          disabled={(!input.trim() && !pendingImage) || isLoading}
         >
           <AppIcon name="Send" size={16} />
         </Button>
