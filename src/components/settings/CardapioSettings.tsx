@@ -26,16 +26,19 @@ interface CardapioSettingsProps {
 }
 
 function PixKeyConfig() {
-  const { activeUnit, updateStoreInfo } = useUnit();
+  const { activeUnit } = useUnit();
   const storeInfo = (activeUnit as any)?.store_info as Record<string, any> | null;
   const [pixKey, setPixKey] = useState(storeInfo?.pix_key || '');
   const [pixKeyType, setPixKeyType] = useState(storeInfo?.pix_key_type || 'aleatoria');
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
+    if (!activeUnit) return;
     setSaving(true);
     try {
-      await updateStoreInfo({ pix_key: pixKey, pix_key_type: pixKeyType });
+      const updated = { ...storeInfo, pix_key: pixKey, pix_key_type: pixKeyType };
+      const { error } = await supabase.from('units').update({ store_info: updated }).eq('id', activeUnit.id);
+      if (error) throw error;
       toast.success('Chave Pix salva!');
     } catch {
       toast.error('Erro ao salvar chave Pix');
