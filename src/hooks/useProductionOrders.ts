@@ -5,142 +5,126 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
 
-export interface ProductionRecipe {
+export interface ProductionItem {
   id: string;
   name: string;
-  yield_quantity: number;
-  yield_unit: string;
-  min_ready_stock: number;
-  current_ready_stock: number;
-  category?: { name: string; color: string } | null;
-  ingredients: {
-    id: string;
-    item_id: string | null;
-    quantity: number;
-    unit_type: string;
-    source_type: string;
-    item?: { id: string; name: string; current_stock: number; unit_type: string } | null;
-  }[];
+  current_stock: number;
+  min_stock: number;
+  unit_type: string;
+  category?: { id: string; name: string; color: string } | null;
+  recipe_id?: string | null;
 }
 
 export interface ProductionOrder {
   id: string;
-  recipe_id: string;
+  item_id: string;
   quantity: number;
   produced_by: string;
   notes: string | null;
-  status: string;
   created_at: string;
-  recipe?: { name: string; yield_unit: string; category?: { name: string; color: string } | null };
+  item?: { name: string; unit_type: string } | null;
 }
+
+const PRODUCTION_CATEGORY_NAME = 'Produção';
 
 export function useProductionOrders() {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
   const queryClient = useQueryClient();
 
-  // Fetch recipes that have min_ready_stock > 0
-  const { data: productionRecipes = [], isLoading: recipesLoading } = useQuery({
-    queryKey: ['production-recipes', activeUnitId],
+  // Find or get the "Produção" category ID
+  const { data: productionCategory } = useQuery({
+    queryKey: ['production-category', activeUnitId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('recipes')
-        .select(`
-          id, name, yield_quantity, yield_unit, min_ready_stock, current_ready_stock,
-          category:recipe_categories(name, color),
-          ingredients:recipe_ingredients!recipe_ingredients_recipe_id_fkey(
-            id, item_id, quantity, unit_type, source_type,
-            item:inventory_items(id, name, current_stock, unit_type)
-          )
-        `)
-        .gt('min_ready_stock', 0)
-        .eq('is_active', true)
+        .from('categories')
+        .select('id, name, color')
+        .eq('unit_id', activeUnitId!)
+        .ilike('name', PRODUCTION_CATEGORY_NAME)
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!activeUnitId,
+  });
+
+  // Fetch inventory items in the "Produção" category
+  const { data: productionItems = [], isLoading: itemsLoading } = useQuery({
+    queryKey: ['production-items', activeUnitId, productionCategory?.id],
+    queryFn: async () => {
+      if (!productionCategory?.id) return [];
+
+      const { data, error } = await supabase
+        .from('inventory_items')
+        .select('id, name, current_stock, min_stock, unit_type, category:categories(id, name, color)')
+        .eq('unit_id', activeUnitId!)
+        .eq('category_id', productionCategory.id)
+        .is('deleted_at', null)
         .order('name');
 
       if (error) throw error;
-      return (data || []) as ProductionRecipe[];
+      return (data || []) as ProductionItem[];
     },
-    enabled: !!user,
+    enabled: !!activeUnitId && !!productionCategory?.id,
   });
 
-  // Recipes needing production
-  const needsProduction = productionRecipes.filter(
-    r => (r.current_ready_stock ?? 0) < (r.min_ready_stock ?? 0)
+  // Items needing production (below min_stock)
+  const needsProduction = productionItems.filter(
+    item => item.current_stock < item.min_stock
   );
 
   // Fetch production history
   const { data: history = [], isLoading: historyLoading } = useQuery({
     queryKey: ['production-orders', activeUnitId],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('production_orders')
-        .select(`
-          *,
-          recipe:recipes(name, yield_unit, category:recipe_categories(name, color))
-        `)
+        .select('id, quantity, produced_by, notes, created_at, item_id, item:inventory_items(name, unit_type)')
+        .eq('unit_id', activeUnitId!)
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (activeUnitId) query = query.eq('unit_id', activeUnitId);
-
-      const { data, error } = await query;
       if (error) throw error;
       return (data || []) as ProductionOrder[];
     },
-    enabled: !!user,
+    enabled: !!activeUnitId,
   });
 
   const invalidate = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['production-recipes'] });
+    queryClient.invalidateQueries({ queryKey: ['production-items'] });
     queryClient.invalidateQueries({ queryKey: ['production-orders'] });
-    queryClient.invalidateQueries({ queryKey: ['recipes'] });
     queryClient.invalidateQueries({ queryKey: ['inventory'] });
   }, [queryClient]);
 
-  // Produce: update ready stock, deduct ingredients, log order
+  // Produce: register entrada movement + log production order
   const produceMut = useMutation({
-    mutationFn: async ({ recipeId, quantity, notes }: { recipeId: string; quantity: number; notes?: string }) => {
-      const recipe = productionRecipes.find(r => r.id === recipeId);
-      if (!recipe) throw new Error('Receita não encontrada');
+    mutationFn: async ({ itemId, quantity, notes }: { itemId: string; quantity: number; notes?: string }) => {
+      const item = productionItems.find(i => i.id === itemId);
+      if (!item) throw new Error('Item não encontrado');
 
-      // 1. Deduct inventory for each ingredient (proportional to portions produced)
-      const multiplier = quantity / recipe.yield_quantity;
-      for (const ing of recipe.ingredients) {
-        if (ing.source_type === 'inventory' && ing.item_id && ing.item) {
-          const deductQty = ing.quantity * multiplier;
-          // Register stock movement (saida)
-          const { error: movError } = await supabase
-            .from('stock_movements')
-            .insert({
-              item_id: ing.item_id,
-              type: 'saida',
-              quantity: deductQty,
-              notes: `Produção: ${quantity} ${recipe.yield_unit} de ${recipe.name}`,
-              user_id: user?.id,
-              unit_id: activeUnitId,
-            });
-          if (movError) throw movError;
-        }
-      }
+      // 1. Register stock entrada movement (trigger updates current_stock)
+      const { error: movError } = await supabase
+        .from('stock_movements')
+        .insert({
+          item_id: itemId,
+          type: 'entrada',
+          quantity,
+          notes: `Produção: ${quantity} ${item.unit_type} de ${item.name}${notes ? ` — ${notes}` : ''}`,
+          user_id: user?.id,
+          unit_id: activeUnitId,
+        });
+      if (movError) throw movError;
 
-      // 2. Update current_ready_stock on recipe
-      const newStock = (recipe.current_ready_stock ?? 0) + quantity;
-      const { error: updateError } = await supabase
-        .from('recipes')
-        .update({ current_ready_stock: newStock })
-        .eq('id', recipeId);
-      if (updateError) throw updateError;
-
-      // 3. Log production order
+      // 2. Log production order
       const { error: logError } = await supabase
         .from('production_orders')
         .insert({
           unit_id: activeUnitId!,
-          recipe_id: recipeId,
+          item_id: itemId,
           quantity,
           produced_by: user!.id,
           notes: notes || null,
-          status: 'completed',
         });
       if (logError) throw logError;
     },
@@ -153,30 +137,41 @@ export function useProductionOrders() {
     },
   });
 
-  // Update ready stock manually (e.g. after sales)
-  const updateStockMut = useMutation({
-    mutationFn: async ({ recipeId, newStock }: { recipeId: string; newStock: number }) => {
-      const { error } = await supabase
-        .from('recipes')
-        .update({ current_ready_stock: Math.max(0, newStock) })
-        .eq('id', recipeId);
+  // Create the "Produção" category if it doesn't exist
+  const ensureCategoryMut = useMutation({
+    mutationFn: async () => {
+      if (productionCategory) return productionCategory;
+
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({
+          name: PRODUCTION_CATEGORY_NAME,
+          color: '#f59e0b',
+          icon: 'ChefHat',
+          unit_id: activeUnitId!,
+        })
+        .select('id, name, color')
+        .single();
+
       if (error) throw error;
+      return data;
     },
     onSuccess: () => {
-      invalidate();
+      queryClient.invalidateQueries({ queryKey: ['production-category'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
     },
   });
 
   return {
-    productionRecipes,
+    productionItems,
     needsProduction,
     history,
-    isLoading: recipesLoading || historyLoading,
-    produce: (recipeId: string, quantity: number, notes?: string) =>
-      produceMut.mutateAsync({ recipeId, quantity, notes }),
+    productionCategory,
+    isLoading: itemsLoading || historyLoading,
+    produce: (itemId: string, quantity: number, notes?: string) =>
+      produceMut.mutateAsync({ itemId, quantity, notes }),
     isProducing: produceMut.isPending,
-    updateReadyStock: (recipeId: string, newStock: number) =>
-      updateStockMut.mutateAsync({ recipeId, newStock }),
+    ensureCategory: () => ensureCategoryMut.mutateAsync(),
     refetch: invalidate,
   };
 }
