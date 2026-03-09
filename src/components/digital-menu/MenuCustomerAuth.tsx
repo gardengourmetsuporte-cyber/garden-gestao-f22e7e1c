@@ -10,6 +10,7 @@ interface Props {
   cuisineType?: string;
   city?: string;
   isOpen?: boolean;
+  bonusPoints?: number;
   onSkip?: () => void;
   onEmailLogin?: () => void;
 }
