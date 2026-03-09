@@ -29,6 +29,100 @@ export default function TabletDigitalMenu() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
 
+  // Auth state for customer login
+  const [customerUser, setCustomerUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+
+  // Signup bonus points from store_info
+  const signupBonus = (unit?.store_info as any)?.signup_bonus_points ?? 0;
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCustomerUser(session?.user ?? null);
+      setAuthChecked(true);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const user = session?.user ?? null;
+      setCustomerUser(user);
+      setAuthChecked(true);
+
+      if (user && unitId && _event === 'SIGNED_IN') {
+        setShowAuth(false);
+        // Ensure customer record and grant signup bonus
+        await ensureCustomerRecord(user, unitId);
+        const needsProfile = await checkNeedsProfile(user, unitId);
+        if (needsProfile) setShowProfile(true);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [unitId]);
+
+  const checkNeedsProfile = async (user: User, uid: string): Promise<boolean> => {
+    try {
+      const email = user.email;
+      if (!email) return true;
+      const { data } = await supabase
+        .from('customers')
+        .select('phone')
+        .eq('unit_id', uid)
+        .eq('email', email)
+        .maybeSingle();
+      return !data || !data.phone;
+    } catch { return true; }
+  };
+
+  const ensureCustomerRecord = async (user: User, uid: string) => {
+    try {
+      const email = user.email;
+      const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email?.split('@')[0] || 'Cliente';
+      if (!email) return;
+
+      const { data: customerId } = await supabase.rpc('upsert_menu_customer', {
+        p_unit_id: uid,
+        p_name: fullName,
+        p_email: email,
+        p_phone: user.phone || null,
+        p_birthday: null,
+      });
+
+      // Grant signup bonus (fire-and-forget)
+      if (customerId) {
+        supabase.rpc('grant_signup_bonus', {
+          p_customer_id: customerId,
+          p_unit_id: uid,
+        }).then(({ data: pts }) => {
+          if (pts && pts > 0) {
+            toast.success(`🎁 Você ganhou ${pts} pontos de boas-vindas!`);
+          }
+        });
+      }
+    } catch (err) {
+      console.error('[TabletMenu] ensureCustomerRecord:', err);
+    }
+  };
+
+  const handleProfileComplete = async (data: { name: string; phone: string; birthday: string | null }) => {
+    if (!unitId || !customerUser) return;
+    try {
+      const { error } = await supabase.rpc('upsert_menu_customer', {
+        p_unit_id: unitId,
+        p_name: data.name,
+        p_email: customerUser.email || null,
+        p_phone: data.phone || null,
+        p_birthday: data.birthday,
+      });
+      if (error) throw error;
+      setShowProfile(false);
+      toast.success('Cadastro completo!');
+    } catch {
+      toast.error('Erro ao salvar dados.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
