@@ -13,6 +13,8 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { MarketingPost, MarketingChannel } from '@/types/marketing';
+import { PostAIChat } from './PostAIChat';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface PostSheetProps {
   open: boolean;
