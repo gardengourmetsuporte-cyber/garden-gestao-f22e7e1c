@@ -113,6 +113,9 @@ export default function PDV() {
     return success;
   };
 
+  const hasNewItems = activeOrderId ? pos.cart.length > originalCartSize : false;
+  const itemCount = pos.cart.reduce((s, i) => s + i.quantity, 0);
+
   // FAB quick actions
   useFabActions(
     cashRegister.isOpen
