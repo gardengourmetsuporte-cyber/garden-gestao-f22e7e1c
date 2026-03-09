@@ -126,6 +126,8 @@ export function usePOS() {
         id: o.id,
         source: o.platform || 'delivery',
         customer_name: o.customer_name,
+        customer_phone: o.customer_phone || null,
+        customer_address: o.customer_address || null,
         table_number: null,
         total: o.total,
         status: o.status,
