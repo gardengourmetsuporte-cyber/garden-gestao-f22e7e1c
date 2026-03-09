@@ -19,6 +19,7 @@ interface Sale {
   status: string;
   source: string;
   customer_name: string | null;
+  customer_phone: string | null;
   customer_document: string | null;
   table_number: number | null;
   paid_at: string | null;
