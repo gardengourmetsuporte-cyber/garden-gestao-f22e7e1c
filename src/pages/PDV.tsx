@@ -462,7 +462,18 @@ export default function PDV() {
         }}
       />
 
-      <PinDialog
+      {invoiceData && (
+        <InvoiceSheet
+          open={!!invoiceData}
+          onOpenChange={(open) => { if (!open) setInvoiceData(null); }}
+          saleId={invoiceData.saleId}
+          total={invoiceData.total}
+          customerName={pos.customerName}
+          payments={invoiceData.payments}
+          items={invoiceData.items}
+        />
+      )}
+
         open={cancelPinOpen}
         onOpenChange={setCancelPinOpen}
         title="Cancelar pedido"
