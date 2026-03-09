@@ -23,6 +23,8 @@ interface ListPickerProps {
   onCreateNew?: (name: string) => Promise<string | null>;
   createLabel?: string;
   createPlaceholder?: string;
+  /** When true, uses nested drawer to avoid closing parent drawer */
+  nested?: boolean;
 }
 
 export function ListPicker({
