@@ -30,6 +30,33 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
   const [orderType, setOrderType] = useState<'dine-in' | 'takeout'>('dine-in');
+  const [payWithCoins, setPayWithCoins] = useState(false);
+  const [customerCoins, setCustomerCoins] = useState<number | null>(null);
+
+  // Check customer coin balance
+  const coinTotal = cart.reduce((sum, item) => {
+    const cp = item.product.coin_price;
+    if (cp == null || cp <= 0) return sum + 999999; // product not available for coins
+    return sum + cp * item.quantity;
+  }, 0);
+  const allProductsHaveCoinPrice = cart.every(i => i.product.coin_price != null && i.product.coin_price > 0);
+  const canPayWithCoins = allProductsHaveCoinPrice && customerCoins !== null && customerCoins >= coinTotal;
+
+  // Fetch customer coins when logged in
+  useState(() => {
+    if (!customerUser) return;
+    const email = customerUser.email;
+    if (!email) return;
+    supabase
+      .from('customers')
+      .select('loyalty_points')
+      .eq('unit_id', unitId)
+      .eq('email', email)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setCustomerCoins(data.loyalty_points ?? 0);
+      });
+  });
 
   if (orderSent) {
     return (
