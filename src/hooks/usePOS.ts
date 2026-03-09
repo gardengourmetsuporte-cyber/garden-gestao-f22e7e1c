@@ -356,6 +356,6 @@ export function usePOS() {
     deliveryAddress, setDeliveryAddress,
     subtotal, total,
     addToCart, updateCartItem, removeFromCart, clearCart,
-    loadOrderIntoCart, finalizeSale, fetchPendingOrders,
+    loadOrderIntoCart, finalizeSale, sendOrder, fetchPendingOrders,
   };
 }
