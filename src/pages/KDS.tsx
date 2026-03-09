@@ -175,82 +175,81 @@ function OrderDetail({
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[hsl(240,10%,4%)] animate-in fade-in slide-in-from-bottom-4 duration-200">
       {/* ── Header ── */}
-      <header className={cn('flex items-center justify-between px-5 py-4 border-b border-white/[0.06] shrink-0', a.bg)}>
-        <div className="flex items-center gap-4">
-          <div className={cn('w-14 h-14 rounded-2xl flex items-center justify-center', a.bg, 'ring-2', a.ring)}>
-            <span className={cn('text-2xl font-black', a.text)}>#{shortId}</span>
+      <header className={cn('flex items-center justify-between px-4 sm:px-6 py-3 border-b border-white/[0.06] shrink-0', a.bg)}>
+        <div className="flex items-center gap-3">
+          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', a.bg, 'ring-2', a.ring)}>
+            <span className={cn('text-xl font-black', a.text)}>#{shortId}</span>
           </div>
           <div>
-            <div className="flex items-center gap-3">
-              <span className={cn('text-sm font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg', a.bg, a.text, 'ring-1', a.ring)}>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={cn('text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md', a.bg, a.text, 'ring-1', a.ring)}>
                 {cfg.label}
               </span>
               <span className={cn(
-                'inline-flex items-center gap-1.5 text-sm font-mono font-bold px-2.5 py-1 rounded-lg',
+                'inline-flex items-center gap-1 text-xs font-mono font-bold px-2 py-0.5 rounded-md',
                 mins >= 15 ? 'bg-red-500/20 text-red-400 animate-pulse' :
                 mins >= 10 ? 'bg-orange-500/15 text-orange-400' :
                 'bg-white/5 text-white/50',
               )}>
-                <Clock className="w-4 h-4" />
+                <Clock className="w-3.5 h-3.5" />
                 {mins} min
               </span>
             </div>
-            <p className="text-xs text-white/40 mt-1">
+            <p className="text-[10px] text-white/40 mt-0.5">
               Criado {format(new Date(order.created_at), "dd/MM 'às' HH:mm", { locale: ptBR })}
             </p>
           </div>
         </div>
-        <button onClick={onClose} className="p-3 rounded-2xl hover:bg-white/10 transition-colors active:scale-95">
-          <X className="w-7 h-7 text-white/60" />
+        <button onClick={onClose} className="p-2.5 rounded-xl hover:bg-white/10 transition-colors active:scale-95">
+          <X className="w-6 h-6 text-white/60" />
         </button>
       </header>
 
       {/* ── Info bar ── */}
-      <div className="flex items-center gap-6 px-5 py-3 border-b border-white/[0.06] bg-white/[0.02] shrink-0">
-        <div className="flex items-center gap-2">
-          {source === 'delivery' ? <Truck className="w-5 h-5 text-blue-400" /> : <UtensilsCrossed className="w-5 h-5 text-emerald-400" />}
-          <span className="text-base font-bold text-white/80">
+      <div className="flex items-center gap-4 px-4 sm:px-6 py-2.5 border-b border-white/[0.06] bg-white/[0.02] shrink-0 text-sm">
+        <div className="flex items-center gap-1.5">
+          {source === 'delivery' ? <Truck className="w-4 h-4 text-blue-400" /> : <UtensilsCrossed className="w-4 h-4 text-emerald-400" />}
+          <span className="font-bold text-white/80">
             {source === 'delivery' ? 'Delivery' : `Mesa ${order.table_number}`}
           </span>
         </div>
         {order.customer_name && (
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-white/40" />
-            <span className="text-base text-white/60 font-medium">{order.customer_name}</span>
+          <div className="flex items-center gap-1.5">
+            <User className="w-3.5 h-3.5 text-white/40" />
+            <span className="text-white/60 font-medium">{order.customer_name}</span>
           </div>
         )}
-        <div className="flex items-center gap-2 ml-auto">
-          <ShoppingBag className="w-4 h-4 text-white/40" />
-          <span className="text-sm text-white/50 font-semibold">{items.length} {items.length === 1 ? 'item' : 'itens'}</span>
+        <div className="flex items-center gap-1.5 ml-auto">
+          <ShoppingBag className="w-3.5 h-3.5 text-white/40" />
+          <span className="text-xs text-white/50 font-semibold">{items.length} {items.length === 1 ? 'item' : 'itens'}</span>
         </div>
       </div>
 
-      {/* ── Items list (scrollable, large) ── */}
-      <div className="flex-1 overflow-y-auto px-5 py-4">
-        <div className="grid gap-3 max-w-3xl mx-auto">
+      {/* ── Items list (scrollable) ── */}
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-3">
+        <div className="grid gap-2 max-w-3xl mx-auto">
           {items.map((item, idx) => (
             <div key={item.id} className={cn(
-              'flex items-start gap-4 rounded-2xl p-4 border transition-colors',
-              'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.05]',
+              'flex items-center gap-3 rounded-xl p-3 border transition-colors',
+              'bg-white/[0.03] border-white/[0.06]',
             )}>
               <span className={cn(
-                'w-12 h-12 rounded-xl flex items-center justify-center text-lg font-black shrink-0',
+                'w-10 h-10 rounded-lg flex items-center justify-center text-sm font-black shrink-0',
                 a.bg, a.text, 'ring-1', a.ring,
               )}>
                 {item.quantity}x
               </span>
               <div className="flex-1 min-w-0">
-                <p className="text-lg font-bold text-white/90 leading-snug">{item.tablet_products?.name || 'Item'}</p>
+                <p className="text-base font-bold text-white/90 leading-tight">{item.tablet_products?.name || 'Item'}</p>
                 {item.tablet_products?.codigo_pdv && (
-                  <p className="text-xs text-white/30 font-mono mt-0.5">COD PDV: {item.tablet_products.codigo_pdv}</p>
+                  <p className="text-[10px] text-white/30 font-mono mt-0.5">COD PDV: {item.tablet_products.codigo_pdv}</p>
                 )}
                 {item.notes && (
-                  <div className="mt-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                    <p className="text-sm text-amber-400/90 font-medium">⚠ {item.notes}</p>
+                  <div className="mt-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                    <p className="text-xs text-amber-400/90 font-medium">⚠ {item.notes}</p>
                   </div>
                 )}
               </div>
-              {/* Future: ficha técnica button per item */}
             </div>
           ))}
           {items.length === 0 && (
@@ -263,11 +262,11 @@ function OrderDetail({
       </div>
 
       {/* ── Footer with actions ── */}
-      <div className="shrink-0 border-t border-white/[0.06] bg-[hsl(240,10%,5%)] px-5 py-4">
+      <div className="shrink-0 border-t border-white/[0.06] bg-[hsl(240,10%,5%)] px-4 sm:px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-3.5 rounded-xl text-sm font-bold text-white/60 bg-white/5 hover:bg-white/10 transition-colors active:scale-[0.97]"
+            className="px-5 py-3 rounded-xl text-sm font-bold text-white/60 bg-white/5 hover:bg-white/10 transition-colors active:scale-[0.97]"
           >
             Voltar
           </button>
@@ -276,7 +275,7 @@ function OrderDetail({
             <button
               onClick={() => { onBump(order.id, cfg.next!); onClose(); }}
               className={cn(
-                'px-10 py-3.5 rounded-xl text-base font-black text-black tracking-wide transition-all active:scale-[0.97] shadow-lg',
+                'px-8 py-3 rounded-xl text-base font-black text-black tracking-wide transition-all active:scale-[0.97] shadow-lg',
                 a.btn,
               )}
             >
