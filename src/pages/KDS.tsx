@@ -310,18 +310,26 @@ export default function KDS() {
         ]);
 
       try {
-        const { data, error } = await withTimeout((async () => {
-          return supabase
-            .from('tablet_orders')
-            .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
-            .eq('unit_id', unitId)
-            .in('status', ACTIVE_STATUSES)
-            .order('created_at', { ascending: true })
-            .limit(50);
-        })());
-        if (error) throw error;
+        const query = supabase
+          .from('tablet_orders')
+          .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
+          .eq('unit_id', unitId)
+          .in('status', ACTIVE_STATUSES)
+          .order('created_at', { ascending: true })
+          .limit(50);
+
+        const { data, error } = await withTimeout(
+          Promise.resolve(query)
+        ) as { data: any; error: any };
+
+        console.log('[KDS] Query result:', { count: data?.length, error });
+        if (error) {
+          console.error('[KDS] Supabase error:', error);
+          throw error;
+        }
         return (data as unknown as KDSOrder[]) || [];
       } catch (err: any) {
+        console.error('[KDS] Fetch error:', err?.name, err?.message, err);
         const msg = String(err?.message || '');
         const isAbort = err?.name === 'AbortError' || msg.toLowerCase().includes('abort');
         if (isAbort) throw new Error('Conexão instável. Tente novamente.');
