@@ -954,6 +954,7 @@ export function TransactionSheet({
       />
 
       <ListPicker
+        nested
         open={showAccountPicker}
         onOpenChange={setShowAccountPicker}
         title={type === 'credit_card' ? 'Selecionar cartão' : 'Selecionar conta'}
@@ -963,6 +964,7 @@ export function TransactionSheet({
       />
 
       <ListPicker
+        nested
         open={showToAccountPicker}
         onOpenChange={setShowToAccountPicker}
         title="Conta de destino"
@@ -972,6 +974,7 @@ export function TransactionSheet({
       />
 
       <ListPicker
+        nested
         open={showSupplierPicker}
         onOpenChange={setShowSupplierPicker}
         title="Selecionar fornecedor"
@@ -988,6 +991,7 @@ export function TransactionSheet({
       />
 
       <ListPicker
+        nested
         open={showEmployeePicker}
         onOpenChange={setShowEmployeePicker}
         title="Selecionar funcionário"
