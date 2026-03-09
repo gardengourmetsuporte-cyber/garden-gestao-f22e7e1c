@@ -229,7 +229,7 @@ export default function Agenda() {
                     </div>
                     <div className="flex flex-col items-start">
                       <span className="font-semibold text-[15px] leading-tight text-foreground">{category.name}</span>
-                      <span className="text-[11px] text-muted-foreground mt-0.5">{catTasks.length} {catTasks.length === 1 ? 'lembrete' : 'lembretes'}</span>
+                      <span className="text-[11px] text-muted-foreground mt-0.5">{catTasks.length} {catTasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
