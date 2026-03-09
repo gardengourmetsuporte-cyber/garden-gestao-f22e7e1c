@@ -954,6 +954,7 @@ export function TransactionSheet({
       />
 
       <ListPicker
+        nested
         open={showAccountPicker}
         onOpenChange={setShowAccountPicker}
         title={type === 'credit_card' ? 'Selecionar cartão' : 'Selecionar conta'}
