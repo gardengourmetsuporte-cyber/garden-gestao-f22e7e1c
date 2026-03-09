@@ -368,10 +368,7 @@ export default function CardapioHub() {
           {cardapioTab === 'config' && (
             <>
               {activeUnit && (() => {
-                // Use published URL for QR codes, not sandbox/preview URL
-                const baseUrl = window.location.hostname.includes('lovableproject.com') || window.location.hostname.includes('lovable.app')
-                  ? 'https://garden-gestao.lovable.app'
-                  : window.location.origin;
+                const baseUrl = window.location.origin;
                 return (
                   <MenuLinksBar
                     publicUrl={`${baseUrl}/m/${activeUnit.id}`}
