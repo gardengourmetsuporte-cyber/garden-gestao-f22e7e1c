@@ -124,7 +124,8 @@ import { useUnit } from '@/contexts/UnitContext';
          unit_cost: number;
          total_cost: number;
         source_type: IngredientSourceType;
-        source_recipe_id: string | null;
+         source_recipe_id: string | null;
+         kds_station_id?: string | null;
        }>;
      }) => {
        const { ingredients, ...recipeData } = data;
