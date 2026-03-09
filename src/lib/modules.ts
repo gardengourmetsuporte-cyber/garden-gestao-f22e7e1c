@@ -29,7 +29,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'copilot', label: 'Copilot IA', icon: 'Sparkles', route: '/copilot', routes: ['/copilot'], group: 'Em Desenvolvimento',
+    key: 'copilot', label: 'Copilot IA', icon: 'Sparkles', route: '/copilot', routes: ['/copilot'], group: 'Gestão',
   },
   {
     key: 'finance', label: 'Financeiro', icon: 'DollarSign', route: '/finance', routes: ['/finance'], group: 'Gestão',
