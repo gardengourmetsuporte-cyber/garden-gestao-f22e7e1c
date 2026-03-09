@@ -85,6 +85,16 @@ export function MenuCustomerAuth({ unitName, logoUrl, cuisineType, city, isOpen 
 
           {/* Login section */}
           <div className="mt-8 w-full">
+            {bonusPoints > 0 && (
+              <div className="mb-5 rounded-xl bg-primary/10 border border-primary/20 p-3 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                  <AppIcon name="CardGiftcard" size={18} className="text-primary" />
+                </div>
+                <p className="text-xs font-semibold text-foreground">
+                  Cadastre-se e ganhe <span className="text-primary">{bonusPoints} pontos</span> para usar na loja! 🎁
+                </p>
+              </div>
+            )}
             <p className="text-sm text-muted-foreground text-center font-medium mb-5">
               Faça login e peça com mais agilidade
             </p>
