@@ -1093,6 +1093,69 @@ export type Database = {
           },
         ]
       }
+      customer_addresses: {
+        Row: {
+          city: string
+          complement: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          is_primary: boolean
+          label: string
+          neighborhood: string
+          number: string
+          reference: string | null
+          street: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string
+          complement?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          is_primary?: boolean
+          label?: string
+          neighborhood?: string
+          number?: string
+          reference?: string | null
+          street?: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          complement?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          is_primary?: boolean
+          label?: string
+          neighborhood?: string
+          number?: string
+          reference?: string | null
+          street?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_addresses_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_addresses_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_campaigns: {
         Row: {
           created_at: string

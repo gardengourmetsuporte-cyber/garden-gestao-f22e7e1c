@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { CustomerAddressManager } from './CustomerAddressManager';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,7 +47,7 @@ interface Props {
   onLogout: () => void;
 }
 
-type AccountTab = 'overview' | 'orders' | 'history' | 'data';
+type AccountTab = 'overview' | 'orders' | 'history' | 'data' | 'addresses';
 
 export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, onLogout }: Props) {
   const [customer, setCustomer] = useState<CustomerData | null>(null);
@@ -293,6 +294,7 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
   const tabs: { key: AccountTab; label: string; icon: string }[] = [
     { key: 'overview', label: 'Resumo', icon: 'Home' },
     { key: 'orders', label: 'Pedidos', icon: 'Receipt' },
+    { key: 'addresses', label: 'Endereços', icon: 'MapPin' },
     { key: 'history', label: 'Moedas', icon: 'History' },
     { key: 'data', label: 'Dados', icon: 'User' },
   ];
@@ -340,6 +342,16 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
 
       {activeTab === 'orders' && (
         <OrdersTab orders={orders} />
+      )}
+
+      {activeTab === 'addresses' && customer && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+            <AppIcon name="MapPin" size={16} className="text-primary" />
+            Meus endereços
+          </h3>
+          <CustomerAddressManager customerId={customer.id} unitId={unitId} />
+        </div>
       )}
 
       {activeTab === 'history' && (
