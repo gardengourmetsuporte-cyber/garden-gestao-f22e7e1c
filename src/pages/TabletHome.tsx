@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
 import { formatCurrency } from '@/lib/format';
+import { CustomerLeaderboard } from '@/components/digital-menu/CustomerLeaderboard';
 import gardenLogo from '@/assets/logo.png';
 
 interface StoreInfo {
@@ -198,6 +199,20 @@ export default function TabletHome() {
             </button>
           ))}
         </div>
+
+        {/* Customer leaderboard widget */}
+        {unitId && (
+          <div className="max-w-2xl mx-auto mt-6">
+            <div className="rounded-3xl bg-card border border-border/30 p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <AppIcon name="EmojiEvents" size={20} style={{ color: 'hsl(45 100% 50%)' }} />
+                <h2 className="text-base font-bold text-foreground">🪙 Ranking de Clientes</h2>
+              </div>
+              <p className="text-[11px] text-muted-foreground mb-3">Clientes com mais moedas Garden</p>
+              <CustomerLeaderboard unitId={unitId} compact />
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
