@@ -340,13 +340,25 @@ export default function PDV() {
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    {/* Cancel / Clear */}
-                    {activeOrderId ? (
+                    {/* Close loaded order (unload without cancelling) */}
+                    {activeOrderId && (
+                      <button
+                        onClick={() => { pos.clearCart(); setActiveOrderId(null); }}
+                        className="h-9 px-3 rounded-xl bg-secondary/60 text-muted-foreground text-xs font-semibold flex items-center gap-1 active:scale-95"
+                      >
+                        <AppIcon name="X" size={13} />
+                        Fechar
+                      </button>
+                    )}
+                    {/* Cancel existing order (requires PIN) */}
+                    {activeOrderId && (
                       <button onClick={handleCancelClick} className="h-9 px-3 rounded-xl bg-destructive/10 text-destructive text-xs font-semibold flex items-center gap-1 active:scale-95">
                         <AppIcon name="Ban" size={13} />
                         Cancelar
                       </button>
-                    ) : (
+                    )}
+                    {/* Clear cart when no active order */}
+                    {!activeOrderId && (
                       <button onClick={() => pos.clearCart()} className="h-9 px-3 rounded-xl bg-secondary/60 text-muted-foreground text-xs font-semibold flex items-center gap-1 active:scale-95">
                         <AppIcon name="X" size={13} />
                         Limpar
