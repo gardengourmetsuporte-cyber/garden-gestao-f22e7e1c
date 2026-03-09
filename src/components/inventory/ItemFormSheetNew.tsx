@@ -497,6 +497,12 @@ export function ItemFormSheetNew({
         onSelect={(id) => setSupplierId(id || '')}
         allowNone
         noneLabel="Sem fornecedor"
+        onCreateNew={onCreateSupplier ? async (name) => {
+          const result = await onCreateSupplier(name);
+          return result?.id || null;
+        } : undefined}
+        createLabel="Criar fornecedor"
+        createPlaceholder="Nome do fornecedor"
       />
     </Sheet>
   );
