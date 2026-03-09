@@ -234,7 +234,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                    unit_id: unitId,
                    type: 'redeemed',
                    points: -coinTotal,
-                   description: 'Pedido #' + (order as any).id.slice(0, 8) + ' pago com moedas',
+                   description: 'Pedido #' + ((order as any).order_number || (order as any).id.slice(0, 8)) + ' pago com moedas',
                  });
                  setCustomerCoins(Math.max(0, (cust.loyalty_points ?? 0) - coinTotal));
                }
