@@ -223,7 +223,7 @@ export function usePOS() {
         .insert({
           unit_id: activeUnitId,
           user_id: user.id,
-          source: sourceOrderId ? 'pedido' : 'balcao',
+          source: sourceOrderId ? 'pedido' : saleSource,
           source_order_id: sourceOrderId || null,
           customer_name: customerName || null,
           customer_document: customerDocument || null,
