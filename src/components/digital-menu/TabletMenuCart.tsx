@@ -233,6 +233,28 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         </div>
       </div>
 
+      {/* Auth banner or logged-in indicator */}
+      {!customerUser ? (
+        <CustomerAuthBanner
+          bonusPoints={signupBonusPoints}
+          onEmailLogin={onLoginClick}
+          onSkip={() => {}}
+        />
+      ) : (
+        <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <AppIcon name="Person" size={18} className="text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">
+              {customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || customerUser.email}
+            </p>
+            <p className="text-[11px] text-muted-foreground truncate">{customerUser.email}</p>
+          </div>
+          <AppIcon name="Check" size={16} className="text-primary shrink-0" />
+        </div>
+      )}
+
       {/* Mesa + Name fields */}
       <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
         <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
@@ -250,15 +272,17 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             inputMode="numeric"
           />
         </div>
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1 block">Seu nome</label>
-          <Input
-            placeholder="Como deseja ser chamado?"
-            value={customerName}
-            onChange={e => setCustomerName(e.target.value)}
-            className="h-12 rounded-xl"
-          />
-        </div>
+        {!customerUser && (
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground mb-1 block">Seu nome</label>
+            <Input
+              placeholder="Como deseja ser chamado?"
+              value={customerName}
+              onChange={e => setCustomerName(e.target.value)}
+              className="h-12 rounded-xl"
+            />
+          </div>
+        )}
       </div>
 
       <Button className="w-full h-14 text-base font-bold rounded-xl" onClick={handleSend} disabled={sending}>
