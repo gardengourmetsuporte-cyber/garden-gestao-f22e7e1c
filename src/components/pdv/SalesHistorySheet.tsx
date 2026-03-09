@@ -51,7 +51,6 @@ const SOURCE_CONFIG: Record<string, { icon: string; label: string }> = {
   balcao: { icon: 'Store', label: 'Balcão' },
   pedido: { icon: 'Store', label: 'Balcão' },
   whatsapp: { icon: 'MessageCircle', label: 'WhatsApp' },
-  pedido: { icon: 'ShoppingBag', label: 'Pedido' },
 };
 
 type ViewMode = 'list' | 'blocks';
