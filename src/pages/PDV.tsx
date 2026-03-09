@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type CartItem, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
 import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
