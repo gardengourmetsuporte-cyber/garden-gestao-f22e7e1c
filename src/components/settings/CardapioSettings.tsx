@@ -24,6 +24,7 @@ type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'rodizio' | 'config';
 
 interface CardapioSettingsProps {
   initialTab?: SettingsTab | null;
+  embedded?: boolean;
 }
 
 function PixKeyConfig() {
