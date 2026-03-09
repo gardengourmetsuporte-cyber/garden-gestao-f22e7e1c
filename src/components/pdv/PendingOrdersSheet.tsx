@@ -332,6 +332,7 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
+  const queryClient = useQueryClient();
 
   const sortedOrders = [...orders].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   const numberedOrders = sortedOrders.map((order, idx) => ({ ...order, sequentialNumber: idx + 1 }));
