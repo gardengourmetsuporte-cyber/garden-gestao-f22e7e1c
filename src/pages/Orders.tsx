@@ -22,6 +22,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { QuotationList } from '@/components/orders/QuotationList';
 import { useShoppingList } from '@/hooks/useShoppingList';
+import { SupplierProfileSheet } from '@/components/orders/SupplierProfileSheet';
+import { useFabAction } from '@/contexts/FabActionContext';
+import { normalizePhone } from '@/lib/normalizePhone';
 
 export default function OrdersPage() {
   const { isAdmin } = useAuth();
