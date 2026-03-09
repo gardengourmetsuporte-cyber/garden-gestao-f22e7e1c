@@ -8,8 +8,8 @@ import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
 import { useCashRegister } from '@/hooks/useCashRegister';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
-import { PDVDeliveryAddress } from '@/components/pdv/PDVDeliveryAddress';
 import { DeliveryPaymentSheet } from '@/components/pdv/DeliveryPaymentSheet';
+import { SaleSourceSheet } from '@/components/pdv/SaleSourceSheet';
 import { InvoiceSheet } from '@/components/pdv/InvoiceSheet';
 import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { PendingOrdersSheet } from '@/components/pdv/PendingOrdersSheet';
@@ -36,6 +36,8 @@ export default function PDV() {
   const [openRegisterDialog, setOpenRegisterDialog] = useState(false);
   const [closeRegisterSheet, setCloseRegisterSheet] = useState(false);
   const [deliveryPaymentOpen, setDeliveryPaymentOpen] = useState(false);
+  const [saleSourceOpen, setSaleSourceOpen] = useState(false);
+  const [saleSourceAction, setSaleSourceAction] = useState<'send' | 'charge'>('send');
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingNotes, setEditingNotes] = useState('');
   const [invoiceData, setInvoiceData] = useState<{
@@ -364,55 +366,6 @@ export default function PDV() {
                   ))}
                 </div>
 
-                {/* Source selector */}
-                <div className="flex gap-1.5">
-                  {([
-                    { key: 'balcao', label: 'Balcão', icon: 'Store' },
-                    { key: 'mesa', label: 'Mesa', icon: 'UtensilsCrossed' },
-                    { key: 'delivery', label: 'Delivery', icon: 'two_wheeler' },
-                  ] as const).map(s => (
-                    <button
-                      key={s.key}
-                      onClick={() => pos.setSaleSource(s.key)}
-                      className={cn(
-                        'flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all',
-                        pos.saleSource === s.key
-                          ? 'bg-primary/15 text-primary border border-primary/30'
-                          : 'bg-secondary/50 text-muted-foreground border border-transparent'
-                      )}
-                    >
-                      <AppIcon name={s.icon} size={12} />
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Context fields */}
-                {pos.saleSource === 'balcao' && (
-                  <div className="flex gap-1.5">
-                    <Input placeholder="Nome do cliente" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1 rounded-xl" />
-                    <Input placeholder="CPF" value={pos.customerDocument} onChange={e => pos.setCustomerDocument(e.target.value)} className="h-8 text-xs w-28 rounded-xl" />
-                  </div>
-                )}
-                {pos.saleSource === 'mesa' && (
-                  <div className="flex gap-1.5">
-                    <Input type="number" placeholder="Nº mesa" value={pos.tableNumber ?? ''} onChange={e => pos.setTableNumber(e.target.value ? Number(e.target.value) : null)} className="h-8 text-xs w-20 rounded-xl" inputMode="numeric" />
-                    <Input placeholder="Nome (opcional)" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1 rounded-xl" />
-                  </div>
-                )}
-                {pos.saleSource === 'delivery' && (
-                  <div className="space-y-1.5">
-                    <div className="flex gap-1.5">
-                      <Input placeholder="Nome do cliente" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1 rounded-xl" />
-                      <Input placeholder="Telefone" value={pos.deliveryPhone} onChange={e => pos.setDeliveryPhone(e.target.value)} className="h-8 text-xs w-28 rounded-xl" inputMode="tel" />
-                    </div>
-                    <PDVDeliveryAddress
-                      value={pos.deliveryAddress}
-                      onChange={pos.setDeliveryAddress}
-                    />
-                  </div>
-                )}
-
                 {/* Footer: total + actions */}
                 <div className="space-y-2 pt-0.5">
                   <div className="flex items-center justify-between">
@@ -422,7 +375,7 @@ export default function PDV() {
                     </div>
                     {/* Finalize / Cobrar */}
                     <button
-                      onClick={() => setPaymentOpen(true)}
+                      onClick={() => { setSaleSourceAction('charge'); setSaleSourceOpen(true); }}
                       className="h-10 px-5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center gap-1.5 active:scale-95 shadow-sm shrink-0"
                     >
                       <AppIcon name="Banknote" size={16} />
@@ -457,16 +410,7 @@ export default function PDV() {
                     )}
                     {/* Send order */}
                     <button
-                      onClick={() => {
-                        if (pos.saleSource === 'delivery') {
-                          if (!pos.customerName.trim()) { pos.sendOrder(); return; }
-                          if (!pos.deliveryPhone.trim()) { pos.sendOrder(); return; }
-                          if (!pos.deliveryAddress.trim()) { pos.sendOrder(); return; }
-                          setDeliveryPaymentOpen(true);
-                        } else {
-                          pos.sendOrder();
-                        }
-                      }}
+                      onClick={() => { setSaleSourceAction('send'); setSaleSourceOpen(true); }}
                       disabled={pos.savingSale || pos.cart.length === 0 || (!!activeOrderId && pos.cart.length <= originalCartSize)}
                       className="h-8 px-3 rounded-xl bg-secondary/60 border border-border/30 text-foreground text-[11px] font-semibold flex items-center gap-1 active:scale-95 disabled:opacity-30 disabled:pointer-events-none ml-auto"
                     >
@@ -548,6 +492,39 @@ export default function PDV() {
           fetchSummary={cashRegister.fetchSalesSummary}
         />
       )}
+
+      <SaleSourceSheet
+        open={saleSourceOpen}
+        onOpenChange={setSaleSourceOpen}
+        initialSource={pos.saleSource}
+        initialCustomerName={pos.customerName}
+        initialTableNumber={pos.tableNumber}
+        onConfirm={(data) => {
+          // Apply selections to POS state
+          pos.setSaleSource(data.source);
+          pos.setCustomerName(data.customerName);
+          pos.setCustomerDocument(data.customerDocument);
+          pos.setTableNumber(data.tableNumber);
+          pos.setDeliveryPhone(data.deliveryPhone);
+          pos.setDeliveryAddress(data.deliveryAddress);
+          setSaleSourceOpen(false);
+
+          if (saleSourceAction === 'charge') {
+            setPaymentOpen(true);
+          } else {
+            // Send order
+            if (data.source === 'delivery') {
+              if (!data.customerName.trim() || !data.deliveryPhone.trim() || !data.deliveryAddress.trim()) {
+                pos.sendOrder();
+              } else {
+                setDeliveryPaymentOpen(true);
+              }
+            } else {
+              pos.sendOrder();
+            }
+          }
+        }}
+      />
     </AppLayout>
   );
 }
