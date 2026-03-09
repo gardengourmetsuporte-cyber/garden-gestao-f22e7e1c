@@ -95,7 +95,24 @@ export function RecipeSheet({
   const [sellingPrice, setSellingPrice] = useState('');
   const [marginMode, setMarginMode] = useState<'margin' | 'price'>('margin');
 
+  const { activeUnit } = useUnit();
   const { settings, calculateOperationalCosts } = useRecipeCostSettings();
+
+  // Load KDS stations
+  const { data: kdsStations = [] } = useQuery({
+    queryKey: ['kds-stations', activeUnit?.id],
+    queryFn: async () => {
+      if (!activeUnit) return [];
+      const { data, error } = await supabase
+        .from('kds_stations')
+        .select('id, name, color')
+        .eq('unit_id', activeUnit.id)
+        .order('sort_order');
+      if (error) throw error;
+      return data as { id: string; name: string; color: string }[];
+    },
+    enabled: !!activeUnit && open,
+  });
 
   // Reset form when recipe changes
   useEffect(() => {
