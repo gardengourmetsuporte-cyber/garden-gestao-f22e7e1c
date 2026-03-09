@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type CartItem, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
+import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 
@@ -17,6 +18,7 @@ export default function PDV() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
 
   const filteredProducts = useMemo(() => {
