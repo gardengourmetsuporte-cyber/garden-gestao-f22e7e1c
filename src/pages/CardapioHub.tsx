@@ -341,41 +341,6 @@ export default function CardapioHub() {
             </div>
           )}
 
-          {cardapioTab === 'rodizio' && (
-            <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /></div>}>
-              <RodizioSettingsLazy />
-            </Suspense>
-          )}
-
-          {/* ==================== OPCIONAIS ==================== */}
-          {cardapioTab === 'opcionais' && (
-            <OptionGroupList
-              optionGroups={optionGroups}
-              onNew={openNewOG}
-              onEdit={openEditOG}
-              onDelete={deleteOptionGroup}
-              onLinkProducts={openLinkProducts}
-            />
-          )}
-
-          {/* ==================== CONFIGURAÇÕES ==================== */}
-          {cardapioTab === 'config' && (
-            <>
-              {activeUnit && (() => {
-                const baseUrl = window.location.origin;
-                return (
-                  <MenuLinksBar
-                    publicUrl={`${baseUrl}/m/${activeUnit.id}`}
-                    tabletUrl={`${baseUrl}/tablet/${activeUnit.id}/menu?mesa=1`}
-                    kdsUrl={`${baseUrl}/kds/${activeUnit.id}`}
-                  />
-                );
-              })()}
-              <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /></div>}>
-                <CardapioSettings />
-              </Suspense>
-            </>
-          )}
         </div>
       </div>
 
