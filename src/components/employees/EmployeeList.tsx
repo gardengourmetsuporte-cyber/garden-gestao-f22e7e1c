@@ -172,10 +172,10 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
                     Pagamentos
                   </Button>
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuTrigger asChild>
                       <button
                         className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-secondary/60 touch-manipulation"
-                        onTouchMove={(e) => e.preventDefault()}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <AppIcon name="MoreVertical" size={16} className="text-muted-foreground" />
                       </button>
