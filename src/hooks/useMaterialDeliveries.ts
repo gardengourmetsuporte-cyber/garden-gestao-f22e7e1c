@@ -66,18 +66,9 @@ export function useMaterialDeliveries(employeeId?: string) {
     }) => {
       let signature_url: string | null = null;
 
-      // Upload signature if provided
+      // Store signature as data URL directly (avoids storage bucket dependency)
       if (input.signature_data_url) {
-        const blob = await fetch(input.signature_data_url).then(r => r.blob());
-        const fileName = `signatures/${unitId}/${Date.now()}.png`;
-        const { error: uploadError } = await supabase.storage
-          .from('attachments')
-          .upload(fileName, blob, { contentType: 'image/png' });
-
-        if (!uploadError) {
-          const { data: urlData } = supabase.storage.from('attachments').getPublicUrl(fileName);
-          signature_url = urlData.publicUrl;
-        }
+        signature_url = input.signature_data_url;
       }
 
       const { data, error } = await supabase
