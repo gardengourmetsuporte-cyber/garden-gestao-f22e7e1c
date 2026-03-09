@@ -212,7 +212,7 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return {
-    unit, categories, groups, products, loading,
+    unit, categories, groups, products, loading, hasVisibleProducts,
     getProductOptionGroups, getGroupProducts,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
   };
