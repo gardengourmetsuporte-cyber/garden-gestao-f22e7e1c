@@ -32,6 +32,7 @@ export default function ChecklistsPage() {
     reorderSectors, reorderSubcategories, reorderItems,
     isItemCompleted, getCompletionProgress, contestCompletion, splitCompletion,
   } = useChecklistPage();
+  const [reminderOpen, setReminderOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -49,8 +50,6 @@ export default function ChecklistsPage() {
     );
   }
 
-
-  const [reminderOpen, setReminderOpen] = useState(false);
 
   const reminderBtn = isAdmin && checklistType !== 'bonus' ? (() => {
     const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
