@@ -144,14 +144,15 @@ const defaultSettings: Omit<RecipeCostSettings, 'id' | 'user_id' | 'created_at' 
      mutationFn: async (newSettings: Partial<RecipeCostSettings>) => {
        if (!user?.id) throw new Error('User not logged in');
        
-       const payload = {
-         user_id: user.id,
-         monthly_products_sold: newSettings.monthly_products_sold ?? defaultSettings.monthly_products_sold,
-         tax_percentage: newSettings.tax_percentage ?? defaultSettings.tax_percentage,
-         card_fee_percentage: newSettings.card_fee_percentage ?? defaultSettings.card_fee_percentage,
-         packaging_cost_per_unit: newSettings.packaging_cost_per_unit ?? defaultSettings.packaging_cost_per_unit,
-         fixed_cost_category_ids: newSettings.fixed_cost_category_ids ?? defaultSettings.fixed_cost_category_ids,
-       };
+        const payload = {
+          user_id: user.id,
+          monthly_products_sold: newSettings.monthly_products_sold ?? defaultSettings.monthly_products_sold,
+          monthly_revenue: newSettings.monthly_revenue ?? defaultSettings.monthly_revenue,
+          tax_percentage: newSettings.tax_percentage ?? defaultSettings.tax_percentage,
+          card_fee_percentage: newSettings.card_fee_percentage ?? defaultSettings.card_fee_percentage,
+          packaging_cost_per_unit: newSettings.packaging_cost_per_unit ?? defaultSettings.packaging_cost_per_unit,
+          fixed_cost_category_ids: newSettings.fixed_cost_category_ids ?? defaultSettings.fixed_cost_category_ids,
+        };
        
        const { error } = await supabase
          .from('recipe_cost_settings')
