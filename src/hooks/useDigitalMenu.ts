@@ -158,6 +158,10 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
 
       setOptionGroups(ogs);
       setProductOptionLinks((linkData as any[]) || []);
+      
+      // Check if we have visible products
+      const hasProducts = filteredProducts.length > 0;
+      setHasVisibleProducts(hasProducts);
     } catch (err) {
       console.error('[useDigitalMenu] Error fetching:', err);
     } finally {
