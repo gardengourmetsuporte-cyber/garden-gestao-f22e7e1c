@@ -293,7 +293,7 @@ export default function PDV() {
                   {([
                     { key: 'balcao', label: 'Balcão', icon: 'Store' },
                     { key: 'mesa', label: 'Mesa', icon: 'UtensilsCrossed' },
-                    { key: 'delivery', label: 'Delivery', icon: 'Bike' },
+                    { key: 'delivery', label: 'Delivery', icon: 'two_wheeler' },
                   ] as const).map(s => (
                     <button
                       key={s.key}
