@@ -204,6 +204,13 @@ export default function ChecklistsPage() {
           </div>
         </div>
       </div>
+
+      <ChecklistReminderSheet
+        open={reminderOpen}
+        onOpenChange={setReminderOpen}
+        checklistType={checklistType as 'abertura' | 'fechamento'}
+        pendingCount={pendingCount}
+      />
     </AppLayout>
   );
 }
