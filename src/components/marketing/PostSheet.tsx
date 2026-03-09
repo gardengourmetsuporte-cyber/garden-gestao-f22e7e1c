@@ -29,6 +29,8 @@ interface PostSheetProps {
 }
 
 export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadMedia, isSaving, prefillDate, prefillTitle }: PostSheetProps) {
+  const { activeUnitId } = useUnit();
+  const [mode, setMode] = useState<'manual' | 'ai'>('manual');
   const [title, setTitle] = useState('');
   const [caption, setCaption] = useState('');
   const [channels, setChannels] = useState<MarketingChannel[]>([]);
