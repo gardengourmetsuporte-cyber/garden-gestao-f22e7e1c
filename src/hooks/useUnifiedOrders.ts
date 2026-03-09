@@ -92,6 +92,7 @@ export function useUnifiedOrders(unitId: string | undefined) {
   return {
     activeTab,
     setActiveTab,
+    balcaoOrders,
     comandas,
     deliveryOrders,
     hubOrders: deliveryHub.orders,
