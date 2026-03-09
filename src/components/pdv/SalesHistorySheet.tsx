@@ -124,6 +124,8 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
     const phoneFormatted = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
     window.open(`https://wa.me/${phoneFormatted}?text=${encodeURIComponent(msg)}`, '_blank');
   }, []);
+
+  const paymentSummary = sales.filter(s => s.status === 'paid').reduce((acc, sale) => {
     sale.payments.forEach(p => {
       acc[p.method] = (acc[p.method] || 0) + p.amount;
     });
