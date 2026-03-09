@@ -176,12 +176,10 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
         onClick={() => setExpandedId(isExpanded ? null : sale.id)}
         className="bg-card border border-border/50 rounded-xl p-3 text-left hover:border-primary/30 transition-all active:scale-[0.97] relative overflow-hidden w-full"
       >
-        {/* Sequential number badge */}
         <div className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
           <span className="text-xs font-bold text-primary">{sale.sequentialNumber}</span>
         </div>
 
-        {/* Status + source */}
         <div className="flex items-center gap-1.5 mb-1.5 pr-8">
           <Badge variant="outline" className={cn('text-[9px] px-1.5 py-0.5 border', statusCfg.className)}>
             {statusCfg.label}
@@ -191,7 +189,6 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
           </Badge>
         </div>
 
-        {/* Customer / table */}
         {(sale.customer_name || sale.table_number) && (
           <p className="text-[11px] text-muted-foreground truncate mb-1">
             {sale.customer_name && `• ${sale.customer_name}`}
@@ -199,74 +196,125 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
           </p>
         )}
 
-        {/* Time */}
         <p className="text-[10px] text-muted-foreground mb-2">
           {sale.paid_at ? format(new Date(sale.paid_at), 'HH:mm', { locale: ptBR }) : format(new Date(sale.created_at), 'HH:mm', { locale: ptBR })}
         </p>
 
-        {/* Price */}
         <div className="flex items-center justify-between mt-auto">
           <span className="text-sm font-bold text-primary">{formatCurrency(sale.total)}</span>
           <AppIcon name={isExpanded ? 'ChevronUp' : 'ChevronDown'} size={14} className="text-muted-foreground" />
         </div>
 
-        {isExpanded && (
-          <div className="mt-3 pt-3 border-t border-border/50 space-y-2" onClick={e => e.stopPropagation()}>
-            {sale.items.length > 0 && (
-              <div className="space-y-1">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Itens</p>
-                {sale.items.map((item, i) => (
-                  <div key={i} className="flex justify-between text-xs">
-                    <span>{item.quantity}x {item.product_name}</span>
-                    <span className="text-muted-foreground">{formatCurrency(item.quantity * item.unit_price)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {sale.payments.length > 0 && (
-              <div className="space-y-1">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Pagamentos</p>
-                {sale.payments.map((pay, i) => (
-                  <div key={i} className="flex justify-between text-xs">
-                    <span>{PAYMENT_LABELS[pay.method] || pay.method}</span>
-                    <span className="font-medium">{formatCurrency(pay.amount)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {sale.notes && <div className="text-xs text-muted-foreground italic">Obs: {sale.notes}</div>}
-            {sale.discount > 0 && <div className="text-xs text-muted-foreground">Desconto: -{formatCurrency(sale.discount)}</div>}
-
-            {/* Action buttons */}
-            {sale.status === 'paid' && (
-              <div className="flex gap-2 pt-2 border-t border-border/30">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 h-8 text-[11px] gap-1.5"
-                  onClick={() => setInvoiceSale(sale)}
-                >
-                  <AppIcon name="Receipt" size={13} />
-                  Nota Fiscal
-                </Button>
-                {sale.customer_phone && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 h-8 text-[11px] gap-1.5 border-emerald-500/30 text-emerald-600"
-                    onClick={() => handleResendWhatsApp(sale)}
-                  >
-                    <AppIcon name="share" size={13} />
-                    Reenviar
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        {isExpanded && renderExpandedContent(sale)}
       </button>
     );
   };
+
+  const renderSaleRow = (sale: Sale & { sequentialNumber: number }) => {
+    const isExpanded = expandedId === sale.id;
+    const statusCfg = STATUS_BADGE[sale.status] || { label: sale.status, className: 'bg-secondary text-muted-foreground' };
+    const sourceKey = getSourceKey(sale);
+    const sourceCfg = SOURCE_CONFIG[sourceKey] || { icon: 'ShoppingBag', label: sourceKey };
+    const timeStr = sale.paid_at ? format(new Date(sale.paid_at), 'HH:mm', { locale: ptBR }) : format(new Date(sale.created_at), 'HH:mm', { locale: ptBR });
+
+    return (
+      <div key={sale.id} className="border-b border-border/30 last:border-b-0">
+        <button
+          onClick={() => setExpandedId(isExpanded ? null : sale.id)}
+          className="w-full flex items-center gap-3 py-2.5 px-1 text-left hover:bg-secondary/30 transition-colors rounded-lg active:scale-[0.99]"
+        >
+          {/* Number */}
+          <span className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <span className="text-[11px] font-bold text-primary">{sale.sequentialNumber}</span>
+          </span>
+
+          {/* Time */}
+          <span className="text-xs font-mono text-muted-foreground w-11 shrink-0">{timeStr}</span>
+
+          {/* Source icon + name/table */}
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
+            <AppIcon name={sourceCfg.icon} size={13} className="text-muted-foreground shrink-0" />
+            <span className="text-xs text-foreground truncate">
+              {sale.customer_name || (sale.table_number ? `Mesa ${sale.table_number}` : sourceCfg.label)}
+            </span>
+          </div>
+
+          {/* Items count */}
+          <span className="text-[10px] text-muted-foreground shrink-0">{sale.items.length} {sale.items.length === 1 ? 'item' : 'itens'}</span>
+
+          {/* Status */}
+          <Badge variant="outline" className={cn('text-[9px] px-1.5 py-0.5 border shrink-0', statusCfg.className)}>
+            {statusCfg.label}
+          </Badge>
+
+          {/* Total */}
+          <span className="text-sm font-bold text-primary w-20 text-right shrink-0">{formatCurrency(sale.total)}</span>
+
+          <AppIcon name={isExpanded ? 'ChevronUp' : 'ChevronDown'} size={14} className="text-muted-foreground shrink-0" />
+        </button>
+
+        {isExpanded && (
+          <div className="px-2 pb-3">
+            {renderExpandedContent(sale)}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderExpandedContent = (sale: Sale & { sequentialNumber: number }) => (
+    <div className="mt-3 pt-3 border-t border-border/50 space-y-2" onClick={e => e.stopPropagation()}>
+      {sale.items.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Itens</p>
+          {sale.items.map((item, i) => (
+            <div key={i} className="flex justify-between text-xs">
+              <span>{item.quantity}x {item.product_name}</span>
+              <span className="text-muted-foreground">{formatCurrency(item.quantity * item.unit_price)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {sale.payments.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Pagamentos</p>
+          {sale.payments.map((pay, i) => (
+            <div key={i} className="flex justify-between text-xs">
+              <span>{PAYMENT_LABELS[pay.method] || pay.method}</span>
+              <span className="font-medium">{formatCurrency(pay.amount)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {sale.notes && <div className="text-xs text-muted-foreground italic">Obs: {sale.notes}</div>}
+      {sale.discount > 0 && <div className="text-xs text-muted-foreground">Desconto: -{formatCurrency(sale.discount)}</div>}
+
+      {sale.status === 'paid' && (
+        <div className="flex gap-2 pt-2 border-t border-border/30">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 h-8 text-[11px] gap-1.5"
+            onClick={() => setInvoiceSale(sale)}
+          >
+            <AppIcon name="Receipt" size={13} />
+            Nota Fiscal
+          </Button>
+          {sale.customer_phone && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-8 text-[11px] gap-1.5 border-emerald-500/30 text-emerald-600"
+              onClick={() => handleResendWhatsApp(sale)}
+            >
+              <AppIcon name="share" size={13} />
+              Reenviar
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
