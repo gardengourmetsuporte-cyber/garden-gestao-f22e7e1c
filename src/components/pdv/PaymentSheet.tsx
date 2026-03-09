@@ -39,6 +39,7 @@ interface PaymentSheetProps {
 
 export function PaymentSheet({
   open, onOpenChange, total, subtotal, discount, itemCount, savingSale, onFinalize,
+  saleSource = 'balcao', customerName, tableNumber,
 }: PaymentSheetProps) {
   const [payments, setPayments] = useState<PaymentLine[]>([]);
   const [payMethod, setPayMethod] = useState('pix');
