@@ -873,7 +873,8 @@ export function ChecklistSettings({
                     <span>{sectors.find(s => s.id === itemSectorId)?.name || 'Selecione'}</span>
                     <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
                   </button>
-                  <ListPicker
+                   <ListPicker
+                     nested
                     open={itemSectorPickerOpen}
                     onOpenChange={setItemSectorPickerOpen}
                     title="Setor"
