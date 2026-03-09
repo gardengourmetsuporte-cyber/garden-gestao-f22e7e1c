@@ -1,12 +1,10 @@
-import { useState, useMemo, useRef, useCallback, useEffect, lazy, Suspense } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
+import { useState, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useUnit } from '@/contexts/UnitContext';
 import { useFabAction } from '@/contexts/FabActionContext';
-import { useRodizioSettings } from '@/hooks/useRodizioSettings';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -35,12 +33,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
-const RodizioSettingsLazy = lazy(() => import('@/components/settings/RodizioSettings').then(m => ({ default: m.RodizioSettings })));
 const CardapioConfigHubLazy = lazy(() => import('@/components/cardapio/CardapioConfigHub').then(m => ({ default: m.CardapioConfigHub })));
 
-type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio';
+type CardapioTab = 'produtos' | 'opcionais';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
@@ -67,8 +63,7 @@ export default function CardapioHub() {
   const tabletAdmin = useTabletAdmin();
   const { orders, pdvConfig, retryPDV } = tabletAdmin;
 
-  // Rodízio settings
-  const { settings: rodizioSettings, loading: rodizioLoading } = useRodizioSettings();
+  // Recipe sync
 
   // Recipe sync
   const recipeSync = useRecipeMenuSync(products, groups, () => {
@@ -110,17 +105,9 @@ export default function CardapioHub() {
   };
 
   // Internal tab for cardápio content
-  const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
+  const [cardapioTab, setCardapioTab] = useState<CardapioTab>('produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'menu' | 'ficha'>('menu');
-
-  useEffect(() => {
-    if (isConfigFromUrl) {
-      setCardapioTab('config');
-    } else if (cardapioTab === 'config') {
-      setCardapioTab('produtos');
-    }
-  }, [isConfigFromUrl]);
   const handleSelectGroup = useCallback((groupId: string) => {
     setSelectedGroupId(prev => prev === groupId ? null : groupId);
   }, []);
@@ -142,7 +129,7 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isDashboard || isConfigFromUrl || cardapioTab === 'config') {
+    if (isDashboard || isConfigFromUrl) {
       return null;
     }
     if (cardapioTab === 'opcionais') {
@@ -270,13 +257,12 @@ export default function CardapioHub() {
       <div className="min-h-screen bg-background pb-24">
         {/* Quick Access Links only in config */}
 
-        {cardapioTab !== 'config' && (
+        {(
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2">
             {activeUnit && <MenuPublishBar unitId={activeUnit.id} products={products} groups={groups} />}
             <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 w-full">
               {([
                 { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
-                { id: 'rodizio' as CardapioTab, label: 'Rodízio', icon: 'all_inclusive', count: undefined },
                 { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
               ]).map(tab => (
                 <button
@@ -351,12 +337,6 @@ export default function CardapioHub() {
             </div>
           )}
 
-          {cardapioTab === 'rodizio' && (
-            <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /></div>}>
-              <RodizioSettingsLazy />
-            </Suspense>
-          )}
-
           {/* ==================== OPCIONAIS ==================== */}
           {cardapioTab === 'opcionais' && (
             <OptionGroupList
@@ -366,25 +346,6 @@ export default function CardapioHub() {
               onDelete={deleteOptionGroup}
               onLinkProducts={openLinkProducts}
             />
-          )}
-
-          {/* ==================== CONFIGURAÇÕES ==================== */}
-          {cardapioTab === 'config' && (
-            <>
-              {activeUnit && (() => {
-                const baseUrl = window.location.origin;
-                return (
-                  <MenuLinksBar
-                    publicUrl={`${baseUrl}/m/${activeUnit.id}`}
-                    tabletUrl={`${baseUrl}/tablet/${activeUnit.id}/menu?mesa=1`}
-                    kdsUrl={`${baseUrl}/kds/${activeUnit.id}`}
-                  />
-                );
-              })()}
-              <Suspense fallback={<div className="space-y-4"><Skeleton className="h-10 w-48" /><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /></div>}>
-                <CardapioSettings />
-              </Suspense>
-            </>
           )}
         </div>
       </div>
@@ -414,165 +375,6 @@ export default function CardapioHub() {
   );
 }
 
-// ==================== MENU LINKS BAR ====================
-function MenuLinksBar({ publicUrl, tabletUrl, kdsUrl }: { publicUrl: string; tabletUrl: string; kdsUrl: string }) {
-  const [qrOpen, setQrOpen] = useState<'public' | 'tablet' | 'kds' | null>(null);
-
-  const copyLink = (url: string, label: string) => {
-    navigator.clipboard.writeText(url);
-    toast.success(`Link "${label}" copiado!`);
-  };
-
-  return (
-    <>
-      <div className="px-4 pt-3 lg:px-6">
-        <div className="flex flex-col gap-2">
-          {/* Cardápio Digital */}
-          <div className="rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <AppIcon name="Globe" size={18} className="text-primary" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-foreground truncate">Cardápio Digital</p>
-              <p className="text-[10px] text-muted-foreground truncate">{publicUrl.replace(/^https?:\/\//, '')}</p>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                onClick={() => setQrOpen('public')}
-                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
-              >
-                <AppIcon name="QrCode" size={13} className="text-muted-foreground" />
-              </button>
-              <button
-                onClick={() => copyLink(publicUrl, 'Cardápio Digital')}
-                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
-              >
-                <AppIcon name="Copy" size={13} className="text-muted-foreground" />
-              </button>
-              <a
-                href={publicUrl}
-                target="_blank"
-                rel="noopener"
-                className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
-              >
-                <AppIcon name="ExternalLink" size={13} className="text-primary" />
-              </a>
-            </div>
-          </div>
-
-          {/* Cardápio Tablet */}
-          <div className="rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <AppIcon name="Tablet" size={18} className="text-primary" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-foreground truncate">Cardápio Tablet</p>
-              <p className="text-[10px] text-muted-foreground truncate">{tabletUrl.replace(/^https?:\/\//, '')}</p>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                onClick={() => setQrOpen('tablet')}
-                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
-              >
-                <AppIcon name="QrCode" size={13} className="text-muted-foreground" />
-              </button>
-              <button
-                onClick={() => copyLink(tabletUrl, 'Cardápio Tablet')}
-                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
-              >
-                <AppIcon name="Copy" size={13} className="text-muted-foreground" />
-              </button>
-              <a
-                href={tabletUrl}
-                target="_blank"
-                rel="noopener"
-                className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
-              >
-                <AppIcon name="ExternalLink" size={13} className="text-primary" />
-              </a>
-            </div>
-          </div>
-
-          {/* KDS - Cozinha */}
-          <div className="rounded-2xl bg-card border border-border/30 p-3.5 flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
-              <AppIcon name="ChefHat" size={18} className="text-orange-400" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-foreground truncate">KDS - Cozinha</p>
-              <p className="text-[10px] text-muted-foreground truncate">{kdsUrl.replace(/^https?:\/\//, '')}</p>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                onClick={() => setQrOpen('kds')}
-                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
-              >
-                <AppIcon name="QrCode" size={13} className="text-muted-foreground" />
-              </button>
-              <button
-                onClick={() => copyLink(kdsUrl, 'KDS - Cozinha')}
-                className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
-              >
-                <AppIcon name="Copy" size={13} className="text-muted-foreground" />
-              </button>
-              <a
-                href={kdsUrl}
-                target="_blank"
-                rel="noopener"
-                className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
-              >
-                <AppIcon name="ExternalLink" size={13} className="text-primary" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* QR Code Modal */}
-      {qrOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setQrOpen(null)}>
-          <div
-            className="bg-card rounded-3xl p-8 shadow-2xl border border-border/30 flex flex-col items-center gap-5 max-w-xs w-full mx-4 animate-in zoom-in-95 fade-in duration-200"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="text-center">
-              <h3 className="text-lg font-bold text-foreground">
-                {qrOpen === 'public' ? 'Cardápio Digital' : qrOpen === 'tablet' ? 'Cardápio Tablet' : 'KDS - Cozinha'}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-1">Escaneie para acessar</p>
-            </div>
-            <div className="bg-white rounded-2xl p-5">
-              <QRCodeSVG
-                value={qrOpen === 'public' ? publicUrl : qrOpen === 'tablet' ? tabletUrl : kdsUrl}
-                size={200}
-                level="H"
-                bgColor="#ffffff"
-                fgColor="#000000"
-              />
-            </div>
-            <button
-              onClick={() => {
-                const url = qrOpen === 'public' ? publicUrl : qrOpen === 'tablet' ? tabletUrl : kdsUrl;
-                const label = qrOpen === 'public' ? 'Cardápio Digital' : qrOpen === 'tablet' ? 'Cardápio Tablet' : 'KDS - Cozinha';
-                copyLink(url, label);
-              }}
-              className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-            >
-              <AppIcon name="Copy" size={16} />
-              Copiar link
-            </button>
-            <button
-              onClick={() => setQrOpen(null)}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
 
 // ==================== MENU PUBLISH BAR ====================
 function MenuPublishBar({ unitId, products, groups }: { unitId: string; products: any[]; groups: any[] }) {
