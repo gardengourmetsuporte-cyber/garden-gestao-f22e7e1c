@@ -247,9 +247,9 @@ export default function PDV() {
                 <p className="text-lg font-bold text-foreground">{formatCurrency(pos.total)}</p>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={pos.clearCart}>
-                  <AppIcon name="RotateCcw" size={14} className="mr-1" />
-                  Novo Pedido
+                <Button variant="ghost" size="sm" onClick={pos.clearCart} className="text-muted-foreground">
+                  <AppIcon name="X" size={14} className="mr-1" />
+                  Cancelar
                 </Button>
                 {pos.saleSource === 'balcao' ? (
                   <Button size="sm" onClick={() => setPaymentOpen(true)}>
