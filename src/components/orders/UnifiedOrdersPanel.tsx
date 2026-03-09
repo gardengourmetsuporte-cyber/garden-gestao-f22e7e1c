@@ -16,6 +16,7 @@ const formatPrice = (v: number) => v.toLocaleString('pt-BR', { style: 'currency'
 
 const statusColor: Record<string, string> = {
   draft: 'bg-secondary text-muted-foreground',
+  pending: 'bg-warning/15 text-warning',
   awaiting_confirmation: 'bg-warning/15 text-warning',
   confirmed: 'bg-primary/15 text-primary',
   preparing: 'bg-amber-500/15 text-amber-500',
