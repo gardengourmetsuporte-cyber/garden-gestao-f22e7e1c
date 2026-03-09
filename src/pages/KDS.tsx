@@ -392,7 +392,7 @@ export default function KDS() {
 
       {/* ── Detail overlay ── */}
       {selectedOrder && (
-        <OrderDetail order={selectedOrder} onClose={() => setSelectedOrder(null)} onBump={handleBump} />
+        <KDSOrderDetail order={selectedOrder} onClose={() => setSelectedOrder(null)} onBump={handleBump} />
       )}
 
       {/* Loading */}
