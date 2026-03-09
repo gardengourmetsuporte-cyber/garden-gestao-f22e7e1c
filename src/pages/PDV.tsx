@@ -34,6 +34,8 @@ export default function PDV() {
   const [openRegisterDialog, setOpenRegisterDialog] = useState(false);
   const [closeRegisterSheet, setCloseRegisterSheet] = useState(false);
   const [deliveryPaymentOpen, setDeliveryPaymentOpen] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editingNotes, setEditingNotes] = useState('');
   const [invoiceData, setInvoiceData] = useState<{
     saleId: string;
     total: number;
