@@ -135,10 +135,10 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
               
             </div>
 
-            {/* Store selector — compact inline */}
+            {/* Store selector — professional dropdown style */}
             {units.length > 1 && (
-              <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${units.length}, 1fr)` }}>
-                {units.map(unit => {
+              <div className="rounded-2xl border border-border/30 bg-card overflow-hidden">
+                {units.map((unit, i) => {
                   const isActive = unit.id === activeUnit?.id;
                   return (
                     <button
@@ -148,19 +148,25 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                         onOpenChange(false);
                       }}
                       className={cn(
-                        "flex items-center justify-center gap-1.5 px-2 py-2 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all min-w-0",
-                        isActive
-                          ? "bg-primary/15 text-foreground border border-primary/30"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                        "flex items-center gap-3 w-full px-4 py-3 transition-all active:scale-[0.98]",
+                        i > 0 && "border-t border-border/20",
+                        isActive ? "bg-primary/10" : "hover:bg-secondary/50"
                       )}
                     >
-                      <span
-                        className={cn(
-                          "w-2 h-2 rounded-full shrink-0",
-                          isActive ? "bg-emerald-400" : "bg-muted-foreground/40"
-                        )}
-                      />
-                      <span className="truncate">{unit.name}</span>
+                      <div className={cn(
+                        "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
+                        isActive ? "bg-primary/20" : "bg-secondary"
+                      )}>
+                        <AppIcon name="Store" size={18} className={isActive ? "text-primary" : "text-muted-foreground"} />
+                      </div>
+                      <div className="flex-1 min-w-0 text-left">
+                        <p className={cn("text-sm font-semibold truncate", isActive ? "text-foreground" : "text-muted-foreground")}>
+                          {unit.name}
+                        </p>
+                      </div>
+                      {isActive && (
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0 shadow-sm shadow-emerald-400/50" />
+                      )}
                     </button>
                   );
                 })}
@@ -171,9 +177,11 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
             {(plan === 'free') && (
               <button
                 onClick={() => { navigate('/plans'); onOpenChange(false); }}
-                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-muted hover:bg-muted/80 transition-all"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 transition-all"
               >
-                <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
+                <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
+                  <AppIcon name="WorkspacePremium" size={20} style={{ color: 'hsl(45 90% 55%)' }} />
+                </div>
                 <span className="text-sm font-semibold text-foreground">Upgrade de Plano</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>FREE</span>
               </button>
@@ -181,9 +189,11 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
             {(plan !== 'free' && isAdmin) && (
               <button
                 onClick={() => { navigate('/plans'); onOpenChange(false); }}
-                className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl bg-muted hover:bg-muted/80 transition-all"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 transition-all"
               >
-                <AppIcon name="Crown" size={20} style={{ color: 'hsl(45 90% 55%)', filter: 'drop-shadow(0 0 6px hsl(45 90% 55% / 0.4))' }} />
+                <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
+                  <AppIcon name="WorkspacePremium" size={20} style={{ color: 'hsl(45 90% 55%)' }} />
+                </div>
                 <span className="text-sm font-semibold text-foreground">Planos</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>{plan?.toUpperCase()}</span>
               </button>
