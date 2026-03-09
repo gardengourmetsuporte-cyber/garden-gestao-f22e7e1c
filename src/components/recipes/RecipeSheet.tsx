@@ -101,6 +101,7 @@ export function RecipeSheet({
       setYieldQuantity(String(recipe.yield_quantity));
       setYieldUnit(recipe.yield_unit);
       setNotes(recipe.preparation_notes || '');
+      setMinReadyStock(String(recipe.min_ready_stock ?? 0));
       setIngredients(
         (recipe.ingredients || []).map((ing) => ({
           id: ing.id,
