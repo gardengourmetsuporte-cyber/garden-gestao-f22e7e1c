@@ -474,6 +474,7 @@ export default function PDV() {
         />
       )}
 
+      <PinDialog
         open={cancelPinOpen}
         onOpenChange={setCancelPinOpen}
         title="Cancelar pedido"
