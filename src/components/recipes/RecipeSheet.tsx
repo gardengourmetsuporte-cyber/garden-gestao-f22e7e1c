@@ -152,6 +152,7 @@ export function RecipeSheet({
       setYieldUnit('unidade');
       setNotes('');
       setMinReadyStock('0');
+      setPackagingTemplateId('');
       setIngredients([]);
     }
   }, [recipe, open]);
