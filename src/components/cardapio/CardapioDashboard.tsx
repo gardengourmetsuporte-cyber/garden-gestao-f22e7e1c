@@ -130,6 +130,9 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
       {/* Delivery Time Widget */}
       <DeliveryTimeWidget unitId={unitId} onNavigate={onNavigate} />
 
+      {/* Auto-confirm Settings */}
+      <AutoConfirmWidget unitId={unitId} storeInfo={storeInfo} />
+
       {/* Warnings: Deactivated products */}
       {deactivatedProducts.length > 0 && (
         <div className="rounded-2xl bg-warning/5 border border-warning/20 p-4">
