@@ -109,17 +109,9 @@ export default function CardapioHub() {
   };
 
   // Internal tab for cardápio content
-  const [cardapioTab, setCardapioTab] = useState<CardapioTab>(isConfigFromUrl ? 'config' : 'produtos');
+  const [cardapioTab, setCardapioTab] = useState<CardapioTab>('produtos');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'menu' | 'ficha'>('menu');
-
-  useEffect(() => {
-    if (isConfigFromUrl) {
-      setCardapioTab('config');
-    } else if (cardapioTab === 'config') {
-      setCardapioTab('produtos');
-    }
-  }, [isConfigFromUrl]);
   const handleSelectGroup = useCallback((groupId: string) => {
     setSelectedGroupId(prev => prev === groupId ? null : groupId);
   }, []);
