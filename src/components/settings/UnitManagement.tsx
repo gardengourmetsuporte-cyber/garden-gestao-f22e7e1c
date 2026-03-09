@@ -128,14 +128,14 @@ async function cloneTemplates(sourceUnitId: string, targetUnitId: string, option
       const [{ data: srcCats }, { data: tgtCats }] = catResult;
       if (srcCats && tgtCats) {
         const tgtByName = new Map(tgtCats.map(c => [c.name, c.id]));
-        srcCats.forEach(c => { const t = tgtByName.get(c.name); if (t) categoryMap.set(c.id as string, t as string); });
+        srcCats.forEach(c => { const t = tgtByName.get(c.name); if (t) categoryMap.set(c.id as string, t as string string, t as string); });
       }
     }
     if (suppResult) {
       const [{ data: srcS }, { data: tgtS }] = suppResult;
       if (srcS && tgtS) {
         const tgtByName = new Map(tgtS.map(s => [s.name, s.id]));
-        srcS.forEach(s => { const t = tgtByName.get(s.name); if (t) supplierMap.set(s.id, t); });
+        srcS.forEach(s => { const t = tgtByName.get(s.name); if (t)  as string, t as stringplierMap.set(s.id, t); });
       }
     }
 
