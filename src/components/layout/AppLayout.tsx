@@ -31,7 +31,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
-  const { isTransitioning } = useUnit();
+  const { isTransitioning, activeUnit } = useUnit();
+  const customLogo = activeUnit?.store_info?.logo_url;
   const isMobile = useIsMobile();
   const isDashboard = location.pathname === '/';
   const moduleTitle = useMemo(() => getRouteTitle(location.pathname), [location.pathname]);
