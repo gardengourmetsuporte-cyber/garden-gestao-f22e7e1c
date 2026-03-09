@@ -206,106 +206,16 @@ export default function PDV() {
       </div>
 
       {/* Payment Sheet */}
-      <Sheet open={paymentOpen} onOpenChange={setPaymentOpen}>
-        <SheetContent side="bottom" className="max-h-[90vh] rounded-t-2xl flex flex-col">
-          <SheetHeader>
-            <SheetTitle>Pagamento — {formatPrice(pos.total)}</SheetTitle>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto space-y-4 mt-4 pb-4">
-            {/* Payments added */}
-            {payments.length > 0 && (
-              <div className="space-y-1.5">
-                {payments.map((p, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-secondary/40 rounded-xl px-3 py-2">
-                    <AppIcon name={PAYMENT_METHODS.find(m => m.key === p.method)?.icon || 'CreditCard'} size={16} className="text-muted-foreground" />
-                    <span className="text-sm flex-1">{PAYMENT_METHODS.find(m => m.key === p.method)?.label || p.method}</span>
-                    <span className="text-sm font-bold">{formatPrice(p.amount)}</span>
-                    <button onClick={() => removePayment(i)} className="text-destructive">
-                      <AppIcon name="X" size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Remaining */}
-            {remaining > 0 && (
-              <div className="text-center py-2">
-                <p className="text-xs text-muted-foreground">Falta</p>
-                <p className="text-2xl font-bold text-foreground">{formatPrice(remaining)}</p>
-              </div>
-            )}
-
-            {change > 0 && (
-              <div className="text-center py-2 bg-primary/10 rounded-xl">
-                <p className="text-xs text-muted-foreground">Troco</p>
-                <p className="text-2xl font-bold text-primary">{formatPrice(change)}</p>
-              </div>
-            )}
-
-            {/* Method selector */}
-            {remaining > 0 && (
-              <>
-                <div className="grid grid-cols-3 gap-2">
-                  {PAYMENT_METHODS.map(m => (
-                    <button
-                      key={m.key}
-                      onClick={() => setPayMethod(m.key)}
-                      className={cn(
-                        'flex flex-col items-center gap-1 p-3 rounded-xl border transition-all',
-                        payMethod === m.key ? 'border-primary bg-primary/10 text-primary' : 'border-border/50 text-muted-foreground'
-                      )}
-                    >
-                      <AppIcon name={m.icon} size={20} />
-                      <span className="text-[10px] font-medium">{m.label}</span>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex gap-2">
-                  <Input
-                    type="number"
-                    placeholder={`Valor (${formatPrice(remaining)})`}
-                    value={payAmount}
-                    onChange={e => setPayAmount(e.target.value)}
-                    className="flex-1"
-                    inputMode="decimal"
-                  />
-                  <Button onClick={addPayment} variant="outline">
-                    <AppIcon name="Plus" size={14} className="mr-1" />
-                    Adicionar
-                  </Button>
-                </div>
-
-                {/* Quick amount buttons for cash */}
-                {payMethod === 'cash' && (
-                  <div className="flex gap-2 flex-wrap">
-                    {[remaining, 10, 20, 50, 100, 200].filter(v => v >= remaining || v >= 10).slice(0, 5).map(v => (
-                      <button
-                        key={v}
-                        onClick={() => { setPayAmount(String(v)); }}
-                        className="px-3 py-1.5 rounded-lg bg-secondary text-xs font-medium"
-                      >
-                        {formatPrice(v)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Finalize */}
-            <Button
-              className="w-full"
-              size="lg"
-              disabled={pos.savingSale}
-              onClick={handleFinalize}
-            >
-              {pos.savingSale ? 'Finalizando...' : `Finalizar Venda — ${formatPrice(pos.total)}`}
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <PaymentSheet
+        open={paymentOpen}
+        onOpenChange={setPaymentOpen}
+        total={pos.total}
+        subtotal={pos.subtotal}
+        discount={pos.discount}
+        itemCount={pos.cart.reduce((s, i) => s + i.quantity, 0)}
+        savingSale={pos.savingSale}
+        onFinalize={handleFinalize}
+      />
 
       {/* Pending Orders Sheet */}
       <Sheet open={ordersOpen} onOpenChange={setOrdersOpen}>
