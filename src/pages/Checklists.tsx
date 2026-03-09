@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { DatePicker } from '@/components/ui/date-picker';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ChecklistView } from '@/components/checklists/ChecklistView';
 import { ChecklistSettings } from '@/components/checklists/ChecklistSettings';
+import { ChecklistReminderSheet } from '@/components/checklists/ChecklistReminderSheet';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -30,6 +32,7 @@ export default function ChecklistsPage() {
     reorderSectors, reorderSubcategories, reorderItems,
     isItemCompleted, getCompletionProgress, contestCompletion, splitCompletion,
   } = useChecklistPage();
+  const [reminderOpen, setReminderOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -53,19 +56,20 @@ export default function ChecklistsPage() {
     if (progress.percent === 100 || progress.total === 0) return null;
     return (
       <button
-        onClick={handleSendReminder}
-        disabled={sendingReminder}
+        onClick={() => setReminderOpen(true)}
         title="Lembrar equipe de completar o checklist"
         className={cn(
           "w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0",
           "hover:bg-amber-500/10 active:scale-95",
-          sendingReminder && "opacity-60 pointer-events-none"
         )}
       >
-        <AppIcon name="notifications" size={14} fill={0} className={cn("text-muted-foreground/60", sendingReminder && "animate-bounce text-amber-500")} />
+        <AppIcon name="notifications" size={14} fill={0} className="text-muted-foreground/60" />
       </button>
     );
   })() : null;
+
+  const currentProgress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
+  const pendingCount = currentProgress.total - currentProgress.completed;
 
   const sharedCardProps = {
     settingsMode, isAdmin, currentDate, deadlineSettings,
@@ -200,6 +204,13 @@ export default function ChecklistsPage() {
           </div>
         </div>
       </div>
+
+      <ChecklistReminderSheet
+        open={reminderOpen}
+        onOpenChange={setReminderOpen}
+        checklistType={checklistType as 'abertura' | 'fechamento'}
+        pendingCount={pendingCount}
+      />
     </AppLayout>
   );
 }
