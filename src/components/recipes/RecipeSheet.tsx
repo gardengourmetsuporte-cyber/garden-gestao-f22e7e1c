@@ -488,12 +488,28 @@ export function RecipeSheet({
                     <span className="text-muted-foreground">Ingredientes ({ingredients.length})</span>
                     <span className="font-medium">{formatCurrency(costPerPortion)}</span>
                   </div>
-                  {operationalCosts.packagingCost > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Embalagem</span>
-                      <span className="font-medium">{formatCurrency(operationalCosts.packagingCost)}</span>
+                  {/* Packaging template selector */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Embalagem</span>
+                      <span className="font-medium text-sm">{formatCurrency(packagingCost)}</span>
                     </div>
-                  )}
+                    <Select value={packagingTemplateId || 'none'} onValueChange={(v) => setPackagingTemplateId(v === 'none' ? '' : v)}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Selecionar embalagem..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">
+                          {operationalCosts.packagingCost > 0 ? `Padrão (${formatCurrency(operationalCosts.packagingCost)})` : 'Sem embalagem'}
+                        </SelectItem>
+                        {packagingTemplates.map((tpl) => (
+                          <SelectItem key={tpl.id} value={tpl.id}>
+                            {tpl.name} ({formatCurrency(tpl.total_cost)})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="flex justify-between text-sm font-semibold pt-1 border-t">
                     <span>Subtotal</span>
                     <span className="text-primary">{formatCurrency(variableCost)}</span>
