@@ -51,7 +51,21 @@ export function PDVDeliveryAddress({ value, onChange }: PDVDeliveryAddressProps)
     }
   }, []);
 
-  // Nominatim autocomplete
+  // Cache user location for proximity bias
+  const userLocationRef = useRef<{ lat: number; lon: number } | null>(null);
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLocationRef.current = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        },
+        () => { /* ignore errors */ },
+        { timeout: 5000, maximumAge: 300000 }
+      );
+    }
+  }, []);
+
+  // Nominatim autocomplete with proximity sorting
   useEffect(() => {
     if (mode !== 'search' || street.length < 4) {
       setSuggestions([]);
@@ -62,11 +76,25 @@ export function PDVDeliveryAddress({ value, onChange }: PDVDeliveryAddressProps)
     debounceRef.current = setTimeout(async () => {
       try {
         const q = encodeURIComponent(street);
+        const loc = userLocationRef.current;
+        // Build viewbox around user location (~30km radius) for proximity bias
+        const viewboxParam = loc
+          ? `&viewbox=${loc.lon - 0.3},${loc.lat + 0.3},${loc.lon + 0.3},${loc.lat - 0.3}`
+          : '';
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${q}&countrycodes=br&limit=5&addressdetails=0`,
+          `https://nominatim.openstreetmap.org/search?format=json&q=${q}&countrycodes=br&limit=8${viewboxParam}&addressdetails=0`,
           { headers: { 'Accept-Language': 'pt-BR' } }
         );
-        const data: NominatimResult[] = await res.json();
+        let data: NominatimResult[] = await res.json();
+        // Sort by distance to user if available
+        if (loc && data.length > 1) {
+          data.sort((a, b) => {
+            const distA = Math.hypot(parseFloat(a.lat) - loc.lat, parseFloat(a.lon) - loc.lon);
+            const distB = Math.hypot(parseFloat(b.lat) - loc.lat, parseFloat(b.lon) - loc.lon);
+            return distA - distB;
+          });
+          data = data.slice(0, 5);
+        }
         setSuggestions(data);
         setShowSuggestions(data.length > 0);
       } catch {
