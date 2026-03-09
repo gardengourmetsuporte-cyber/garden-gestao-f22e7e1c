@@ -95,7 +95,7 @@ export function usePOS() {
     // Delivery hub orders
     const { data: deliveryData } = await supabase
       .from('delivery_hub_orders')
-      .select('id, customer_name, customer_phone, total, status, created_at, platform')
+      .select('id, customer_name, customer_phone, customer_address, total, status, created_at, platform')
       .eq('unit_id', activeUnitId)
       .in('status', ['new', 'accepted', 'preparing', 'ready'])
       .order('created_at', { ascending: false });
