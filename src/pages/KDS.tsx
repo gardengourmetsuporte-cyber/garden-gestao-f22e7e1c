@@ -310,17 +310,18 @@ export default function KDS() {
         ]);
 
       try {
-        const res = await withTimeout(
-          supabase
-            .from('tablet_orders')
-            .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
-            .eq('unit_id', unitId)
-            .in('status', ACTIVE_STATUSES)
-            .order('created_at', { ascending: true })
-            .limit(50)
-            .then(r => r)
-        );
-        const { data, error } = res as { data: any; error: any };
+        const query = supabase
+          .from('tablet_orders')
+          .select('id, unit_id, table_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv))')
+          .eq('unit_id', unitId)
+          .in('status', ACTIVE_STATUSES)
+          .order('created_at', { ascending: true })
+          .limit(50);
+
+        const { data, error } = await withTimeout(
+          Promise.resolve(query)
+        ) as { data: any; error: any };
+
         console.log('[KDS] Query result:', { count: data?.length, error });
         if (error) {
           console.error('[KDS] Supabase error:', error);
