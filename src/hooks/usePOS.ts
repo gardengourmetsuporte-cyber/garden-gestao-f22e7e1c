@@ -304,7 +304,7 @@ export function usePOS() {
   }, [activeUnitId, user, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, clearCart, fetchPendingOrders]);
 
   // Send order (mesa/delivery) — creates a tablet_order instead of a sale
-  const sendOrder = useCallback(async () => {
+  const sendOrder = useCallback(async (paymentInfo?: { method: string; change: number }) => {
     if (!activeUnitId || !user?.id) return null;
     if (cart.length === 0) { toast.error('Carrinho vazio'); return null; }
 
@@ -324,18 +324,25 @@ export function usePOS() {
 
     setSavingSale(true);
     try {
+      const insertData: any = {
+        unit_id: activeUnitId,
+        table_number: tableNumber || 0,
+        status: 'pending',
+        total,
+        source: saleSource,
+        customer_name: customerName.trim() || null,
+        customer_phone: saleSource === 'delivery' ? deliveryPhone.replace(/\D/g, '') : null,
+        customer_address: saleSource === 'delivery' ? deliveryAddress.trim() : null,
+      };
+
+      if (paymentInfo) {
+        insertData.payment_method = paymentInfo.method;
+        insertData.payment_change = paymentInfo.change;
+      }
+
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
-        .insert({
-          unit_id: activeUnitId,
-          table_number: tableNumber || 0,
-          status: 'pending',
-          total,
-          source: saleSource,
-          customer_name: customerName.trim() || null,
-          customer_phone: saleSource === 'delivery' ? deliveryPhone.replace(/\D/g, '') : null,
-          customer_address: saleSource === 'delivery' ? deliveryAddress.trim() : null,
-        })
+        .insert(insertData)
         .select('id')
         .single();
 
