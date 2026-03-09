@@ -22,7 +22,7 @@ interface Props {
   onSelect?: (deliveryId: string) => void;
 }
 
-export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocation }: Props) {
+export function DeliveryCard({ delivery, selected, onStatusChange, onCardClick, onSetLocation, onEdit, onArchive, onSelect }: Props) {
   const addr = delivery.address;
   const cfg = STATUS_CONFIG[delivery.status];
   const StatusIcon = cfg.icon;
@@ -38,8 +38,8 @@ export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocat
 
   return (
     <div
-      className="group rounded-xl bg-background/50 hover:bg-background/80 border border-border/20 hover:border-border/40 transition-all duration-200 p-3 cursor-pointer active:scale-[0.98]"
-      onClick={() => onCardClick?.(delivery.id)}
+      className={`group rounded-xl bg-background/50 hover:bg-background/80 border transition-all duration-200 p-3 cursor-pointer active:scale-[0.98] ${selected ? 'border-primary/50 ring-2 ring-primary/20 bg-primary/5' : 'border-border/20 hover:border-border/40'}`}
+      onClick={() => onSelect ? onSelect(delivery.id) : onCardClick?.(delivery.id)}
     >
       {/* Top row: avatar + info + status */}
       <div className="flex items-start gap-3">
