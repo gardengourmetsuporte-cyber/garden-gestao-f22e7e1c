@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
-import type { MenuCategory, MenuGroup } from '@/hooks/useMenuAdmin';
+import type { MenuCategory, MenuGroup, MenuProduct } from '@/hooks/useMenuAdmin';
 
 const MENU_ICONS = [
   'restaurant', 'lunch_dining', 'local_pizza', 'ramen_dining', 'bakery_dining',
