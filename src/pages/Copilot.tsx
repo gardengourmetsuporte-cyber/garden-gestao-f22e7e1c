@@ -169,7 +169,7 @@ export default function CopilotPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-[calc(100vh-3.5rem)] lg:h-screen">
+      <div className="flex flex-col h-[calc(100vh-3.5rem-5rem)] lg:h-screen">
         {/* Toolbar */}
         <div className="shrink-0 border-b border-border/20 bg-card/60 backdrop-blur-sm">
           <div className="flex items-center gap-3 h-12 px-4">
