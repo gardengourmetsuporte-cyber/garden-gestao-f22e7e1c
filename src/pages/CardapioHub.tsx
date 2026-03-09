@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
 const CardapioConfigHubLazy = lazy(() => import('@/components/cardapio/CardapioConfigHub').then(m => ({ default: m.CardapioConfigHub })));
+const CardapioOrdersViewLazy = lazy(() => import('@/components/cardapio/CardapioOrdersView').then(m => ({ default: m.CardapioOrdersView })));
 
 type CardapioTab = 'produtos' | 'opcionais';
 
@@ -229,111 +230,12 @@ export default function CardapioHub() {
 
   // ==================== PEDIDOS (ORDERS) VIEW ====================
   if (isPedidosConfig) {
-    const today = new Date().toISOString().slice(0, 10);
-    const todayOrders = orders.filter(o => o.created_at.slice(0, 10) === today);
-    const olderOrders = orders.filter(o => o.created_at.slice(0, 10) !== today);
-
     return (
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
-          <div className="px-4 py-3 lg:px-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-foreground">Pedidos</h2>
-              {todayOrders.length > 0 && (
-                <span className="text-xs font-semibold text-muted-foreground bg-secondary/60 px-2.5 py-1 rounded-lg">
-                  {todayOrders.length} hoje
-                </span>
-              )}
-            </div>
-
-            {/* Summary chips */}
-            {todayOrders.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
-                {[
-                  { label: 'Pendentes', count: todayStats.pending, color: 'bg-warning/15 text-warning' },
-                  { label: 'Enviados', count: todayStats.sent, color: 'bg-success/15 text-success' },
-                  { label: 'Erros', count: todayStats.errors, color: 'bg-destructive/15 text-destructive' },
-                ].filter(c => c.count > 0).map(chip => (
-                  <div key={chip.label} className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap", chip.color)}>
-                    {chip.count} {chip.label}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {orders.length === 0 ? (
-              <EmptyState icon="ShoppingBag" title="Nenhum pedido" subtitle="Os pedidos do cardápio digital aparecerão aqui." />
-            ) : (
-              <>
-                {todayOrders.length > 0 && (
-                  <div className="space-y-2.5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50">Hoje</p>
-                    {todayOrders.map(order => {
-                      const st = getStatus(order.status);
-                      const items = order.tablet_order_items || [];
-                      return (
-                        <div key={order.id} className="rounded-2xl bg-card border border-border/40 p-4 space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-2.5">
-                              <div className={cn("w-2 h-2 rounded-full shrink-0 mt-0.5", st.dotColor)} />
-                              <div>
-                                <p className="text-sm font-bold text-foreground leading-tight">{getSourceLabel(order)}</p>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">
-                                  {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-extrabold text-foreground tabular-nums">{formatPrice(order.total)}</p>
-                              <span className={cn("text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-md inline-block mt-1", st.color)}>
-                                {st.label}
-                              </span>
-                            </div>
-                          </div>
-                          {items.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5">
-                              {items.slice(0, 4).map((item: any, idx: number) => (
-                                <span key={idx} className="text-[10px] text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                                  {item.quantity}× {item.tablet_products?.name || '?'}
-                                </span>
-                              ))}
-                              {items.length > 4 && (
-                                <span className="text-[10px] text-muted-foreground/60">+{items.length - 4}</span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {olderOrders.length > 0 && (
-                  <div className="space-y-2.5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50">Anteriores</p>
-                    {olderOrders.slice(0, 20).map(order => {
-                      const st = getStatus(order.status);
-                      return (
-                        <div key={order.id} className="rounded-2xl bg-card border border-border/40 p-3.5 flex items-center gap-3">
-                          <div className={cn("w-2 h-2 rounded-full shrink-0", st.dotColor)} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-foreground leading-tight">{getSourceLabel(order)}</p>
-                            <p className="text-[10px] text-muted-foreground">
-                              {new Date(order.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} · {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                              <span className={cn("ml-1.5 font-bold uppercase", st.color.includes('text-') ? st.color.split(' ').find(c => c.startsWith('text-')) : '')}>
-                                {st.label}
-                              </span>
-                            </p>
-                          </div>
-                          <p className="text-sm font-extrabold text-foreground tabular-nums">{formatPrice(order.total)}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+          <Suspense fallback={<div className="p-4 space-y-4"><Skeleton className="h-10 w-full rounded-xl" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-24 w-full rounded-2xl" /></div>}>
+            <CardapioOrdersViewLazy orders={orders} />
+          </Suspense>
         </div>
       </AppLayout>
     );
