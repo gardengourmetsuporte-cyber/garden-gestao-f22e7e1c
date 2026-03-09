@@ -172,12 +172,19 @@ export function useDigitalMenu(unitId: string | undefined, channel: 'tablet' | '
     queryKey: ['digital-menu', unitId, channel],
     queryFn: async () => {
       if (!unitId) return EMPTY_DATA;
-      return fetchDigitalMenuData(unitId, channel);
+      return Promise.race([
+        fetchDigitalMenuData(unitId, channel),
+        new Promise<DigitalMenuData>((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout ao carregar cardápio')), 12000)
+        ),
+      ]);
     },
     enabled: !!unitId,
     staleTime: 3 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   const menuData = data ?? EMPTY_DATA;

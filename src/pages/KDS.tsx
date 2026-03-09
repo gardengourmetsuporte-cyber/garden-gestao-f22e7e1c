@@ -298,7 +298,7 @@ export default function KDS() {
   const [selectedOrder, setSelectedOrder] = useState<KDSOrder | null>(null);
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
 
-  const { data: orders = [], isLoading } = useQuery({
+  const { data: orders = [], isPending, isFetching } = useQuery({
     queryKey: ['kds-orders', unitId],
     queryFn: async () => {
       if (!unitId) return [];
@@ -315,6 +315,8 @@ export default function KDS() {
     enabled: !!unitId,
     staleTime: 5_000,
     refetchInterval: 10_000,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   // Realtime
@@ -457,7 +459,7 @@ export default function KDS() {
       )}
 
       {/* Loading */}
-      {isLoading && (
+      {(isPending || (isFetching && orders.length === 0)) && (
         <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50">
           <RefreshCw className="w-8 h-8 animate-spin text-emerald-400" />
         </div>
