@@ -182,7 +182,16 @@ export default function Deliveries() {
     } catch {}
   };
 
-  if (isLoading) return <AppLayout><PageLoader /></AppLayout>;
+  if (isLoading) return (
+    <AppLayout>
+      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+        <div className="relative w-16 h-16 flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full border-2 border-primary/10" />
+          <div className="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-[spin_1s_ease-in-out_infinite]" />
+        </div>
+      </div>
+    </AppLayout>
+  );
 
   return (
     <AppLayout>
