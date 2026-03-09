@@ -118,7 +118,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
             </div>
           </div>
         </div>
-        <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => { setOrderSent(null); onClear(); resetFee(); }}>
+        <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => { setOrderSent(null); setSentAutoConfirmed(false); onClear(); resetFee(); }}>
           <AppIcon name="Plus" size={18} className="mr-2" />
           Fazer novo pedido
         </Button>
