@@ -372,6 +372,9 @@ export const ICON_MAP: Record<string, string> = {
   // Compliance / Safety
   FireExtinguisher: 'fire_hydrant_alt',
   KeyRound: 'vpn_key',
+  Key: 'vpn_key',
+  Plug: 'electrical_services',
+  Plug2: 'electrical_services',
   ShieldAlert: 'gpp_maybe',
   Recycle: 'recycling',
   Bug: 'pest_control',
