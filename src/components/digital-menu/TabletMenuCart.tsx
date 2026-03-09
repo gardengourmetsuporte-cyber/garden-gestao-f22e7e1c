@@ -72,14 +72,16 @@ export function TabletMenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRe
     );
   }
 
-  const withTimeout = async <T,>(promise: Promise<T>, ms: number, label: string): Promise<T> => {
+  const withTimeout = async <T,>(promiseLike: PromiseLike<T>, ms: number, label: string): Promise<T> => {
     let timeoutId: number | undefined;
     const timeoutPromise = new Promise<T>((_, reject) => {
       timeoutId = window.setTimeout(() => reject(new Error(`timeout:${label}`)), ms);
     });
 
     try {
-      return await Promise.race([promise, timeoutPromise]);
+      // Postgrest builders are PromiseLike (thenable), not real Promises.
+      const wrapped = Promise.resolve(promiseLike as any) as Promise<T>;
+      return await Promise.race([wrapped, timeoutPromise]);
     } finally {
       if (timeoutId) window.clearTimeout(timeoutId);
     }
