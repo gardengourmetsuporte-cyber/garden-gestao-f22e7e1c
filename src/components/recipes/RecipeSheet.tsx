@@ -163,9 +163,11 @@ export function RecipeSheet({
   const portions = parseFloat(yieldQuantity) || 1;
   const costPerPortion = ingredientsCost / portions;
 
+  // Use selling price for proportional fixed cost only when user manually set a price
+  const priceForFixedCost = marginMode === 'price' ? (parseFloat(sellingPrice) || undefined) : undefined;
   const operationalCosts = useMemo(
-    () => calculateOperationalCosts(costPerPortion),
-    [costPerPortion, settings]
+    () => calculateOperationalCosts(costPerPortion, priceForFixedCost),
+    [costPerPortion, priceForFixedCost, settings]
   );
 
   const variableCost = costPerPortion + operationalCosts.packagingCost;

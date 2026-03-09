@@ -4260,6 +4260,7 @@ export type Database = {
           fixed_cost_category_ids: string[] | null
           id: string
           monthly_products_sold: number
+          monthly_revenue: number
           packaging_cost_per_unit: number
           tax_percentage: number
           updated_at: string
@@ -4271,6 +4272,7 @@ export type Database = {
           fixed_cost_category_ids?: string[] | null
           id?: string
           monthly_products_sold?: number
+          monthly_revenue?: number
           packaging_cost_per_unit?: number
           tax_percentage?: number
           updated_at?: string
@@ -4282,6 +4284,7 @@ export type Database = {
           fixed_cost_category_ids?: string[] | null
           id?: string
           monthly_products_sold?: number
+          monthly_revenue?: number
           packaging_cost_per_unit?: number
           tax_percentage?: number
           updated_at?: string

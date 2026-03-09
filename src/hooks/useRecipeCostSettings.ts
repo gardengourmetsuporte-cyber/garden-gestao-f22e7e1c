@@ -4,17 +4,18 @@
  import { useUnit } from '@/contexts/UnitContext';
  import { toast } from 'sonner';
  
- export interface RecipeCostSettings {
-   id: string;
-   user_id: string;
-   monthly_products_sold: number;
-   tax_percentage: number;
-   card_fee_percentage: number;
-   packaging_cost_per_unit: number;
-   fixed_cost_category_ids: string[];
-   created_at: string;
-   updated_at: string;
- }
+export interface RecipeCostSettings {
+    id: string;
+    user_id: string;
+    monthly_products_sold: number;
+    monthly_revenue: number;
+    tax_percentage: number;
+    card_fee_percentage: number;
+    packaging_cost_per_unit: number;
+    fixed_cost_category_ids: string[];
+    created_at: string;
+    updated_at: string;
+  }
  
  export interface OperationalCosts {
    fixedCostPerProduct: number;
@@ -32,13 +33,14 @@
    parent_id: string | null;
  }
  
- const defaultSettings: Omit<RecipeCostSettings, 'id' | 'user_id' | 'created_at' | 'updated_at'> = {
-   monthly_products_sold: 1000,
-   tax_percentage: 0,
-   card_fee_percentage: 0,
-   packaging_cost_per_unit: 0,
-   fixed_cost_category_ids: [],
- };
+const defaultSettings: Omit<RecipeCostSettings, 'id' | 'user_id' | 'created_at' | 'updated_at'> = {
+    monthly_products_sold: 1000,
+    monthly_revenue: 50000,
+    tax_percentage: 0,
+    card_fee_percentage: 0,
+    packaging_cost_per_unit: 0,
+    fixed_cost_category_ids: [],
+  };
  
  export function useRecipeCostSettings() {
   const { user } = useAuth();
@@ -59,12 +61,13 @@
        
        if (error) throw error;
        
-       if (data) {
-         return {
-           ...data,
-           fixed_cost_category_ids: data.fixed_cost_category_ids || [],
-         } as RecipeCostSettings;
-       }
+        if (data) {
+          return {
+            ...data,
+            monthly_revenue: (data as any).monthly_revenue ?? 50000,
+            fixed_cost_category_ids: data.fixed_cost_category_ids || [],
+          } as RecipeCostSettings;
+        }
        
        return null;
      },
@@ -141,14 +144,15 @@
      mutationFn: async (newSettings: Partial<RecipeCostSettings>) => {
        if (!user?.id) throw new Error('User not logged in');
        
-       const payload = {
-         user_id: user.id,
-         monthly_products_sold: newSettings.monthly_products_sold ?? defaultSettings.monthly_products_sold,
-         tax_percentage: newSettings.tax_percentage ?? defaultSettings.tax_percentage,
-         card_fee_percentage: newSettings.card_fee_percentage ?? defaultSettings.card_fee_percentage,
-         packaging_cost_per_unit: newSettings.packaging_cost_per_unit ?? defaultSettings.packaging_cost_per_unit,
-         fixed_cost_category_ids: newSettings.fixed_cost_category_ids ?? defaultSettings.fixed_cost_category_ids,
-       };
+        const payload = {
+          user_id: user.id,
+          monthly_products_sold: newSettings.monthly_products_sold ?? defaultSettings.monthly_products_sold,
+          monthly_revenue: newSettings.monthly_revenue ?? defaultSettings.monthly_revenue,
+          tax_percentage: newSettings.tax_percentage ?? defaultSettings.tax_percentage,
+          card_fee_percentage: newSettings.card_fee_percentage ?? defaultSettings.card_fee_percentage,
+          packaging_cost_per_unit: newSettings.packaging_cost_per_unit ?? defaultSettings.packaging_cost_per_unit,
+          fixed_cost_category_ids: newSettings.fixed_cost_category_ids ?? defaultSettings.fixed_cost_category_ids,
+        };
        
        const { error } = await supabase
          .from('recipe_cost_settings')
@@ -166,25 +170,35 @@
      },
    });
  
-   // Calcular custos operacionais para um custo de ingredientes específico
-   const calculateOperationalCosts = (ingredientCost: number): OperationalCosts => {
-     const effectiveSettings = settings || defaultSettings;
-     const monthlyProducts = effectiveSettings.monthly_products_sold || 1000;
-     
-     const fixedCostPerProduct = monthlyProducts > 0 ? monthlyFixedCost / monthlyProducts : 0;
-     const taxAmount = ingredientCost * (effectiveSettings.tax_percentage / 100);
-     const cardFeeAmount = ingredientCost * (effectiveSettings.card_fee_percentage / 100);
-     const packagingCost = effectiveSettings.packaging_cost_per_unit;
-     
-     return {
-       fixedCostPerProduct,
-       taxAmount,
-       cardFeeAmount,
-       packagingCost,
-       totalOperational: fixedCostPerProduct + taxAmount + cardFeeAmount + packagingCost,
-       monthlyFixedCost,
-     };
-   };
+    // Calcular custos operacionais para um custo de ingredientes específico
+    // sellingPrice: preço de venda do produto para rateio proporcional de custos fixos
+    const calculateOperationalCosts = (ingredientCost: number, sellingPrice?: number): OperationalCosts => {
+      const effectiveSettings = settings || defaultSettings;
+      const monthlyRevenue = effectiveSettings.monthly_revenue || 50000;
+      
+      // Rateio proporcional: (preço de venda / receita mensal) × custo fixo mensal
+      let fixedCostPerProduct: number;
+      if (sellingPrice && sellingPrice > 0 && monthlyRevenue > 0) {
+        fixedCostPerProduct = (sellingPrice / monthlyRevenue) * monthlyFixedCost;
+      } else {
+        // Fallback: divisão simples por quantidade de produtos
+        const monthlyProducts = effectiveSettings.monthly_products_sold || 1000;
+        fixedCostPerProduct = monthlyProducts > 0 ? monthlyFixedCost / monthlyProducts : 0;
+      }
+      
+      const taxAmount = ingredientCost * (effectiveSettings.tax_percentage / 100);
+      const cardFeeAmount = ingredientCost * (effectiveSettings.card_fee_percentage / 100);
+      const packagingCost = effectiveSettings.packaging_cost_per_unit;
+      
+      return {
+        fixedCostPerProduct,
+        taxAmount,
+        cardFeeAmount,
+        packagingCost,
+        totalOperational: fixedCostPerProduct + taxAmount + cardFeeAmount + packagingCost,
+        monthlyFixedCost,
+      };
+    };
  
    return {
      settings: settings || defaultSettings,

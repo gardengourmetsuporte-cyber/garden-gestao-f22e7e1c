@@ -18,21 +18,23 @@ import { AppIcon } from '@/components/ui/app-icon';
      isSaving,
    } = useRecipeCostSettings();
  
-   const [monthlyProductsSold, setMonthlyProductsSold] = useState('1000');
-   const [taxPercentage, setTaxPercentage] = useState('0');
-   const [cardFeePercentage, setCardFeePercentage] = useState('0');
-   const [packagingCostPerUnit, setPackagingCostPerUnit] = useState('0');
+    const [monthlyProductsSold, setMonthlyProductsSold] = useState('1000');
+    const [monthlyRevenue, setMonthlyRevenue] = useState('50000');
+    const [taxPercentage, setTaxPercentage] = useState('0');
+    const [cardFeePercentage, setCardFeePercentage] = useState('0');
+    const [packagingCostPerUnit, setPackagingCostPerUnit] = useState('0');
    const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
  
    // Carregar valores quando settings mudar
    useEffect(() => {
-     if (settings && 'id' in settings) {
-       setMonthlyProductsSold(String(settings.monthly_products_sold || 1000));
-       setTaxPercentage(String(settings.tax_percentage || 0));
-       setCardFeePercentage(String(settings.card_fee_percentage || 0));
-       setPackagingCostPerUnit(String(settings.packaging_cost_per_unit || 0));
-       setSelectedCategoryIds(settings.fixed_cost_category_ids || []);
-     }
+      if (settings && 'id' in settings) {
+        setMonthlyProductsSold(String(settings.monthly_products_sold || 1000));
+        setMonthlyRevenue(String((settings as any).monthly_revenue || 50000));
+        setTaxPercentage(String(settings.tax_percentage || 0));
+        setCardFeePercentage(String(settings.card_fee_percentage || 0));
+        setPackagingCostPerUnit(String(settings.packaging_cost_per_unit || 0));
+        setSelectedCategoryIds(settings.fixed_cost_category_ids || []);
+      }
    }, [settings]);
  
    const handleToggleCategory = (categoryId: string) => {
@@ -44,18 +46,21 @@ import { AppIcon } from '@/components/ui/app-icon';
    };
  
    const handleSave = () => {
-     saveSettings({
-       monthly_products_sold: parseFloat(monthlyProductsSold) || 1000,
-       tax_percentage: parseFloat(taxPercentage) || 0,
-       card_fee_percentage: parseFloat(cardFeePercentage) || 0,
-       packaging_cost_per_unit: parseFloat(packagingCostPerUnit) || 0,
-       fixed_cost_category_ids: selectedCategoryIds,
-     });
+      saveSettings({
+        monthly_products_sold: parseFloat(monthlyProductsSold) || 1000,
+        monthly_revenue: parseFloat(monthlyRevenue) || 50000,
+        tax_percentage: parseFloat(taxPercentage) || 0,
+        card_fee_percentage: parseFloat(cardFeePercentage) || 0,
+        packaging_cost_per_unit: parseFloat(packagingCostPerUnit) || 0,
+        fixed_cost_category_ids: selectedCategoryIds,
+      });
    };
  
-   const costPerProduct = parseFloat(monthlyProductsSold) > 0
-     ? monthlyFixedCost / parseFloat(monthlyProductsSold)
-     : 0;
+    const examplePrice = 30;
+    const revenue = parseFloat(monthlyRevenue) || 50000;
+    const costPerProduct = revenue > 0
+      ? (examplePrice / revenue) * monthlyFixedCost
+      : 0;
  
    const formatCurrency = (value: number) =>
      new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -85,36 +90,36 @@ import { AppIcon } from '@/components/ui/app-icon';
                <AppIcon name="Calculator" className="h-4 w-4" />
                Rateio de Custos Fixos
              </CardTitle>
-             <CardDescription>
-               Os custos fixos do financeiro serão divididos pela quantidade de produtos vendidos
-             </CardDescription>
+              <CardDescription>
+                Os custos fixos do financeiro serão distribuídos proporcionalmente ao preço de venda de cada produto
+              </CardDescription>
            </CardHeader>
            <CardContent className="space-y-4">
-             <div className="space-y-2">
-               <Label htmlFor="monthly-products" className="flex items-center gap-2">
-                 Média de produtos vendidos por mês
-                 <Tooltip>
-                   <TooltipTrigger>
-                     <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
-                   </TooltipTrigger>
-                   <TooltipContent className="max-w-xs">
-                     Informe quantos produtos você vende em média por mês.
-                     Esse número será usado para dividir os custos fixos.
-                   </TooltipContent>
-                 </Tooltip>
-               </Label>
-               <div className="flex items-center gap-2">
-                 <Input
-                   id="monthly-products"
-                   type="number"
-                   value={monthlyProductsSold}
-                   onChange={(e) => setMonthlyProductsSold(e.target.value)}
-                   min="1"
-                   className="max-w-[200px]"
-                 />
-                 <span className="text-sm text-muted-foreground">produtos</span>
-               </div>
-             </div>
+              <div className="space-y-2">
+                <Label htmlFor="monthly-revenue" className="flex items-center gap-2">
+                  Faturamento mensal estimado
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      Informe sua receita bruta mensal estimada.
+                      O custo fixo de cada produto será calculado proporcionalmente ao seu preço de venda em relação a esse faturamento.
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">R$</span>
+                  <Input
+                    id="monthly-revenue"
+                    type="number"
+                    value={monthlyRevenue}
+                    onChange={(e) => setMonthlyRevenue(e.target.value)}
+                    min="1"
+                    className="max-w-[200px]"
+                  />
+                </div>
+              </div>
  
              {/* Categorias de Custo Fixo */}
              <div className="space-y-3">
@@ -157,17 +162,27 @@ import { AppIcon } from '@/components/ui/app-icon';
                )}
              </div>
  
-             {/* Resumo do Custo Fixo */}
-             <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-               <div className="flex justify-between text-sm">
-                 <span className="text-muted-foreground">Custo Fixo Mensal:</span>
-                 <span className="font-medium">{formatCurrency(monthlyFixedCost)}</span>
-               </div>
-               <div className="flex justify-between text-sm">
-                 <span className="text-muted-foreground">Custo por Produto:</span>
-                 <span className="font-bold text-primary">{formatCurrency(costPerProduct)}</span>
-               </div>
-             </div>
+              {/* Resumo do Custo Fixo */}
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Custo Fixo Mensal:</span>
+                  <span className="font-medium">{formatCurrency(monthlyFixedCost)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Faturamento Estimado:</span>
+                  <span className="font-medium">{formatCurrency(revenue)}</span>
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <p className="text-xs text-muted-foreground mb-1">Exemplo de rateio proporcional:</p>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Produto de R$ {examplePrice}:</span>
+                    <span className="font-bold text-primary">{formatCurrency(costPerProduct)}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground italic">
+                  Fórmula: (Preço do Produto ÷ Faturamento Mensal) × Custo Fixo
+                </p>
+              </div>
            </CardContent>
          </Card>
  
