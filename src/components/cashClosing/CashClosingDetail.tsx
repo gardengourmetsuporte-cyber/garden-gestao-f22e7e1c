@@ -40,7 +40,41 @@ import { AppIcon } from '@/components/ui/app-icon';
    const [divergentNotes, setDivergentNotes] = useState('');
    const [showReceipt, setShowReceipt] = useState(false);
 
-   // Edit mode
+    // Cancelled orders for this closing date
+    const [cancelledOrders, setCancelledOrders] = useState<{ source: string; customer_name: string | null; total: number; created_at: string }[]>([]);
+    const [cancelledTotal, setCancelledTotal] = useState(0);
+
+    useEffect(() => {
+      async function fetchCancelled() {
+        if (!closing.unit_id) return;
+        const dateStr = closing.date;
+
+        // Fetch cancelled tablet_orders
+        const { data: tabletCancelled } = await supabase
+          .from('tablet_orders')
+          .select('source, customer_name, total, created_at')
+          .eq('unit_id', closing.unit_id)
+          .eq('status', 'cancelled')
+          .gte('created_at', `${dateStr}T00:00:00`)
+          .lt('created_at', `${dateStr}T23:59:59.999`);
+
+        // Fetch cancelled pos_sales
+        const { data: salesCancelled } = await supabase
+          .from('pos_sales')
+          .select('source, customer_name, total, created_at')
+          .eq('unit_id', closing.unit_id)
+          .eq('status', 'cancelled')
+          .gte('created_at', `${dateStr}T00:00:00`)
+          .lt('created_at', `${dateStr}T23:59:59.999`);
+
+        const all = [...(tabletCancelled || []), ...(salesCancelled || [])];
+        setCancelledOrders(all);
+        setCancelledTotal(all.reduce((s, o) => s + (o.total || 0), 0));
+      }
+      fetchCancelled();
+    }, [closing.unit_id, closing.date]);
+
+    // Edit mode
    const [isEditing, setIsEditing] = useState(false);
    const [isSaving, setIsSaving] = useState(false);
    const [editDate, setEditDate] = useState(closing.date);
