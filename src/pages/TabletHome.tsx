@@ -36,23 +36,30 @@ export default function TabletHome() {
           new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout ao carregar página')), ms)),
         ]);
 
-      const [unitRes, rodizioRes] = await withTimeout(Promise.all([
-        supabase.from('units').select('name, store_info').eq('id', unitId).single(),
-        supabase
-          .from('rodizio_settings')
-          .select('is_active, price, description, time_limit_minutes')
-          .eq('unit_id', unitId)
-          .eq('is_active', true)
-          .maybeSingle(),
-      ]));
+      try {
+        const [unitRes, rodizioRes] = await withTimeout(Promise.all([
+          supabase.from('units').select('name, store_info').eq('id', unitId).single(),
+          supabase
+            .from('rodizio_settings')
+            .select('is_active, price, description, time_limit_minutes')
+            .eq('unit_id', unitId)
+            .eq('is_active', true)
+            .maybeSingle(),
+        ]));
 
-      if (unitRes.error) throw unitRes.error;
-      if (rodizioRes.error) throw rodizioRes.error;
+        if (unitRes.error) throw unitRes.error;
+        if (rodizioRes.error) throw rodizioRes.error;
 
-      return {
-        unit: (unitRes.data as { name: string; store_info: StoreInfo | null }) ?? null,
-        rodizio: (rodizioRes.data as RodizioSettings | null) ?? null,
-      };
+        return {
+          unit: (unitRes.data as { name: string; store_info: StoreInfo | null }) ?? null,
+          rodizio: (rodizioRes.data as RodizioSettings | null) ?? null,
+        };
+      } catch (err: any) {
+        const msg = String(err?.message || '');
+        const isAbort = err?.name === 'AbortError' || msg.toLowerCase().includes('abort');
+        if (isAbort) throw new Error('Conexão instável. Tente novamente.');
+        throw err;
+      }
     },
     enabled: !!unitId,
     staleTime: 3 * 60 * 1000,
