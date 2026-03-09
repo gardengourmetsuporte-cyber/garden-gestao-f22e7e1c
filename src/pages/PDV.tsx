@@ -270,6 +270,11 @@ export default function PDV() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Sales History Sheet */}
+      <SalesHistorySheet open={historyOpen} onOpenChange={setHistoryOpen} />
     </AppLayout>
+  );
+}
   );
 }
