@@ -366,6 +366,27 @@ export function RecipeSheet({
                     </Select>
                   </div>
                 </div>
+
+                {/* Min Ready Stock */}
+                <div className="space-y-2">
+                  <Label htmlFor="minReadyStock">Estoque mínimo de produção</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="minReadyStock"
+                      type="number"
+                      value={minReadyStock}
+                      onChange={(e) => setMinReadyStock(e.target.value)}
+                      min="0"
+                      step="1"
+                      placeholder="0"
+                      className="w-24"
+                    />
+                    <span className="text-sm text-muted-foreground">{yieldUnit} prontos</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Defina o mínimo para gerar ordens de produção automaticamente (0 = desativado)
+                  </p>
+                </div>
               </div>
 
               <Separator />
