@@ -206,6 +206,7 @@ export function useCashRegister() {
           receipt_url: '',
           status: 'pending',
           notes: notes ? `[PDV] ${notes}` : '[PDV] Fechamento automático via PDV',
+          expenses: expenses && expenses.length > 0 ? expenses : null,
         })
         .select('id')
         .single();
