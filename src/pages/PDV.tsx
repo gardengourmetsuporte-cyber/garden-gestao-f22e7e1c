@@ -349,7 +349,7 @@ export default function PDV() {
             <Button
               className="w-full"
               size="lg"
-              disabled={paymentTotal < pos.total || pos.savingSale}
+              disabled={pos.savingSale}
               onClick={handleFinalize}
             >
               {pos.savingSale ? 'Finalizando...' : `Finalizar Venda — ${formatPrice(pos.total)}`}
