@@ -148,13 +148,15 @@ export function MenuCategoryTree({
 
   return (
     <div className="space-y-2">
-      {/* Add category button */}
-      <button
-        onClick={openNewCategory}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary transition-all active:scale-[0.97] bg-primary/[0.06] border border-dashed border-primary/20 hover:bg-primary/[0.1]"
-      >
-        <AppIcon name="Plus" size={16} /> Nova Categoria
-      </button>
+      {/* Add category button - only in menu mode */}
+      {viewMode !== 'ficha' && (
+        <button
+          onClick={openNewCategory}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary transition-all active:scale-[0.97] bg-primary/[0.06] border border-dashed border-primary/20 hover:bg-primary/[0.1]"
+        >
+          <AppIcon name="Plus" size={16} /> Nova Categoria
+        </button>
+      )}
 
       {categories.map(cat => {
         const expanded = expandedCats.has(cat.id);
@@ -229,24 +231,26 @@ export function MenuCategoryTree({
                   />
                 )}
               </button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="p-3 rounded-lg hover:bg-secondary/60 mr-2 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
-                    <AppIcon name="MoreVertical" size={14} className="text-muted-foreground/50" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => openNewGroup(cat.id)}>
-                    <AppIcon name="Plus" size={14} className="mr-2" /> Novo Grupo
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => openEditCategory(cat)}>
-                    <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onDeleteCategory(cat.id)} className="text-destructive">
-                    <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {viewMode !== 'ficha' && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-3 rounded-lg hover:bg-secondary/60 mr-2 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
+                      <AppIcon name="MoreVertical" size={14} className="text-muted-foreground/50" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => openNewGroup(cat.id)}>
+                      <AppIcon name="Plus" size={14} className="mr-2" /> Novo Grupo
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openEditCategory(cat)}>
+                      <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onDeleteCategory(cat.id)} className="text-destructive">
+                      <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
 
             {expanded && (
@@ -324,21 +328,23 @@ export function MenuCategoryTree({
                             </div>
                           )}
                         </button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button className="p-2.5 rounded-lg hover:bg-secondary/60 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
-                              <AppIcon name="MoreVertical" size={12} className="text-muted-foreground" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openEditGroup(grp)}>
-                              <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => onDeleteGroup(grp.id)} className="text-destructive">
-                              <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        {viewMode !== 'ficha' && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button className="p-2.5 rounded-lg hover:bg-secondary/60 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
+                                <AppIcon name="MoreVertical" size={12} className="text-muted-foreground" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => openEditGroup(grp)}>
+                                <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => onDeleteGroup(grp.id)} className="text-destructive">
+                                <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </div>
                       {isSelected && renderGroupContent && (
                         <div className="mt-2 mb-1">
@@ -348,12 +354,14 @@ export function MenuCategoryTree({
                     </div>
                   );
                 })}
-                <button
-                  onClick={() => openNewGroup(cat.id)}
-                  className="flex items-center gap-2 px-3 py-2 text-xs text-primary hover:bg-primary/5 rounded-xl transition-all w-full active:scale-[0.98]"
-                >
-                  <AppIcon name="Plus" size={12} /> Adicionar grupo
-                </button>
+                {viewMode !== 'ficha' && (
+                  <button
+                    onClick={() => openNewGroup(cat.id)}
+                    className="flex items-center gap-2 px-3 py-2 text-xs text-primary hover:bg-primary/5 rounded-xl transition-all w-full active:scale-[0.98]"
+                  >
+                    <AppIcon name="Plus" size={12} /> Adicionar grupo
+                  </button>
+                )}
               </div>
             )}
           </div>
