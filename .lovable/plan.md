@@ -1,45 +1,25 @@
 
 
-## Plano: Substituir saudação por header contextual integrado ao top bar
+## Correção: Layout bugado dos botões no PDV (mobile)
 
-### O que muda
+### Problema identificado
+Na tela do PDV em mobile, os botões de ação ("Cancelar Pedido", "Cobrar", "Enviar Pedido") estão sendo cortados/truncados porque o container `flex gap-2` não tem tratamento para overflow. O texto "Enviar P..." está claramente cortado no screenshot.
 
-A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
+### Solução
 
-### Conceito visual
+**Arquivo: `src/pages/PDV.tsx`**
 
-```text
-┌──────────────────────────────────┐
-│  [logo]          [bell] [avatar] │  ← top bar (já existe)
-├──────────────────────────────────┤
-│                                  │
-│  Olá, Bruno                      │  ← greeting inline, menor
-│  ┌────────┐ ┌────────┐ ┌──────┐ │
-│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
-│  │pendente│ │tarefas │ │alertas│ │     dados do dia
-│  └────────┘ └────────┘ └──────┘ │
-│                                  │
-└──────────────────────────────────┘
-```
+1. **Reorganizar o layout dos botões de ação** — mudar de uma linha horizontal para um layout que se adapte melhor ao mobile:
+   - Colocar o total e os botões em linhas separadas no mobile
+   - Usar `flex-wrap` nos botões para que eles quebrem linha se necessário
+   - Reduzir o texto dos botões ou usar ícones-only em telas menores
 
-### Implementação
+2. **Ajuste específico**:
+   - Trocar o container dos botões de `flex gap-2` para `flex gap-2 flex-wrap justify-end`
+   - Garantir que os botões usem texto mais curto: "Cancelar" ao invés de "Cancelar Pedido", "Enviar" ao invés de "Enviar Pedido"
+   - Mover a seção de total+botões para um layout em coluna no mobile (`flex flex-col gap-2`)
 
-1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
-
-2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
-   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
-   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
-     - Contas a vencer (se houver)
-     - Checklists pendentes
-     - Pedidos pendentes
-     - Tarefas da agenda
-   - Cada pill é clicável e navega para o módulo correspondente
-   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
-   - Sem data, sem frase motivacional — informação pura e acionável
-
-3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
-
-### Resultado
-
-Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
+3. **Layout proposto**:
+   - Linha 1: Total à esquerda
+   - Linha 2: Botões alinhados à direita com `flex-wrap`
 
