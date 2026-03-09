@@ -175,6 +175,31 @@ export default function TabletDigitalMenu() {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
+      {/* Auth modal */}
+      {showAuth && (
+        <MenuCustomerAuth
+          unitName={unit?.name}
+          logoUrl={unit?.store_info?.logo_url}
+          cuisineType={unit?.store_info?.cuisine_type}
+          city={unit?.store_info?.city}
+          isOpen={true}
+          bonusPoints={signupBonus}
+          onSkip={() => setShowAuth(false)}
+          onEmailLogin={() => setShowAuth(false)}
+        />
+      )}
+
+      {/* Profile completion modal */}
+      {showProfile && customerUser && (
+        <MenuCustomerProfile
+          unitName={unit?.name}
+          logoUrl={unit?.store_info?.logo_url}
+          defaultName={customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || ''}
+          defaultEmail={customerUser.email}
+          onComplete={handleProfileComplete}
+          onBack={() => setShowProfile(false)}
+        />
+      )}
       {/* Header */}
       <header className="flex items-center gap-4 px-6 py-3 border-b border-border/30 bg-card/80 backdrop-blur-sm shrink-0">
         {/* Back button */}
