@@ -113,11 +113,13 @@ function OrderCard({
         <div className="flex items-center gap-1.5">
           {source === 'delivery' ? (
             <Truck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+          ) : source === 'qrcode' ? (
+            <Hash className="w-3.5 h-3.5 text-purple-400 shrink-0" />
           ) : (
             <UtensilsCrossed className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
           )}
           <span className="text-xs font-semibold text-white/70 truncate">
-            {source === 'delivery' ? 'Delivery' : `Mesa ${order.table_number}`}
+            {source === 'delivery' ? 'Delivery' : source === 'qrcode' ? `QR · Mesa ${order.table_number}` : `Mesa ${order.table_number}`}
           </span>
           {order.customer_name && (
             <span className="text-[10px] text-white/40 truncate ml-auto">{order.customer_name}</span>
