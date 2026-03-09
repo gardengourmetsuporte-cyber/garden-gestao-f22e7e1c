@@ -169,7 +169,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         .insert({
         unit_id: unitId,
         table_number: 0,
-        status: autoConfirm ? 'confirmed' : 'awaiting_confirmation',
+        status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
         total: grandTotal,
         source: 'delivery',
         customer_name: customerName.trim(),
