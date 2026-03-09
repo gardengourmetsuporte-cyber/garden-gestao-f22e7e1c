@@ -114,10 +114,13 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
       // Update local state immediately
       const total_cost = calculateIngredientCost(newPrice, displayUnit, ingredient.quantity, ingredient.unit_type);
       onChange({ item_price: newPrice, total_cost });
-    } finally {
-      setIsSavingPrice(false);
       setShowGlobalWarning(false);
       setEditingPrice(false);
+    } catch (err) {
+      console.error('Erro ao salvar preço global:', err);
+    } finally {
+      setIsSavingPrice(false);
+    }
     }
   };
 
