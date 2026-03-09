@@ -428,6 +428,18 @@ export default function PDV() {
 
       <SalesHistorySheet open={historyOpen} onOpenChange={setHistoryOpen} />
 
+      <DeliveryPaymentSheet
+        open={deliveryPaymentOpen}
+        onOpenChange={setDeliveryPaymentOpen}
+        total={pos.total}
+        customerName={pos.customerName}
+        sending={pos.savingSale}
+        onConfirm={async (method, change) => {
+          const orderId = await pos.sendOrder({ method, change });
+          if (orderId) setDeliveryPaymentOpen(false);
+        }}
+      />
+
       <PinDialog
         open={cancelPinOpen}
         onOpenChange={setCancelPinOpen}
