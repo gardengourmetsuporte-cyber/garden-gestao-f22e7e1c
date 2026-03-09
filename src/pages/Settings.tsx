@@ -35,22 +35,25 @@ interface MenuItem {
 }
 
 const allMenuItems: MenuItem[] = [
-  { value: 'plan', icon: 'Crown', label: 'Meu Plano', description: 'Gerencie sua assinatura', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
+  // Conta
   { value: 'profile', icon: 'User', label: 'Perfil', description: 'Nome, avatar e dados pessoais', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
+  { value: 'plan', icon: 'Crown', label: 'Meu Plano', description: 'Gerencie sua assinatura', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'appearance', icon: 'Palette', label: 'Aparência', description: 'Tema claro ou escuro', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'notifications', icon: 'BellRing', label: 'Notificações', description: 'Push, som e categorias de alerta', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
   { value: 'team', icon: 'Users', label: 'Equipe', description: 'Membros, convites e níveis de acesso', variant: 'cyan', section: 'Conta', requiredPlan: 'free' },
+  // Operação
   { value: 'categories', icon: 'Tag', label: 'Categorias', description: 'Categorias de estoque', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
   { value: 'suppliers', icon: 'Truck', label: 'Fornecedores', description: 'Cadastro de fornecedores', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
   { value: 'checklists', icon: 'ClipboardCheck', label: 'Checklists', description: 'Setores, itens e pontuação', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
-  { value: 'payments', icon: 'Wallet', label: 'Métodos de Pagamento', description: 'Taxas e prazos de recebimento', variant: 'amber', section: 'Operação', requiredPlan: 'pro' },
   { value: 'costs', icon: 'Calculator', label: 'Custos de Receitas', description: 'Percentuais e markups', variant: 'amber', section: 'Operação', requiredPlan: 'pro' },
+  { value: 'payments', icon: 'Wallet', label: 'Métodos de Pagamento', description: 'Taxas e prazos de recebimento', variant: 'amber', section: 'Operação', requiredPlan: 'pro' },
+  { value: 'cardapio-digital', icon: 'UtensilsCrossed', label: 'Cardápio Digital', description: 'PDV, mesas, QR e roleta', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
+  // Sistema
+  { value: 'units', icon: 'Store', label: 'Lojas', description: 'Gerenciar suas lojas', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
   { value: 'rewards', icon: 'Gift', label: 'Loja de Recompensas', description: 'Prêmios para colaboradores', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
   { value: 'medals', icon: 'Award', label: 'Medalhas', description: 'Conceder medalhas de prestígio', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
-  { value: 'units', icon: 'Store', label: 'Lojas', description: 'Gerenciar suas lojas', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
-  { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
-  { value: 'cardapio-digital', icon: 'UtensilsCrossed', label: 'Cardápio Digital', description: 'PDV, mesas, QR e roleta', variant: 'amber', section: 'Operação', requiredPlan: 'free' },
   { value: 'loyalty', icon: 'Heart', label: 'Fidelidade', description: 'Regras de pontos e recompensas', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
+  { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
   { value: 'system-backup', icon: 'HardDrive', label: 'Backup Geral', description: 'Backup completo de todos os dados', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
 ];
 
