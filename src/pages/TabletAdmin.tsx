@@ -139,7 +139,7 @@ export default function TabletAdmin() {
         {activeUnit && (
           <div className="flex items-center justify-end">
             <a
-              href={`/tablet/${activeUnit.id}`}
+              href={`/tablet/${activeUnit.id}/menu?mesa=1`}
               target="_blank"
               rel="noopener"
               className="flex items-center gap-1.5 text-xs text-primary font-medium bg-primary/10 px-3 py-1.5 rounded-lg"

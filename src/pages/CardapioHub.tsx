@@ -375,7 +375,7 @@ export default function CardapioHub() {
                 return (
                   <MenuLinksBar
                     publicUrl={`${baseUrl}/m/${activeUnit.id}`}
-                    tabletUrl={`${baseUrl}/tablet/${activeUnit.id}`}
+                    tabletUrl={`${baseUrl}/tablet/${activeUnit.id}/menu?mesa=1`}
                     kdsUrl={`${baseUrl}/kds/${activeUnit.id}`}
                   />
                 );
