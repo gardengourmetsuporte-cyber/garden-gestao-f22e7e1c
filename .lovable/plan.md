@@ -1,45 +1,30 @@
 
 
-## Plano: Substituir saudação por header contextual integrado ao top bar
+## Plano: Automatizar aceite de pedidos e migrar gestão para o PDV
 
-### O que muda
+### Problema
+A tela "Central de Pedidos" (aba `?tab=pedidos` no CardapioHub) é redundante. Pedidos deveriam ser aceitos automaticamente, e o gerenciamento de status deve acontecer no **PDV** (PendingOrdersSheet), **KDS** e **Entregas**.
 
-A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
+### Mudanças
 
-### Conceito visual
+**1. Auto-aceitar pedidos no banco de dados**
+- Criar migration com trigger que seta `status = 'preparing'` automaticamente quando um novo pedido é inserido na tabela `tablet_orders` (em vez de ficar como `pending`/`awaiting_confirmation`).
+- Pedidos já nascem como "Preparando", eliminando a necessidade de aceite manual.
 
-```text
-┌──────────────────────────────────┐
-│  [logo]          [bell] [avatar] │  ← top bar (já existe)
-├──────────────────────────────────┤
-│                                  │
-│  Olá, Bruno                      │  ← greeting inline, menor
-│  ┌────────┐ ┌────────┐ ┌──────┐ │
-│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
-│  │pendente│ │tarefas │ │alertas│ │     dados do dia
-│  └────────┘ └────────┘ └──────┘ │
-│                                  │
-└──────────────────────────────────┘
-```
+**2. Adicionar botões de status no detalhe do pedido no PDV (`PendingOrdersSheet.tsx`)**
+- No footer do `OrderDetailSheet`, além de "Adicionar itens", "Cobrar" e "Despachar", adicionar botões contextuais baseados no status atual:
+  - **Preparando** → botão "Marcar como Pronto"
+  - **Pronto** → botão "Entregue" (mesa/balcão) ou "Despachar" (delivery)
+  - **Cancelar** → botão secundário disponível enquanto não entregue
+- Lógica de update de status via Supabase direto no componente.
 
-### Implementação
+**3. Remover a aba "Pedidos" do CardapioHub**
+- Remover o bloco `if (isPedidos)` do `CardapioHub.tsx` e a referência ao `UnifiedOrdersPanel`.
+- Remover a aba "Pedidos" da navegação/tabs do hub do cardápio.
+- O componente `UnifiedOrdersPanel.tsx` pode ser mantido por ora (dead code cleanup futuro).
 
-1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
-
-2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
-   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
-   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
-     - Contas a vencer (se houver)
-     - Checklists pendentes
-     - Pedidos pendentes
-     - Tarefas da agenda
-   - Cada pill é clicável e navega para o módulo correspondente
-   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
-   - Sem data, sem frase motivacional — informação pura e acionável
-
-3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
-
-### Resultado
-
-Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
+### Arquivos afetados
+- **Nova migration SQL** — trigger de auto-aceite
+- `src/components/pdv/PendingOrdersSheet.tsx` — botões de status contextual no detalhe
+- `src/pages/CardapioHub.tsx` — remover view de pedidos
 
