@@ -77,6 +77,9 @@ export default function PDV() {
               className="pl-9 h-10"
             />
           </div>
+          <Button variant="outline" size="icon" className="shrink-0" onClick={() => setHistoryOpen(true)}>
+            <AppIcon name="Receipt" size={18} />
+          </Button>
           <Button variant="outline" size="icon" className="shrink-0 relative" onClick={() => setOrdersOpen(true)}>
             <AppIcon name="ClipboardList" size={18} />
             {pos.pendingOrders.length > 0 && (
