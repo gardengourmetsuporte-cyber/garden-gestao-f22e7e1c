@@ -391,9 +391,12 @@ export default function PDV() {
                   <div className="space-y-1.5">
                     <div className="flex gap-1.5">
                       <Input placeholder="Nome do cliente" value={pos.customerName} onChange={e => pos.setCustomerName(e.target.value)} className="h-8 text-xs flex-1 rounded-xl" />
-                      <Input placeholder="Telefone" value={pos.deliveryPhone} onChange={e => pos.setDeliveryPhone(e.target.value)} className="h-8 text-xs w-28 rounded-xl" />
+                      <Input placeholder="Telefone" value={pos.deliveryPhone} onChange={e => pos.setDeliveryPhone(e.target.value)} className="h-8 text-xs w-28 rounded-xl" inputMode="tel" />
                     </div>
-                    <Input placeholder="Endereço de entrega" value={pos.deliveryAddress} onChange={e => pos.setDeliveryAddress(e.target.value)} className="h-8 text-xs rounded-xl" />
+                    <PDVDeliveryAddress
+                      value={pos.deliveryAddress}
+                      onChange={pos.setDeliveryAddress}
+                    />
                   </div>
                 )}
 
