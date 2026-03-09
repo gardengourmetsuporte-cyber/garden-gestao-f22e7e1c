@@ -69,7 +69,7 @@ export default function PDV() {
 
   const handleCancelPinSubmit = async (pin: string): Promise<boolean> => {
     if (!activeOrderId) return false;
-    const { authorized, userName } = await pos.validatePinWithPermission(pin, 'menu-admin.pdv-cancel');
+    const { authorized, userName } = await pos.validatePinWithPermission(pin, 'menu-admin.pdv');
     if (!authorized) {
       if (!userName) toast.error('PIN inválido');
       else toast.error(`${userName} não tem permissão para cancelar pedidos`);
