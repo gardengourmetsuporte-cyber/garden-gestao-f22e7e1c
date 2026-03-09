@@ -121,7 +121,6 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
     } finally {
       setIsSavingPrice(false);
     }
-    }
   };
 
   return (
