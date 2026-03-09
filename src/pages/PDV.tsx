@@ -269,16 +269,16 @@ export default function PDV() {
                 )}
 
                 {/* Totals and actions */}
-                <div className="flex items-center justify-between pt-1">
-                  <div>
-                    <p className="text-xs text-muted-foreground">{pos.cart.reduce((s, i) => s + i.quantity, 0)} itens</p>
-                    <p className="text-lg font-bold text-foreground">{formatCurrency(pos.total)}</p>
-                  </div>
-                  <div className="flex gap-2">
+                <div className="flex flex-col gap-2 pt-1">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground">{pos.cart.reduce((s, i) => s + i.quantity, 0)} itens</p>
+                      <p className="text-lg font-bold text-foreground">{formatCurrency(pos.total)}</p>
+                    </div>
                     {activeOrderId ? (
                       <Button variant="ghost" size="sm" onClick={handleCancelClick} className="text-destructive hover:text-destructive">
                         <AppIcon name="Ban" size={14} className="mr-1" />
-                        Cancelar Pedido
+                        Cancelar
                       </Button>
                     ) : (
                       <Button variant="ghost" size="sm" onClick={() => pos.clearCart()} className="text-muted-foreground">
@@ -286,6 +286,8 @@ export default function PDV() {
                         Limpar
                       </Button>
                     )}
+                  </div>
+                  <div className="flex gap-2 justify-end flex-wrap">
                     {pos.saleSource === 'balcao' ? (
                       <>
                         <Button variant="outline" size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
@@ -312,7 +314,7 @@ export default function PDV() {
                         )}
                         <Button size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
                           <AppIcon name="Send" size={14} className="mr-1" />
-                          Enviar Pedido
+                          Enviar
                         </Button>
                       </>
                     )}
