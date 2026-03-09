@@ -1,4 +1,4 @@
-import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation, AlertTriangle } from 'lucide-react';
+import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation, AlertTriangle, Pencil, Archive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -13,9 +13,13 @@ const STATUS_CONFIG: Record<DeliveryStatus, { label: string; bg: string; text: s
 
 interface Props {
   delivery: Delivery;
+  selected?: boolean;
   onStatusChange: (id: string, status: DeliveryStatus) => void;
   onCardClick?: (deliveryId: string) => void;
   onSetLocation?: (delivery: Delivery) => void;
+  onEdit?: (delivery: Delivery) => void;
+  onArchive?: (delivery: Delivery) => void;
+  onSelect?: (deliveryId: string) => void;
 }
 
 export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocation }: Props) {
