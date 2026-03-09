@@ -157,7 +157,7 @@ export default function CardapioHub() {
     // Toggle between menu and ficha tecnica
     if (cardapioTab === 'produtos') {
       return {
-        icon: viewMode === 'menu' ? 'ChefHat' : 'Eye',
+        icon: viewMode === 'menu' ? 'RecipeBook' : 'Eye',
         label: viewMode === 'menu' ? 'Ficha Técnica' : 'Ver Cardápio',
         onClick: () => setViewMode(v => v === 'menu' ? 'ficha' : 'menu'),
       };
