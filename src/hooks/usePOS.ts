@@ -284,7 +284,64 @@ export function usePOS() {
     } finally {
       setSavingSale(false);
     }
-  }, [activeUnitId, user, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, clearCart, fetchPendingOrders]);
+  }, [activeUnitId, user, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, clearCart, fetchPendingOrders]);
+
+  // Send order (mesa/delivery) — creates a tablet_order instead of a sale
+  const sendOrder = useCallback(async () => {
+    if (!activeUnitId || !user?.id) return null;
+    if (cart.length === 0) { toast.error('Carrinho vazio'); return null; }
+
+    if (saleSource === 'mesa' && !tableNumber) {
+      toast.error('Informe o número da mesa');
+      return null;
+    }
+    if (saleSource === 'delivery') {
+      if (!customerName.trim()) { toast.error('Informe o nome do cliente'); return null; }
+      if (!deliveryPhone.trim()) { toast.error('Informe o telefone'); return null; }
+      if (!deliveryAddress.trim()) { toast.error('Informe o endereço'); return null; }
+    }
+
+    setSavingSale(true);
+    try {
+      const { data: order, error: orderError } = await supabase
+        .from('tablet_orders')
+        .insert({
+          unit_id: activeUnitId,
+          table_number: tableNumber || 0,
+          status: 'pending',
+          total,
+          source: saleSource,
+          customer_name: customerName.trim() || null,
+          customer_phone: saleSource === 'delivery' ? deliveryPhone.replace(/\D/g, '') : null,
+          customer_address: saleSource === 'delivery' ? deliveryAddress.trim() : null,
+        })
+        .select('id')
+        .single();
+
+      if (orderError || !order) throw new Error(orderError?.message || 'Erro ao criar pedido');
+
+      const items = cart.map(c => ({
+        order_id: order.id,
+        product_id: c.product.id || null,
+        quantity: c.quantity,
+        notes: c.notes || null,
+        unit_price: c.unit_price,
+      }));
+
+      const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
+      if (itemsError) throw new Error(itemsError.message);
+
+      toast.success('Pedido enviado!');
+      clearCart();
+      fetchPendingOrders();
+      return order.id;
+    } catch (err: any) {
+      toast.error('Erro ao enviar pedido: ' + (err.message || 'erro desconhecido'));
+      return null;
+    } finally {
+      setSavingSale(false);
+    }
+  }, [activeUnitId, user, cart, saleSource, customerName, deliveryPhone, deliveryAddress, tableNumber, total, clearCart, fetchPendingOrders]);
 
   return {
     products, categories, cart, pendingOrders,
@@ -299,6 +356,6 @@ export function usePOS() {
     deliveryAddress, setDeliveryAddress,
     subtotal, total,
     addToCart, updateCartItem, removeFromCart, clearCart,
-    loadOrderIntoCart, finalizeSale, fetchPendingOrders,
+    loadOrderIntoCart, finalizeSale, sendOrder, fetchPendingOrders,
   };
 }
