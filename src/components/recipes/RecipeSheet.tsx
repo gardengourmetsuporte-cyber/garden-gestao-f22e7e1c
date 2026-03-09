@@ -95,6 +95,7 @@ export function RecipeSheet({
   const [marginPercent, setMarginPercent] = useState(50);
   const [sellingPrice, setSellingPrice] = useState('');
   const [marginMode, setMarginMode] = useState<'margin' | 'price'>('margin');
+  const [packagingTemplateId, setPackagingTemplateId] = useState<string>('');
 
   const { activeUnit } = useUnit();
    const { settings, calculateOperationalCosts } = useRecipeCostSettings();
