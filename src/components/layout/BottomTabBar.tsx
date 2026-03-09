@@ -28,7 +28,7 @@ const HOME_TAB: TabDef = { key: 'home', icon: 'Home', label: 'Início', path: '/
 const CARDAPIO_TABS: TabDef[] = [
   { key: 'home', icon: 'Home', label: 'Início', path: '/cardapio', moduleKey: 'cardapio' },
   { key: 'cardapio', icon: 'MenuBook', label: 'Cardápio', path: '/cardapio?tab=produtos', moduleKey: 'cardapio' },
-  { key: 'config', icon: 'Settings', label: 'Config', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
+  { key: 'pedidos', icon: 'Receipt', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
 ];
 
 const HIDDEN_ROUTES = ['/finance', '/personal-finance'];
@@ -267,12 +267,8 @@ export function BottomTabBar() {
               />
             ))}
 
-            {/* Last tab — Config (in cardápio) or Mais */}
-            {isCardapioRoute ? (
-              <ConfigButton slotWidth={slotWidth} active={isActive('/cardapio?section=config')} onClick={() => { navigator.vibrate?.(10); navigate('/cardapio?section=config'); }} />
-            ) : (
-              <MoreButton moreOpen={moreOpen} slotWidth={slotWidth} onToggle={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }} />
-            )}
+            {/* Last tab — Mais */}
+            <MoreButton moreOpen={moreOpen} slotWidth={slotWidth} onToggle={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }} />
           </div>
         </div>
       </nav>
@@ -281,45 +277,6 @@ export function BottomTabBar() {
   );
 }
 
-/* ─── Config Button (Cardápio) ─── */
-function ConfigButton({ slotWidth, active, onClick }: { slotWidth: string; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label="Mais"
-      className="flex flex-col items-center justify-center h-full gap-0.5 transition-all relative"
-      style={{ width: slotWidth }}
-    >
-      <div
-        className={cn(
-          "absolute left-1/2 -translate-x-1/2 bottom-full pointer-events-none transition-all ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-          active ? "w-14 h-3.5 opacity-100 duration-400" : "w-8 h-0 opacity-0 duration-200"
-        )}
-      >
-        <div className="w-full h-full bg-background rounded-t-[14px]" />
-      </div>
-      <div
-        className="relative"
-        style={{
-          transform: active ? 'scale(1.12) translateY(-2px)' : 'scale(1)',
-          transition: 'transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-        }}
-      >
-        <div
-          className={cn(
-            "absolute inset-0 rounded-full transition-all duration-500",
-            active ? "opacity-100 scale-[2.2]" : "opacity-0 scale-100"
-          )}
-          style={{
-            background: active ? 'radial-gradient(circle, hsl(var(--primary) / 0.12) 0%, transparent 70%)' : 'none',
-          }}
-        />
-        <AppIcon name="Menu" size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={cn("relative z-10 transition-colors duration-300", active ? 'text-primary' : 'text-muted-foreground')} />
-      </div>
-      <span className={cn("text-[10px] transition-all duration-300", active ? "font-semibold text-primary translate-y-[-1px]" : "font-normal text-muted-foreground")}>Config</span>
-    </button>
-  );
-}
 
 /* ─── More Button ─── */
 function MoreButton({ moreOpen, slotWidth, onToggle }: { moreOpen: boolean; slotWidth: string; onToggle: () => void }) {
