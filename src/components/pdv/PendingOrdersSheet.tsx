@@ -271,12 +271,11 @@ function OrderDetailSheet({
           {order.status === 'preparing' && (
             <Button
               size="sm"
-              variant="outline"
-              className="w-full h-11 rounded-xl text-sm border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
+              className="w-full h-12 rounded-xl text-sm bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={() => onUpdateStatus(order, 'ready')}
               disabled={updatingStatus === order.id}
             >
-              <AppIcon name={updatingStatus === order.id ? 'Loader2' : 'CheckCircle'} size={16} className={cn("mr-1.5", updatingStatus === order.id && "animate-spin")} />
+              <AppIcon name={updatingStatus === order.id ? 'Loader2' : 'CheckCircle'} size={18} className={cn("mr-1.5", updatingStatus === order.id && "animate-spin")} />
               Marcar como Pronto
             </Button>
           )}
@@ -284,12 +283,11 @@ function OrderDetailSheet({
           {order.status === 'ready' && !isDelivery && (
             <Button
               size="sm"
-              variant="outline"
-              className="w-full h-11 rounded-xl text-sm border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
+              className="w-full h-12 rounded-xl text-sm bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={() => onUpdateStatus(order, 'delivered')}
               disabled={updatingStatus === order.id}
             >
-              <AppIcon name={updatingStatus === order.id ? 'Loader2' : 'PackageCheck'} size={16} className={cn("mr-1.5", updatingStatus === order.id && "animate-spin")} />
+              <AppIcon name={updatingStatus === order.id ? 'Loader2' : 'PackageCheck'} size={18} className={cn("mr-1.5", updatingStatus === order.id && "animate-spin")} />
               Entregue
             </Button>
           )}
@@ -298,11 +296,11 @@ function OrderDetailSheet({
             <Button
               size="sm"
               variant="outline"
-              className="w-full h-11 rounded-xl text-sm"
+              className="w-full h-12 rounded-xl text-sm"
               onClick={() => onDispatch(order)}
               disabled={dispatching === order.id}
             >
-              <AppIcon name={dispatching === order.id ? 'Loader2' : 'Bike'} size={16} className={cn("mr-1.5", dispatching === order.id && "animate-spin")} />
+              <AppIcon name={dispatching === order.id ? 'Loader2' : 'two_wheeler'} size={18} className={cn("mr-1.5", dispatching === order.id && "animate-spin")} />
               Despachar
             </Button>
           )}
@@ -311,7 +309,7 @@ function OrderDetailSheet({
             <Button
               size="sm"
               variant="ghost"
-              className="w-full h-9 rounded-xl text-xs text-destructive hover:bg-destructive/10"
+              className="w-full h-10 rounded-xl text-xs text-destructive hover:bg-destructive/10"
               onClick={() => onUpdateStatus(order, 'cancelled')}
               disabled={updatingStatus === order.id}
             >
