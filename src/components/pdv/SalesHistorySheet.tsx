@@ -422,17 +422,18 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
               })}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {Object.entries(filteredGrouped).map(([sourceKey, sourceSales]) => {
                 const cfg = SOURCE_CONFIG[sourceKey] || { icon: 'ShoppingBag', label: sourceKey };
                 return (
                   <div key={sourceKey}>
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-1 px-1">
                       <AppIcon name={cfg.icon} size={14} className="text-muted-foreground" />
                       <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{cfg.label}</span>
+                      <span className="text-[10px] text-muted-foreground/60">({sourceSales.length})</span>
                     </div>
-                    <div className="space-y-1.5">
-                      {sourceSales.map(sale => renderSaleBlock(sale))}
+                    <div className="bg-card rounded-xl border border-border/40 divide-y divide-border/30 px-2">
+                      {sourceSales.map(sale => renderSaleRow(sale))}
                     </div>
                   </div>
                 );
