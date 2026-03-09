@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type CartItem, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
+import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 
@@ -17,6 +18,7 @@ export default function PDV() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
 
   const filteredProducts = useMemo(() => {
@@ -75,6 +77,9 @@ export default function PDV() {
               className="pl-9 h-10"
             />
           </div>
+          <Button variant="outline" size="icon" className="shrink-0" onClick={() => setHistoryOpen(true)}>
+            <AppIcon name="Receipt" size={18} />
+          </Button>
           <Button variant="outline" size="icon" className="shrink-0 relative" onClick={() => setOrdersOpen(true)}>
             <AppIcon name="ClipboardList" size={18} />
             {pos.pendingOrders.length > 0 && (
@@ -265,6 +270,9 @@ export default function PDV() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Sales History Sheet */}
+      <SalesHistorySheet open={historyOpen} onOpenChange={setHistoryOpen} />
     </AppLayout>
   );
 }
