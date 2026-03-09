@@ -217,6 +217,7 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
 
 function DeliveryTimeWidget({ unitId, onNavigate }: { unitId?: string; onNavigate: (tab: string) => void }) {
   const { zones, isLoading, bulkAdjustTime } = useDeliveryZones();
+  const queryClient = useQueryClient();
 
   const activeZones = zones.filter(z => z.is_active);
   const minTime = activeZones.length > 0 ? Math.min(...activeZones.map(z => z.delivery_time_minutes)) : 0;
