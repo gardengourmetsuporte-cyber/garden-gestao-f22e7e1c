@@ -184,6 +184,15 @@ function FichaTecnicaCard({
       className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors active:scale-[0.98] cursor-pointer"
       onClick={() => onEditRecipe?.(product)}
     >
+      {/* Image */}
+      {product.image_url ? (
+        <img src={product.image_url} alt={product.name} className="w-10 h-10 rounded-xl object-cover shrink-0" />
+      ) : (
+        <div className="w-10 h-10 rounded-xl bg-secondary/60 flex items-center justify-center shrink-0">
+          <AppIcon name="Package" size={16} className="text-muted-foreground/40" />
+        </div>
+      )}
+
       {/* Name */}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
