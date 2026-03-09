@@ -272,6 +272,7 @@ function AuthenticatedRoutes() {
           <Route path="/calendar" element={<ProtectedRoute><CalendarFull /></ProtectedRoute>} />
           <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
           <Route path="/personal-finance" element={<ProtectedRoute><PersonalFinance /></ProtectedRoute>} />
+          <Route path="/compliance" element={<ProtectedRoute><Compliance /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>

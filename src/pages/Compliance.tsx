@@ -4,7 +4,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ObligationCard } from '@/components/compliance/ObligationCard';
 import { ObligationSheet } from '@/components/compliance/ObligationSheet';
-import { useObligations, OBLIGATION_CATEGORIES, getObligationStatus } from '@/hooks/useObligations';
+import { useObligations, getObligationStatus } from '@/hooks/useObligations';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -23,7 +23,7 @@ export default function Compliance() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  useFabAction(() => { setEditing(null); setSheetOpen(true); });
+  useFabAction({ icon: 'Plus', label: 'Nova Obrigação', onClick: () => { setEditing(null); setSheetOpen(true); } }, []);
 
   const filtered = useMemo(() => {
     let list = obligations;
@@ -46,7 +46,7 @@ export default function Compliance() {
   const warningCount = obligations.filter(o => getObligationStatus(o).variant === 'warning').length;
 
   return (
-    <AppLayout title="Obrigações Legais" icon="ShieldCheck">
+    <AppLayout>
       {/* Summary badges */}
       {obligations.length > 0 && (expiredCount > 0 || warningCount > 0) && (
         <div className="flex gap-2 px-4 mb-3">
@@ -97,7 +97,7 @@ export default function Compliance() {
           <EmptyState
             icon="ShieldCheck"
             title="Nenhuma obrigação cadastrada"
-            description="Cadastre alvarás, laudos, licenças e outros documentos obrigatórios."
+            subtitle="Cadastre alvarás, laudos, licenças e outros documentos obrigatórios."
             actionLabel="Cadastrar"
             actionIcon="Plus"
             onAction={() => { setEditing(null); setSheetOpen(true); }}
