@@ -169,7 +169,7 @@ function OrderDetail({
   const a = ACCENT_MAP[cfg.accent];
   const source = order.source || 'mesa';
   const items = order.tablet_order_items || [];
-  const shortId = order.id.slice(0, 4).toUpperCase();
+  const shortId = (order as any).order_number ? `${(order as any).order_number}` : order.id.slice(0, 4).toUpperCase();
   const mins = Math.floor((Date.now() - new Date(order.created_at).getTime()) / 60_000);
 
   return (
