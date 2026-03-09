@@ -2,12 +2,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { AppIcon } from '@/components/ui/app-icon';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
 import { useDeliveryFeeCalculator } from '@/hooks/useDeliveryZones';
+import { CustomerAddressManager, useCustomerAddresses, type CustomerAddress } from './CustomerAddressManager';
 import type { User } from '@supabase/supabase-js';
 
 interface Props {
@@ -20,70 +20,79 @@ interface Props {
   onUpdateQuantity: (index: number, qty: number) => void;
   onRemove: (index: number) => void;
   onClear: () => void;
+  onLogin?: () => void;
 }
 
-export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, source, onUpdateQuantity, onRemove, onClear }: Props) {
+export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, source, onUpdateQuantity, onRemove, onClear, onLogin }: Props) {
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
   const [sentAutoConfirmed, setSentAutoConfirmed] = useState(false);
   const isQrCode = source === 'qrcode';
+  const isDelivery = !isQrCode;
 
-  // Delivery fields — pre-fill from logged-in user + saved customer data
+  // Customer data
+  const [customerId, setCustomerId] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
-  const [customerAddress, setCustomerAddress] = useState('');
   const [tableNumber, setTableNumber] = useState('');
-  const [saveAddress, setSaveAddress] = useState(true);
+
+  // Address selection for delivery
+  const [selectedAddress, setSelectedAddress] = useState<CustomerAddress | null>(null);
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const { addresses, loading: loadingAddresses, primaryAddress, refetch: refetchAddresses } = useCustomerAddresses(customerId, unitId);
 
   // Fee calculation
   const { calculateFee, calculating, result: feeResult, reset: resetFee } = useDeliveryFeeCalculator();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
+  // Load customer data
   useEffect(() => {
-    if (customerUser) {
-      const name = customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || '';
-      const phone = customerUser.phone || '';
-      setCustomerName(prev => prev || name);
-      setCustomerPhone(prev => prev || phone);
+    if (!customerUser) {
+      setCustomerId(null);
+      setCustomerName('');
+      setCustomerPhone('');
+      return;
+    }
+    const name = customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || '';
+    setCustomerName(prev => prev || name);
 
-      // Load saved address from customer record
-      const email = customerUser.email;
-      if (email) {
-        supabase
-          .from('customers')
-          .select('phone, notes')
-          .eq('unit_id', unitId)
-          .eq('email', email)
-          .maybeSingle()
-          .then(({ data }) => {
-            if (data) {
-              if (data.phone) setCustomerPhone(prev => prev || formatPhone(data.phone!));
-              if (data.notes) setCustomerAddress(prev => prev || data.notes!);
-            }
-          });
-      }
+    // Fetch customer record
+    const email = customerUser.email;
+    if (email) {
+      supabase
+        .from('customers')
+        .select('id, phone')
+        .eq('unit_id', unitId)
+        .eq('email', email)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setCustomerId(data.id);
+            if (data.phone) setCustomerPhone(prev => prev || formatPhone(data.phone!));
+          }
+        });
     }
   }, [customerUser, unitId]);
 
-  // Debounced fee calculation when address changes
-  const handleAddressChange = useCallback((value: string) => {
-    setCustomerAddress(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (value.trim().length >= 10) {
+  // Auto-select primary address
+  useEffect(() => {
+    if (!selectedAddress && primaryAddress) {
+      setSelectedAddress(primaryAddress);
+    }
+  }, [primaryAddress, selectedAddress]);
+
+  // Calculate fee when address selected
+  useEffect(() => {
+    if (selectedAddress && isDelivery) {
+      const fullAddr = `${selectedAddress.street}, ${selectedAddress.number}, ${selectedAddress.neighborhood}, ${selectedAddress.city}`;
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
-        calculateFee(unitId, value);
-      }, 1200);
+        calculateFee(unitId, fullAddr);
+      }, 500);
     } else {
       resetFee();
     }
-  }, [unitId, calculateFee, resetFee]);
-
-  // Calculate fee when pre-filled address loads
-  useEffect(() => {
-    if (customerAddress.length >= 10 && !feeResult && !calculating) {
-      calculateFee(unitId, customerAddress);
-    }
-  }, [customerAddress]);
+  }, [selectedAddress, unitId, isDelivery]);
 
   const deliveryFee = feeResult?.fee ?? 0;
   const grandTotal = cartTotal + deliveryFee;
@@ -148,18 +157,23 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
   }
 
   const handleSend = async () => {
-    if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
     if (isQrCode) {
+      if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
       if (!tableNumber.trim() || parseInt(tableNumber) <= 0) { toast.error('Informe o número da mesa'); return; }
     } else {
-      if (!customerPhone.trim()) { toast.error('Informe seu telefone'); return; }
-      if (!customerAddress.trim()) { toast.error('Informe seu endereço de entrega'); return; }
+      // Delivery requires login
+      if (!customerUser) { toast.error('Faça login para pedir delivery'); return; }
+      if (!selectedAddress) { toast.error('Selecione um endereço de entrega'); return; }
       if (feeResult?.out_of_range) { toast.error('Endereço fora da área de entrega'); return; }
     }
 
     setSending(true);
 
     try {
+      const fullAddress = selectedAddress
+        ? `${selectedAddress.street}, ${selectedAddress.number}${selectedAddress.complement ? ' - ' + selectedAddress.complement : ''}, ${selectedAddress.neighborhood}, ${selectedAddress.city}${selectedAddress.reference ? ' (Ref: ' + selectedAddress.reference + ')' : ''}`
+        : null;
+
       const orderData = isQrCode
         ? {
             unit_id: unitId,
@@ -177,9 +191,10 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
             status: 'confirmed',
             total: grandTotal,
             source: 'delivery' as string,
-            customer_name: customerName.trim(),
+            customer_name: customerName.trim() || customerUser?.user_metadata?.full_name || 'Cliente',
             customer_phone: customerPhone.replace(/\D/g, ''),
-            customer_address: customerAddress.trim(),
+            customer_address: fullAddress,
+            customer_email: customerUser?.email || null,
           };
 
       const { data: order, error: orderError } = await supabase
@@ -201,7 +216,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
-      // Auto send to PDV (skip for qrcode — needs manual approval)
+      // Auto send to PDV (skip for qrcode)
       if (!isQrCode) {
         try {
           await fetch(
@@ -218,21 +233,6 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         } catch (e) {
           console.warn('[MenuCart] send-to-pdv failed:', e);
         }
-      }
-
-      // Save address to customer record (fire-and-forget, don't block order)
-      if (saveAddress && customerUser?.email && customerAddress.trim()) {
-        supabase
-          .from('customers')
-          .update({
-            notes: customerAddress.trim(),
-            phone: customerPhone.replace(/\D/g, ''),
-          })
-          .eq('unit_id', unitId)
-          .eq('email', customerUser.email)
-          .then(({ error: saveErr }) => {
-            if (saveErr) console.warn('Failed to save address:', saveErr);
-          });
       }
 
       toast.success('Pedido enviado com sucesso!');
@@ -266,8 +266,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           <span className="text-sm font-semibold text-foreground">{formatPrice(cartTotal)}</span>
         </div>
 
-        {/* Delivery fee line — hide for QR Code */}
-        {!isQrCode && (
+        {isDelivery && (
           <>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground flex items-center gap-1">
@@ -284,8 +283,6 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
                 <span className="text-xs text-muted-foreground">—</span>
               )}
             </div>
-
-            {/* Distance info */}
             {feeResult && !feeResult.out_of_range && (
               <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
                 <AppIcon name="MapPin" size={10} />
@@ -304,11 +301,11 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       </div>
 
       {/* Out of range warning */}
-      {!isQrCode && feeResult?.out_of_range && (
+      {isDelivery && feeResult?.out_of_range && (
         <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 flex items-center gap-2">
           <AppIcon name="AlertTriangle" size={16} className="text-destructive shrink-0" />
           <p className="text-xs text-destructive">
-            Infelizmente não entregamos neste endereço ({feeResult.distance_km} km). Tente um endereço mais próximo.
+            Infelizmente não entregamos neste endereço ({feeResult.distance_km} km). Tente outro endereço.
           </p>
         </div>
       )}
@@ -323,35 +320,134 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         </div>
       )}
 
-      {/* Logged-in user indicator */}
-      {customerUser && (
-        <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <AppIcon name="Person" size={18} className="text-primary" />
+      {/* ===== DELIVERY: Require login ===== */}
+      {isDelivery && !customerUser && (
+        <div className="rounded-2xl bg-card border border-primary/30 p-5 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <AppIcon name="LogIn" size={24} className="text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-foreground">Faça login para continuar</p>
+              <p className="text-xs text-muted-foreground">Precisamos da sua conta para delivery</p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground truncate">
-              {customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || customerUser.email}
-            </p>
-            <p className="text-[11px] text-muted-foreground truncate">{customerUser.email}</p>
-          </div>
-          <AppIcon name="Check" size={16} className="text-primary shrink-0" />
+          <Button className="w-full h-12 rounded-xl font-bold" onClick={onLogin}>
+            <AppIcon name="LogIn" size={18} className="mr-2" />
+            Entrar na minha conta
+          </Button>
         </div>
       )}
 
-      {/* Customer fields */}
-      <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
-        <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-          <AppIcon name={isQrCode ? 'RestaurantMenu' : 'Bike'} size={16} className="text-primary" />
-          {isQrCode ? 'Dados para o pedido' : 'Dados para entrega'}
-        </h3>
-        <Input
-          placeholder="Seu nome *"
-          value={customerName}
-          onChange={e => setCustomerName(e.target.value)}
-          className="h-12 rounded-xl"
-        />
-        {isQrCode ? (
+      {/* ===== DELIVERY: Logged in — show address picker ===== */}
+      {isDelivery && customerUser && (
+        <>
+          {/* User info */}
+          <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <AppIcon name="Person" size={18} className="text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground truncate">
+                {customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || customerUser.email}
+              </p>
+              <p className="text-[11px] text-muted-foreground truncate">{customerUser.email}</p>
+            </div>
+            <AppIcon name="Check" size={16} className="text-primary shrink-0" />
+          </div>
+
+          {/* Address selection */}
+          <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <AppIcon name="MapPin" size={16} className="text-primary" />
+              Endereço de entrega
+            </h3>
+
+            {loadingAddresses ? (
+              <div className="space-y-2">
+                <div className="h-16 rounded-xl bg-muted animate-pulse" />
+              </div>
+            ) : addresses.length === 0 || showAddAddress ? (
+              <>
+                {customerId && (
+                  <CustomerAddressManager
+                    customerId={customerId}
+                    unitId={unitId}
+                    onSelect={(a) => { setSelectedAddress(a); setShowAddAddress(false); }}
+                    selectable
+                    selectedId={selectedAddress?.id || null}
+                  />
+                )}
+                {!customerId && (
+                  <div className="text-center py-4">
+                    <p className="text-xs text-muted-foreground">Faça seu primeiro pedido para cadastrar endereços</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Address cards for selection */}
+                {addresses.map(a => {
+                  const isSelected = selectedAddress?.id === a.id;
+                  const fullAddr = `${a.street}, ${a.number}${a.complement ? ' - ' + a.complement : ''} · ${a.neighborhood}, ${a.city}`;
+                  return (
+                    <div
+                      key={a.id}
+                      onClick={() => setSelectedAddress(a)}
+                      className={`rounded-xl border p-3 cursor-pointer transition-all active:scale-[0.98] ${
+                        isSelected ? 'border-primary bg-primary/5' : 'border-border/30'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                          isSelected ? 'border-primary bg-primary' : 'border-border'
+                        }`}>
+                          {isSelected && <AppIcon name="Check" size={12} className="text-primary-foreground" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <AppIcon name={a.label === 'Trabalho' ? 'Briefcase' : 'Home'} size={12} className="text-primary shrink-0" />
+                            <span className="text-xs font-bold text-foreground">{a.label}</span>
+                            {a.is_primary && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">Principal</span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{fullAddr}</p>
+                          {a.reference && (
+                            <p className="text-[10px] text-muted-foreground/60 truncate">Ref: {a.reference}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <button
+                  onClick={() => setShowAddAddress(true)}
+                  className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl border border-dashed border-border/50 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                >
+                  <AppIcon name="Plus" size={14} />
+                  Adicionar novo endereço
+                </button>
+              </>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* QR Code fields */}
+      {isQrCode && (
+        <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
+          <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+            <AppIcon name="RestaurantMenu" size={16} className="text-primary" />
+            Dados para o pedido
+          </h3>
+          <Input
+            placeholder="Seu nome *"
+            value={customerName}
+            onChange={e => setCustomerName(e.target.value)}
+            className="h-12 rounded-xl"
+          />
           <Input
             placeholder="Número da mesa *"
             value={tableNumber}
@@ -361,41 +457,13 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
             type="number"
             min={1}
           />
-        ) : (
-          <>
-            <Input
-              placeholder="Telefone *"
-              value={customerPhone}
-              onChange={e => setCustomerPhone(formatPhone(e.target.value))}
-              className="h-12 rounded-xl"
-              inputMode="tel"
-            />
-            <Textarea
-              placeholder="Endereço completo * (rua, número, bairro, cidade)"
-              value={customerAddress}
-              onChange={e => handleAddressChange(e.target.value)}
-              className="rounded-xl resize-none"
-              rows={2}
-            />
-            {customerUser && (
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={saveAddress}
-                  onChange={e => setSaveAddress(e.target.checked)}
-                  className="w-4 h-4 rounded border-border accent-primary"
-                />
-                <span className="text-xs text-muted-foreground">Salvar endereço para próximos pedidos</span>
-              </label>
-            )}
-          </>
-        )}
-      </div>
+        </div>
+      )}
 
       <Button
         className="w-full h-14 text-base font-bold rounded-xl"
         onClick={handleSend}
-        disabled={sending || (!isQrCode && feeResult?.out_of_range)}
+        disabled={sending || (isDelivery && !customerUser) || (isDelivery && feeResult?.out_of_range)}
       >
         {sending ? (
           <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
