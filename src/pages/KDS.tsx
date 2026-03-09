@@ -298,7 +298,7 @@ export default function KDS() {
   const [selectedOrder, setSelectedOrder] = useState<KDSOrder | null>(null);
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
 
-  const { data: orders = [], isPending, isFetching, isError, error, refetch } = useQuery({
+  const { data: orders = [], isPending, isError, error, refetch } = useQuery({
     queryKey: ['kds-orders', unitId],
     queryFn: async () => {
       if (!unitId) return [];
