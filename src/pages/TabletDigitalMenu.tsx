@@ -337,10 +337,13 @@ export default function TabletDigitalMenu() {
             cartTotal={cartTotal}
             unitId={unitId!}
             autoConfirm={(unit?.store_info as any)?.auto_confirm?.mesa ?? false}
+            customerUser={customerUser}
+            signupBonusPoints={signupBonus}
             onUpdateQuantity={updateCartQuantity}
             onRemove={removeFromCart}
             onClear={clearCart}
             onClose={() => setCartOpen(false)}
+            onLoginClick={() => { setCartOpen(false); setShowAuth(true); }}
           />
         </SheetContent>
       </Sheet>
