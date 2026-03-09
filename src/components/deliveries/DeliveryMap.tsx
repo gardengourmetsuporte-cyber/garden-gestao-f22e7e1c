@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState, useMemo, useImperativeHandle, forwardRef } from 'react';
-import { Loader2, Map } from 'lucide-react';
+import { Loader2, Map, LocateFixed } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Delivery, DeliveryStatus } from '@/hooks/useDeliveries';
