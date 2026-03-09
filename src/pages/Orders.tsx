@@ -258,7 +258,7 @@ export default function OrdersPage() {
               { key: 'orders' as const, label: 'Histórico', icon: 'Clock', badge: pendingOrders.length || undefined, color: 'text-purple-400', bg: 'bg-purple-500/10' },
             ];
 
-            const renderCard = (tab: typeof supplierTab, large = false) => (
+            const renderCard = (tab: { key: string; label: string; icon: string; badge: number | undefined; color: string; bg: string }, large = false) => (
               <button
                 key={tab.key}
                 onClick={() => setOrderTab(tab.key)}
