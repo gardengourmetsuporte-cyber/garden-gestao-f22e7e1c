@@ -128,9 +128,27 @@ export default function InventoryPage() {
     unit_type: 'unidade' | 'kg' | 'litro'; current_stock: number; min_stock: number;
   }) => {
     try {
-      if (editingItem) await updateItem(editingItem.id, data);
-      else await addItem(data);
+      if (editingItem) {
+        await updateItem(editingItem.id, data);
+        // Scroll to the edited item after sheet closes
+        setTimeout(() => scrollToItem(editingItem.id), 400);
+      } else {
+        const newItem = await addItem(data);
+        if (newItem?.id) setTimeout(() => scrollToItem(newItem.id), 400);
+      }
     } catch { toast.error('Erro ao salvar item'); }
+  };
+
+  const scrollToItem = (itemId: string) => {
+    const el = document.querySelector(`[data-item-id="${itemId}"]`);
+    if (el) {
+      // Expand parent category if collapsed
+      el.closest('[data-category-group]')?.querySelector('button')?.click;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Brief highlight
+      el.classList.add('ring-2', 'ring-primary/50', 'rounded-2xl');
+      setTimeout(() => el.classList.remove('ring-2', 'ring-primary/50', 'rounded-2xl'), 2000);
+    }
   };
 
   const handleDeleteItem = async (id: string) => {
