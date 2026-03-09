@@ -100,6 +100,9 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, o
 
     setSending(true);
 
+    const requestTimeoutMs = 12000;
+    const maxRetries = 3;
+
     // Resolve live auto-confirm from unit store_info (avoid stale cache on long-open tablets)
     let shouldAutoConfirm = autoConfirm;
     try {
@@ -114,8 +117,6 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, o
       // keep prop fallback
     }
 
-    const maxRetries = 3;
-    const requestTimeoutMs = 12000;
     let lastError: any = null;
 
     try {
