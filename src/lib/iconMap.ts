@@ -370,8 +370,8 @@ export const ICON_MAP: Record<string, string> = {
   Delete: 'backspace',
 
   // Compliance / Safety
-  FireExtinguisher: 'fire_extinguisher',
-  KeyRound: 'key',
+  FireExtinguisher: 'fire_hydrant_alt',
+  KeyRound: 'vpn_key',
   ShieldAlert: 'gpp_maybe',
   Recycle: 'recycling',
   Bug: 'pest_control',
