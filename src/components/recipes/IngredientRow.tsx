@@ -51,7 +51,7 @@ const UNIT_OPTIONS: { value: RecipeUnitType; label: string }[] = [
   { value: 'ml', label: 'ml' },
 ];
 
-export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPrice, onUpdateItemUnit }: IngredientRowProps) {
+export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPrice, onUpdateItemUnit, kdsStations = [] }: IngredientRowProps) {
   const [editingPrice, setEditingPrice] = useState(false);
   const [newPriceValue, setNewPriceValue] = useState('');
   const [showGlobalWarning, setShowGlobalWarning] = useState(false);
