@@ -286,7 +286,7 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
 
   const flow = TABLET_STATUS_FLOW[order.status];
   const nextStatuses = flow?.next || [];
-  const orderNumber = order.id.slice(0, 4).toUpperCase();
+  const orderNumber = (order as any).order_number ? `${(order as any).order_number}` : order.id.slice(0, 4).toUpperCase();
   const timeAgo = formatDistanceToNow(new Date(order.created_at), { addSuffix: false, locale: ptBR });
   const isDelivery = order.source === 'delivery';
   const formattedDate = new Date(order.created_at).toLocaleString('pt-BR', {

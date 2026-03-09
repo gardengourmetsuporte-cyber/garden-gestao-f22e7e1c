@@ -131,6 +131,7 @@ export function usePOS() {
         customer_phone: o.customer_phone || null,
         customer_address: o.customer_address || null,
         table_number: null,
+        order_number: null,
         total: o.total,
         status: o.status,
         created_at: o.created_at,
