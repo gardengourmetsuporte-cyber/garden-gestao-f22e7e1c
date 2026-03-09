@@ -381,14 +381,14 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       <Button
         className="w-full h-14 text-base font-bold rounded-xl"
         onClick={handleSend}
-        disabled={sending || feeResult?.out_of_range}
+        disabled={sending || (!isQrCode && feeResult?.out_of_range)}
       >
         {sending ? (
           <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
         ) : (
           <AppIcon name="Send" size={20} className="mr-2" />
         )}
-        Finalizar Pedido • {formatPrice(grandTotal)}
+        {isQrCode ? `Enviar Pedido • ${formatPrice(cartTotal)}` : `Finalizar Pedido • ${formatPrice(grandTotal)}`}
       </Button>
     </div>
   );
