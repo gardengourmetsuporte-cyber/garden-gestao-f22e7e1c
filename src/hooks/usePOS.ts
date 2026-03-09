@@ -303,6 +303,10 @@ export function usePOS() {
       toast.error('Informe o número da mesa');
       return null;
     }
+    if (saleSource === 'balcao' && !customerName.trim()) {
+      toast.error('Informe o nome do cliente');
+      return null;
+    }
     if (saleSource === 'delivery') {
       if (!customerName.trim()) { toast.error('Informe o nome do cliente'); return null; }
       if (!deliveryPhone.trim()) { toast.error('Informe o telefone'); return null; }

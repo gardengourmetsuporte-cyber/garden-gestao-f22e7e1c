@@ -29,6 +29,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [customerName, setCustomerName] = useState('');
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
+  const [orderType, setOrderType] = useState<'dine-in' | 'takeout'>('dine-in');
 
   if (orderSent) {
     return (
@@ -139,7 +140,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 table_number: parseInt(tableNumber) || 0,
                 status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
                 total: cartTotal,
-                source: 'mesa',
+                source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
                 customer_name: finalName,
               })
               .select('id')
@@ -258,6 +259,38 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           <AppIcon name="Check" size={16} className="text-primary shrink-0" />
         </div>
       )}
+
+      {/* Order type selector */}
+      <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
+        <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+          <AppIcon name="UtensilsCrossed" size={16} className="text-primary" />
+          Tipo do pedido
+        </h3>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setOrderType('dine-in')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all border ${
+              orderType === 'dine-in'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-secondary/50 text-muted-foreground border-border/30'
+            }`}
+          >
+            <AppIcon name="UtensilsCrossed" size={18} />
+            Comer aqui
+          </button>
+          <button
+            onClick={() => setOrderType('takeout')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all border ${
+              orderType === 'takeout'
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-secondary/50 text-muted-foreground border-border/30'
+            }`}
+          >
+            <AppIcon name="ShoppingBag" size={18} />
+            Levar
+          </button>
+        </div>
+      </div>
 
       {/* Mesa + Name fields */}
       <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">

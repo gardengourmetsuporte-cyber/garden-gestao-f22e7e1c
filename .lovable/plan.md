@@ -1,30 +1,45 @@
 
 
-## Plano: Enviar pedido no Balcão + Opção "Comer aqui / Levar" no Tablet
+## Plano: Substituir saudação por header contextual integrado ao top bar
 
-### Problema
-1. No PDV Balcão, só tem "Cobrar" — mas às vezes o cliente quer apenas lançar o pedido na cozinha e pagar depois (retirada).
-2. No Tablet, não há opção para o cliente escolher entre "Comer aqui" e "Levar".
+### O que muda
 
-### Mudanças
+A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
 
-**1. PDV — Balcão: adicionar botão "Enviar" ao lado de "Cobrar"**
-- No modo `balcao`, exibir dois botões primários:
-  - **Enviar** (outline/secondary) — envia pedido para cozinha via `sendOrder()` sem cobrar
-  - **Cobrar** (primary) — abre pagamento como hoje
-- Ao enviar sem cobrar, o pedido vai como `tablet_order` com source `balcao`, aparece na Central de Pedidos/KDS
+### Conceito visual
 
-**2. Tablet — Opção "Comer aqui" / "Levar"**
-- No `TabletMenu.tsx`, antes do botão "Finalizar Pedido" no carrinho, adicionar um seletor com dois chips:
-  - 🍽️ **Comer aqui** (padrão)
-  - 🛍️ **Levar**
-- Salvar a escolha no campo `notes` do pedido (prefixo `[LEVAR]` ou `[COMER AQUI]`) ou em um campo dedicado
-- O KDS/Central de Pedidos mostrará essa informação
+```text
+┌──────────────────────────────────┐
+│  [logo]          [bell] [avatar] │  ← top bar (já existe)
+├──────────────────────────────────┤
+│                                  │
+│  Olá, Bruno                      │  ← greeting inline, menor
+│  ┌────────┐ ┌────────┐ ┌──────┐ │
+│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
+│  │pendente│ │tarefas │ │alertas│ │     dados do dia
+│  └────────┘ └────────┘ └──────┘ │
+│                                  │
+└──────────────────────────────────┘
+```
 
-### Arquivos a Editar
-| Arquivo | Ação |
-|---|---|
-| `src/pages/PDV.tsx` | Adicionar botão "Enviar" no modo balcão |
-| `src/pages/TabletMenu.tsx` | Adicionar seletor "Comer aqui / Levar" no carrinho |
-| `src/hooks/usePOS.ts` | Permitir `sendOrder()` funcionar com source `balcao` (remover restrição de mesa obrigatória) |
+### Implementação
+
+1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
+
+2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
+   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
+   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
+     - Contas a vencer (se houver)
+     - Checklists pendentes
+     - Pedidos pendentes
+     - Tarefas da agenda
+   - Cada pill é clicável e navega para o módulo correspondente
+   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
+   - Sem data, sem frase motivacional — informação pura e acionável
+
+3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
+
+### Resultado
+
+Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
 
