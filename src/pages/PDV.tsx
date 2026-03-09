@@ -367,9 +367,19 @@ export default function PDV() {
                       </button>
                     )}
 
-                    {/* Send order — disabled if loaded order has no new items added */}
+                    {/* Send order — for delivery opens payment sheet first */}
                     <button
-                      onClick={() => pos.sendOrder()}
+                      onClick={() => {
+                        if (pos.saleSource === 'delivery') {
+                          // Validate delivery fields first
+                          if (!pos.customerName.trim()) { pos.sendOrder(); return; } // triggers validation toast
+                          if (!pos.deliveryPhone.trim()) { pos.sendOrder(); return; }
+                          if (!pos.deliveryAddress.trim()) { pos.sendOrder(); return; }
+                          setDeliveryPaymentOpen(true);
+                        } else {
+                          pos.sendOrder();
+                        }
+                      }}
                       disabled={pos.savingSale || pos.cart.length === 0 || (!!activeOrderId && pos.cart.length <= originalCartSize)}
                       className="h-9 px-3 rounded-xl bg-secondary/60 border border-border/30 text-foreground text-xs font-semibold flex items-center gap-1 active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
                     >
