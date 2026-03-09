@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
 import { formatCurrency } from '@/lib/format';
@@ -24,25 +25,98 @@ export default function TabletHome() {
   const [searchParams] = useSearchParams();
   const mesa = searchParams.get('mesa') || '1';
 
-  const [unit, setUnit] = useState<{ name: string; store_info: StoreInfo | null } | null>(null);
-  const [rodizio, setRodizio] = useState<RodizioSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useQuery({
+    queryKey: ['tablet-home', unitId],
+    queryFn: async () => {
+      if (!unitId) return { unit: null, rodizio: null as RodizioSettings | null };
 
-  useEffect(() => {
-    if (!unitId) return;
-    const fetch = async () => {
       const [unitRes, rodizioRes] = await Promise.all([
         supabase.from('units').select('name, store_info').eq('id', unitId).single(),
-        supabase.from('rodizio_settings').select('is_active, price, description, time_limit_minutes').eq('unit_id', unitId).eq('is_active', true).maybeSingle(),
+        supabase
+          .from('rodizio_settings')
+          .select('is_active, price, description, time_limit_minutes')
+          .eq('unit_id', unitId)
+          .eq('is_active', true)
+          .maybeSingle(),
       ]);
-      setUnit(unitRes.data as any);
-      setRodizio(rodizioRes.data as any);
-      setLoading(false);
-    };
-    fetch();
-  }, [unitId]);
 
-  if (loading) {
+      if (unitRes.error) throw unitRes.error;
+      if (rodizioRes.error) throw rodizioRes.error;
+
+      return {
+        unit: (unitRes.data as { name: string; store_info: StoreInfo | null }) ?? null,
+        rodizio: (rodizioRes.data as RodizioSettings | null) ?? null,
+      };
+    },
+    enabled: !!unitId,
+    staleTime: 3 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    refetchOnMount: false,
+  });
+
+  const unit = data?.unit ?? null;
+  const rodizio = data?.rodizio ?? null;
+
+  const menuItems = useMemo(() => {
+    return [
+      {
+        id: 'cardapio',
+        icon: 'Restaurant',
+        label: 'Cardápio',
+        subtitle: 'Veja nosso menu completo',
+        color: 'hsl(var(--primary))',
+        bgColor: 'hsl(var(--primary) / 0.1)',
+        onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
+      },
+      ...(rodizio?.is_active ? [{
+        id: 'rodizio',
+        icon: 'AllInclusive',
+        label: 'Rodízio',
+        subtitle: `${formatCurrency(rodizio.price)} • ${rodizio.time_limit_minutes}min`,
+        color: 'hsl(45 100% 50%)',
+        bgColor: 'hsl(45 100% 50% / 0.1)',
+        onClick: () => navigate(`/tablet/${unitId}/rodizio?mesa=${mesa}`),
+      }] : []),
+      {
+        id: 'mural',
+        icon: 'Newspaper',
+        label: 'Mural da Casa',
+        subtitle: 'Novidades e avisos',
+        color: 'hsl(var(--accent-foreground))',
+        bgColor: 'hsl(var(--accent) / 0.5)',
+        onClick: () => {},
+      },
+      {
+        id: 'avalie',
+        icon: 'Star',
+        label: 'Avalie o Local',
+        subtitle: 'Deixe sua avaliação',
+        color: 'hsl(45 100% 50%)',
+        bgColor: 'hsl(45 100% 50% / 0.1)',
+        onClick: () => {},
+      },
+      {
+        id: 'jogos',
+        icon: 'Gamepad2',
+        label: 'Jogos',
+        subtitle: 'Divirta-se enquanto espera',
+        color: 'hsl(280 80% 60%)',
+        bgColor: 'hsl(280 80% 60% / 0.1)',
+        onClick: () => {},
+      },
+      {
+        id: 'conta',
+        icon: 'User',
+        label: 'Minha Conta',
+        subtitle: 'Seus dados e pedidos',
+        color: 'hsl(var(--muted-foreground))',
+        bgColor: 'hsl(var(--secondary))',
+        onClick: () => {},
+      },
+    ];
+  }, [mesa, navigate, rodizio, unitId]);
+
+  if (isLoading) {
     return (
       <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
         <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3 animate-pulse" style={{ animationDuration: '2s' }}>
@@ -53,68 +127,10 @@ export default function TabletHome() {
     );
   }
 
-  const logoUrl = (unit?.store_info as any)?.logo_url;
-
-  const menuItems = [
-    {
-      id: 'cardapio',
-      icon: 'Restaurant',
-      label: 'Cardápio',
-      subtitle: 'Veja nosso menu completo',
-      color: 'hsl(var(--primary))',
-      bgColor: 'hsl(var(--primary) / 0.1)',
-      onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
-    },
-    ...(rodizio?.is_active ? [{
-      id: 'rodizio',
-      icon: 'AllInclusive',
-      label: 'Rodízio',
-      subtitle: `${formatCurrency(rodizio.price)} • ${rodizio.time_limit_minutes}min`,
-      color: 'hsl(45 100% 50%)',
-      bgColor: 'hsl(45 100% 50% / 0.1)',
-      onClick: () => navigate(`/tablet/${unitId}/rodizio?mesa=${mesa}`),
-    }] : []),
-    {
-      id: 'mural',
-      icon: 'Newspaper',
-      label: 'Mural da Casa',
-      subtitle: 'Novidades e avisos',
-      color: 'hsl(var(--accent-foreground))',
-      bgColor: 'hsl(var(--accent) / 0.5)',
-      onClick: () => {},
-    },
-    {
-      id: 'avalie',
-      icon: 'Star',
-      label: 'Avalie o Local',
-      subtitle: 'Deixe sua avaliação',
-      color: 'hsl(45 100% 50%)',
-      bgColor: 'hsl(45 100% 50% / 0.1)',
-      onClick: () => {},
-    },
-    {
-      id: 'jogos',
-      icon: 'Gamepad2',
-      label: 'Jogos',
-      subtitle: 'Divirta-se enquanto espera',
-      color: 'hsl(280 80% 60%)',
-      bgColor: 'hsl(280 80% 60% / 0.1)',
-      onClick: () => {},
-    },
-    {
-      id: 'conta',
-      icon: 'User',
-      label: 'Minha Conta',
-      subtitle: 'Seus dados e pedidos',
-      color: 'hsl(var(--muted-foreground))',
-      bgColor: 'hsl(var(--secondary))',
-      onClick: () => {},
-    },
-  ];
+  const logoUrl = unit?.store_info?.logo_url;
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col">
-      {/* Header with logo */}
       <header className="flex flex-col items-center pt-10 pb-6 px-6">
         <div className="w-24 h-24 rounded-3xl overflow-hidden border-2 border-border/30 bg-white flex items-center justify-center shadow-lg mb-4">
           {logoUrl ? (
@@ -127,7 +143,6 @@ export default function TabletHome() {
         <p className="text-sm text-muted-foreground mt-1">Mesa {mesa}</p>
       </header>
 
-      {/* Menu grid */}
       <main className="flex-1 px-6 pb-10">
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl mx-auto">
           {menuItems.map(item => (
@@ -153,3 +168,4 @@ export default function TabletHome() {
     </div>
   );
 }
+
