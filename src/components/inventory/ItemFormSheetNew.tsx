@@ -91,6 +91,11 @@ export function ItemFormSheetNew({
       setRecipeUnitType('');
       setRecipeUnitPrice('');
       setShowRecipeSection(false);
+      setStockUnitLabel('');
+      setStockToRecipeFactor('');
+      setPurchaseUnitLabel('');
+      setPurchaseToStockFactor('');
+      setShowPurchaseSection(false);
     }
   }, [item, open]);
 
