@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -30,19 +30,19 @@ export function CashRegisterOpenDialog({ open, onOpenChange, saving, onOpen }: C
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <AppIcon name="Lock" size={20} className="text-primary" />
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="rounded-t-2xl px-5 pb-8">
+        <SheetHeader className="text-left">
+          <SheetTitle className="flex items-center gap-2">
+            <AppIcon name="Unlock" size={20} className="text-primary" />
             Abrir Caixa
-          </DialogTitle>
-          <DialogDescription>
+          </SheetTitle>
+          <SheetDescription>
             Informe o valor inicial em dinheiro no caixa para começar a operar.
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
-        <div className="space-y-4 pt-2">
+        <div className="space-y-4 pt-4">
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">Troco inicial (R$)</label>
             <Input
@@ -74,7 +74,7 @@ export function CashRegisterOpenDialog({ open, onOpenChange, saving, onOpen }: C
             Abrir Caixa
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
