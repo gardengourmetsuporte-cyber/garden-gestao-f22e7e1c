@@ -1,4 +1,4 @@
-import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation, AlertTriangle } from 'lucide-react';
+import { MapPin, Package, Clock, Truck, CheckCircle2, XCircle, Navigation, AlertTriangle, Pencil, Archive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -13,12 +13,16 @@ const STATUS_CONFIG: Record<DeliveryStatus, { label: string; bg: string; text: s
 
 interface Props {
   delivery: Delivery;
+  selected?: boolean;
   onStatusChange: (id: string, status: DeliveryStatus) => void;
   onCardClick?: (deliveryId: string) => void;
   onSetLocation?: (delivery: Delivery) => void;
+  onEdit?: (delivery: Delivery) => void;
+  onArchive?: (delivery: Delivery) => void;
+  onSelect?: (deliveryId: string) => void;
 }
 
-export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocation }: Props) {
+export function DeliveryCard({ delivery, selected, onStatusChange, onCardClick, onSetLocation, onEdit, onArchive, onSelect }: Props) {
   const addr = delivery.address;
   const cfg = STATUS_CONFIG[delivery.status];
   const StatusIcon = cfg.icon;
@@ -34,8 +38,8 @@ export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocat
 
   return (
     <div
-      className="group rounded-xl bg-background/50 hover:bg-background/80 border border-border/20 hover:border-border/40 transition-all duration-200 p-3 cursor-pointer active:scale-[0.98]"
-      onClick={() => onCardClick?.(delivery.id)}
+      className={`group rounded-xl bg-background/50 hover:bg-background/80 border transition-all duration-200 p-3 cursor-pointer active:scale-[0.98] ${selected ? 'border-primary/50 ring-2 ring-primary/20 bg-primary/5' : 'border-border/20 hover:border-border/40'}`}
+      onClick={() => onSelect ? onSelect(delivery.id) : onCardClick?.(delivery.id)}
     >
       {/* Top row: avatar + info + status */}
       <div className="flex items-start gap-3">
@@ -103,6 +107,11 @@ export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocat
         </span>
 
         <div className="flex items-center gap-1">
+          {/* Edit button */}
+          <Button size="sm" variant="ghost" className="h-7 w-7 p-0 rounded-lg" onClick={(e) => { e.stopPropagation(); onEdit?.(delivery); }}>
+            <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+          </Button>
+
           {mapsUrl && (
             <Button size="sm" variant="ghost" className="h-7 w-7 p-0 rounded-lg" asChild>
               <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Abrir rota" onClick={(e) => e.stopPropagation()}>
@@ -130,6 +139,18 @@ export function DeliveryCard({ delivery, onStatusChange, onCardClick, onSetLocat
               onClick={(e) => { e.stopPropagation(); onStatusChange(delivery.id, 'delivered'); }}
             >
               <CheckCircle2 className="w-3.5 h-3.5" /> Entregue
+            </Button>
+          )}
+
+          {/* Archive delivered */}
+          {delivery.status === 'delivered' && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 text-[11px] px-2 gap-1 rounded-lg font-medium text-muted-foreground"
+              onClick={(e) => { e.stopPropagation(); onArchive?.(delivery); }}
+            >
+              <Archive className="w-3.5 h-3.5" /> Encerrar
             </Button>
           )}
         </div>
