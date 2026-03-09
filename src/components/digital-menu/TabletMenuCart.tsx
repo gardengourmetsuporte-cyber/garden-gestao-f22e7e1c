@@ -261,9 +261,47 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         <div className="border-t border-border/30" />
         <div className="flex items-center justify-between">
           <span className="font-bold text-foreground">Total</span>
-          <span className="text-xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+          {payWithCoins ? (
+            <div className="flex items-center gap-1.5">
+              <AppIcon name="Coins" size={18} className="text-amber-500" />
+              <span className="text-xl font-bold text-amber-500 tabular-nums">{coinTotal} moedas</span>
+            </div>
+          ) : (
+            <span className="text-xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+          )}
         </div>
       </div>
+
+      {/* Coin payment option */}
+      {customerUser && allProductsHaveCoinPrice && customerCoins !== null && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center">
+                <AppIcon name="Coins" size={18} className="text-amber-500" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-foreground">Pagar com Moedas</p>
+                <p className="text-[11px] text-muted-foreground">Saldo: <span className="font-bold text-amber-600">{customerCoins}</span> moedas</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setPayWithCoins(!payWithCoins)}
+              className={`w-12 h-7 rounded-full transition-all relative ${payWithCoins ? 'bg-amber-500' : 'bg-secondary'}`}
+              disabled={!canPayWithCoins && !payWithCoins}
+            >
+              <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-all ${payWithCoins ? 'left-[22px]' : 'left-0.5'}`} />
+            </button>
+          </div>
+          {!canPayWithCoins && (
+            <p className="text-[11px] text-destructive font-medium">
+              {customerCoins < coinTotal
+                ? `Saldo insuficiente (faltam ${coinTotal - customerCoins} moedas)`
+                : 'Alguns produtos não possuem preço em moedas'}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Auth banner or logged-in indicator */}
       {!customerUser ? (
