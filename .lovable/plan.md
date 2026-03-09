@@ -1,45 +1,40 @@
 
 
-## Plano: Substituir saudação por header contextual integrado ao top bar
+## Plano: Logo personalizada da empresa nas Configurações de Aparência
 
-### O que muda
+### O que muda para o usuário
+Na tela de **Aparência**, além de escolher o tema, o usuário poderá fazer upload da logo da sua empresa. Essa logo será exibida:
+- No **topo da tela** (header mobile e sidebar desktop), substituindo o logo padrão do Garden
+- Na **tela de carregamento interna** (PageLoader)
 
-A seção de boas-vindas atual (greeting + data + frase motivacional) será removida e substituída por um **hero compacto contextual** que funciona como extensão visual do top bar, criando continuidade entre header e conteúdo.
+### Implementação técnica
 
-### Conceito visual
+**1. Expandir o contexto de unidade (`UnitContext.tsx`)**
+- Adicionar `store_info` à interface `Unit` e ao `select` que busca as unidades, para que `activeUnit.store_info?.logo_url` fique disponível globalmente.
 
-```text
-┌──────────────────────────────────┐
-│  [logo]          [bell] [avatar] │  ← top bar (já existe)
-├──────────────────────────────────┤
-│                                  │
-│  Olá, Bruno                      │  ← greeting inline, menor
-│  ┌────────┐ ┌────────┐ ┌──────┐ │
-│  │ 📊 12  │ │ ✅ 3   │ │ 🔔 2 │ │  ← "context pills" com
-│  │pendente│ │tarefas │ │alertas│ │     dados do dia
-│  └────────┘ └────────┘ └──────┘ │
-│                                  │
-└──────────────────────────────────┘
-```
+**2. Atualizar `AppearanceSettings.tsx`**
+- Adicionar seção "Logo da Empresa" acima do seletor de tema.
+- Input de upload de imagem com preview circular.
+- Ao selecionar, faz upload para o bucket `brand-assets` (já existe) e salva a URL em `units.store_info.logo_url` (merge com o JSON existente).
+- Botão para remover a logo.
 
-### Implementação
+**3. Atualizar `AppLayout.tsx` (header mobile)**
+- Importar `useUnit` e ler `activeUnit.store_info?.logo_url`.
+- Se existir, usar a logo da empresa no lugar de `gardenLogo`.
 
-1. **`AdminDashboard.tsx`** (linhas 85-94): Remover o bloco `{/* Welcome */}` com greeting, data e frase motivacional.
+**4. Atualizar `DesktopHeader.tsx` / `AppSidebar.tsx`**
+- Mesma lógica: se a unidade tem logo customizada, exibir no lugar do padrão.
 
-2. **Criar `src/components/dashboard/DashboardContextBar.tsx`**: Novo componente compacto que:
-   - Exibe greeting curto em uma linha (`Olá, Bruno`) com tipografia `text-base font-bold`
-   - Abaixo, uma row de **context pills** horizontais (scroll) mostrando dados acionáveis do dia:
-     - Contas a vencer (se houver)
-     - Checklists pendentes
-     - Pedidos pendentes
-     - Tarefas da agenda
-   - Cada pill é clicável e navega para o módulo correspondente
-   - Usa `backdrop-blur` e `bg-muted/30` para glassmorphism sutil, conectando visualmente com o header transparente
-   - Sem data, sem frase motivacional — informação pura e acionável
+**5. Atualizar `PageLoader.tsx`**
+- Receber `logoUrl` como prop opcional (passada pelos componentes pai que usam `<PageLoader />`).
+- Fallback para `gardenLogo` quando não houver logo customizada.
+- Nos locais que renderizam `<PageLoader />` (AppLayout, páginas), passar a logo da unidade quando disponível.
 
-3. **`AdminDashboard.tsx`**: Importar e renderizar `<DashboardContextBar>` no lugar do bloco removido, passando `stats` e `firstName`.
-
-### Resultado
-
-Em vez de texto decorativo estático, o usuário vê um resumo inteligente do dia com ações rápidas — moderno, funcional e visualmente integrado ao top bar.
+### Arquivos editados
+- `src/contexts/UnitContext.tsx` — interface Unit + select
+- `src/components/settings/AppearanceSettings.tsx` — seção de upload de logo
+- `src/components/layout/AppLayout.tsx` — logo dinâmica no header mobile + PageLoader
+- `src/components/layout/DesktopHeader.tsx` — logo dinâmica
+- `src/components/layout/AppSidebar.tsx` — logo dinâmica
+- `src/components/PageLoader.tsx` — prop opcional de logo
 
