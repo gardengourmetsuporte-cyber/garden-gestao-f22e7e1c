@@ -201,7 +201,7 @@ export function useCashRegister() {
           meal_voucher_amount: summary.total_meal_voucher,
           delivery_amount: summary.total_delivery,
           signed_account_amount: summary.total_signed_account,
-          total_amount: totalAmount,
+          
           cash_difference: cashDifference,
           receipt_url: '',
           status: 'pending',
