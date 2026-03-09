@@ -133,7 +133,7 @@ export default function CardapioHub() {
 
   // Contextual FAB action based on current sub-view
   const fabAction = useMemo(() => {
-    if (isDashboard || isConfigFromUrl || cardapioTab === 'config') {
+    if (isDashboard || isConfigFromUrl) {
       return null;
     }
     if (cardapioTab === 'opcionais') {
