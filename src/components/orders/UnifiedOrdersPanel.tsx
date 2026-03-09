@@ -104,9 +104,10 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
   const [selectedOrder, setSelectedOrder] = useState<TabletOrder | null>(null);
 
   const tabs: { id: UnifiedTab; label: string; icon: string; count: number; badge?: number }[] = [
+    { id: 'balcao', label: 'Balcão', icon: 'Store', count: stats.balcao, badge: stats.balcaoPending },
     { id: 'comandas', label: 'Comandas', icon: 'Receipt', count: stats.comandas, badge: stats.comandasPending },
     { id: 'delivery', label: 'Delivery', icon: 'Truck', count: stats.delivery, badge: stats.deliveryPending },
-    { id: 'ifood', label: 'iFood/Rappi', icon: 'Store', count: stats.ifood, badge: stats.ifoodNew },
+    { id: 'ifood', label: 'iFood/Rappi', icon: 'ShoppingBag', count: stats.ifood, badge: stats.ifoodNew },
   ];
 
   return (
