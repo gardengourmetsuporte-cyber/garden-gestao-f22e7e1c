@@ -151,7 +151,7 @@ export function ItemFormSheetNew({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 h-[85dvh] overflow-y-auto">
+      <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-safe-bottom h-[85dvh] overflow-y-auto scroll-smooth">
         <SheetHeader className="pb-4">
           <SheetTitle className="text-xl">
             {item ? 'Editar Item' : 'Novo Item'}
