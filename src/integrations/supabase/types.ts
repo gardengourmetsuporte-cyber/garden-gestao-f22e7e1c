@@ -3713,6 +3713,54 @@ export type Database = {
           },
         ]
       }
+      production_orders: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          produced_by: string
+          quantity: number
+          recipe_id: string
+          status: string | null
+          unit_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          produced_by: string
+          quantity: number
+          recipe_id: string
+          status?: string | null
+          unit_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          produced_by?: string
+          quantity?: number
+          recipe_id?: string
+          status?: string | null
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_orders_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_orders_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -4140,8 +4188,10 @@ export type Database = {
           cost_per_portion: number
           cost_updated_at: string | null
           created_at: string
+          current_ready_stock: number | null
           id: string
           is_active: boolean
+          min_ready_stock: number | null
           name: string
           preparation_notes: string | null
           total_cost: number
@@ -4154,8 +4204,10 @@ export type Database = {
           cost_per_portion?: number
           cost_updated_at?: string | null
           created_at?: string
+          current_ready_stock?: number | null
           id?: string
           is_active?: boolean
+          min_ready_stock?: number | null
           name: string
           preparation_notes?: string | null
           total_cost?: number
@@ -4168,8 +4220,10 @@ export type Database = {
           cost_per_portion?: number
           cost_updated_at?: string | null
           created_at?: string
+          current_ready_stock?: number | null
           id?: string
           is_active?: boolean
+          min_ready_stock?: number | null
           name?: string
           preparation_notes?: string | null
           total_cost?: number
