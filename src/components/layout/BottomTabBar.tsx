@@ -267,12 +267,8 @@ export function BottomTabBar() {
               />
             ))}
 
-            {/* Last tab — Config (in cardápio) or Mais */}
-            {isCardapioRoute ? (
-              <ConfigButton slotWidth={slotWidth} active={isActive('/cardapio?section=config')} onClick={() => { navigator.vibrate?.(10); navigate('/cardapio?section=config'); }} />
-            ) : (
-              <MoreButton moreOpen={moreOpen} slotWidth={slotWidth} onToggle={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }} />
-            )}
+            {/* Last tab — Mais */}
+            <MoreButton moreOpen={moreOpen} slotWidth={slotWidth} onToggle={() => { navigator.vibrate?.(10); setMoreOpen(!moreOpen); }} />
           </div>
         </div>
       </nav>
