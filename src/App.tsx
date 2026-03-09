@@ -64,6 +64,11 @@ const Employees = lazy(() => lazyRetry(() => import("./pages/Employees")));
 const TabletConfirm = lazy(() => lazyRetry(() => import("./pages/TabletConfirm")));
 const CardapioHub = lazy(() => lazyRetry(() => import("./pages/CardapioHub")));
 const WhatsApp = lazy(() => lazyRetry(() => import("./pages/WhatsApp")));
+const WhatsAppChats = lazy(() => lazyRetry(() => import("./pages/WhatsAppChats")));
+const WhatsAppOrdersPage = lazy(() => lazyRetry(() => import("./pages/WhatsAppOrdersPage")));
+const WhatsAppKnowledgePage = lazy(() => lazyRetry(() => import("./pages/WhatsAppKnowledgePage")));
+const WhatsAppLogsPage = lazy(() => lazyRetry(() => import("./pages/WhatsAppLogsPage")));
+const WhatsAppSettingsPage = lazy(() => lazyRetry(() => import("./pages/WhatsAppSettingsPage")));
 const Profile = lazy(() => lazyRetry(() => import("./pages/Profile")));
 const Orders = lazy(() => lazyRetry(() => import("./pages/Orders")));
 const Marketing = lazy(() => lazyRetry(() => import("./pages/Marketing")));
@@ -261,6 +266,11 @@ function AuthenticatedRoutes() {
           <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
           <Route path="/brand-core" element={<Navigate to="/marketing" replace />} />
           <Route path="/whatsapp" element={<ProtectedRoute><WhatsApp /></ProtectedRoute>} />
+          <Route path="/whatsapp/chats" element={<ProtectedRoute><WhatsAppChats /></ProtectedRoute>} />
+          <Route path="/whatsapp/orders" element={<ProtectedRoute><WhatsAppOrdersPage /></ProtectedRoute>} />
+          <Route path="/whatsapp/knowledge" element={<ProtectedRoute><WhatsAppKnowledgePage /></ProtectedRoute>} />
+          <Route path="/whatsapp/logs" element={<ProtectedRoute><WhatsAppLogsPage /></ProtectedRoute>} />
+          <Route path="/whatsapp/settings" element={<ProtectedRoute><WhatsAppSettingsPage /></ProtectedRoute>} />
           <Route path="/ranking" element={<ProtectedRoute><Ranking /></ProtectedRoute>} />
           <Route path="/deliveries" element={<ProtectedRoute><Deliveries /></ProtectedRoute>} />
           <Route path="/delivery-hub" element={<ProtectedRoute><DeliveryHub /></ProtectedRoute>} />
