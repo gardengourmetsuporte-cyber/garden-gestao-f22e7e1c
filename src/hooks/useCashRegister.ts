@@ -150,12 +150,13 @@ export function useCashRegister() {
   }, [activeUnitId, currentRegister]);
 
   // Close register
-  const closeRegister = useCallback(async (finalCash: number, notes?: string) => {
+  const closeRegister = useCallback(async (finalCash: number, notes?: string, expenses?: { description: string; amount: number }[]) => {
     if (!activeUnitId || !user?.id || !currentRegister) return false;
     setSaving(true);
     try {
       const summary = await fetchSalesSummary();
-      const expectedCash = currentRegister.initial_cash + summary.total_cash;
+      const totalExpenses = expenses?.reduce((sum, e) => sum + e.amount, 0) || 0;
+      const expectedCash = currentRegister.initial_cash + summary.total_cash - totalExpenses;
       const cashDifference = finalCash - expectedCash;
 
       // Update register
@@ -205,6 +206,7 @@ export function useCashRegister() {
           receipt_url: '',
           status: 'pending',
           notes: notes ? `[PDV] ${notes}` : '[PDV] Fechamento automático via PDV',
+          expenses: expenses && expenses.length > 0 ? expenses : null,
         })
         .select('id')
         .single();

@@ -129,7 +129,7 @@ export default function PDV() {
       <AppLayout>
         <div className="flex flex-col items-center justify-center h-[calc(100dvh-env(safe-area-inset-top)-3.5rem)] px-6 text-center pb-[calc(72px+env(safe-area-inset-bottom,0px))] lg:pb-0">
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-            <AppIcon name="Lock" size={28} className="text-primary" />
+            <AppIcon name="LockKeyhole" size={28} className="text-primary" />
           </div>
           <h2 className="text-lg font-bold text-foreground mb-1">Caixa Fechado</h2>
           <p className="text-sm text-muted-foreground mb-6 max-w-xs">
@@ -183,24 +183,9 @@ export default function PDV() {
               )}
             </button>
             <button onClick={() => setCloseRegisterSheet(true)} className="w-9 h-9 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center shrink-0">
-              <AppIcon name="Lock" size={16} className="text-destructive" />
+              <AppIcon name="LockKeyhole" size={15} className="text-destructive" />
             </button>
           </div>
-
-          {/* Register status */}
-          {cashRegister.currentRegister && (
-            <div className="flex items-center justify-between bg-primary/5 border border-primary/15 rounded-xl px-3 py-1.5">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[11px] text-muted-foreground">
-                  Aberto {format(new Date(cashRegister.currentRegister.opened_at), "HH:mm", { locale: ptBR })}
-                </span>
-              </div>
-              <span className="text-[11px] font-semibold text-primary">
-                Troco: {formatCurrency(cashRegister.currentRegister.initial_cash)}
-              </span>
-            </div>
-          )}
 
           {/* Categories */}
           <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-3 px-3">
