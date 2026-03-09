@@ -50,24 +50,27 @@ export default function ChecklistsPage() {
   }
 
 
+  const [reminderOpen, setReminderOpen] = useState(false);
+
   const reminderBtn = isAdmin && checklistType !== 'bonus' ? (() => {
     const progress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
     if (progress.percent === 100 || progress.total === 0) return null;
     return (
       <button
-        onClick={handleSendReminder}
-        disabled={sendingReminder}
+        onClick={() => setReminderOpen(true)}
         title="Lembrar equipe de completar o checklist"
         className={cn(
           "w-6 h-6 rounded-full flex items-center justify-center transition-all shrink-0",
           "hover:bg-amber-500/10 active:scale-95",
-          sendingReminder && "opacity-60 pointer-events-none"
         )}
       >
-        <AppIcon name="notifications" size={14} fill={0} className={cn("text-muted-foreground/60", sendingReminder && "animate-bounce text-amber-500")} />
+        <AppIcon name="notifications" size={14} fill={0} className="text-muted-foreground/60" />
       </button>
     );
   })() : null;
+
+  const currentProgress = checklistType === 'abertura' ? getTypeProgress.abertura : getTypeProgress.fechamento;
+  const pendingCount = currentProgress.total - currentProgress.completed;
 
   const sharedCardProps = {
     settingsMode, isAdmin, currentDate, deadlineSettings,
