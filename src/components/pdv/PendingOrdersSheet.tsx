@@ -498,6 +498,8 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
         onLoadOrder={onLoadOrder}
         onDispatch={handleDispatch}
         dispatching={dispatching}
+        onUpdateStatus={handleUpdateStatus}
+        updatingStatus={updatingStatus}
       />
     </>
   );
