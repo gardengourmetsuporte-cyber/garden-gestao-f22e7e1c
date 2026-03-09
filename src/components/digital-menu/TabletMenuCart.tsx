@@ -295,7 +295,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           <span className="font-bold text-foreground">Total</span>
           {payWithCoins ? (
             <div className="flex items-center gap-1.5">
-              <AppIcon name="Coins" size={18} className="text-amber-500" />
+              <span className="text-lg">🪙</span>
               <span className="text-xl font-bold text-amber-500 tabular-nums">{coinTotal} moedas</span>
             </div>
           ) : (
