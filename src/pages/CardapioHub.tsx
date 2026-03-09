@@ -38,6 +38,7 @@ import { cn } from '@/lib/utils';
 const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings })));
 const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioDashboard').then(m => ({ default: m.CardapioDashboard })));
 const RodizioSettingsLazy = lazy(() => import('@/components/settings/RodizioSettings').then(m => ({ default: m.RodizioSettings })));
+const CardapioConfigHubLazy = lazy(() => import('@/components/cardapio/CardapioConfigHub').then(m => ({ default: m.CardapioConfigHub })));
 
 type CardapioTab = 'produtos' | 'opcionais' | 'config' | 'rodizio';
 
@@ -46,6 +47,7 @@ export default function CardapioHub() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const isProdutos = searchParams.get('tab') === 'produtos';
+  const isPedidosConfig = searchParams.get('tab') === 'pedidos';
   const isDashboard = !searchParams.get('tab') && !searchParams.get('section');
   const isConfigFromUrl = searchParams.get('section') === 'config';
 
@@ -248,7 +250,19 @@ export default function CardapioHub() {
     );
   }
 
-  // Pedidos tab removed — orders are now managed via PDV, KDS, and Deliveries
+  // ==================== CONFIG HUB VIEW ====================
+  if (isPedidosConfig) {
+    return (
+      <AppLayout>
+        <div className="min-h-screen bg-background pb-24">
+          <Suspense fallback={<div className="p-4 space-y-4"><Skeleton className="h-10 w-48 rounded-xl" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-24 w-full rounded-2xl" /></div>}>
+            <CardapioConfigHubLazy />
+          </Suspense>
+        </div>
+      </AppLayout>
+    );
+  }
+
 
   // ==================== CARDÁPIO VIEW (default) ====================
   return (

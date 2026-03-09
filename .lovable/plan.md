@@ -1,54 +1,17 @@
+## Plano: Central de Configurações do Cardápio ✅
 
+### Implementado
 
-## Plano: Transformar aba "Pedidos" em Central de Configurações
+A aba "Pedidos" no bottom nav do Cardápio foi transformada em **Central de Configurações** com seções colapsáveis (Accordion):
 
-A aba "Pedidos" no bottom nav do Cardápio atualmente apenas espelha o cardápio. Vamos transformá-la em um hub de configurações organizado por solução (similar ao iFood), com seções colapsáveis.
+- **Solução Delivery**: Sobre, delivery & retirada, áreas e taxas, pagamento, horários
+- **Solução Tablet**: Integração PDV, mesas & QR codes, chave Pix
+- **QR Code Balcão**: Link externo (`/m/:unitId?source=qrcode`) para cliente escanear e pedir pelo celular
+- **Gamificação**: Roleta de prêmios e probabilidades
+- **Rodízio**: Preço fixo, regras e categorias
 
-### Estrutura da nova aba
-
-```text
-┌─────────────────────────────┐
-│  ⚙️  Configurações          │
-├─────────────────────────────┤
-│  🛵 Solução Delivery    ▾   │
-│    • Sobre (nome, descrição)│
-│    • Delivery & Retirada    │
-│    • Áreas e Taxas          │
-│    • Formas de Pagamento    │
-│    • Horários               │
-├─────────────────────────────┤
-│  📱 Solução em Tablet   ▾   │
-│    • Integração PDV         │
-│    • Mesas & QR Codes       │
-│    • Chave Pix              │
-├─────────────────────────────┤
-│  📷 QR Code Balcão     ▾   │
-│    • Link externo p/ cliente│
-│    • QR Code gerado         │
-│    • Configurações          │
-│    (novo source: 'qrcode')  │
-├─────────────────────────────┤
-│  🎰 Gamificação        ▾   │
-│    • Roleta / Prêmios       │
-│  ♾️ Rodízio             ▾   │
-│    • Configurações rodízio  │
-└─────────────────────────────┘
-```
-
-### Alterações por arquivo
-
-| Arquivo | O que muda |
-|---|---|
-| `src/pages/CardapioHub.tsx` | Detectar `?tab=pedidos` e renderizar novo componente `CardapioConfigHub` em vez do cardápio. Renomear o bottom tab de "Pedidos" para "Config" |
-| `src/components/layout/BottomTabBar.tsx` | Alterar label/icon do tab "pedidos" de `ShoppingBag`/"Pedidos" para `Settings`/"Config" |
-| `src/components/cardapio/CardapioConfigHub.tsx` | **Novo arquivo** — Hub de configurações com seções colapsáveis (Accordion). Reutiliza os componentes existentes do `CardapioSettings` (PDV, Mesas, Delivery, Gamificação, Rodízio) reorganizados por "Solução". Adiciona seção "QR Code Balcão" com link externo para o cliente escanear e pedir pelo celular (`/m/:unitId?source=qrcode`). |
-
-### Seção "QR Code Balcão" (novo canal)
-- Gera QR code apontando para `/m/:unitId?source=qrcode`
-- O cliente escaneia no celular, faz o pedido pelo cardápio digital
-- Pedido entra no sistema com `source: 'qrcode'` (diferenciando de mesa/delivery/balcão)
-- O QR é genérico (sem mesa), cliente informa nome no checkout
-
-### O que é reutilizado
-Todo o conteúdo de configuração já existe em `CardapioSettings.tsx`. O novo componente reorganiza as mesmas funcionalidades em seções por "Solução" usando Accordion, sem duplicar código — importando sub-componentes ou extraindo seções.
-
+### Arquivos alterados
+- `src/components/layout/BottomTabBar.tsx` — Tab renomeado de "Pedidos" (ShoppingBag) para "Config" (Settings)
+- `src/components/cardapio/CardapioConfigHub.tsx` — **Novo** — Hub de configurações com Accordion
+- `src/pages/CardapioHub.tsx` — Renderiza CardapioConfigHub quando `?tab=pedidos`
+- `src/components/settings/CardapioSettings.tsx` — Prop `embedded` para uso inline sem hub/back button

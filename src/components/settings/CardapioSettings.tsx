@@ -24,6 +24,7 @@ type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'rodizio' | 'config';
 
 interface CardapioSettingsProps {
   initialTab?: SettingsTab | null;
+  embedded?: boolean;
 }
 
 function PixKeyConfig() {
@@ -92,7 +93,7 @@ function PixKeyConfig() {
   );
 }
 
-export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
+export function CardapioSettings({ initialTab = null, embedded = false }: CardapioSettingsProps) {
   const { activeUnit } = useUnit();
   const tabletAdmin = useTabletAdmin();
   const { tables, pdvConfig, addTable, removeTable, savePDVConfig, retryPDV } = tabletAdmin;
@@ -165,8 +166,8 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
     { id: 'config', label: 'Geral', icon: 'Cog', description: 'Delivery, retirada e horários' },
   ];
 
-  // Hub menu view — matches Settings page pattern
-  if (!activeTab) {
+  // Hub menu view — matches Settings page pattern (skip when embedded)
+  if (!activeTab && !embedded) {
     return (
       <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
         {TABS.map((tab) => (
@@ -189,14 +190,16 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
 
   return (
     <div className="space-y-4">
-      {/* Back button */}
-      <button
-        onClick={() => setActiveTab(null)}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors -mt-1"
-      >
-        <AppIcon name="ChevronLeft" size={16} />
-        <span>{activeTabData?.label}</span>
-      </button>
+      {/* Back button — hide when embedded */}
+      {!embedded && (
+        <button
+          onClick={() => setActiveTab(null)}
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors -mt-1"
+        >
+          <AppIcon name="ChevronLeft" size={16} />
+          <span>{activeTabData?.label}</span>
+        </button>
+      )}
 
       {/* ==================== PDV ==================== */}
       {activeTab === 'pdv' && (
