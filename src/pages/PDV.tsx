@@ -32,6 +32,7 @@ export default function PDV() {
   const [cancelPinOpen, setCancelPinOpen] = useState(false);
   const [openRegisterDialog, setOpenRegisterDialog] = useState(false);
   const [closeRegisterSheet, setCloseRegisterSheet] = useState(false);
+  const [deliveryPaymentOpen, setDeliveryPaymentOpen] = useState(false);
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
