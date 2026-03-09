@@ -379,4 +379,9 @@ export const ICON_MAP: Record<string, string> = {
   Recycle: 'recycling',
   Bug: 'pest_control',
   Wind: 'air',
+
+  // Material Symbol pass-through (used in digital menu)
+  EmojiEvents: 'emoji_events',
+  Storefront: 'storefront',
+  Casino: 'casino',
 };
