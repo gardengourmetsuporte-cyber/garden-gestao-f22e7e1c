@@ -22,15 +22,17 @@ interface Props {
   onClear: () => void;
 }
 
-export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, onUpdateQuantity, onRemove, onClear }: Props) {
+export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, source, onUpdateQuantity, onRemove, onClear }: Props) {
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
   const [sentAutoConfirmed, setSentAutoConfirmed] = useState(false);
+  const isQrCode = source === 'qrcode';
 
   // Delivery fields — pre-fill from logged-in user + saved customer data
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+  const [tableNumber, setTableNumber] = useState('');
   const [saveAddress, setSaveAddress] = useState(true);
 
   // Fee calculation
