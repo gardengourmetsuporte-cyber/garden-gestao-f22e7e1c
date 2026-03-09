@@ -2690,6 +2690,47 @@ export type Database = {
           },
         ]
       }
+      kds_stations: {
+        Row: {
+          color: string
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+          sort_order: number
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+          sort_order?: number
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+          sort_order?: number
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kds_stations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_obligations: {
         Row: {
           alert_days_before: number
@@ -4253,6 +4294,7 @@ export type Database = {
           created_at: string
           id: string
           item_id: string | null
+          kds_station_id: string | null
           quantity: number
           recipe_id: string
           sort_order: number | null
@@ -4266,6 +4308,7 @@ export type Database = {
           created_at?: string
           id?: string
           item_id?: string | null
+          kds_station_id?: string | null
           quantity: number
           recipe_id: string
           sort_order?: number | null
@@ -4279,6 +4322,7 @@ export type Database = {
           created_at?: string
           id?: string
           item_id?: string | null
+          kds_station_id?: string | null
           quantity?: number
           recipe_id?: string
           sort_order?: number | null
@@ -4294,6 +4338,13 @@ export type Database = {
             columns: ["item_id"]
             isOneToOne: false
             referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_ingredients_kds_station_id_fkey"
+            columns: ["kds_station_id"]
+            isOneToOne: false
+            referencedRelation: "kds_stations"
             referencedColumns: ["id"]
           },
           {
