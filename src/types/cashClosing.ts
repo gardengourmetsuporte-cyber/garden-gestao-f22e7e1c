@@ -11,6 +11,7 @@ export interface CashClosing {
   id: string;
   date: string;
   user_id: string;
+  unit_id: string | null;
   unit_name: string;
   
   // Payment amounts
