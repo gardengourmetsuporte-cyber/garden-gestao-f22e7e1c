@@ -29,9 +29,9 @@ import { normalizePhone } from '@/lib/normalizePhone';
 export default function OrdersPage() {
   const { isAdmin } = useAuth();
   const { items, registerMovement } = useInventoryDB();
-  const { suppliers } = useSuppliers();
+  const { suppliers, addSupplier, updateSupplier, deleteSupplier } = useSuppliers();
   const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
-  const { addInvoice } = useSupplierInvoices();
+  const { addInvoice, invoices } = useSupplierInvoices();
   const { createQuotation } = useQuotations();
   const { items: shoppingListItems, removeFromList, clearList, isLoading: shoppingListLoading } = useShoppingList();
 
@@ -45,11 +45,53 @@ export default function OrdersPage() {
   const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
   const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
-  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list'>('to-order');
+  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list' | 'suppliers'>('to-order');
   const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
   const [cotationStep, setCotationStep] = useState(false);
   const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
   const [isCreatingQuotation, setIsCreatingQuotation] = useState(false);
+
+  // Supplier profile states
+  const [profileSheetOpen, setProfileSheetOpen] = useState(false);
+  const [profileSupplier, setProfileSupplier] = useState<Supplier | null>(null);
+  const [isNewSupplier, setIsNewSupplier] = useState(false);
+  const [supplierSearch, setSupplierSearch] = useState('');
+
+  const handleOpenProfile = (supplier: Supplier) => {
+    setProfileSupplier(supplier);
+    setIsNewSupplier(false);
+    setProfileSheetOpen(true);
+  };
+
+  const handleNewSupplier = () => {
+    setProfileSupplier(null);
+    setIsNewSupplier(true);
+    setProfileSheetOpen(true);
+  };
+
+  const handleSaveProfile = async (data: { name: string; phone?: string; email?: string; delivery_frequency?: string }) => {
+    if (isNewSupplier) {
+      const created = await addSupplier(data as any);
+      setProfileSupplier(created);
+      setIsNewSupplier(false);
+    } else if (profileSupplier) {
+      await updateSupplier(profileSupplier.id, data as any);
+      setProfileSupplier({ ...profileSupplier, ...data } as Supplier);
+    }
+  };
+
+  const handleDeleteProfile = async (id: string) => {
+    await deleteSupplier(id);
+    setProfileSheetOpen(false);
+  };
+
+  useFabAction(orderTab === 'suppliers' ? { icon: 'Plus', label: 'Novo Fornecedor', onClick: handleNewSupplier } : null, [orderTab]);
+
+  const filteredSuppliers = useMemo(() => {
+    if (!supplierSearch.trim()) return suppliers;
+    const q = supplierSearch.toLowerCase();
+    return suppliers.filter(s => s.name.toLowerCase().includes(q) || s.phone?.includes(q) || s.email?.toLowerCase().includes(q));
+  }, [suppliers, supplierSearch]);
 
   const lowStockItems = useMemo(() => items.filter(item => item.current_stock <= item.min_stock), [items]);
 
