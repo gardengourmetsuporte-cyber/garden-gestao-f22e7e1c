@@ -511,6 +511,20 @@ export const DeliveryMap = forwardRef<DeliveryMapHandle, Props>(function Deliver
         </div>
       )}
 
+      {/* My Location button */}
+      <button
+        type="button"
+        onClick={centerOnMyLocation}
+        className="absolute bottom-4 right-4 z-[500] w-10 h-10 rounded-full bg-card border border-border/30 shadow-lg flex items-center justify-center hover:bg-secondary/80 active:scale-95 transition-all"
+        title="Minha localização"
+      >
+        {locating ? (
+          <Loader2 className="w-5 h-5 text-primary animate-spin" />
+        ) : (
+          <LocateFixed className="w-5 h-5 text-primary" />
+        )}
+      </button>
+
       {/* Map fills parent */}
       <div
         ref={mapRef}
