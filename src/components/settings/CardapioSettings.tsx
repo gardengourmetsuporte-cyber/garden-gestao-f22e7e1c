@@ -257,19 +257,26 @@ export function CardapioSettings({ initialTab = null }: CardapioSettingsProps) {
             onUpdate={handleSettingsUpdate}
           />
 
-          {activeUnit && (
-            <Card className="p-3">
-              <p className="text-xs text-muted-foreground mb-1">Link do cardápio digital (com roleta)</p>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 text-xs bg-muted px-2 py-1.5 rounded truncate">
-                  {`${window.location.origin}/m/${activeUnit.id}`}
-                </code>
-                <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/m/${activeUnit.id}`); toast.success('Link copiado!'); }}>
-                  <AppIcon name="Copy" size={14} />
-                </Button>
-              </div>
-            </Card>
-          )}
+            {activeUnit && (
+              <Card className="p-3">
+                <p className="text-xs text-muted-foreground mb-1">Link do cardápio digital (com roleta)</p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-xs bg-muted px-2 py-1.5 rounded truncate">
+                    {`${basePublicUrl}/m/${activeUnit.id}`}
+                  </code>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${basePublicUrl}/m/${activeUnit.id}`);
+                      toast.success('Link copiado!');
+                    }}
+                  >
+                    <AppIcon name="Copy" size={14} />
+                  </Button>
+                </div>
+              </Card>
+            )}
 
           <GamificationMetrics
             playsToday={gamAdmin.metrics.playsToday}
