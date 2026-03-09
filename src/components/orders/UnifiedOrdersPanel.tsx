@@ -148,6 +148,10 @@ export function UnifiedOrdersPanel({ unitId, onRetryPDV }: Props) {
       </div>
 
       {/* Content */}
+      {activeTab === 'balcao' && (
+        <TabletOrderList orders={balcaoOrders} emptyIcon="Store" emptyTitle="Nenhum pedido no balcão" emptySubtitle="Pedidos para retirada aparecerão aqui" onRetryPDV={onRetryPDV} showCustomer onOpenOrder={setSelectedOrder} />
+      )}
+
       {activeTab === 'comandas' && (
         <TabletOrderList orders={comandas} emptyIcon="QrCode" emptyTitle="Nenhuma comanda" emptySubtitle="Pedidos feitos nas mesas aparecerão aqui" onRetryPDV={onRetryPDV} showTable onOpenOrder={setSelectedOrder} />
       )}
