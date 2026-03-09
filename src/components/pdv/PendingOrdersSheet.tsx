@@ -388,6 +388,28 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
     }
   };
 
+  const handleUpdateStatus = async (order: PendingOrder, newStatus: string) => {
+    setUpdatingStatus(order.id);
+    try {
+      const { error } = await supabase
+        .from('tablet_orders')
+        .update({ status: newStatus })
+        .eq('id', order.id);
+      if (error) throw error;
+      const labels: Record<string, string> = {
+        ready: 'Pedido marcado como pronto!',
+        delivered: 'Pedido entregue!',
+        cancelled: 'Pedido cancelado.',
+      };
+      toast.success(labels[newStatus] || 'Status atualizado!');
+      setSelectedOrder(null);
+    } catch (err: any) {
+      toast.error('Erro ao atualizar: ' + (err.message || 'erro'));
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
   const renderOrderCard = (order: typeof numberedOrders[0], sourceKey: string) => {
     const cfg = SOURCE_CONFIG[sourceKey] || { icon: 'ShoppingBag', label: sourceKey };
 
