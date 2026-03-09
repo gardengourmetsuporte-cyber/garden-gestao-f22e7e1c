@@ -17,6 +17,7 @@ import { useUnit } from '@/contexts/UnitContext';
 interface TabDef {
   key: string;
   icon: string;
+  customIcon?: string;
   label: string;
   path: string;
   moduleKey: string;
@@ -27,7 +28,7 @@ const HOME_TAB: TabDef = { key: 'home', icon: 'Home', label: 'Início', path: '/
 // Custom tabs when inside CardapioHub
 const CARDAPIO_TABS: TabDef[] = [
   { key: 'home', icon: 'Home', label: 'Início', path: '/cardapio', moduleKey: 'cardapio' },
-  { key: 'cardapio', icon: 'MenuBook', label: 'Cardápio', path: '/cardapio?tab=produtos', moduleKey: 'cardapio' },
+  { key: 'cardapio', icon: 'MenuBook', customIcon: '/icons/cardapio.png', label: 'Cardápio', path: '/cardapio?tab=produtos', moduleKey: 'cardapio' },
   { key: 'pedidos', icon: 'Receipt', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
 ];
 
@@ -402,16 +403,20 @@ const TabButton = forwardRef<
             background: active ? 'radial-gradient(circle, hsl(var(--primary) / 0.12) 0%, transparent 70%)' : 'none',
           }}
         />
-        <AppIcon
-          name={tab.icon}
-          size={22}
-          fill={active ? 1 : 0}
-          weight={active ? 600 : 400}
-          className={cn(
-            "relative z-10 transition-colors duration-300",
-            active ? 'text-primary' : ''
-          )}
-        />
+        {tab.customIcon ? (
+          <img src={tab.customIcon} alt="" className={cn("w-[22px] h-[22px] relative z-10 transition-all", active ? "brightness-0 invert opacity-90" : "dark:invert dark:opacity-70 opacity-70")} />
+        ) : (
+          <AppIcon
+            name={tab.icon}
+            size={22}
+            fill={active ? 1 : 0}
+            weight={active ? 600 : 400}
+            className={cn(
+              "relative z-10 transition-colors duration-300",
+              active ? 'text-primary' : ''
+            )}
+          />
+        )}
         {locked && (
           <AppIcon name="Gem" size={9} className="absolute -top-1 -right-2 z-10" style={{ color: 'hsl(45 90% 55%)' }} />
         )}
