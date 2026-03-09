@@ -100,8 +100,23 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, o
 
     setSending(true);
 
-    const maxRetries = 3;
     const requestTimeoutMs = 12000;
+    const maxRetries = 3;
+
+    // Resolve live auto-confirm from unit store_info (avoid stale cache on long-open tablets)
+    let shouldAutoConfirm = autoConfirm;
+    try {
+      const { data: unitRow } = await withTimeout(
+        supabase.from('units').select('store_info').eq('id', unitId).maybeSingle(),
+        requestTimeoutMs,
+        'get_store_info'
+      );
+      const live = (unitRow as any)?.store_info?.auto_confirm?.mesa;
+      if (typeof live === 'boolean') shouldAutoConfirm = live;
+    } catch {
+      // keep prop fallback
+    }
+
     let lastError: any = null;
 
     try {
@@ -113,7 +128,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, o
               .insert({
                 unit_id: unitId,
                 table_number: parseInt(tableNumber) || 0,
-                status: autoConfirm ? 'confirmed' : 'awaiting_confirmation',
+                status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
                 total: cartTotal,
                 source: 'mesa',
                 customer_name: customerName.trim(),
@@ -134,16 +149,34 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, o
             unit_price: c.product.price + c.selectedOptions.reduce((s, o) => s + o.price, 0),
           }));
 
-          const { error: itemsError } = await withTimeout(
-            supabase.from('tablet_order_items').insert(items),
-            requestTimeoutMs,
-            'create_items'
-          );
-          if (itemsError) throw new Error(itemsError.message);
+           const { error: itemsError } = await withTimeout(
+             supabase.from('tablet_order_items').insert(items),
+             requestTimeoutMs,
+             'create_items'
+           );
+           if (itemsError) throw new Error(itemsError.message);
 
-          toast.success('Pedido enviado com sucesso!');
-          setOrderSent((order as any).id.slice(0, 8));
-          return; // Success — exit
+           if (shouldAutoConfirm) {
+             try {
+               await fetch(
+                 `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+                 {
+                   method: 'POST',
+                   headers: {
+                     'Content-Type': 'application/json',
+                     apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                   },
+                   body: JSON.stringify({ order_id: (order as any).id }),
+                 }
+               );
+             } catch (e) {
+               console.warn('[TabletMenuCart] send-to-pdv failed:', e);
+             }
+           }
+
+           toast.success('Pedido enviado com sucesso!');
+           setOrderSent((order as any).id.slice(0, 8));
+           return; // Success — exit
         } catch (err: any) {
           lastError = err;
 

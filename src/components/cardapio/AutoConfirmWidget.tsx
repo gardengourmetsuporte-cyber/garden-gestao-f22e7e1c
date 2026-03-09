@@ -31,7 +31,11 @@ export function AutoConfirmWidget({ unitId, storeInfo }: Props) {
         .update({ store_info: updated })
         .eq('id', unitId);
       if (error) throw error;
+
+      // Refresh cached menu data immediately (tablet + delivery)
       queryClient.invalidateQueries({ queryKey: ['store-info', unitId] });
+      queryClient.invalidateQueries({ queryKey: ['digital-menu', unitId] });
+
       toast.success(value ? 'Confirmação automática ativada' : 'Confirmação automática desativada');
     } catch {
       toast.error('Erro ao salvar configuração');
