@@ -93,6 +93,7 @@ const Notifications = lazy(() => lazyRetry(() => import("./pages/Notifications")
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
 const ShareReceiptHandler = lazy(() => lazyRetry(() => import("./pages/ShareReceiptHandler")));
 const Documentation = lazy(() => lazyRetry(() => import("./pages/Documentation")));
+const Compliance = lazy(() => lazyRetry(() => import("./pages/Compliance")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
