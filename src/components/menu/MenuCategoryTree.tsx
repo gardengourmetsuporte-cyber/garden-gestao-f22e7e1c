@@ -73,6 +73,8 @@ interface Props {
   onDeleteGroup: (id: string) => void;
   getProductCount: (groupId: string) => number;
   renderGroupContent?: (groupId: string) => React.ReactNode;
+  viewMode?: 'menu' | 'ficha';
+  getProductsByGroup?: (groupId: string) => MenuProduct[];
 }
 
 export function MenuCategoryTree({
