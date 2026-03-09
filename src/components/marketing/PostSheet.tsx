@@ -304,6 +304,7 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
             )}
           </div>
         </div>
+        )}
       </SheetContent>
     </Sheet>
   );
