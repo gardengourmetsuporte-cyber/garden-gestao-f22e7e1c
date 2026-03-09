@@ -274,7 +274,7 @@ export default function PDV() {
                 </button>
 
                 {/* Items */}
-                <div className="max-h-28 overflow-y-auto space-y-1">
+                <div className="max-h-40 overflow-y-auto space-y-1.5">
                   {pos.cart.map(item => (
                     <div key={item.id} className="space-y-0.5">
                       <div className="flex items-center gap-2">
