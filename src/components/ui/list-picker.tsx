@@ -78,7 +78,7 @@ export function ListPicker({
   );
 
   return (
-    <Sheet nested open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) resetState(); }}>
+    <Sheet nested={nested} open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) resetState(); }}>
        <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl" onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader className="pb-3 border-b border-border/20">
           <SheetTitle>{title}</SheetTitle>
