@@ -1,14 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDigitalMenu, DMProduct } from '@/hooks/useDigitalMenu';
 import { MenuProductDetail } from '@/components/digital-menu/MenuProductDetail';
 import { MenuSearch } from '@/components/digital-menu/MenuSearch';
 import { TabletMenuCart } from '@/components/digital-menu/TabletMenuCart';
+import { MenuCustomerAuth } from '@/components/digital-menu/MenuCustomerAuth';
+import { MenuCustomerProfile } from '@/components/digital-menu/MenuCustomerProfile';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { formatCurrency as formatPrice } from '@/lib/format';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import gardenLogo from '@/assets/logo.png';
+import type { User } from '@supabase/supabase-js';
 
 export default function TabletDigitalMenu() {
   const { unitId } = useParams<{ unitId: string }>();
