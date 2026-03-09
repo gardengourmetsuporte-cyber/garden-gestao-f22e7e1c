@@ -437,7 +437,11 @@ export function usePOS() {
       .eq('id', uu.access_level_id)
       .maybeSingle();
 
-    const hasPermission = al?.modules?.includes(requiredModule) ?? false;
+    const modules = al?.modules || [];
+    const hasPermission =
+      modules.includes(requiredModule) ||
+      (requiredModule === 'menu-admin.pdv-cancel' && modules.includes('menu-admin.pdv'));
+
     return { authorized: hasPermission, userName: emp.full_name };
   }, [activeUnitId]);
 
