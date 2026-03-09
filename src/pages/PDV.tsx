@@ -34,6 +34,12 @@ export default function PDV() {
   const [openRegisterDialog, setOpenRegisterDialog] = useState(false);
   const [closeRegisterSheet, setCloseRegisterSheet] = useState(false);
   const [deliveryPaymentOpen, setDeliveryPaymentOpen] = useState(false);
+  const [invoiceData, setInvoiceData] = useState<{
+    saleId: string;
+    total: number;
+    payments: { method: string; amount: number }[];
+    items: { name: string; quantity: number; unit_price: number }[];
+  } | null>(null);
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
