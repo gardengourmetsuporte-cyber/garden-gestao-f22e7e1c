@@ -129,7 +129,7 @@ export default function PDV() {
       <AppLayout>
         <div className="flex flex-col items-center justify-center h-[calc(100dvh-env(safe-area-inset-top)-3.5rem)] px-6 text-center pb-[calc(72px+env(safe-area-inset-bottom,0px))] lg:pb-0">
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-            <AppIcon name="Lock" size={28} className="text-primary" />
+            <AppIcon name="LockKeyhole" size={28} className="text-primary" />
           </div>
           <h2 className="text-lg font-bold text-foreground mb-1">Caixa Fechado</h2>
           <p className="text-sm text-muted-foreground mb-6 max-w-xs">
