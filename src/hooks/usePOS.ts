@@ -107,6 +107,8 @@ export function usePOS() {
         id: o.id,
         source: o.source || 'mesa',
         customer_name: o.customer_name,
+        customer_phone: o.customer_phone || null,
+        customer_address: o.customer_address || null,
         table_number: o.table_number,
         total: o.total,
         status: o.status,
