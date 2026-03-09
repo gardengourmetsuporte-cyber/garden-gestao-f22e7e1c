@@ -23,7 +23,7 @@ export function PageLoader({ logoUrl }: PageLoaderProps = {}) {
           <img
             alt="Garden Gestão"
             className="w-full h-full object-cover animate-pulse"
-            src={gardenLogo}
+            src={logo}
             style={{ animationDuration: '2s' }}
             fetchPriority="high"
             decoding="async"
