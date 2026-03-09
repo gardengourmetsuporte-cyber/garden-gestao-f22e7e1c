@@ -36,6 +36,7 @@ export interface MenuProduct {
   name: string;
   codigo_pdv: string | null;
   price: number;
+  coin_price: number | null;
   category: string;
   image_url: string | null;
   description: string | null;
