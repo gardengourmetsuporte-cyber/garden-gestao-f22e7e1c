@@ -98,7 +98,7 @@ export default function Compliance() {
             icon="ShieldCheck"
             title="Nenhuma obrigação cadastrada"
             subtitle="Cadastre alvarás, laudos, licenças e outros documentos obrigatórios."
-            actionLabel="Cadastrar"
+            actionLabel="Nova Obrigação"
             actionIcon="Plus"
             onAction={() => { setEditing(null); setSheetOpen(true); }}
           />

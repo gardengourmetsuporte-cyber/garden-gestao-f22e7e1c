@@ -7,7 +7,7 @@ const features = [
   { icon: "Package", label: "Estoque" },
   { icon: "Users", label: "Equipe" },
   { icon: "ListChecks", label: "Checklists" },
-  { icon: "Bot", label: "IA Copiloto" },
+  { icon: "Bot", label: "Copilot IA" },
   { icon: "ShoppingCart", label: "Pedidos" },
 ];
 

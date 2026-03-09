@@ -316,7 +316,7 @@ function ConfigButton({ slotWidth, active, onClick }: { slotWidth: string; activ
         />
         <AppIcon name="Menu" size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={cn("relative z-10 transition-colors duration-300", active ? 'text-primary' : 'text-muted-foreground')} />
       </div>
-      <span className={cn("text-[10px] transition-all duration-300", active ? "font-semibold text-primary translate-y-[-1px]" : "font-normal text-muted-foreground")}>Mais</span>
+      <span className={cn("text-[10px] transition-all duration-300", active ? "font-semibold text-primary translate-y-[-1px]" : "font-normal text-muted-foreground")}>Config</span>
     </button>
   );
 }

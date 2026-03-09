@@ -466,7 +466,7 @@ const SECTIONS: DocSection[] = [
   },
   {
     id: 'mod-whatsapp',
-    title: 'WhatsApp Bot',
+    title: 'WhatsApp IA',
     icon: <MessageCircle className="w-4 h-4" />,
     category: 'modules',
     content: (

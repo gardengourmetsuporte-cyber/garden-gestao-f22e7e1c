@@ -49,7 +49,7 @@ export default function Customers() {
     setSheetOpen(true);
   }, []);
 
-  useFabAction({ icon: 'Plus', label: 'Novo cliente', onClick: openNewSheet }, [openNewSheet]);
+  useFabAction({ icon: 'Plus', label: 'Novo Cliente', onClick: openNewSheet }, [openNewSheet]);
 
   const filtered = useMemo(() => {
     let list = customers;

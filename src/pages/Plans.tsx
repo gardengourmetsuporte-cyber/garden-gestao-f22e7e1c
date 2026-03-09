@@ -194,7 +194,7 @@ export default function Plans() {
                     <h3 className="text-sm font-bold text-foreground">Quer ainda mais?</h3>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    O plano Business inclui Marketing, Copilot IA, WhatsApp Bot, Cardápio Digital, Tablets e Gamificação.
+                    O plano Business inclui Marketing, Copilot IA, WhatsApp IA, Cardápio Digital, Tablets e Gamificação.
                   </p>
                   <button
                     onClick={handleManageSubscription}
