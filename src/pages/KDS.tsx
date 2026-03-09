@@ -378,14 +378,28 @@ export default function KDS() {
   }, []);
 
   const handleBump = useCallback(async (orderId: string, nextStatus: string) => {
+    // Optimistic: remove from local cache immediately if moving to delivered
+    if (nextStatus === 'delivered' || nextStatus === 'completed') {
+      queryClient.setQueryData(['kds-orders', unitId], (old: KDSOrder[] | undefined) =>
+        (old || []).filter(o => o.id !== orderId)
+      );
+    } else {
+      // Optimistic: update status locally
+      queryClient.setQueryData(['kds-orders', unitId], (old: KDSOrder[] | undefined) =>
+        (old || []).map(o => o.id === orderId ? { ...o, status: nextStatus } : o)
+      );
+    }
+
     const { error } = await supabase
       .from('tablet_orders')
-      .update({ status: nextStatus })
+      .update({ status: nextStatus, updated_at: new Date().toISOString() })
       .eq('id', orderId);
+
     if (error) {
       console.error('[KDS] Bump failed:', error);
+      // Revert optimistic update
+      queryClient.invalidateQueries({ queryKey: ['kds-orders', unitId] });
     }
-    queryClient.invalidateQueries({ queryKey: ['kds-orders', unitId] });
   }, [unitId, queryClient]);
 
   const toggleFullscreen = useCallback(() => {
