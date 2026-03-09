@@ -283,9 +283,9 @@ export const ICON_MAP: Record<string, string> = {
 
   // Health & Body
   Heart: 'favorite',
-  HeartPulse: 'monitor_heart',
+  HeartPulse: 'ecg_heart',
   Pill: 'medication',
-  Stethoscope: 'stethoscope',
+  Stethoscope: 'medical_services',
   Dumbbell: 'fitness_center',
 
   // Entertainment
