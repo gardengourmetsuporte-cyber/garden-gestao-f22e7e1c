@@ -128,7 +128,7 @@ async function cloneTemplates(sourceUnitId: string, targetUnitId: string, option
       const [{ data: srcCats }, { data: tgtCats }] = catResult;
       if (srcCats && tgtCats) {
         const tgtByName = new Map(tgtCats.map(c => [c.name, c.id]));
-        srcCats.forEach(c => { const t = tgtByName.get(c.name); if (t) categoryMap.set(c.id, t); });
+        srcCats.forEach(c => { const t = tgtByName.get(c.name); if (t) categoryMap.set(c.id as string, t as string); });
       }
     }
     if (suppResult) {
