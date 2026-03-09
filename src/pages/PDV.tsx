@@ -22,6 +22,7 @@ export default function PDV() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [cartExpanded, setCartExpanded] = useState(true);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [originalCartSize, setOriginalCartSize] = useState(0);
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
@@ -45,9 +46,12 @@ export default function PDV() {
   const handleLoadOrder = (order: PendingOrder) => {
     pos.loadOrderIntoCart(order);
     setActiveOrderId(order.id);
+    setOriginalCartSize(order.items.length);
     setCartExpanded(true);
     setOrdersOpen(false);
   };
+
+  const hasNewItems = activeOrderId ? pos.cart.length > originalCartSize : false;
 
 
   return (
@@ -257,11 +261,24 @@ export default function PDV() {
                           Cobrar
                         </Button>
                       </>
-                    ) : (
-                      <Button size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
-                        <AppIcon name="Send" size={14} className="mr-1" />
-                        Enviar Pedido
+                    ) : activeOrderId && !hasNewItems ? (
+                      <Button size="sm" onClick={() => setPaymentOpen(true)}>
+                        <AppIcon name="Banknote" size={14} className="mr-1" />
+                        Cobrar
                       </Button>
+                    ) : (
+                      <>
+                        {activeOrderId && hasNewItems && (
+                          <Button variant="outline" size="sm" onClick={() => setPaymentOpen(true)}>
+                            <AppIcon name="Banknote" size={14} className="mr-1" />
+                            Cobrar
+                          </Button>
+                        )}
+                        <Button size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
+                          <AppIcon name="Send" size={14} className="mr-1" />
+                          Enviar Pedido
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
