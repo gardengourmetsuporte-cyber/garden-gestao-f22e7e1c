@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
 import { formatCurrency } from '@/lib/format';
+import { CustomerLeaderboard } from '@/components/digital-menu/CustomerLeaderboard';
 import gardenLogo from '@/assets/logo.png';
 
 interface StoreInfo {
