@@ -90,9 +90,9 @@ import { AppIcon } from '@/components/ui/app-icon';
                <AppIcon name="Calculator" className="h-4 w-4" />
                Rateio de Custos Fixos
              </CardTitle>
-             <CardDescription>
-               Os custos fixos do financeiro serão divididos pela quantidade de produtos vendidos
-             </CardDescription>
+              <CardDescription>
+                Os custos fixos do financeiro serão distribuídos proporcionalmente ao preço de venda de cada produto
+              </CardDescription>
            </CardHeader>
            <CardContent className="space-y-4">
              <div className="space-y-2">
