@@ -4,22 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AppIcon } from '@/components/ui/app-icon';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
-import { Obligation, OBLIGATION_CATEGORIES } from '@/hooks/useObligations';
+import { Obligation, OBLIGATION_TEMPLATES, getCategoryConfig } from '@/hooks/useObligations';
 
 interface ObligationSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   obligation?: Obligation | null;
+  template?: typeof OBLIGATION_TEMPLATES[number] | null;
   onSave: (data: any) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
 }
 
-export function ObligationSheet({ open, onOpenChange, obligation, onSave, onDelete }: ObligationSheetProps) {
+export function ObligationSheet({ open, onOpenChange, obligation, template, onSave, onDelete }: ObligationSheetProps) {
   const { activeUnit } = useUnit();
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -46,10 +46,23 @@ export function ObligationSheet({ open, onOpenChange, obligation, onSave, onDele
         notes: obligation.notes || '',
         document_url: obligation.document_url || '',
       });
+    } else if (template) {
+      setForm({
+        title: template.title,
+        category: template.category,
+        description: template.description,
+        issue_date: '',
+        expiry_date: '',
+        alert_days_before: template.defaultAlertDays,
+        notes: '',
+        document_url: '',
+      });
     } else {
       setForm({ title: '', category: 'outros', description: '', issue_date: '', expiry_date: '', alert_days_before: 30, notes: '', document_url: '' });
     }
-  }, [obligation, open]);
+  }, [obligation, template, open]);
+
+  const cat = getCategoryConfig(form.category);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -97,66 +110,54 @@ export function ObligationSheet({ open, onOpenChange, obligation, onSave, onDele
       <SheetContent side="bottom" className="rounded-t-3xl max-h-[90vh] overflow-y-auto pb-safe">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <AppIcon name="ShieldCheck" size={20} />
-            {obligation ? 'Editar Obrigação' : 'Nova Obrigação'}
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: cat.color + '20' }}>
+              <AppIcon name={template?.icon as any || 'ShieldCheck'} size={18} style={{ color: cat.color }} />
+            </div>
+            <div className="text-left">
+              <div className="text-base">{form.title || 'Nova Obrigação'}</div>
+              <div className="text-xs font-normal text-muted-foreground">{cat.label}</div>
+            </div>
           </SheetTitle>
         </SheetHeader>
 
         <div className="space-y-4 mt-4">
-          <div>
-            <Label>Título *</Label>
-            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Ex: Laudo do Bombeiro" />
-          </div>
-
-          <div>
-            <Label>Categoria</Label>
-            <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {OBLIGATION_CATEGORIES.map(c => (
-                  <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Descrição</Label>
-            <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Observações..." rows={2} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Data de emissão</Label>
-              <Input type="date" value={form.issue_date} onChange={e => setForm(f => ({ ...f, issue_date: e.target.value }))} />
+          {/* Key dates - the main action */}
+          <div className="bg-secondary/30 rounded-xl p-4 space-y-3">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Datas</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Emissão</Label>
+                <Input type="date" value={form.issue_date} onChange={e => setForm(f => ({ ...f, issue_date: e.target.value }))} />
+              </div>
+              <div>
+                <Label className="text-xs">Vencimento</Label>
+                <Input type="date" value={form.expiry_date} onChange={e => setForm(f => ({ ...f, expiry_date: e.target.value }))} />
+              </div>
             </div>
             <div>
-              <Label>Data de vencimento</Label>
-              <Input type="date" value={form.expiry_date} onChange={e => setForm(f => ({ ...f, expiry_date: e.target.value }))} />
+              <Label className="text-xs">Alertar quantos dias antes</Label>
+              <Input type="number" min={1} value={form.alert_days_before} onChange={e => setForm(f => ({ ...f, alert_days_before: parseInt(e.target.value) || 30 }))} />
             </div>
           </div>
 
-          <div>
-            <Label>Alertar quantos dias antes</Label>
-            <Input type="number" min={1} value={form.alert_days_before} onChange={e => setForm(f => ({ ...f, alert_days_before: parseInt(e.target.value) || 30 }))} />
-          </div>
-
-          <div>
-            <Label>Documento (PDF, foto)</Label>
+          {/* Document upload */}
+          <div className="bg-secondary/30 rounded-xl p-4 space-y-2">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Documento</h3>
             <div className="flex items-center gap-2">
               <Input type="file" accept="image/*,.pdf" onChange={handleUpload} disabled={uploading} />
               {uploading && <AppIcon name="Loader2" size={16} className="animate-spin text-muted-foreground" />}
             </div>
             {form.document_url && (
-              <a href={form.document_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline mt-1 inline-block">
-                Ver documento atual
+              <a href={form.document_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline inline-flex items-center gap-1">
+                <AppIcon name="ExternalLink" size={12} /> Ver documento
               </a>
             )}
           </div>
 
+          {/* Notes */}
           <div>
-            <Label>Notas</Label>
-            <Textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} />
+            <Label className="text-xs">Observações</Label>
+            <Textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Anotações, responsável, contato..." />
           </div>
 
           <div className="flex gap-2 pt-2">
@@ -167,7 +168,8 @@ export function ObligationSheet({ open, onOpenChange, obligation, onSave, onDele
             )}
             <Button className="flex-1" onClick={handleSubmit} disabled={saving}>
               {saving && <AppIcon name="Loader2" size={16} className="animate-spin mr-2" />}
-              {obligation ? 'Salvar' : 'Cadastrar'}
+              <AppIcon name="Check" size={16} className="mr-1" />
+              {obligation ? 'Atualizar' : 'Salvar'}
             </Button>
           </div>
         </div>

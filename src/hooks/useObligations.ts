@@ -35,12 +35,36 @@ export const OBLIGATION_CATEGORIES = [
   { value: 'outros', label: 'Outros', color: '#64748b' },
 ] as const;
 
+// Pre-defined obligations for food service businesses
+export const OBLIGATION_TEMPLATES = [
+  { category: 'bombeiro', title: 'AVCB / CLCB', description: 'Auto de Vistoria ou Certificado de Licenciamento do Corpo de Bombeiros', icon: 'Flame', defaultAlertDays: 60 },
+  { category: 'bombeiro', title: 'Extintores - Recarga', description: 'Recarga anual dos extintores de incêndio', icon: 'FireExtinguisher', defaultAlertDays: 30 },
+  { category: 'vigilancia_sanitaria', title: 'Alvará Sanitário', description: 'Licença sanitária emitida pela Vigilância', icon: 'HeartPulse', defaultAlertDays: 60 },
+  { category: 'vigilancia_sanitaria', title: 'Manual de Boas Práticas (MBP)', description: 'Documento obrigatório RDC 216/2004', icon: 'BookOpen', defaultAlertDays: 90 },
+  { category: 'vigilancia_sanitaria', title: 'POP - Procedimentos Operacionais', description: 'Procedimentos Operacionais Padronizados', icon: 'ClipboardList', defaultAlertDays: 90 },
+  { category: 'vigilancia_sanitaria', title: 'Análise de Água', description: 'Laudo de potabilidade da água', icon: 'Droplets', defaultAlertDays: 30 },
+  { category: 'vigilancia_sanitaria', title: 'Curso Manipulação de Alimentos', description: 'Certificado de capacitação dos manipuladores', icon: 'GraduationCap', defaultAlertDays: 60 },
+  { category: 'prefeitura', title: 'Alvará de Funcionamento', description: 'Licença municipal para funcionamento do estabelecimento', icon: 'Building2', defaultAlertDays: 60 },
+  { category: 'prefeitura', title: 'Inscrição Municipal (ISS)', description: 'Cadastro municipal e imposto sobre serviços', icon: 'FileText', defaultAlertDays: 30 },
+  { category: 'detetizacao', title: 'Dedetização / Desinsetização', description: 'Controle de pragas e vetores com laudo técnico', icon: 'Bug', defaultAlertDays: 15 },
+  { category: 'detetizacao', title: 'Desratização', description: 'Controle de roedores com certificado', icon: 'Bug', defaultAlertDays: 15 },
+  { category: 'detetizacao', title: 'Limpeza de Caixa d\'Água', description: 'Higienização semestral da caixa d\'água', icon: 'Droplets', defaultAlertDays: 30 },
+  { category: 'detetizacao', title: 'Limpeza de Coifa / Exaustão', description: 'Higienização do sistema de exaustão', icon: 'Wind', defaultAlertDays: 30 },
+  { category: 'contabilidade', title: 'CNPJ Ativo', description: 'Cadastro Nacional de Pessoa Jurídica', icon: 'FileCheck', defaultAlertDays: 30 },
+  { category: 'contabilidade', title: 'Certificado Digital (e-CNPJ)', description: 'Certificado digital para emissão de NF', icon: 'KeyRound', defaultAlertDays: 30 },
+  { category: 'trabalhista', title: 'PPRA / PGR', description: 'Programa de Gerenciamento de Riscos', icon: 'ShieldAlert', defaultAlertDays: 60 },
+  { category: 'trabalhista', title: 'PCMSO', description: 'Programa de Controle Médico de Saúde Ocupacional', icon: 'Stethoscope', defaultAlertDays: 60 },
+  { category: 'trabalhista', title: 'ASO - Exames Periódicos', description: 'Atestados de Saúde Ocupacional dos funcionários', icon: 'UserCheck', defaultAlertDays: 30 },
+  { category: 'ambiental', title: 'Licença Ambiental', description: 'Licença ambiental (quando aplicável)', icon: 'Leaf', defaultAlertDays: 60 },
+  { category: 'ambiental', title: 'Cadastro Óleo de Cozinha', description: 'Destinação correta do óleo usado', icon: 'Recycle', defaultAlertDays: 30 },
+] as const;
+
 export function getCategoryConfig(category: string) {
   return OBLIGATION_CATEGORIES.find(c => c.value === category) || OBLIGATION_CATEGORIES[OBLIGATION_CATEGORIES.length - 1];
 }
 
 export function getObligationStatus(obligation: { expiry_date: string | null; alert_days_before: number }) {
-  if (!obligation.expiry_date) return { label: 'Sem vencimento', variant: 'muted' as const, color: '#64748b' };
+  if (!obligation.expiry_date) return { label: 'Pendente', variant: 'muted' as const, color: '#64748b' };
   const now = new Date();
   const expiry = new Date(obligation.expiry_date + 'T23:59:59');
   const diffDays = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
