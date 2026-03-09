@@ -56,9 +56,11 @@ import { AppIcon } from '@/components/ui/app-icon';
       });
    };
  
-   const costPerProduct = parseFloat(monthlyProductsSold) > 0
-     ? monthlyFixedCost / parseFloat(monthlyProductsSold)
-     : 0;
+    const examplePrice = 30;
+    const revenue = parseFloat(monthlyRevenue) || 50000;
+    const costPerProduct = revenue > 0
+      ? (examplePrice / revenue) * monthlyFixedCost
+      : 0;
  
    const formatCurrency = (value: number) =>
      new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
