@@ -72,62 +72,97 @@ export function TabletMenuCart({ cart, cartTotal, unitId, onUpdateQuantity, onRe
     );
   }
 
+  const withTimeout = async <T,>(promise: Promise<T>, ms: number, label: string): Promise<T> => {
+    let timeoutId: number | undefined;
+    const timeoutPromise = new Promise<T>((_, reject) => {
+      timeoutId = window.setTimeout(() => reject(new Error(`timeout:${label}`)), ms);
+    });
+
+    try {
+      return await Promise.race([promise, timeoutPromise]);
+    } finally {
+      if (timeoutId) window.clearTimeout(timeoutId);
+    }
+  };
+
   const handleSend = async () => {
-    if (!tableNumber.trim()) { toast.error('Informe o número da mesa'); return; }
-    if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
+    if (!tableNumber.trim()) {
+      toast.error('Informe o número da mesa');
+      return;
+    }
+    if (!customerName.trim()) {
+      toast.error('Informe seu nome');
+      return;
+    }
 
     setSending(true);
 
     const maxRetries = 3;
+    const requestTimeoutMs = 12000;
     let lastError: any = null;
 
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        const { data: order, error: orderError } = await supabase
-          .from('tablet_orders')
-          .insert({
-            unit_id: unitId,
-            table_number: parseInt(tableNumber) || 0,
-            status: 'awaiting_confirmation',
-            total: cartTotal,
-            source: 'mesa',
-            customer_name: customerName.trim(),
-          })
-          .select('id')
-          .single();
+    try {
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          const { data: order, error: orderError } = await withTimeout(
+            supabase
+              .from('tablet_orders')
+              .insert({
+                unit_id: unitId,
+                table_number: parseInt(tableNumber) || 0,
+                status: 'awaiting_confirmation',
+                total: cartTotal,
+                source: 'mesa',
+                customer_name: customerName.trim(),
+              })
+              .select('id')
+              .single(),
+            requestTimeoutMs,
+            'create_order'
+          );
 
-        if (orderError || !order) throw new Error(orderError?.message || 'Erro ao criar pedido');
+          if (orderError || !order) throw new Error(orderError?.message || 'Erro ao criar pedido');
 
-        const items = cart.map(c => ({
-          order_id: (order as any).id,
-          product_id: c.product.id,
-          quantity: c.quantity,
-          notes: [c.notes, c.selectedOptions.map(o => o.name).join(', ')].filter(Boolean).join(' | ') || null,
-          unit_price: c.product.price + c.selectedOptions.reduce((s, o) => s + o.price, 0),
-        }));
+          const items = cart.map(c => ({
+            order_id: (order as any).id,
+            product_id: c.product.id,
+            quantity: c.quantity,
+            notes: [c.notes, c.selectedOptions.map(o => o.name).join(', ')].filter(Boolean).join(' | ') || null,
+            unit_price: c.product.price + c.selectedOptions.reduce((s, o) => s + o.price, 0),
+          }));
 
-        const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
-        if (itemsError) throw new Error(itemsError.message);
+          const { error: itemsError } = await withTimeout(
+            supabase.from('tablet_order_items').insert(items),
+            requestTimeoutMs,
+            'create_items'
+          );
+          if (itemsError) throw new Error(itemsError.message);
 
-        toast.success('Pedido enviado com sucesso!');
-        setOrderSent((order as any).id.slice(0, 8));
-        setSending(false);
-        return; // Success — exit
-      } catch (err: any) {
-        lastError = err;
-        const isAbort = err?.name === 'AbortError' || err?.message?.includes('abort');
-        const isNetwork = err?.message?.includes('fetch') || err?.message?.includes('network');
-        if ((isAbort || isNetwork) && attempt < maxRetries - 1) {
-          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
-          continue; // Retry
+          toast.success('Pedido enviado com sucesso!');
+          setOrderSent((order as any).id.slice(0, 8));
+          return; // Success — exit
+        } catch (err: any) {
+          lastError = err;
+
+          const msg = String(err?.message || '');
+          const isTimeout = msg.startsWith('timeout:');
+          const isAbort = err?.name === 'AbortError' || msg.toLowerCase().includes('abort');
+          const isNetwork = msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('network');
+
+          if ((isTimeout || isAbort || isNetwork) && attempt < maxRetries - 1) {
+            await new Promise(r => setTimeout(r, 900 * (attempt + 1)));
+            continue; // Retry
+          }
+
+          break; // Non-retryable error
         }
-        break; // Non-retryable error
       }
-    }
 
-    toast.error('Erro ao enviar pedido. Verifique sua conexão e tente novamente.');
-    console.error('[TabletMenuCart] Order send failed:', lastError);
-    setSending(false);
+      toast.error('Conexão lenta. Tente novamente.');
+      console.error('[TabletMenuCart] Order send failed:', lastError);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
