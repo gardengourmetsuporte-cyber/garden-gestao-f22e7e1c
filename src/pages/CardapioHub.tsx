@@ -127,8 +127,24 @@ export default function CardapioHub() {
   const selectedGroup = groups.find(g => g.id === selectedGroupId) || null;
   const groupProducts = selectedGroupId ? getProductsByGroup(selectedGroupId) : [];
 
-  // FAB actions — contextual per tab
-  const { useFabActions } = require('@/contexts/FabActionContext');
+  // FAB actions — contextual per active tab
+  const fabActions = useMemo(() => {
+    if (!isProdutos && cardapioTab !== 'opcionais') return [];
+    const actions: { icon: string; label: string; onClick: () => void }[] = [];
+    if (isProdutos && cardapioTab === 'produtos') {
+      actions.push({
+        icon: viewMode === 'menu' ? 'RecipeBook' : 'Eye',
+        label: viewMode === 'menu' ? 'Ficha Técnica' : 'Cardápio',
+        onClick: () => setViewMode(v => v === 'menu' ? 'ficha' : 'menu'),
+      });
+    }
+    if (isProdutos && cardapioTab === 'opcionais') {
+      actions.push({ icon: 'Plus', label: 'Novo Opcional', onClick: openNewOG });
+    }
+    return actions;
+  }, [isProdutos, cardapioTab, viewMode]);
+
+  useFabActions(fabActions, [isProdutos, cardapioTab, viewMode]);
 
   // Order stats
   const todayStats = useMemo(() => {
