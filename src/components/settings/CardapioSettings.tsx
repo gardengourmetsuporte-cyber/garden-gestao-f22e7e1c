@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useGamificationAdmin } from '@/hooks/useGamificationAdmin';
 import { useUnit } from '@/contexts/UnitContext';
