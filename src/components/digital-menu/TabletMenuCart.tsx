@@ -244,7 +244,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
            }
 
            toast.success(payWithCoins ? 'Pedido enviado! Moedas debitadas ✨' : 'Pedido enviado com sucesso!');
-      order_number ? `${(order as any).order_number}` : (order as any).     setOrderSent((order as any).id.slice(0, 8));
+      setOrderSent((order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8));
            return; // Success — exit
         } catch (err: any) {
           lastError = err;
