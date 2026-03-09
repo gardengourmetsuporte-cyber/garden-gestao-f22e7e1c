@@ -8,6 +8,7 @@ import { usePOS, type POSProduct, type PaymentLine, type PendingOrder } from '@/
 import { useCashRegister } from '@/hooks/useCashRegister';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
 import { DeliveryPaymentSheet } from '@/components/pdv/DeliveryPaymentSheet';
+import { InvoiceSheet } from '@/components/pdv/InvoiceSheet';
 import { SalesHistorySheet } from '@/components/pdv/SalesHistorySheet';
 import { PendingOrdersSheet } from '@/components/pdv/PendingOrdersSheet';
 import { CashRegisterOpenDialog } from '@/components/pdv/CashRegisterOpenDialog';
