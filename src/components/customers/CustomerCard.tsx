@@ -52,7 +52,7 @@ export const CustomerCard = forwardRef<HTMLDivElement, Props>(function CustomerC
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
             className="p-2 -m-1 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
           >
-            <AppIcon name="Trash" size={16} />
+            <AppIcon name="Trash2" size={16} />
           </button>
         </div>
 
