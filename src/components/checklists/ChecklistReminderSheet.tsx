@@ -52,13 +52,24 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
       const userIds = unitUsers.map(u => u.user_id);
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, full_name, phone, avatar_url')
+        .select('user_id, full_name, avatar_url')
         .in('user_id', userIds);
+
+      // Get phone from employees table (linked by user_id)
+      const { data: employees } = await supabase
+        .from('employees')
+        .select('user_id, cpf')
+        .in('user_id', userIds)
+        .is('deleted_at', null);
+
+      const employeePhoneMap = new Map<string, string>();
+      // employees don't have phone field either, so WhatsApp will depend on channel config
+      // For now, we skip phone-based WhatsApp — the bulk-send will use the channel
 
       const list: TeamMember[] = (profiles || []).map(p => ({
         user_id: p.user_id,
         full_name: p.full_name || 'Sem nome',
-        phone: p.phone,
+        phone: null,
         avatar_url: p.avatar_url,
       }));
 
