@@ -5,22 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type CartItem, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
+import { PaymentSheet } from '@/components/pdv/PaymentSheet';
+import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
-
-const PAYMENT_METHODS = [
-  { key: 'cash', label: 'Dinheiro', icon: 'Banknote' },
-  { key: 'debit', label: 'Débito', icon: 'CreditCard' },
-  { key: 'credit', label: 'Crédito', icon: 'CreditCard' },
-  { key: 'pix', label: 'Pix', icon: 'QrCode' },
-  { key: 'meal_voucher', label: 'Vale Refeição', icon: 'Ticket' },
-] as const;
-
-function formatPrice(v: number) {
-  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
 
 export default function PDV() {
   const pos = usePOS();
@@ -28,11 +17,7 @@ export default function PDV() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
-  const [payments, setPayments] = useState<PaymentLine[]>([]);
-  const [payMethod, setPayMethod] = useState('pix');
-  const [payAmount, setPayAmount] = useState('');
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
-  const [mainTab, setMainTab] = useState('catalogo');
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
@@ -44,46 +29,11 @@ export default function PDV() {
     return list;
   }, [pos.products, selectedCategory, search]);
 
-  const paymentTotal = payments.reduce((s, p) => s + p.amount, 0);
-  const remaining = Math.max(0, pos.total - paymentTotal);
-  const change = Math.max(0, paymentTotal - pos.total);
-
-  const addPayment = () => {
-    const amt = parseFloat(payAmount) || pos.total - paymentTotal;
-    if (amt <= 0) return;
-    setPayments(prev => [...prev, { method: payMethod, amount: amt, change_amount: 0 }]);
-    setPayAmount('');
-  };
-
-  const removePayment = (idx: number) => {
-    setPayments(prev => prev.filter((_, i) => i !== idx));
-  };
-
-  const handleFinalize = async () => {
-    // If user didn't add payments, assume the remaining amount on the selected method.
-    let effectivePayments = payments;
-    let effectivePaymentTotal = paymentTotal;
-
-    if (effectivePaymentTotal < pos.total) {
-      const autoAmount = pos.total - effectivePaymentTotal;
-      if (autoAmount <= 0) return;
-      effectivePayments = [...effectivePayments, { method: payMethod, amount: autoAmount, change_amount: 0 }];
-      effectivePaymentTotal += autoAmount;
-      // Keep UI in sync (useful if finalize fails and the sheet stays open)
-      setPayments(effectivePayments);
-    }
-
-    // Adjust last payment for change
-    const effectiveChange = Math.max(0, effectivePaymentTotal - pos.total);
-    const adjusted = [...effectivePayments];
-    if (effectiveChange > 0 && adjusted.length > 0) {
-      adjusted[adjusted.length - 1] = { ...adjusted[adjusted.length - 1], change_amount: effectiveChange };
-    }
-
-    const saleId = await pos.finalizeSale(adjusted, activeOrderId || undefined);
+  const handleFinalize = async (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string }) => {
+    if (options.notes) pos.setSaleNotes(options.notes);
+    const saleId = await pos.finalizeSale(payments, activeOrderId || undefined);
     if (saleId) {
       setPaymentOpen(false);
-      setPayments([]);
       setActiveOrderId(null);
     }
   };
@@ -92,7 +42,6 @@ export default function PDV() {
     pos.loadOrderIntoCart(order);
     setActiveOrderId(order.id);
     setOrdersOpen(false);
-    setMainTab('catalogo');
   };
 
   const statusLabel: Record<string, string> = {
@@ -184,7 +133,7 @@ export default function PDV() {
                   )}
                   <span className="text-xs font-medium text-foreground line-clamp-2 leading-tight">{product.name}</span>
                   {product.codigo_pdv && <span className="text-[10px] text-muted-foreground">#{product.codigo_pdv}</span>}
-                  <span className="text-xs font-bold text-primary">{formatPrice(product.price)}</span>
+                  <span className="text-xs font-bold text-primary">{formatCurrency(product.price)}</span>
                 </button>
               ))}
             </div>
@@ -214,7 +163,7 @@ export default function PDV() {
                     </button>
                   </div>
                   <span className="flex-1 truncate text-xs">{item.product.name}</span>
-                  <span className="text-xs font-medium shrink-0">{formatPrice(item.quantity * item.unit_price)}</span>
+                  <span className="text-xs font-medium shrink-0">{formatCurrency(item.quantity * item.unit_price)}</span>
                 </div>
               ))}
             </div>
@@ -239,14 +188,14 @@ export default function PDV() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground">{pos.cart.reduce((s, i) => s + i.quantity, 0)} itens</p>
-                <p className="text-lg font-bold text-foreground">{formatPrice(pos.total)}</p>
+                <p className="text-lg font-bold text-foreground">{formatCurrency(pos.total)}</p>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={pos.clearCart}>
                   <AppIcon name="Trash2" size={14} className="mr-1" />
                   Limpar
                 </Button>
-                <Button size="sm" onClick={() => { setPayments([]); setPaymentOpen(true); }}>
+                <Button size="sm" onClick={() => setPaymentOpen(true)}>
                   <AppIcon name="Banknote" size={14} className="mr-1" />
                   Cobrar
                 </Button>
@@ -257,106 +206,16 @@ export default function PDV() {
       </div>
 
       {/* Payment Sheet */}
-      <Sheet open={paymentOpen} onOpenChange={setPaymentOpen}>
-        <SheetContent side="bottom" className="max-h-[90vh] rounded-t-2xl flex flex-col">
-          <SheetHeader>
-            <SheetTitle>Pagamento — {formatPrice(pos.total)}</SheetTitle>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto space-y-4 mt-4 pb-4">
-            {/* Payments added */}
-            {payments.length > 0 && (
-              <div className="space-y-1.5">
-                {payments.map((p, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-secondary/40 rounded-xl px-3 py-2">
-                    <AppIcon name={PAYMENT_METHODS.find(m => m.key === p.method)?.icon || 'CreditCard'} size={16} className="text-muted-foreground" />
-                    <span className="text-sm flex-1">{PAYMENT_METHODS.find(m => m.key === p.method)?.label || p.method}</span>
-                    <span className="text-sm font-bold">{formatPrice(p.amount)}</span>
-                    <button onClick={() => removePayment(i)} className="text-destructive">
-                      <AppIcon name="X" size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Remaining */}
-            {remaining > 0 && (
-              <div className="text-center py-2">
-                <p className="text-xs text-muted-foreground">Falta</p>
-                <p className="text-2xl font-bold text-foreground">{formatPrice(remaining)}</p>
-              </div>
-            )}
-
-            {change > 0 && (
-              <div className="text-center py-2 bg-primary/10 rounded-xl">
-                <p className="text-xs text-muted-foreground">Troco</p>
-                <p className="text-2xl font-bold text-primary">{formatPrice(change)}</p>
-              </div>
-            )}
-
-            {/* Method selector */}
-            {remaining > 0 && (
-              <>
-                <div className="grid grid-cols-3 gap-2">
-                  {PAYMENT_METHODS.map(m => (
-                    <button
-                      key={m.key}
-                      onClick={() => setPayMethod(m.key)}
-                      className={cn(
-                        'flex flex-col items-center gap-1 p-3 rounded-xl border transition-all',
-                        payMethod === m.key ? 'border-primary bg-primary/10 text-primary' : 'border-border/50 text-muted-foreground'
-                      )}
-                    >
-                      <AppIcon name={m.icon} size={20} />
-                      <span className="text-[10px] font-medium">{m.label}</span>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex gap-2">
-                  <Input
-                    type="number"
-                    placeholder={`Valor (${formatPrice(remaining)})`}
-                    value={payAmount}
-                    onChange={e => setPayAmount(e.target.value)}
-                    className="flex-1"
-                    inputMode="decimal"
-                  />
-                  <Button onClick={addPayment} variant="outline">
-                    <AppIcon name="Plus" size={14} className="mr-1" />
-                    Adicionar
-                  </Button>
-                </div>
-
-                {/* Quick amount buttons for cash */}
-                {payMethod === 'cash' && (
-                  <div className="flex gap-2 flex-wrap">
-                    {[remaining, 10, 20, 50, 100, 200].filter(v => v >= remaining || v >= 10).slice(0, 5).map(v => (
-                      <button
-                        key={v}
-                        onClick={() => { setPayAmount(String(v)); }}
-                        className="px-3 py-1.5 rounded-lg bg-secondary text-xs font-medium"
-                      >
-                        {formatPrice(v)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Finalize */}
-            <Button
-              className="w-full"
-              size="lg"
-              disabled={pos.savingSale}
-              onClick={handleFinalize}
-            >
-              {pos.savingSale ? 'Finalizando...' : `Finalizar Venda — ${formatPrice(pos.total)}`}
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <PaymentSheet
+        open={paymentOpen}
+        onOpenChange={setPaymentOpen}
+        total={pos.total}
+        subtotal={pos.subtotal}
+        discount={pos.discount}
+        itemCount={pos.cart.reduce((s, i) => s + i.quantity, 0)}
+        savingSale={pos.savingSale}
+        onFinalize={handleFinalize}
+      />
 
       {/* Pending Orders Sheet */}
       <Sheet open={ordersOpen} onOpenChange={setOrdersOpen}>
@@ -390,7 +249,7 @@ export default function PDV() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-muted-foreground">{format(new Date(order.created_at), 'HH:mm')}</span>
-                    <span className="text-sm font-bold text-primary">{formatPrice(order.total)}</span>
+                    <span className="text-sm font-bold text-primary">{formatCurrency(order.total)}</span>
                   </div>
                   {order.items.length > 0 && (
                     <div className="mt-1.5 text-[10px] text-muted-foreground space-y-0.5">
