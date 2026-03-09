@@ -249,30 +249,31 @@ import { PackagingTemplatesSettings } from './PackagingTemplatesSettings';
                  </div>
                </div>
  
-               <div className="space-y-2">
-                 <Label htmlFor="packaging" className="flex items-center gap-2">
-                   Custo de embalagem
-                   <Tooltip>
-                     <TooltipTrigger>
-                       <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
-                     </TooltipTrigger>
-                     <TooltipContent>
-                       Custo médio de embalagem por unidade vendida
-                     </TooltipContent>
-                   </Tooltip>
-                 </Label>
-                 <div className="flex items-center gap-2">
-                   <span className="text-sm text-muted-foreground">R$</span>
-                   <Input
-                     id="packaging"
-                     type="number"
-                     value={packagingCostPerUnit}
-                     onChange={(e) => setPackagingCostPerUnit(e.target.value)}
-                     min="0"
-                     step="0.01"
-                   />
-                 </div>
-               </div>
+                <div className="space-y-2">
+                  <Label htmlFor="packaging" className="flex items-center gap-2">
+                    Custo de embalagem padrão
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AppIcon name="HelpCircle" className="h-4 w-4 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        Valor padrão usado para receitas sem template de embalagem vinculado.
+                        Use os Templates de Embalagem abaixo para definir custos específicos por produto.
+                      </TooltipContent>
+                    </Tooltip>
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">R$</span>
+                    <Input
+                      id="packaging"
+                      type="number"
+                      value={packagingCostPerUnit}
+                      onChange={(e) => setPackagingCostPerUnit(e.target.value)}
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
              </div>
            </CardContent>
          </Card>
