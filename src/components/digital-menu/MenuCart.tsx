@@ -149,26 +149,42 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
 
   const handleSend = async () => {
     if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
-    if (!customerPhone.trim()) { toast.error('Informe seu telefone'); return; }
-    if (!customerAddress.trim()) { toast.error('Informe seu endereço de entrega'); return; }
-    if (feeResult?.out_of_range) { toast.error('Endereço fora da área de entrega'); return; }
-
+    if (isQrCode) {
+      if (!tableNumber.trim() || parseInt(tableNumber) <= 0) { toast.error('Informe o número da mesa'); return; }
+    } else {
+      if (!customerPhone.trim()) { toast.error('Informe seu telefone'); return; }
+      if (!customerAddress.trim()) { toast.error('Informe seu endereço de entrega'); return; }
+      if (feeResult?.out_of_range) { toast.error('Endereço fora da área de entrega'); return; }
+    }
 
     setSending(true);
 
     try {
+      const orderData = isQrCode
+        ? {
+            unit_id: unitId,
+            table_number: parseInt(tableNumber),
+            status: 'awaiting_confirmation',
+            total: cartTotal,
+            source: 'qrcode' as string,
+            customer_name: customerName.trim(),
+            customer_phone: null as string | null,
+            customer_address: null as string | null,
+          }
+        : {
+            unit_id: unitId,
+            table_number: 0,
+            status: 'confirmed',
+            total: grandTotal,
+            source: 'delivery' as string,
+            customer_name: customerName.trim(),
+            customer_phone: customerPhone.replace(/\D/g, ''),
+            customer_address: customerAddress.trim(),
+          };
+
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
-        .insert({
-        unit_id: unitId,
-        table_number: 0,
-        status: 'confirmed',
-        total: grandTotal,
-        source: 'delivery',
-        customer_name: customerName.trim(),
-        customer_phone: customerPhone.replace(/\D/g, ''),
-        customer_address: customerAddress.trim(),
-      })
+        .insert(orderData)
         .select('id')
         .single();
 
