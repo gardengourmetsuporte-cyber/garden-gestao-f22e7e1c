@@ -94,6 +94,9 @@ export default function DigitalMenu() {
     }
   };
 
+  // Signup bonus points from store_info
+  const signupBonus = (unit?.store_info as any)?.signup_bonus_points ?? 0;
+
   // Create/update customer record using RPC (bypasses RLS)
   const ensureCustomerRecord = async (user: User, unitId: string) => {
     try {
@@ -101,13 +104,25 @@ export default function DigitalMenu() {
       const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email?.split('@')[0] || 'Cliente';
       if (!email) return;
 
-      await supabase.rpc('upsert_menu_customer', {
+      const { data: customerId } = await supabase.rpc('upsert_menu_customer', {
         p_unit_id: unitId,
         p_name: fullName,
         p_email: email,
         p_phone: user.phone || null,
         p_birthday: null,
       });
+
+      // Grant signup bonus (fire-and-forget)
+      if (customerId) {
+        supabase.rpc('grant_signup_bonus', {
+          p_customer_id: customerId,
+          p_unit_id: unitId,
+        }).then(({ data: pts }) => {
+          if (pts && pts > 0) {
+            toast.success(`🎁 Você ganhou ${pts} pontos de boas-vindas!`);
+          }
+        });
+      }
     } catch (err) {
       console.error('[DigitalMenu] Failed to ensure customer record:', err);
     }
@@ -295,6 +310,7 @@ export default function DigitalMenu() {
           cuisineType={unit?.store_info?.cuisine_type}
           city={unit?.store_info?.city}
           isOpen={true}
+          bonusPoints={signupBonus}
           onSkip={() => setShowAuth(false)}
           onEmailLogin={() => {
             setShowAuth(false);

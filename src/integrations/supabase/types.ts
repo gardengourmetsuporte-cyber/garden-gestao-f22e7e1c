@@ -5833,6 +5833,10 @@ export type Database = {
       get_sector_points_summary: { Args: { p_unit_id: string }; Returns: Json }
       get_unit_plan: { Args: { p_unit_id: string }; Returns: string }
       get_user_unit_ids: { Args: { _user_id: string }; Returns: string[] }
+      grant_signup_bonus: {
+        Args: { p_customer_id: string; p_unit_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
