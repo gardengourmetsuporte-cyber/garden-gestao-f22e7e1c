@@ -67,7 +67,7 @@ const WhatsApp = lazy(() => lazyRetry(() => import("./pages/WhatsApp")));
 const Profile = lazy(() => lazyRetry(() => import("./pages/Profile")));
 const Orders = lazy(() => lazyRetry(() => import("./pages/Orders")));
 const Marketing = lazy(() => lazyRetry(() => import("./pages/Marketing")));
-const BrandCore = lazy(() => lazyRetry(() => import("./pages/BrandCore")));
+// BrandCore removed — consolidated into Marketing
 const Ranking = lazy(() => lazyRetry(() => import("./pages/Ranking")));
 const Deliveries = lazy(() => lazyRetry(() => import("./pages/Deliveries")));
 const DeliveryHub = lazy(() => lazyRetry(() => import("./pages/DeliveryHub")));
