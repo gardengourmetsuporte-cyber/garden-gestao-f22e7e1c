@@ -47,22 +47,6 @@ export default function PDV() {
     setOrdersOpen(false);
   };
 
-  const statusLabel: Record<string, string> = {
-    pending: 'Aguardando',
-    confirmed: 'Confirmado',
-    preparing: 'Preparando',
-    ready: 'Pronto',
-    new: 'Novo',
-    accepted: 'Aceito',
-  };
-
-  const sourceIcon: Record<string, string> = {
-    mesa: 'UtensilsCrossed',
-    delivery: 'Truck',
-    ifood: 'Truck',
-    balcao: 'Store',
-    whatsapp: 'MessageCircle',
-  };
 
   return (
     <AppLayout>
