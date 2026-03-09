@@ -437,7 +437,7 @@ export function ItemFormSheetNew({
                     min={1}
                   />
                   {parseFloat(purchaseToStockFactor) > 0 && parseFloat(unitPrice) > 0 && (
-                    <p className="text-sm text-emerald-600 font-medium">
+                    <p className="text-sm text-primary font-medium">
                       = R$ {(parseFloat(unitPrice) * parseFloat(purchaseToStockFactor)).toFixed(2)} por {purchaseUnitLabel.trim()}
                       {parseFloat(stockToRecipeFactor) > 0 && (
                         <> ({parseFloat(purchaseToStockFactor) * parseFloat(stockToRecipeFactor)} unidades)</>
