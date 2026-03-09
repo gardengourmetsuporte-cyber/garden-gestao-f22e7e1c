@@ -161,6 +161,27 @@ export function MenuCategoryTree({
         const catGroups = groups.filter(g => g.category_id === cat.id);
         const totalProducts = catGroups.reduce((sum, g) => sum + getProductCount(g.id), 0);
 
+        // Ficha mode: compute category-level stats
+        const catStats = viewMode === 'ficha' && getProductsByGroup ? (() => {
+          const allProds = catGroups.flatMap(g => getProductsByGroup(g.id));
+          const withCost = allProds.filter(p => (p as any).cost_per_portion > 0);
+          if (withCost.length === 0) return null;
+          const avgCMV = withCost.reduce((s, p) => {
+            const cost = (p as any).cost_per_portion || 0;
+            return s + (p.price > 0 ? (cost / p.price) * 100 : 0);
+          }, 0) / withCost.length;
+          const avgMargin = withCost.reduce((s, p) => {
+            const cost = (p as any).cost_per_portion || 0;
+            return s + (cost > 0 ? ((p.price - cost) / cost) * 100 : 0);
+          }, 0) / withCost.length;
+          const linked = allProds.filter(p => !!(p as any).recipe_id).length;
+          return { avgCMV, avgMargin, linked, total: allProds.length, withCost: withCost.length };
+        })() : null;
+
+        const catMarginColor = catStats
+          ? catStats.avgMargin >= 200 ? 'text-success' : catStats.avgMargin >= 100 ? 'text-warning' : 'text-destructive'
+          : '';
+
         return (
           <div key={cat.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
             {/* Vertical accent bar */}
@@ -183,18 +204,30 @@ export function MenuCategoryTree({
                 </div>
                 <div className="flex-1 text-left min-w-0">
                   <p className="font-semibold text-foreground truncate">{cat.name}</p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {catGroups.length} grupo{catGroups.length !== 1 ? 's' : ''} · {totalProducts} produto{totalProducts !== 1 ? 's' : ''}
-                  </p>
-                </div>
-                <AppIcon
-                  name="ChevronDown"
-                  size={16}
-                  className={cn(
-                    "text-muted-foreground/50 transition-transform duration-200",
-                    !expanded && "-rotate-90"
+                  {viewMode === 'ficha' && catStats ? (
+                    <p className="text-[11px] text-muted-foreground">
+                      {catStats.linked}/{catStats.total} com ficha · CMV {catStats.avgCMV.toFixed(0)}%
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      {catGroups.length} grupo{catGroups.length !== 1 ? 's' : ''} · {totalProducts} produto{totalProducts !== 1 ? 's' : ''}
+                    </p>
                   )}
-                />
+                </div>
+                {viewMode === 'ficha' && catStats ? (
+                  <span className={cn("text-sm font-bold shrink-0", catMarginColor)}>
+                    {catStats.avgMargin.toFixed(0)}%
+                  </span>
+                ) : (
+                  <AppIcon
+                    name="ChevronDown"
+                    size={16}
+                    className={cn(
+                      "text-muted-foreground/50 transition-transform duration-200",
+                      !expanded && "-rotate-90"
+                    )}
+                  />
+                )}
               </button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
