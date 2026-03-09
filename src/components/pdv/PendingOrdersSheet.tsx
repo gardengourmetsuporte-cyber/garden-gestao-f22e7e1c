@@ -330,6 +330,7 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
   const [filterSource, setFilterSource] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<(PendingOrder & { sequentialNumber: number }) | null>(null);
   const [dispatching, setDispatching] = useState<string | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
 
