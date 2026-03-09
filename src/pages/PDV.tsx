@@ -251,10 +251,17 @@ export default function PDV() {
                   <AppIcon name="Trash2" size={14} className="mr-1" />
                   Limpar
                 </Button>
-                <Button size="sm" onClick={() => setPaymentOpen(true)}>
-                  <AppIcon name="Banknote" size={14} className="mr-1" />
-                  Cobrar
-                </Button>
+                {pos.saleSource === 'balcao' ? (
+                  <Button size="sm" onClick={() => setPaymentOpen(true)}>
+                    <AppIcon name="Banknote" size={14} className="mr-1" />
+                    Cobrar
+                  </Button>
+                ) : (
+                  <Button size="sm" onClick={() => pos.sendOrder()} disabled={pos.savingSale}>
+                    <AppIcon name="Send" size={14} className="mr-1" />
+                    Enviar Pedido
+                  </Button>
+                )}
               </div>
             </div>
           </div>
