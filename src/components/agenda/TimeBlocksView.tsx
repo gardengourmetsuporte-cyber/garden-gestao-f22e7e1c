@@ -60,17 +60,29 @@ function PickerTaskList({ availableTasks, pickerHour, allocateTask }: {
     return <p className="text-sm text-muted-foreground text-center py-6">Todas as tarefas já foram alocadas</p>;
   }
 
-  const grouped = new Map<string, { category: ManagerTask['category']; tasks: ManagerTask[] }>();
-  const uncategorized: ManagerTask[] = [];
-  availableTasks.forEach(task => {
-    if (task.category) {
-      const key = task.category.id || task.category.name;
-      if (!grouped.has(key)) grouped.set(key, { category: task.category, tasks: [] });
-      grouped.get(key)!.tasks.push(task);
-    } else {
-      uncategorized.push(task);
-    }
+  // Sort all tasks by due_date (earliest first, no date last)
+  const sortedTasks = [...availableTasks].sort((a, b) => {
+    if (a.due_date && b.due_date) return a.due_date.localeCompare(b.due_date);
+    if (a.due_date && !b.due_date) return -1;
+    if (!a.due_date && b.due_date) return 1;
+    return (a.sort_order ?? 0) - (b.sort_order ?? 0);
   });
+
+  // Group by date
+  const grouped = new Map<string, ManagerTask[]>();
+  sortedTasks.forEach(task => {
+    const key = task.due_date || '__no_date__';
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key)!.push(task);
+  });
+
+  const formatGroupDate = (key: string) => {
+    if (key === '__no_date__') return 'Sem data';
+    const d = new Date(key + 'T12:00:00');
+    if (isToday(d)) return 'Hoje';
+    if (isTomorrow(d)) return 'Amanhã';
+    return format(d, "dd 'de' MMM", { locale: ptBR });
+  };
 
   const toggleGroup = (key: string) => {
     setExpandedGroups(prev => {
@@ -83,33 +95,44 @@ function PickerTaskList({ availableTasks, pickerHour, allocateTask }: {
 
   return (
     <div className="space-y-1.5 mt-3 pb-4">
-      {[...grouped.values()].map(({ category, tasks: catTasks }) => {
-        const key = category!.id || category!.name;
-        const isOpen = expandedGroups.has(key);
+      {[...grouped.entries()].map(([dateKey, dateTasks]) => {
+        const isOpen = expandedGroups.has(dateKey);
+        const isOverdue = dateKey !== '__no_date__' && dateKey < format(new Date(), 'yyyy-MM-dd');
         return (
-          <div key={key}>
+          <div key={dateKey}>
             <button
-              onClick={() => toggleGroup(key)}
+              onClick={() => toggleGroup(dateKey)}
               className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-all"
             >
               <div className="flex items-center gap-2.5">
-                <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: category!.color }} />
-                <span className="text-sm font-semibold">{category!.name}</span>
-                <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-muted/50 text-muted-foreground font-medium">{catTasks.length}</span>
+                <AppIcon name={dateKey === '__no_date__' ? 'CalendarOff' : 'CalendarDays'} size={14} className={isOverdue ? 'text-destructive' : 'text-primary'} />
+                <span className={cn("text-sm font-semibold", isOverdue && "text-destructive")}>{formatGroupDate(dateKey)}</span>
+                <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-muted/50 text-muted-foreground font-medium">{dateTasks.length}</span>
               </div>
               <AppIcon name="ChevronDown" size={16} className={cn("text-muted-foreground transition-transform duration-200", isOpen ? "rotate-0" : "-rotate-90")} />
             </button>
             <div className={cn("overflow-hidden transition-all duration-200", isOpen ? "max-h-[2000px] opacity-100 mt-1.5" : "max-h-0 opacity-0")}>
               <div className="space-y-1.5 ml-2">
-                {catTasks.map(task => (
+                {dateTasks.map(task => (
                   <button
                     key={task.id}
                     onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/5 border border-primary/10 hover:border-primary/25 transition-all text-left"
                   >
+                    {task.category && <span className="w-2 h-5 rounded-full shrink-0" style={{ backgroundColor: task.category.color }} />}
                     <div className="min-w-0 flex-1">
                       <span className="text-sm font-medium truncate block">{task.title}</span>
-                      {task.notes && <span className="text-[11px] text-muted-foreground truncate block">{task.notes}</span>}
+                      <div className="flex items-center gap-2">
+                        {task.due_date && (
+                          <span className={cn(
+                            "text-[10px] font-medium",
+                            isOverdue ? "text-destructive" : "text-muted-foreground"
+                          )}>
+                            {formatGroupDate(dateKey)}
+                          </span>
+                        )}
+                        {task.notes && <span className="text-[11px] text-muted-foreground truncate">{task.notes}</span>}
+                      </div>
                     </div>
                     <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
                   </button>
@@ -119,48 +142,6 @@ function PickerTaskList({ availableTasks, pickerHour, allocateTask }: {
           </div>
         );
       })}
-      {uncategorized.length > 0 && (
-        <div>
-          <button
-            onClick={() => toggleGroup('__uncategorized__')}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-border/50 bg-card/50 hover:bg-card transition-all"
-          >
-            <div className="flex items-center gap-2">
-              <AppIcon name="Folder" size={14} className="text-muted-foreground" />
-              <span className="text-sm font-semibold">Sem categoria</span>
-              <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-muted/50 text-muted-foreground font-medium">{uncategorized.length}</span>
-            </div>
-            <AppIcon
-              name="ChevronDown"
-              size={16}
-              className={cn(
-                "text-muted-foreground transition-transform duration-200",
-                expandedGroups.has('__uncategorized__') ? "rotate-0" : "-rotate-90"
-              )}
-            />
-          </button>
-          <div className={cn(
-            "overflow-hidden transition-all duration-200",
-            expandedGroups.has('__uncategorized__') ? "max-h-[2000px] opacity-100 mt-1.5" : "max-h-0 opacity-0"
-          )}>
-            <div className="space-y-1.5 ml-2">
-              {uncategorized.map(task => (
-                <button
-                  key={task.id}
-                  onClick={() => pickerHour !== null && allocateTask(pickerHour, task.id)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/5 border border-primary/10 hover:border-primary/25 transition-all text-left"
-                >
-                  <div className="min-w-0 flex-1">
-                    <span className="text-sm font-medium truncate block">{task.title}</span>
-                    {task.notes && <span className="text-[11px] text-muted-foreground truncate block">{task.notes}</span>}
-                  </div>
-                  <AppIcon name="Plus" size={16} className="text-primary shrink-0" />
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
