@@ -148,13 +148,15 @@ export function MenuCategoryTree({
 
   return (
     <div className="space-y-2">
-      {/* Add category button */}
-      <button
-        onClick={openNewCategory}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary transition-all active:scale-[0.97] bg-primary/[0.06] border border-dashed border-primary/20 hover:bg-primary/[0.1]"
-      >
-        <AppIcon name="Plus" size={16} /> Nova Categoria
-      </button>
+      {/* Add category button - only in menu mode */}
+      {viewMode !== 'ficha' && (
+        <button
+          onClick={openNewCategory}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-primary transition-all active:scale-[0.97] bg-primary/[0.06] border border-dashed border-primary/20 hover:bg-primary/[0.1]"
+        >
+          <AppIcon name="Plus" size={16} /> Nova Categoria
+        </button>
+      )}
 
       {categories.map(cat => {
         const expanded = expandedCats.has(cat.id);
