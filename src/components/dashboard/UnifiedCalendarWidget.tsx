@@ -64,7 +64,7 @@ export function UnifiedCalendarWidget() {
         <UnifiedMonthGrid
           currentMonth={currentMonth}
           selectedDate={selectedDate}
-          onSelectDate={(key) => setSelectedDate(key || null)}
+          onSelectDate={(key) => setSelectedDate(prev => prev === key ? null : (key || null))}
           getDayIndicators={getDayIndicators}
           disablePast
           compact
