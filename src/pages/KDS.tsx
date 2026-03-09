@@ -468,7 +468,7 @@ export default function KDS() {
       )}
 
       {/* Loading */}
-      {(isPending || (isFetching && orders.length === 0)) && (
+      {(isPending && !isError) && (
         <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50">
           <RefreshCw className="w-8 h-8 animate-spin text-emerald-400" />
         </div>

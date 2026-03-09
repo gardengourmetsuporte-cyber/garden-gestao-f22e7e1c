@@ -135,6 +135,24 @@ export default function TabletHome() {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-4 px-6 text-center">
+        <AppIcon name="WifiOff" size={34} className="text-destructive" />
+        <div>
+          <p className="text-base font-bold text-foreground">Falha ao abrir o tablet</p>
+          <p className="text-sm text-muted-foreground mt-1">{(error as Error)?.message || 'Erro de conexão'}</p>
+        </div>
+        <button
+          onClick={() => refetch()}
+          className="h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
   const logoUrl = unit?.store_info?.logo_url;
 
   return (
