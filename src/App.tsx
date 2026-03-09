@@ -87,6 +87,7 @@ const TabletDigitalMenu = lazy(() => lazyRetry(() => import("./pages/TabletDigit
 const SupplierPortal = lazy(() => lazyRetry(() => import("./pages/SupplierPortal")));
 const TabletHome = lazy(() => lazyRetry(() => import("./pages/TabletHome")));
 const TabletRodizio = lazy(() => lazyRetry(() => import("./pages/TabletRodizio")));
+const TabletBill = lazy(() => lazyRetry(() => import("./pages/TabletBill")));
 const KDS = lazy(() => lazyRetry(() => import("./pages/KDS")));
 const Notifications = lazy(() => lazyRetry(() => import("./pages/Notifications")));
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
