@@ -19,6 +19,7 @@ interface TaskFormData {
   due_date?: string;
   due_time?: string;
   category_id?: string;
+  has_alarm?: boolean;
 }
 
 interface TaskSheetProps {
@@ -42,6 +43,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
   const [dueDate, setDueDate] = useState<Date>(new Date());
   const [hasTime, setHasTime] = useState(false);
   const [dueTime, setDueTime] = useState('09:00');
+  const [hasAlarm, setHasAlarm] = useState(false);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
 
@@ -53,6 +55,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
       setDueDate(editingTask.due_date ? new Date(editingTask.due_date + 'T12:00:00') : new Date());
       setHasTime(!!editingTask.due_time);
       setDueTime(editingTask.due_time || '09:00');
+      setHasAlarm(!!(editingTask as any).has_alarm);
       setCategoryId(editingTask.category_id || null);
     } else {
       resetForm();
@@ -66,6 +69,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
     setDueDate(new Date());
     setHasTime(false);
     setDueTime('09:00');
+    setHasAlarm(false);
     setCategoryId(null);
   };
 
@@ -79,6 +83,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
       due_date: hasDate ? format(dueDate, 'yyyy-MM-dd') : undefined,
       due_time: hasTime ? dueTime : undefined,
       category_id: categoryId || undefined,
+      has_alarm: hasTime && hasAlarm,
     };
 
     if (editingTask && onUpdate) onUpdate({ ...formData, id: editingTask.id });
@@ -200,6 +205,18 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
                   </div>
                   <Switch checked={hasTime} onCheckedChange={setHasTime} />
                 </div>
+                {hasTime && (
+                  <div className="flex items-center justify-between p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-xl bg-amber-500/10"><AppIcon name="Bell" size={16} className="text-amber-400" /></div>
+                      <div>
+                        <p className="font-semibold text-sm">Alarme</p>
+                        <p className="text-[11px] text-muted-foreground">Notificação no horário</p>
+                      </div>
+                    </div>
+                    <Switch checked={hasAlarm} onCheckedChange={setHasAlarm} />
+                  </div>
+                )}
               </div>
             </div>
             <div className="sticky bottom-0 pt-3 pb-4 flex gap-2">

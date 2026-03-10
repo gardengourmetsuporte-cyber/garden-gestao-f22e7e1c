@@ -1,0 +1,1 @@
+ALTER TABLE public.manager_tasks ADD COLUMN IF NOT EXISTS has_alarm boolean NOT NULL DEFAULT false;

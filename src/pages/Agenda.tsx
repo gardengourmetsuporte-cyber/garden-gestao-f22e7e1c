@@ -16,6 +16,7 @@ import { TaskItem } from '@/components/agenda/TaskItem';
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
 import { TimeBlocksView } from '@/components/agenda/TimeBlocksView';
 import { AgendaAIPanel } from '@/components/agenda/AgendaAIPanel';
+import { useTaskAlarms } from '@/hooks/useTaskAlarms';
 
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -101,6 +102,9 @@ export default function Agenda() {
 
   // Use tempTasks if available (during reorder), else server data
   const displayTasks = useMemo(() => tempTasks || tasks, [tempTasks, tasks]);
+
+  // Alarm system
+  useTaskAlarms(displayTasks);
 
   // Clear temp after server catches up
   useEffect(() => {
