@@ -20,6 +20,7 @@ interface PendingOrdersSheetProps {
   orders: PendingOrder[];
   loading: boolean;
   onLoadOrder: (order: PendingOrder) => void;
+  onChargeOrder?: (order: PendingOrder) => void;
 }
 
 const STATUS_LABELS: Record<string, string> = {
