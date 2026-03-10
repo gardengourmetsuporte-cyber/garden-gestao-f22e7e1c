@@ -42,10 +42,10 @@ Deno.serve(async (req) => {
     const { action, sale_id, unit_id } = await req.json();
 
     // Validate unit access
-    const { data: access } = await supabase
+    const { data: access } = await supabaseAdmin
       .from('user_units')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('unit_id', unit_id)
       .single();
 
