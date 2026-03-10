@@ -134,7 +134,7 @@ import {
   Armchair,
   Drop,
   Lightning,
-  Wifi,
+  WifiHigh,
   Wrench,
   Hammer,
   PaintBrush,
