@@ -34,13 +34,10 @@ function splitCSVLine(line: string, delimiter: string): string[] {
 }
 
 function parseDate(dateStr: string): string | null {
-  // DD/MM/YYYY
   const m1 = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (m1) return `${m1[3]}-${m1[2].padStart(2, "0")}-${m1[1].padStart(2, "0")}`;
-  // YYYY-MM-DD (already ISO)
   const m2 = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (m2) return dateStr;
-  // DD-MM-YYYY
   const m3 = dateStr.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
   if (m3) return `${m3[3]}-${m3[2].padStart(2, "0")}-${m3[1].padStart(2, "0")}`;
   return null;
@@ -50,24 +47,19 @@ function parseAmount(amountStr: string): number {
   let cleaned = amountStr.replace(/[R$\s]/g, "").trim();
   const negative = cleaned.startsWith("-");
   if (negative) cleaned = cleaned.substring(1);
-  // Detect format: if has both . and , → Brazilian (1.234,56)
   if (cleaned.includes(",") && cleaned.includes(".")) {
     if (cleaned.lastIndexOf(",") > cleaned.lastIndexOf(".")) {
-      // Brazilian: 1.234,56
       cleaned = cleaned.replace(/\./g, "").replace(",", ".");
     } else {
-      // US: 1,234.56
       cleaned = cleaned.replace(/,/g, "");
     }
   } else if (cleaned.includes(",")) {
-    // Could be decimal comma: 1234,56
     cleaned = cleaned.replace(",", ".");
   }
   const val = parseFloat(cleaned);
   return isNaN(val) ? 0 : negative ? -val : val;
 }
 
-// Smart income category mappings (Mobills and common PT-BR patterns)
 const INCOME_MAPPINGS: Record<string, { parent: string; sub: string }> = {
   pix: { parent: "vendas balcao", sub: "pix" },
   debito: { parent: "vendas balcao", sub: "debito" },
@@ -109,11 +101,11 @@ Deno.serve(async (req) => {
     const admin = createClient(supabaseUrl, serviceKey);
 
     const body = await req.json();
-    const { csvText, unitId, mode, delimiter: delimiterInput, columnMapping } = body;
+    const { csvText, unitId, compensateBalance, delimiter: delimiterInput, columnMapping } = body;
 
-    if (!csvText || !unitId || !["historical", "full_migration"].includes(mode)) {
+    if (!csvText || !unitId) {
       return new Response(
-        JSON.stringify({ error: "Missing csvText, unitId, or invalid mode" }),
+        JSON.stringify({ error: "Missing csvText or unitId" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -142,7 +134,7 @@ Deno.serve(async (req) => {
     // Fetch accounts and categories
     const { data: accounts } = await admin
       .from("finance_accounts")
-      .select("id, name")
+      .select("id, name, balance")
       .eq("unit_id", unitId)
       .eq("is_active", true);
 
@@ -152,8 +144,10 @@ Deno.serve(async (req) => {
       .eq("unit_id", unitId);
 
     const accountMap = new Map<string, string>();
+    const accountBalancesBefore = new Map<string, number>();
     for (const a of accounts || []) {
       accountMap.set(normalize(a.name), a.id);
+      accountBalancesBefore.set(a.id, a.balance);
     }
 
     const catMap = new Map<string, { id: string; type: string; parent_id: string | null }>();
@@ -161,7 +155,6 @@ Deno.serve(async (req) => {
       catMap.set(normalize(c.name), { id: c.id, type: c.type, parent_id: c.parent_id });
     }
 
-    // Column indices from client mapping
     const idxDate = columnMapping.date ?? -1;
     const idxDesc = columnMapping.description ?? -1;
     const idxCat = columnMapping.category ?? -1;
@@ -182,7 +175,6 @@ Deno.serve(async (req) => {
     const toInsert: any[] = [];
     let skipped = 0;
 
-    // Skip header (line 0)
     for (let i = 1; i < lines.length; i++) {
       const cols = splitCSVLine(lines[i], delimiter);
       if (cols.length < 2) { skipped++; continue; }
@@ -209,7 +201,6 @@ Deno.serve(async (req) => {
       if (normAccount && accountMap.has(normAccount)) {
         accountId = accountMap.get(normAccount)!;
       } else if (accountName) {
-        // Fuzzy: partial match
         for (const [key, id] of accountMap.entries()) {
           if (key.includes(normAccount) || normAccount.includes(key)) {
             accountId = id;
@@ -224,7 +215,6 @@ Deno.serve(async (req) => {
       const normCat = normalize(catName);
       const normSubcat = normalize(subcatName);
 
-      // Try smart income mappings
       if (isIncome) {
         const incomeKey = normSubcat || normCat;
         const mapping = INCOME_MAPPINGS[incomeKey];
@@ -245,7 +235,6 @@ Deno.serve(async (req) => {
         } else if (normCat && catMap.has(normCat)) {
           categoryId = catMap.get(normCat)!.id;
         } else {
-          // Fuzzy contains
           for (const [key, val] of catMap.entries()) {
             if ((normSubcat && key.includes(normSubcat)) || (normCat && key.includes(normCat))) {
               categoryId = val.id;
@@ -277,12 +266,12 @@ Deno.serve(async (req) => {
 
     if (toInsert.length === 0) {
       return new Response(
-        JSON.stringify({ imported: 0, skipped, unmatchedCategories: [...unmatchedCategories], unmatchedAccounts: [...unmatchedAccounts] }),
+        JSON.stringify({ imported: 0, skipped, unmatchedCategories: [...unmatchedCategories], unmatchedAccounts: [...unmatchedAccounts], adjustments: [] }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Batch insert (chunks of 500)
+    // Batch insert (as is_paid = false, no balance trigger fires)
     const CHUNK = 500;
     const insertedIds: string[] = [];
     for (let i = 0; i < toInsert.length; i += CHUNK) {
@@ -301,16 +290,67 @@ Deno.serve(async (req) => {
       if (data) insertedIds.push(...data.map((d: any) => d.id));
     }
 
-    // Full migration: mark as paid (trigger handles balances)
-    if (mode === "full_migration" && insertedIds.length > 0) {
-      for (let i = 0; i < insertedIds.length; i += CHUNK) {
-        const ids = insertedIds.slice(i, i + CHUNK);
-        const { error } = await admin
+    // Now mark all as paid (trigger will update balances)
+    for (let i = 0; i < insertedIds.length; i += CHUNK) {
+      const ids = insertedIds.slice(i, i + CHUNK);
+      const { error } = await admin
+        .from("finance_transactions")
+        .update({ is_paid: true })
+        .in("id", ids);
+      if (error) {
+        console.error("Update is_paid error:", error);
+      }
+    }
+
+    // Handle balance compensation
+    const adjustments: { accountName: string; oldBalance: number; newBalance: number; adjustmentAmount: number }[] = [];
+
+    if (compensateBalance && accounts) {
+      // Fetch updated balances
+      const { data: updatedAccounts } = await admin
+        .from("finance_accounts")
+        .select("id, name, balance")
+        .eq("unit_id", unitId)
+        .eq("is_active", true);
+
+      for (const acc of updatedAccounts || []) {
+        const oldBalance = accountBalancesBefore.get(acc.id);
+        if (oldBalance === undefined) continue;
+        const diff = acc.balance - oldBalance;
+        if (Math.abs(diff) < 0.01) continue;
+
+        // Create adjustment transaction to restore original balance
+        // If balance increased (diff > 0), we need an expense to bring it back down
+        // If balance decreased (diff < 0), we need an income to bring it back up
+        const adjType = diff > 0 ? "expense" : "income";
+        const adjAmount = Math.abs(diff);
+
+        const { error: adjError } = await admin
           .from("finance_transactions")
-          .update({ is_paid: true })
-          .in("id", ids);
-        if (error) {
-          console.error("Update is_paid error:", error);
+          .insert({
+            user_id: user.id,
+            unit_id: unitId,
+            type: adjType,
+            amount: adjAmount,
+            description: "[Ajuste de importação]",
+            account_id: acc.id,
+            date: new Date().toISOString().split("T")[0],
+            is_paid: true,
+            is_fixed: false,
+            is_recurring: false,
+            notes: `Ajuste automático para manter saldo anterior (${oldBalance.toFixed(2)}) após importação CSV`,
+            sort_order: 0,
+          });
+
+        if (adjError) {
+          console.error("Adjustment error:", adjError);
+        } else {
+          adjustments.push({
+            accountName: acc.name,
+            oldBalance,
+            newBalance: acc.balance,
+            adjustmentAmount: adjAmount,
+          });
         }
       }
     }
@@ -321,6 +361,7 @@ Deno.serve(async (req) => {
         skipped,
         unmatchedCategories: [...unmatchedCategories],
         unmatchedAccounts: [...unmatchedAccounts],
+        adjustments,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
