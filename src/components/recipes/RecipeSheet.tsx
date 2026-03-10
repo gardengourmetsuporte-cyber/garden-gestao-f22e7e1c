@@ -42,8 +42,6 @@ interface InventoryItem {
   name: string;
   unit_type: string;
   unit_price: number;
-  recipe_unit_type?: string | null;
-  recipe_unit_price?: number | null;
   category?: { id: string; name: string; color: string } | null;
 }
 
