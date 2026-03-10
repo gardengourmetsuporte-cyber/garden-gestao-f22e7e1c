@@ -6,6 +6,9 @@ import { FinanceBackupSheet } from './FinanceBackupSheet';
 import { FinanceImportSheet } from './FinanceImportSheet';
 import { FinanceAccount, FinanceCategory, FinanceTransaction } from '@/types/finance';
 import { useFinanceBackup } from '@/hooks/useFinanceBackup';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface FinanceMoreProps {
   accounts: FinanceAccount[];

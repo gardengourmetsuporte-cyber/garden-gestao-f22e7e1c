@@ -101,6 +101,127 @@ Deno.serve(async (req) => {
     const admin = createClient(supabaseUrl, serviceKey);
 
     const body = await req.json();
+
+    // ===== FIX IMPORTED ACTION =====
+    if (body.action === "fix_imported") {
+      const { unitId } = body;
+      if (!unitId) {
+        return new Response(JSON.stringify({ error: "Missing unitId" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: hasAccess } = await admin.rpc("user_has_unit_access", {
+        _user_id: user.id,
+        _unit_id: unitId,
+      });
+      if (!hasAccess) {
+        return new Response(JSON.stringify({ error: "No unit access" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Find unpaid imported transactions
+      const { data: unpaidTxns, error: fetchErr } = await admin
+        .from("finance_transactions")
+        .select("id")
+        .eq("unit_id", unitId)
+        .eq("is_paid", false)
+        .like("notes", "%[Importado]%");
+
+      if (fetchErr) {
+        return new Response(JSON.stringify({ error: fetchErr.message }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (!unpaidTxns || unpaidTxns.length === 0) {
+        return new Response(
+          JSON.stringify({ updated: 0, adjustments: [] }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Save current balances
+      const { data: accountsBefore } = await admin
+        .from("finance_accounts")
+        .select("id, name, balance")
+        .eq("unit_id", unitId)
+        .eq("is_active", true);
+
+      const balancesBefore = new Map<string, number>();
+      for (const a of accountsBefore || []) {
+        balancesBefore.set(a.id, a.balance);
+      }
+
+      // Batch update to is_paid = true
+      const ids = unpaidTxns.map((t: any) => t.id);
+      const CHUNK = 500;
+      for (let i = 0; i < ids.length; i += CHUNK) {
+        const batch = ids.slice(i, i + CHUNK);
+        const { error: upErr } = await admin
+          .from("finance_transactions")
+          .update({ is_paid: true })
+          .in("id", batch);
+        if (upErr) console.error("Update batch error:", upErr);
+      }
+
+      // Calculate diffs and create adjustments at 2020-01-01
+      const { data: accountsAfter } = await admin
+        .from("finance_accounts")
+        .select("id, name, balance")
+        .eq("unit_id", unitId)
+        .eq("is_active", true);
+
+      const adjustments: any[] = [];
+      for (const acc of accountsAfter || []) {
+        const oldBal = balancesBefore.get(acc.id);
+        if (oldBal === undefined) continue;
+        const diff = acc.balance - oldBal;
+        if (Math.abs(diff) < 0.01) continue;
+
+        const adjType = diff > 0 ? "expense" : "income";
+        const adjAmount = Math.abs(diff);
+
+        const { error: adjErr } = await admin
+          .from("finance_transactions")
+          .insert({
+            user_id: user.id,
+            unit_id: unitId,
+            type: adjType,
+            amount: adjAmount,
+            description: "[Ajuste de importação retroativo]",
+            account_id: acc.id,
+            date: "2020-01-01",
+            is_paid: true,
+            is_fixed: false,
+            is_recurring: false,
+            notes: `Ajuste automático para manter saldo anterior (${oldBal.toFixed(2)}) após correção de importação`,
+            sort_order: 0,
+          });
+
+        if (adjErr) {
+          console.error("Adjustment error:", adjErr);
+        } else {
+          adjustments.push({
+            accountName: acc.name,
+            oldBalance: oldBal,
+            newBalance: acc.balance,
+            adjustmentAmount: adjAmount,
+          });
+        }
+      }
+
+      return new Response(
+        JSON.stringify({ updated: ids.length, adjustments }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ===== NORMAL IMPORT FLOW =====
     const { csvText, unitId, compensateBalance, delimiter: delimiterInput, columnMapping } = body;
 
     if (!csvText || !unitId) {
