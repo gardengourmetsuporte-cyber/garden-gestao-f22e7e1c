@@ -207,7 +207,7 @@ Deno.serve(async (req) => {
         });
       }
 
-      return new Response(JSON.stringify({ configured: true, environment: focusEnv }), {
+      return new Response(JSON.stringify({ configured: true, environment: focusEnv2 }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
