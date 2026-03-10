@@ -44,7 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Truck', customIcon: '/icons/motocicleta.png', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Monitor', label: 'PDV', href: '/pdv', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'RestaurantMenu', customIcon: '/icons/cardapio.png', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
-  { icon: 'MessageCircle', customIcon: '/icons/whatsapp.png', label: 'WhatsApp IA', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
+  { icon: 'MessageCircle', customIcon: '/icons/whatsapp.png', keepIconColor: true, label: 'WhatsApp IA', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
 
   // ── Pessoas ──
   { icon: 'Users', customIcon: '/icons/funcionarios.png', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
