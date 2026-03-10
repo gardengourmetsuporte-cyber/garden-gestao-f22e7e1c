@@ -67,10 +67,23 @@ export function FinanceCharts({
   const [entityView, setEntityView] = useState<'employees' | 'suppliers' | null>(null);
   const [entityData, setEntityData] = useState<EntityStats[]>([]);
 
+  const annualStats = useAnnualFinanceStats(selectedMonth.getFullYear(), categoriesProp);
+
   const categoryData = dataType === 'expense' ? expensesByCategory : incomeByCategory;
   const subcategoryData = drillDownCategory ? getSubcategoryStats(drillDownCategory.id, dataType) : [];
   const displayData = drillDownCategory ? subcategoryData : categoryData;
   const displayTotal = displayData.reduce((sum, c) => sum + c.amount, 0);
+
+  const handleYearChange = (delta: number) => {
+    const newDate = setYear(selectedMonth, selectedMonth.getFullYear() + delta);
+    onMonthChange(newDate);
+  };
+
+  const handleAnnualMonthClick = (monthIndex: number) => {
+    const newDate = setMonth(setYear(selectedMonth, annualStats.year), monthIndex);
+    onMonthChange(newDate);
+    setViewType('categories');
+  };
 
   const detectEntityData = useCallback((categoryId: string): { type: 'employees' | 'suppliers' | null; data: EntityStats[] } => {
     const relevantTxs = transactions.filter(t => {
