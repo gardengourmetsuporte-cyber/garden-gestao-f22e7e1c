@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const userId = claimsData.claims.sub as string;
+    const userId = user.id;
     const { unit_id } = await req.json();
 
     if (!unit_id) {
