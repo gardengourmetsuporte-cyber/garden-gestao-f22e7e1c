@@ -15,6 +15,7 @@ import { TaskSheet } from '@/components/agenda/TaskSheet';
 import { TaskItem } from '@/components/agenda/TaskItem';
 import { AgendaCalendarView } from '@/components/agenda/AgendaCalendarView';
 import { TimeBlocksView } from '@/components/agenda/TimeBlocksView';
+import { AgendaAIPanel } from '@/components/agenda/AgendaAIPanel';
 
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -299,6 +300,10 @@ export default function Agenda() {
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
           <DesktopActionBar label="Nova Tarefa" onClick={() => { setEditingTask(null); setTaskSheetOpen(true); }} />
+
+          {/* AI Panel */}
+          <AgendaAIPanel tasks={displayTasks} />
+
           {/* Stats + actions row */}
           <div className="flex items-center justify-between">
             {!isLoading && (
