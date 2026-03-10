@@ -66,15 +66,11 @@ export function ItemFormSheetNew({
       setName(item.name);
       setCategoryId(item.category_id || '');
       setSupplierId(item.supplier_id || '');
-      setUnitType(item.unit_type);
+      setUnitType(item.unit_type as any);
       setCurrentStock(item.current_stock.toString());
       setMinStock(item.min_stock.toString());
       setUnitPrice(item.unit_price?.toString() || '');
-      setRecipeUnitType(item.recipe_unit_type || '');
-      setRecipeUnitPrice(item.recipe_unit_price?.toString() || '');
-      setShowRecipeSection(!!item.recipe_unit_type || !!item.recipe_unit_price);
       setStockUnitLabel(item.stock_unit_label || '');
-      setStockToRecipeFactor(item.stock_to_recipe_factor?.toString() || '');
       setPurchaseUnitLabel(item.purchase_unit_label || '');
       setPurchaseToStockFactor(item.purchase_to_stock_factor?.toString() || '');
       setShowPurchaseSection(!!item.purchase_unit_label || !!item.purchase_to_stock_factor);
@@ -86,11 +82,7 @@ export function ItemFormSheetNew({
       setCurrentStock('');
       setMinStock('');
       setUnitPrice('');
-      setRecipeUnitType('');
-      setRecipeUnitPrice('');
-      setShowRecipeSection(false);
       setStockUnitLabel('');
-      setStockToRecipeFactor('');
       setPurchaseUnitLabel('');
       setPurchaseToStockFactor('');
       setShowPurchaseSection(false);
