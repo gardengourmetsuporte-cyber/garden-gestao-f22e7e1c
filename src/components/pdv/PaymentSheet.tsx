@@ -98,7 +98,7 @@ export function PaymentSheet({
       effectivePayments[last] = { ...effectivePayments[last], change_amount: effectiveChange };
     }
 
-    onFinalize(effectivePayments, { emitInvoice, notes });
+    onFinalize(effectivePayments, { emitInvoice, notes, customerDocument: customerDocument.trim() || undefined });
   };
 
   const reset = () => {
