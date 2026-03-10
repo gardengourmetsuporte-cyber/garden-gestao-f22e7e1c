@@ -74,7 +74,7 @@ export function useAgenda() {
 
   // Add task mutation
   const addTaskMutation = useMutation({
-    mutationFn: async (task: { title: string; notes?: string; due_date?: string; due_time?: string; category_id?: string; parent_id?: string }) => {
+    mutationFn: async (task: { title: string; notes?: string; due_date?: string; due_time?: string; category_id?: string; parent_id?: string; has_alarm?: boolean }) => {
       if (!user?.id || !activeUnitId) throw new Error('User not authenticated');
       const { error } = await supabase
         .from('manager_tasks')
@@ -88,6 +88,7 @@ export function useAgenda() {
           priority: 'medium',
           category_id: task.category_id || null,
           parent_id: task.parent_id || null,
+          has_alarm: task.has_alarm || false,
         } as any);
       if (error) throw error;
     },
