@@ -456,6 +456,24 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
           <div className="px-5 pt-5 pb-3 border-b border-border space-y-3">
             <div className="flex items-center justify-between">
               <SheetTitle className="text-base font-bold">Pedidos Pendentes ({orders.length})</SheetTitle>
+              <div className="flex items-center gap-0.5 bg-secondary rounded-lg p-0.5">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn('h-8 w-8', viewMode === 'blocks' && 'bg-background shadow-sm')}
+                  onClick={() => setViewMode('blocks')}
+                >
+                  <AppIcon name="LayoutGrid" size={16} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn('h-8 w-8', viewMode === 'list' && 'bg-background shadow-sm')}
+                  onClick={() => setViewMode('list')}
+                >
+                  <AppIcon name="List" size={16} />
+                </Button>
+              </div>
             </div>
 
             {sourceKeys.length > 1 && (
