@@ -1,19 +1,26 @@
-## Plano: Rateio Proporcional de Custos Fixos ✅
 
-### Implementado
 
-O cálculo de custos fixos foi alterado de **divisão igualitária** para **rateio proporcional por preço de venda**.
+# Adicionar aba iFood na CardapioOrdersView
 
-**Fórmula anterior:** `Custo Fixo / Nº Produtos = valor igual para todos`  
-**Fórmula nova:** `(Preço do Produto / Faturamento Mensal) × Custo Fixo Mensal`
+## Problema
+A tela de pedidos do Cardápio mostra apenas pedidos internos (Mesa, Balcão, QR Code, Delivery) vindos do `useTabletAdmin`. Falta a aba **iFood** que já existe no `useUnifiedOrders` e `useDeliveryHub`.
 
-Exemplo (custo fixo = R$ 6.974, faturamento = R$ 50.000):
-- Água (R$ 5): R$ 0,70 de custo fixo
-- Lanche (R$ 45): R$ 6,28 de custo fixo
+## Solução
 
-### Arquivos alterados
-- Migration: adicionada coluna `monthly_revenue` em `recipe_cost_settings`
-- `src/hooks/useRecipeCostSettings.ts` — `calculateOperationalCosts` agora aceita `sellingPrice` opcional
-- `src/components/settings/RecipeCostSettings.tsx` — campo "Faturamento mensal estimado" no lugar de "Média de produtos vendidos"
-- `src/components/recipes/RecipeSheet.tsx` — passa preço de venda para cálculo proporcional
-- `src/hooks/useRecipeMenuSync.ts` — usa preço do produto vinculado no cardápio
+### 1. `CardapioHub.tsx` — Passar pedidos do iFood
+- Importar `useDeliveryHub` e chamar com `activeUnit?.id`
+- Passar `hubOrders` como nova prop para `CardapioOrdersView`
+
+### 2. `CardapioOrdersView.tsx` — Adicionar canal iFood
+- Adicionar `'ifood'` ao type `Channel`
+- Adicionar entrada no array `CHANNELS`: `{ id: 'ifood', label: 'iFood', icon: 'ShoppingBag', ... }`
+- Aceitar nova prop `hubOrders` (array de `HubOrder`)
+- Normalizar `hubOrders` para o formato `OrderItem` e incluir no fluxo de filtragem/contagem
+- Quando `channel === 'ifood'`, mostrar apenas os pedidos do hub
+- Incluir pedidos do hub na aba "Todos"
+- Mapear status do hub (`new`, `accepted`, `preparing`, etc.) para os status visuais existentes
+
+### Impacto
+- Nenhuma mudança no banco de dados
+- Apenas 2 arquivos alterados: `CardapioHub.tsx` e `CardapioOrdersView.tsx`
+
