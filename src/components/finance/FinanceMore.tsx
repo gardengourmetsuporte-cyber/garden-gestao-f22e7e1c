@@ -33,6 +33,7 @@ export function FinanceMore({
   const [accountsOpen, setAccountsOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const backup = useFinanceBackup(accounts, transactions, selectedMonth, onRefreshAll);
 
