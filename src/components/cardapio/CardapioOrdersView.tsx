@@ -1,9 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 import type { HubOrder } from '@/hooks/useDeliveryHub';
 
+/* ─── Types ─── */
 interface OrderItem {
   id: string;
   created_at: string;
@@ -20,34 +23,37 @@ interface Props {
   hubOrders?: HubOrder[];
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; dotColor: string }> = {
-  draft: { label: 'Rascunho', color: 'bg-secondary text-muted-foreground', dotColor: 'bg-muted-foreground' },
-  awaiting_confirmation: { label: 'Aguardando', color: 'bg-warning/15 text-warning', dotColor: 'bg-warning' },
-  pending: { label: 'Pendente', color: 'bg-warning/15 text-warning', dotColor: 'bg-warning' },
-  confirmed: { label: 'Confirmado', color: 'bg-primary/15 text-primary', dotColor: 'bg-primary' },
-  preparing: { label: 'Preparando', color: 'bg-orange-500/15 text-orange-400', dotColor: 'bg-orange-400' },
-  ready: { label: 'Pronto', color: 'bg-emerald-500/15 text-emerald-400', dotColor: 'bg-emerald-400' },
-  dispatched: { label: 'Despachado', color: 'bg-blue-500/15 text-blue-400', dotColor: 'bg-blue-400' },
-  delivered: { label: 'Entregue', color: 'bg-emerald-500/15 text-emerald-400', dotColor: 'bg-emerald-400' },
-  sent_to_pdv: { label: 'Enviado PDV', color: 'bg-emerald-500/15 text-emerald-400', dotColor: 'bg-emerald-400' },
-  cancelled: { label: 'Cancelado', color: 'bg-destructive/15 text-destructive', dotColor: 'bg-destructive' },
-  error: { label: 'Erro', color: 'bg-destructive/15 text-destructive', dotColor: 'bg-destructive' },
-  // Hub statuses
-  new: { label: 'Novo', color: 'bg-warning/15 text-warning', dotColor: 'bg-warning' },
-  accepted: { label: 'Aceito', color: 'bg-primary/15 text-primary', dotColor: 'bg-primary' },
+/* ─── Status ─── */
+const STATUS_FLOW = ['pending', 'preparing', 'ready', 'delivered'] as const;
+
+const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: string; pulse?: boolean }> = {
+  draft: { label: 'Rascunho', color: 'text-muted-foreground', bg: 'bg-muted/50', icon: 'FileEdit' },
+  awaiting_confirmation: { label: 'Aguardando', color: 'text-amber-400', bg: 'bg-amber-500/15', icon: 'Clock', pulse: true },
+  pending: { label: 'Pendente', color: 'text-amber-400', bg: 'bg-amber-500/15', icon: 'Clock', pulse: true },
+  confirmed: { label: 'Confirmado', color: 'text-sky-400', bg: 'bg-sky-500/15', icon: 'CheckCircle2' },
+  new: { label: 'Novo', color: 'text-amber-400', bg: 'bg-amber-500/15', icon: 'Bell', pulse: true },
+  accepted: { label: 'Aceito', color: 'text-sky-400', bg: 'bg-sky-500/15', icon: 'CheckCircle2' },
+  preparing: { label: 'Preparando', color: 'text-orange-400', bg: 'bg-orange-500/15', icon: 'Flame', pulse: true },
+  ready: { label: 'Pronto', color: 'text-emerald-400', bg: 'bg-emerald-500/15', icon: 'PackageCheck' },
+  dispatched: { label: 'Despachado', color: 'text-blue-400', bg: 'bg-blue-500/15', icon: 'Truck' },
+  delivered: { label: 'Entregue', color: 'text-emerald-400', bg: 'bg-emerald-500/15', icon: 'CircleCheckBig' },
+  sent_to_pdv: { label: 'Enviado PDV', color: 'text-emerald-400', bg: 'bg-emerald-500/15', icon: 'CircleCheckBig' },
+  cancelled: { label: 'Cancelado', color: 'text-red-400', bg: 'bg-red-500/12', icon: 'XCircle' },
+  error: { label: 'Erro', color: 'text-red-400', bg: 'bg-red-500/12', icon: 'AlertTriangle' },
 };
 
+/* ─── Channels ─── */
 type Channel = 'todos' | 'delivery' | 'mesa' | 'balcao' | 'qrcode' | 'ifood';
 
-const CHANNELS: { id: Channel; label: string; icon: string; emptyTitle: string; emptySubtitle: string }[] = [
-  { id: 'todos', label: 'Todos', icon: 'LayoutGrid', emptyTitle: 'Nenhum pedido', emptySubtitle: 'Os pedidos aparecerão aqui' },
-  { id: 'delivery', label: 'Delivery', icon: 'Truck', emptyTitle: 'Nenhum delivery', emptySubtitle: 'Pedidos de entrega aparecerão aqui' },
-  { id: 'mesa', label: 'Mesa', icon: 'Utensils', emptyTitle: 'Nenhum pedido de mesa', emptySubtitle: 'Pedidos do tablet nas mesas aparecerão aqui' },
-  { id: 'balcao', label: 'Balcão', icon: 'Store', emptyTitle: 'Nenhum pedido no balcão', emptySubtitle: 'Pedidos para retirada aparecerão aqui' },
-  { id: 'qrcode', label: 'QR Code', icon: 'QrCode', emptyTitle: 'Nenhum pedido QR', emptySubtitle: 'Pedidos via QR Code aparecerão aqui' },
-  { id: 'ifood', label: 'iFood', icon: 'ShoppingBag', emptyTitle: 'Nenhum pedido iFood', emptySubtitle: 'Pedidos do iFood aparecerão aqui' },
+const CHANNELS: { id: Channel; label: string; icon: string }[] = [
+  { id: 'todos', label: 'Todos', icon: 'LayoutGrid' },
+  { id: 'delivery', label: 'Delivery', icon: 'Truck' },
+  { id: 'mesa', label: 'Mesa', icon: 'Utensils' },
+  { id: 'balcao', label: 'Balcão', icon: 'Store' },
+  { id: 'ifood', label: 'iFood', icon: 'ShoppingBag' },
 ];
 
+/* ─── Helpers ─── */
 function normalizeHubOrders(hubOrders: HubOrder[]): OrderItem[] {
   return hubOrders.map(o => ({
     id: o.id,
@@ -64,35 +70,58 @@ function getOrderChannel(order: OrderItem): Channel {
   if (order.source === 'ifood') return 'ifood';
   if (order.source === 'delivery') return 'delivery';
   if (order.source === 'balcao') return 'balcao';
-  if (order.source === 'qrcode') return 'qrcode';
+  if (order.source === 'qrcode') return 'balcao';
   if ((order.table_number ?? 0) > 0) return 'mesa';
   return 'balcao';
+}
+
+function getSourceIcon(ch: Channel) {
+  switch (ch) {
+    case 'ifood': return 'ShoppingBag';
+    case 'delivery': return 'Truck';
+    case 'mesa': return 'Utensils';
+    default: return 'Store';
+  }
 }
 
 function getSourceLabel(order: OrderItem) {
   if (order.source === 'ifood') return order.customer_name || 'iFood';
   if (order.source === 'delivery') return 'Delivery';
-  if (order.source === 'balcao') return 'Balcão';
-  if (order.source === 'qrcode') return 'QR Code';
   if ((order.table_number ?? 0) > 0) return `Mesa ${order.table_number}`;
   if (order.customer_name) return order.customer_name;
-  return 'Pedido';
+  return 'Balcão';
 }
 
 const formatPrice = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-const getStatus = (s: string) => STATUS_CONFIG[s] || { label: s, color: 'bg-secondary text-muted-foreground', dotColor: 'bg-muted-foreground' };
+const getStatus = (s: string) => STATUS_CONFIG[s] || { label: s, color: 'text-muted-foreground', bg: 'bg-muted/50', icon: 'HelpCircle' };
 
-const CHANNEL_STYLE: Record<Channel, { bg: string; text: string }> = {
-  todos: { bg: 'bg-secondary/10', text: 'text-muted-foreground' },
-  delivery: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
-  mesa: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  balcao: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
-  qrcode: { bg: 'bg-purple-500/10', text: 'text-purple-400' },
-  ifood: { bg: 'bg-red-500/10', text: 'text-red-400' },
+const CHANNEL_ACCENT: Record<Channel, string> = {
+  todos: 'border-l-primary',
+  delivery: 'border-l-blue-500',
+  mesa: 'border-l-amber-500',
+  balcao: 'border-l-emerald-500',
+  qrcode: 'border-l-purple-500',
+  ifood: 'border-l-red-500',
 };
 
+const isActive = (status: string) => ['awaiting_confirmation', 'pending', 'confirmed', 'new', 'accepted', 'preparing', 'ready'].includes(status);
+const isDone = (status: string) => ['delivered', 'sent_to_pdv', 'dispatched'].includes(status);
+const isError = (status: string) => ['cancelled', 'error'].includes(status);
+
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'agora';
+  if (mins < 60) return `${mins}min`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h`;
+  return `${Math.floor(hrs / 24)}d`;
+}
+
+/* ─── Main Component ─── */
 export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   const [channel, setChannel] = useState<Channel>('todos');
+  const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
 
   const allOrders = useMemo(() => {
     const normalized = normalizeHubOrders(hubOrders);
@@ -115,45 +144,51 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
     return sorted.filter(o => getOrderChannel(o) === channel);
   }, [allOrders, channel]);
 
-  const todayOrders = filtered.filter(o => o.created_at.slice(0, 10) === today);
-  const olderOrders = filtered.filter(o => o.created_at.slice(0, 10) !== today);
-  const activeChannel = CHANNELS.find(c => c.id === channel)!;
+  // Split: active orders (in progress) vs completed
+  const activeOrders = filtered.filter(o => isActive(o.status));
+  const doneOrders = filtered.filter(o => isDone(o.status));
+  const errorOrders = filtered.filter(o => isError(o.status));
+  const otherOrders = filtered.filter(o => !isActive(o.status) && !isDone(o.status) && !isError(o.status));
 
   const stats = useMemo(() => {
-    const active = channel === 'todos' ? allOrders : filtered;
-    const todayActive = active.filter(o => o.created_at.slice(0, 10) === today);
+    const todayAll = allOrders.filter(o => o.created_at.slice(0, 10) === today);
+    const scoped = channel === 'todos' ? todayAll : todayAll.filter(o => getOrderChannel(o) === channel);
     return {
-      pending: todayActive.filter(o => ['awaiting_confirmation', 'pending', 'confirmed', 'new'].includes(o.status)).length,
-      preparing: todayActive.filter(o => ['preparing', 'ready', 'accepted'].includes(o.status)).length,
-      done: todayActive.filter(o => ['sent_to_pdv', 'delivered', 'dispatched'].includes(o.status)).length,
-      errors: todayActive.filter(o => ['error', 'cancelled'].includes(o.status)).length,
+      active: scoped.filter(o => isActive(o.status)).length,
+      done: scoped.filter(o => isDone(o.status)).length,
+      errors: scoped.filter(o => isError(o.status)).length,
+      revenue: scoped.filter(o => !isError(o.status)).reduce((sum, o) => sum + o.total, 0),
     };
-  }, [allOrders, filtered, channel, today]);
+  }, [allOrders, channel, today]);
+
+  const handleOrderClick = useCallback((order: OrderItem) => {
+    setSelectedOrder(order);
+  }, []);
 
   return (
     <div className="px-4 py-3 lg:px-6 space-y-4">
-      {/* Channel Tabs */}
-      <div className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-4 px-4 pb-0.5">
+      {/* ─── Channel Pills ─── */}
+      <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1">
         {CHANNELS.map(ch => {
-          const isActive = channel === ch.id;
+          const active = channel === ch.id;
           const count = channelCounts[ch.id];
           return (
             <button
               key={ch.id}
               onClick={() => setChannel(ch.id)}
               className={cn(
-                "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0",
-                isActive
-                  ? "bg-primary/15 text-primary shadow-sm"
-                  : "bg-card border border-border/30 text-muted-foreground hover:text-foreground hover:border-border/60"
+                "flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-200 shrink-0 touch-manipulation",
+                active
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-[1.02]"
+                  : "bg-card/80 border border-border/30 text-muted-foreground active:scale-95"
               )}
             >
               <AppIcon name={ch.icon} size={14} />
               {ch.label}
               {count > 0 && (
                 <span className={cn(
-                  "text-[10px] font-bold px-1.5 py-0.5 rounded-md ml-0.5",
-                  isActive ? "bg-primary/20" : "bg-secondary"
+                  "min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-extrabold rounded-full",
+                  active ? "bg-white/25 text-primary-foreground" : "bg-primary/15 text-primary"
                 )}>
                   {count}
                 </span>
@@ -163,133 +198,363 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
         })}
       </div>
 
-      {/* Status Summary */}
-      {(stats.pending > 0 || stats.preparing > 0 || stats.done > 0 || stats.errors > 0) && (
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { label: 'Pendentes', count: stats.pending, color: 'text-warning', bg: 'bg-warning/10', icon: 'Clock' },
-            { label: 'Preparando', count: stats.preparing, color: 'text-orange-400', bg: 'bg-orange-400/10', icon: 'ChefHat' },
-            { label: 'Concluídos', count: stats.done, color: 'text-emerald-400', bg: 'bg-emerald-400/10', icon: 'CheckCircle2' },
-            { label: 'Erros', count: stats.errors, color: 'text-destructive', bg: 'bg-destructive/10', icon: 'AlertTriangle' },
-          ].map(s => (
-            <div key={s.label} className={cn("flex flex-col items-center gap-1 py-2.5 rounded-xl", s.bg)}>
-              <span className={cn("text-lg font-extrabold tabular-nums", s.color)}>{s.count}</span>
-              <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">{s.label}</span>
-            </div>
-          ))}
+      {/* ─── Live Stats Bar ─── */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/15 to-amber-600/5 border border-amber-500/20 p-3 text-center">
+          {stats.active > 0 && <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-400 animate-pulse" />}
+          <p className="text-2xl font-black tabular-nums text-amber-400">{stats.active}</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400/70 mt-0.5">Em preparo</p>
         </div>
-      )}
+        <div className="rounded-2xl bg-gradient-to-br from-emerald-500/15 to-emerald-600/5 border border-emerald-500/20 p-3 text-center">
+          <p className="text-2xl font-black tabular-nums text-emerald-400">{stats.done}</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/70 mt-0.5">Concluídos</p>
+        </div>
+        <div className="rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 p-3 text-center">
+          <p className="text-lg font-black tabular-nums text-primary">{formatPrice(stats.revenue)}</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-primary/70 mt-0.5">Faturamento</p>
+        </div>
+      </div>
 
-      {/* Orders List */}
+      {/* ─── Orders Feed ─── */}
       {filtered.length === 0 ? (
-        <EmptyState icon={activeChannel.icon} title={activeChannel.emptyTitle} subtitle={activeChannel.emptySubtitle} />
+        <EmptyState icon="ShoppingBag" title="Nenhum pedido" subtitle="Os pedidos aparecerão aqui em tempo real" />
       ) : (
         <div className="space-y-5">
-          {todayOrders.length > 0 && (
-            <div className="space-y-2.5">
-              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50">Hoje</p>
-              {todayOrders.map((order, i) => (
-                <OrderCard key={order.id} order={order} index={i} showSource={channel === 'todos'} />
-              ))}
-            </div>
+          {/* Active orders — priority section */}
+          {activeOrders.length > 0 && (
+            <section className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-amber-400">
+                  Em andamento ({activeOrders.length})
+                </p>
+              </div>
+              <div className="space-y-2">
+                {activeOrders.map((order, i) => (
+                  <TimelineOrderCard
+                    key={order.id}
+                    order={order}
+                    index={i}
+                    onClick={() => handleOrderClick(order)}
+                  />
+                ))}
+              </div>
+            </section>
           )}
 
-          {olderOrders.length > 0 && (
-            <div className="space-y-2.5">
-              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/50">Anteriores</p>
-              {olderOrders.slice(0, 20).map((order, i) => (
-                <OrderCardCompact key={order.id} order={order} index={i} showSource={channel === 'todos'} />
+          {/* Completed orders */}
+          {doneOrders.length > 0 && (
+            <section className="space-y-2">
+              <div className="flex items-center gap-2">
+                <AppIcon name="CircleCheckBig" size={12} className="text-emerald-400" />
+                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-400/70">
+                  Concluídos ({doneOrders.length})
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                {doneOrders.slice(0, 10).map((order, i) => (
+                  <CompactOrderCard
+                    key={order.id}
+                    order={order}
+                    index={i}
+                    onClick={() => handleOrderClick(order)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Errors/Cancelled */}
+          {errorOrders.length > 0 && (
+            <section className="space-y-2">
+              <div className="flex items-center gap-2">
+                <AppIcon name="XCircle" size={12} className="text-red-400/70" />
+                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-red-400/60">
+                  Cancelados ({errorOrders.length})
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                {errorOrders.slice(0, 5).map((order, i) => (
+                  <CompactOrderCard
+                    key={order.id}
+                    order={order}
+                    index={i}
+                    onClick={() => handleOrderClick(order)}
+                    dimmed
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Other (drafts, etc) */}
+          {otherOrders.length > 0 && (
+            <section className="space-y-1.5">
+              {otherOrders.slice(0, 10).map((order, i) => (
+                <CompactOrderCard
+                  key={order.id}
+                  order={order}
+                  index={i}
+                  onClick={() => handleOrderClick(order)}
+                />
               ))}
-            </div>
+            </section>
           )}
         </div>
       )}
+
+      {/* ─── Order Detail Sheet ─── */}
+      <OrderDetailSheet order={selectedOrder} onClose={() => setSelectedOrder(null)} />
     </div>
   );
 }
 
-function OrderCard({ order, index, showSource }: { order: OrderItem; index: number; showSource: boolean }) {
+/* ─── Timeline Order Card (Active) ─── */
+function TimelineOrderCard({ order, index, onClick }: { order: OrderItem; index: number; onClick: () => void }) {
   const st = getStatus(order.status);
-  const items = order.tablet_order_items || [];
   const ch = getOrderChannel(order);
-  const channelIcon = ch === 'ifood' ? 'ShoppingBag'
-    : ch === 'delivery' ? 'Truck'
-    : ch === 'mesa' ? 'Utensils'
-    : ch === 'qrcode' ? 'QrCode'
-    : 'Store';
-  const style = CHANNEL_STYLE[ch];
+  const items = order.tablet_order_items || [];
+  const accent = CHANNEL_ACCENT[ch];
 
   return (
-    <div
-      className="rounded-2xl bg-card border border-border/40 p-4 space-y-3 animate-fade-in"
-      style={{ animationDelay: `${index * 30}ms` }}
+    <button
+      onClick={onClick}
+      className={cn(
+        "w-full text-left rounded-2xl bg-card border border-border/40 overflow-hidden transition-all duration-200",
+        "active:scale-[0.98] hover:border-border/60 hover:shadow-lg hover:shadow-black/5",
+        "border-l-[3px]", accent,
+        "animate-fade-in"
+      )}
+      style={{ animationDelay: `${index * 40}ms` }}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center shrink-0", style.bg)}>
-            <AppIcon name={channelIcon} size={16} className={style.text} />
+      {/* Header */}
+      <div className="p-4 pb-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", st.bg)}>
+              <AppIcon name={st.icon} size={18} className={st.color} />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-[15px] font-bold text-foreground truncate">{getSourceLabel(order)}</p>
+                <span className="text-[10px] text-muted-foreground/60 shrink-0">{timeAgo(order.created_at)}</span>
+              </div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                {st.pulse && <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", st.color.replace('text-', 'bg-'))} />}
+                <span className={cn("text-[11px] font-bold uppercase tracking-wide", st.color)}>
+                  {st.label}
+                </span>
+                <span className="text-[10px] text-muted-foreground/40">·</span>
+                <span className="text-[10px] text-muted-foreground/60">
+                  {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-bold text-foreground leading-tight">{getSourceLabel(order)}</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-              {order.customer_name && showSource && (
-                <span className="ml-1.5">· {order.customer_name}</span>
-              )}
-            </p>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-sm font-extrabold text-foreground tabular-nums">{formatPrice(order.total)}</p>
-          <span className={cn("text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-md inline-block mt-1", st.color)}>
-            {st.label}
-          </span>
+          <p className="text-base font-black text-foreground tabular-nums shrink-0">
+            {formatPrice(order.total)}
+          </p>
         </div>
       </div>
+
+      {/* Items Preview */}
       {items.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {items.slice(0, 4).map((item: any, idx: number) => (
-            <span key={idx} className="text-[10px] text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-              {item.quantity}× {item.tablet_products?.name || '?'}
-            </span>
-          ))}
-          {items.length > 4 && (
-            <span className="text-[10px] text-muted-foreground/60">+{items.length - 4}</span>
-          )}
+        <div className="px-4 pb-3">
+          <div className="flex flex-wrap gap-1.5">
+            {items.slice(0, 3).map((item: any, idx: number) => (
+              <span key={idx} className="inline-flex items-center gap-1 text-[11px] text-muted-foreground bg-secondary/60 px-2.5 py-1 rounded-lg">
+                <span className="font-bold text-foreground/70">{item.quantity}×</span>
+                <span className="truncate max-w-[140px]">{item.tablet_products?.name || '?'}</span>
+              </span>
+            ))}
+            {items.length > 3 && (
+              <span className="text-[11px] text-muted-foreground/50 px-2 py-1">+{items.length - 3}</span>
+            )}
+          </div>
         </div>
       )}
-    </div>
+
+      {/* Progress Steps (for active orders) */}
+      <div className="px-4 pb-3">
+        <div className="flex items-center gap-1">
+          {STATUS_FLOW.map((step, i) => {
+            const currentIdx = STATUS_FLOW.indexOf(mapToFlowStatus(order.status));
+            const filled = i <= currentIdx;
+            const isCurrent = i === currentIdx;
+            return (
+              <div key={step} className="flex items-center flex-1 gap-1">
+                <div className={cn(
+                  "h-1 flex-1 rounded-full transition-all duration-500",
+                  filled
+                    ? isCurrent ? "bg-primary animate-pulse" : "bg-primary/60"
+                    : "bg-secondary/60"
+                )} />
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex justify-between mt-1">
+          <span className="text-[8px] text-muted-foreground/40 uppercase">Pendente</span>
+          <span className="text-[8px] text-muted-foreground/40 uppercase">Entregue</span>
+        </div>
+      </div>
+    </button>
   );
 }
 
-function OrderCardCompact({ order, index, showSource }: { order: OrderItem; index: number; showSource: boolean }) {
+function mapToFlowStatus(status: string): typeof STATUS_FLOW[number] {
+  if (['awaiting_confirmation', 'pending', 'confirmed', 'new', 'accepted'].includes(status)) return 'pending';
+  if (status === 'preparing') return 'preparing';
+  if (status === 'ready') return 'ready';
+  return 'delivered';
+}
+
+/* ─── Compact Order Card (Done/Cancelled) ─── */
+function CompactOrderCard({ order, index, onClick, dimmed }: { order: OrderItem; index: number; onClick: () => void; dimmed?: boolean }) {
   const st = getStatus(order.status);
   const ch = getOrderChannel(order);
-  const channelIcon = ch === 'ifood' ? 'ShoppingBag'
-    : ch === 'delivery' ? 'Truck'
-    : ch === 'mesa' ? 'Utensils'
-    : ch === 'qrcode' ? 'QrCode'
-    : 'Store';
-  const style = CHANNEL_STYLE[ch];
 
   return (
-    <div
-      className="rounded-2xl bg-card border border-border/40 p-3.5 flex items-center gap-3 animate-fade-in"
+    <button
+      onClick={onClick}
+      className={cn(
+        "w-full text-left flex items-center gap-3 p-3 rounded-xl bg-card/60 border border-border/30",
+        "transition-all duration-150 active:scale-[0.98]",
+        dimmed && "opacity-50",
+        "animate-fade-in"
+      )}
       style={{ animationDelay: `${index * 20}ms` }}
     >
-      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", style.bg)}>
-        <AppIcon name={channelIcon} size={13} className={style.text} />
+      <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", st.bg)}>
+        <AppIcon name={getSourceIcon(ch)} size={14} className={st.color} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold text-foreground leading-tight truncate">{getSourceLabel(order)}</p>
-        <p className="text-[10px] text-muted-foreground">
-          {new Date(order.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} · {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-          <span className={cn("ml-1.5 font-bold uppercase", st.color.split(' ').find(c => c.startsWith('text-')) || '')}>
-            {st.label}
+        <p className="text-sm font-semibold text-foreground truncate">{getSourceLabel(order)}</p>
+        <div className="flex items-center gap-1.5">
+          <span className={cn("text-[10px] font-bold uppercase", st.color)}>{st.label}</span>
+          <span className="text-[10px] text-muted-foreground/40">·</span>
+          <span className="text-[10px] text-muted-foreground/60">
+            {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </span>
-        </p>
+        </div>
       </div>
-      <p className="text-sm font-extrabold text-foreground tabular-nums">{formatPrice(order.total)}</p>
-    </div>
+      <p className="text-sm font-bold text-foreground/80 tabular-nums shrink-0">{formatPrice(order.total)}</p>
+      <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/30 shrink-0" />
+    </button>
+  );
+}
+
+/* ─── Order Detail Sheet ─── */
+function OrderDetailSheet({ order, onClose }: { order: OrderItem | null; onClose: () => void }) {
+  if (!order) return null;
+  const st = getStatus(order.status);
+  const ch = getOrderChannel(order);
+  const items = order.tablet_order_items || [];
+
+  return (
+    <Sheet open={!!order} onOpenChange={() => onClose()}>
+      <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto">
+        <SheetHeader className="text-left pb-4">
+          <SheetTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center", st.bg)}>
+                <AppIcon name={st.icon} size={20} className={st.color} />
+              </div>
+              <div>
+                <p className="text-lg font-bold">{getSourceLabel(order)}</p>
+                <p className="text-xs text-muted-foreground font-normal">
+                  {new Date(order.created_at).toLocaleString('pt-BR', {
+                    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                  })}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xl font-black tabular-nums">{formatPrice(order.total)}</p>
+            </div>
+          </SheetTitle>
+        </SheetHeader>
+
+        {/* Status Badge */}
+        <div className={cn("flex items-center gap-2 px-4 py-3 rounded-xl mb-4", st.bg)}>
+          {st.pulse && <div className={cn("w-2 h-2 rounded-full animate-pulse", st.color.replace('text-', 'bg-'))} />}
+          <AppIcon name={st.icon} size={16} className={st.color} />
+          <span className={cn("text-sm font-bold", st.color)}>{st.label}</span>
+        </div>
+
+        {/* Progress */}
+        <div className="mb-5">
+          <div className="flex items-center gap-1.5">
+            {STATUS_FLOW.map((step, i) => {
+              const currentIdx = STATUS_FLOW.indexOf(mapToFlowStatus(order.status));
+              const filled = i <= currentIdx;
+              const isCurrent = i === currentIdx;
+              const stepLabel = step === 'pending' ? 'Recebido' : step === 'preparing' ? 'Preparando' : step === 'ready' ? 'Pronto' : 'Entregue';
+              return (
+                <div key={step} className="flex-1 text-center">
+                  <div className={cn(
+                    "h-1.5 rounded-full mb-1.5 transition-all",
+                    filled ? isCurrent ? "bg-primary" : "bg-primary/60" : "bg-secondary/60"
+                  )} />
+                  <span className={cn(
+                    "text-[9px] font-bold uppercase",
+                    filled ? "text-primary" : "text-muted-foreground/40"
+                  )}>
+                    {stepLabel}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Items */}
+        {items.length > 0 && (
+          <div className="space-y-2 mb-5">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Itens do pedido</p>
+            <div className="space-y-1.5">
+              {items.map((item: any, idx: number) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30">
+                  <span className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-black text-primary">
+                    {item.quantity}
+                  </span>
+                  <p className="flex-1 text-sm font-medium text-foreground">{item.tablet_products?.name || 'Item'}</p>
+                  {item.unit_price && (
+                    <p className="text-sm font-semibold text-muted-foreground tabular-nums">
+                      {formatPrice(item.unit_price * item.quantity)}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Info */}
+        <div className="space-y-2 mb-5">
+          <div className="flex justify-between py-2 border-b border-border/30">
+            <span className="text-sm text-muted-foreground">Canal</span>
+            <div className="flex items-center gap-1.5">
+              <AppIcon name={getSourceIcon(ch)} size={14} className="text-foreground" />
+              <span className="text-sm font-semibold">{ch === 'ifood' ? 'iFood' : ch === 'delivery' ? 'Delivery' : ch === 'mesa' ? 'Mesa' : 'Balcão'}</span>
+            </div>
+          </div>
+          {order.customer_name && (
+            <div className="flex justify-between py-2 border-b border-border/30">
+              <span className="text-sm text-muted-foreground">Cliente</span>
+              <span className="text-sm font-semibold">{order.customer_name}</span>
+            </div>
+          )}
+          <div className="flex justify-between py-2">
+            <span className="text-sm text-muted-foreground">Total</span>
+            <span className="text-sm font-black">{formatPrice(order.total)}</span>
+          </div>
+        </div>
+
+        <Button variant="outline" className="w-full h-12 rounded-xl" onClick={onClose}>
+          Fechar
+        </Button>
+      </SheetContent>
+    </Sheet>
   );
 }
