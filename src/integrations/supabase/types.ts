@@ -2928,6 +2928,7 @@ export type Database = {
           date: string
           due_date: string | null
           due_time: string | null
+          has_alarm: boolean
           id: string
           is_completed: boolean
           is_system_generated: boolean
@@ -2950,6 +2951,7 @@ export type Database = {
           date?: string
           due_date?: string | null
           due_time?: string | null
+          has_alarm?: boolean
           id?: string
           is_completed?: boolean
           is_system_generated?: boolean
@@ -2972,6 +2974,7 @@ export type Database = {
           date?: string
           due_date?: string | null
           due_time?: string | null
+          has_alarm?: boolean
           id?: string
           is_completed?: boolean
           is_system_generated?: boolean

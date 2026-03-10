@@ -259,7 +259,7 @@ export function TimeBlocksView({ tasks, onToggleTask, onTaskClick }: TimeBlocksV
       </div>
 
       {/* Timeline */}
-      <div ref={scrollRef} className="relative flex flex-col-reverse gap-1">
+      <div ref={scrollRef} className="relative flex flex-col gap-1">
         {HOURS.map((hour) => {
           const taskIds = allocations[hour] || [];
           const hourTasks = taskIds.map(id => taskMap.get(id)).filter(Boolean) as ManagerTask[];
