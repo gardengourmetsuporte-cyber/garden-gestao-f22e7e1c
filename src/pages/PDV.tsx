@@ -79,7 +79,7 @@ export default function PDV() {
       if (options.emitInvoice) {
         try {
           const { data, error } = await supabase.functions.invoke('fiscal-nfce', {
-            body: { action: 'emit-nfce', sale_id: saleId, unit_id: pos.saleSource === 'balcao' ? undefined : undefined },
+            body: { action: 'emit-nfce', sale_id: saleId, unit_id: activeUnitId },
           });
           // unit_id is validated server-side from user access
           if (error) {
