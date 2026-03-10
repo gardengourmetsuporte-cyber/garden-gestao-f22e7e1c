@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
       }
 
       // Fetch sale data
-      const { data: sale, error: saleError } = await supabase
+      const { data: sale, error: saleError } = await supabaseAdmin
         .from('pos_sales')
         .select('*, pos_sale_items(*), pos_sale_payments(*)')
         .eq('id', sale_id)
