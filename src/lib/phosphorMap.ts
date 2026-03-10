@@ -125,7 +125,7 @@ import {
   ChartLine,
   Pulse,
   Repeat,
-  FileSignature,
+  Signature,
   Briefcase,
   Building,
   Storefront,
