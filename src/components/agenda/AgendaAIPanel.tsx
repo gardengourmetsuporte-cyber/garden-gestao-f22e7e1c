@@ -166,11 +166,8 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
                   <span className="text-[10px] font-bold uppercase tracking-widest text-primary drop-shadow-sm">Copilot IA</span>
                   <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                 </div>
-                <p className="text-base font-bold text-white leading-tight drop-shadow-md">
-                  Folhinha
-                </p>
                 <p className="text-xs text-white/70 mt-0.5">
-                  Seu assistente inteligente
+                  Análise inteligente da agenda
                 </p>
               </div>
               <button
