@@ -155,7 +155,7 @@ Deno.serve(async (req) => {
 
       if (response.ok && (result.status === 'processando_autorizacao' || result.status === 'autorizado')) {
         // Update sale with fiscal data
-        await supabase
+        await supabaseAdmin
           .from('pos_sales')
           .update({
             fiscal_status: 'issued',
