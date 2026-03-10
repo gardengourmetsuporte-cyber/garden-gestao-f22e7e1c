@@ -285,9 +285,9 @@ import { useUnit } from '@/contexts/UnitContext';
        // Get existing recipe
        const { data: existing, error: fetchError } = await supabase
          .from('recipes')
-         .select(`
-           *,
-           ingredients:recipe_ingredients(*)
+          .select(`
+            *,
+            ingredients:recipe_ingredients!recipe_ingredients_recipe_id_fkey(*)
          `)
          .eq('id', recipeId)
          .single();
