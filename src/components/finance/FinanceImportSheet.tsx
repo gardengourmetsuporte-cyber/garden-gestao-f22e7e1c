@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { AppIcon } from '@/components/ui/app-icon';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,15 +16,6 @@ interface FinanceImportSheetProps {
   onRefreshAll: () => Promise<void>;
 }
 
-interface PreviewRow {
-  date: string;
-  description: string;
-  category: string;
-  subcategory: string;
-  account: string;
-  amount: string;
-}
-
 interface ImportResult {
   imported: number;
   skipped: number;
@@ -31,38 +23,79 @@ interface ImportResult {
   unmatchedAccounts: string[];
 }
 
-function parseCSVPreview(text: string): PreviewRow[] {
-  const lines = text.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 2) return [];
+type FieldKey = 'date' | 'description' | 'category' | 'subcategory' | 'account' | 'amount';
 
-  const headers = lines[0].split(';').map(h =>
-    h.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/"/g, '')
-  );
+const FIELD_LABELS: Record<FieldKey, string> = {
+  date: 'Data',
+  description: 'Descrição',
+  category: 'Categoria',
+  subcategory: 'Subcategoria',
+  account: 'Conta',
+  amount: 'Valor',
+};
 
-  const idxDate = headers.findIndex(h => h === 'data');
-  const idxDesc = headers.findIndex(h => h === 'descricao' || h === 'descrição');
-  const idxCat = headers.findIndex(h => h === 'categoria');
-  const idxSubcat = headers.findIndex(h => h === 'subcategoria');
-  const idxAccount = headers.findIndex(h => h === 'conta');
-  const idxAmount = headers.findIndex(h => h === 'valor');
+const REQUIRED_FIELDS: FieldKey[] = ['date', 'amount'];
 
-  const rows: PreviewRow[] = [];
-  for (let i = 1; i < Math.min(lines.length, 11); i++) {
-    const cols = lines[i].split(';').map(c => c.replace(/"/g, '').trim());
-    rows.push({
-      date: cols[idxDate] || '',
-      description: cols[idxDesc] || '',
-      category: cols[idxCat] || '',
-      subcategory: cols[idxSubcat] || '',
-      account: cols[idxAccount] || '',
-      amount: cols[idxAmount] || '',
-    });
-  }
-  return rows;
+// Aliases for auto-detection (normalized, no accents, lowercase)
+const FIELD_ALIASES: Record<FieldKey, string[]> = {
+  date: ['data', 'date', 'dt', 'dia'],
+  description: ['descricao', 'descrição', 'description', 'desc', 'titulo', 'title', 'nome'],
+  category: ['categoria', 'category', 'cat', 'tipo'],
+  subcategory: ['subcategoria', 'subcategory', 'sub', 'detalhe'],
+  account: ['conta', 'account', 'banco', 'bank', 'carteira', 'wallet'],
+  amount: ['valor', 'amount', 'value', 'total', 'quantia', 'price', 'preco'],
+};
+
+function normalize(str: string): string {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/"/g, '');
 }
 
-function countCSVLines(text: string): number {
-  return text.split(/\r?\n/).filter(l => l.trim()).length - 1; // minus header
+function detectDelimiter(firstLine: string): string {
+  const semicolons = (firstLine.match(/;/g) || []).length;
+  const commas = (firstLine.match(/,/g) || []).length;
+  const tabs = (firstLine.match(/\t/g) || []).length;
+  if (tabs > semicolons && tabs > commas) return '\t';
+  if (semicolons >= commas) return ';';
+  return ',';
+}
+
+function splitCSVLine(line: string, delimiter: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      inQuotes = !inQuotes;
+    } else if (ch === delimiter && !inQuotes) {
+      result.push(current.trim().replace(/^"|"$/g, ''));
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current.trim().replace(/^"|"$/g, ''));
+  return result;
+}
+
+function autoDetectMapping(headers: string[]): Record<FieldKey, number> {
+  const mapping: Record<FieldKey, number> = {
+    date: -1, description: -1, category: -1, subcategory: -1, account: -1, amount: -1,
+  };
+
+  const normalizedHeaders = headers.map(normalize);
+
+  for (const field of Object.keys(FIELD_ALIASES) as FieldKey[]) {
+    for (const alias of FIELD_ALIASES[field]) {
+      const idx = normalizedHeaders.findIndex(h => h === alias);
+      if (idx !== -1 && mapping[field] === -1) {
+        mapping[field] = idx;
+        break;
+      }
+    }
+  }
+
+  return mapping;
 }
 
 export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: FinanceImportSheetProps) {
@@ -72,11 +105,18 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
 
   const [csvText, setCsvText] = useState<string | null>(null);
   const [fileName, setFileName] = useState('');
-  const [preview, setPreview] = useState<PreviewRow[]>([]);
+  const [headers, setHeaders] = useState<string[]>([]);
+  const [delimiter, setDelimiter] = useState(';');
+  const [sampleRows, setSampleRows] = useState<string[][]>([]);
   const [totalLines, setTotalLines] = useState(0);
+  const [columnMapping, setColumnMapping] = useState<Record<FieldKey, number>>({
+    date: -1, description: -1, category: -1, subcategory: -1, account: -1, amount: -1,
+  });
   const [mode, setMode] = useState<'historical' | 'full_migration'>('historical');
   const [isImporting, setIsImporting] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
+
+  const missingRequired = REQUIRED_FIELDS.filter(f => columnMapping[f] === -1);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -87,7 +127,6 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
     const buffer = await file.arrayBuffer();
     let text: string;
 
-    // Try UTF-16 LE (common in Mobills exports)
     const bytes = new Uint8Array(buffer);
     if (bytes[0] === 0xff && bytes[1] === 0xfe) {
       text = new TextDecoder('utf-16le').decode(buffer);
@@ -95,18 +134,52 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
       text = new TextDecoder('utf-8').decode(buffer);
     }
 
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) {
+      toast.error('Arquivo vazio ou inválido');
+      return;
+    }
+
+    const det = detectDelimiter(lines[0]);
+    setDelimiter(det);
+
+    const hdrs = splitCSVLine(lines[0], det);
+    setHeaders(hdrs);
+
+    const rows: string[][] = [];
+    for (let i = 1; i < Math.min(lines.length, 11); i++) {
+      rows.push(splitCSVLine(lines[i], det));
+    }
+    setSampleRows(rows);
+    setTotalLines(lines.length - 1);
     setCsvText(text);
-    setPreview(parseCSVPreview(text));
-    setTotalLines(countCSVLines(text));
+
+    // Auto-detect column mapping
+    const autoMap = autoDetectMapping(hdrs);
+    setColumnMapping(autoMap);
+  };
+
+  const handleMappingChange = (field: FieldKey, value: string) => {
+    setColumnMapping(prev => ({ ...prev, [field]: value === 'none' ? -1 : parseInt(value) }));
   };
 
   const handleImport = async () => {
     if (!csvText || !user || !activeUnitId) return;
+    if (missingRequired.length > 0) {
+      toast.error(`Mapeie as colunas obrigatórias: ${missingRequired.map(f => FIELD_LABELS[f]).join(', ')}`);
+      return;
+    }
     setIsImporting(true);
 
     try {
       const { data, error } = await supabase.functions.invoke('import-finance-csv', {
-        body: { csvText, unitId: activeUnitId, mode },
+        body: {
+          csvText,
+          unitId: activeUnitId,
+          mode,
+          delimiter,
+          columnMapping,
+        },
       });
 
       if (error) throw error;
@@ -125,56 +198,106 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
   const handleReset = () => {
     setCsvText(null);
     setFileName('');
-    setPreview([]);
+    setHeaders([]);
+    setSampleRows([]);
     setTotalLines(0);
     setResult(null);
+    setColumnMapping({ date: -1, description: -1, category: -1, subcategory: -1, account: -1, amount: -1 });
     if (fileRef.current) fileRef.current.value = '';
   };
+
+  // Preview using current mapping
+  const previewMapped = useMemo(() => {
+    return sampleRows.map(cols => ({
+      date: columnMapping.date >= 0 ? cols[columnMapping.date] || '' : '',
+      description: columnMapping.description >= 0 ? cols[columnMapping.description] || '' : '',
+      category: columnMapping.category >= 0 ? cols[columnMapping.category] || '' : '',
+      subcategory: columnMapping.subcategory >= 0 ? cols[columnMapping.subcategory] || '' : '',
+      account: columnMapping.account >= 0 ? cols[columnMapping.account] || '' : '',
+      amount: columnMapping.amount >= 0 ? cols[columnMapping.amount] || '' : '',
+    }));
+  }, [sampleRows, columnMapping]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Importar CSV (Mobills)</SheetTitle>
+          <SheetTitle>Importar CSV</SheetTitle>
           <SheetDescription>
-            Importe suas transações do Mobills para o sistema financeiro.
+            Importe transações de qualquer planilha ou app financeiro (Mobills, Organizze, etc).
           </SheetDescription>
         </SheetHeader>
 
         <div className="mt-4 space-y-4">
           {/* Backup warning */}
-          <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 border border-amber-500/30 p-3">
-            <AppIcon name="AlertTriangle" size={16} className="text-amber-500 mt-0.5 shrink-0" />
-            <p className="text-xs text-amber-200/80">
+          <div className="flex items-start gap-2 rounded-lg bg-accent/10 border border-accent/30 p-3">
+            <AppIcon name="AlertTriangle" size={16} className="text-accent mt-0.5 shrink-0" />
+            <p className="text-xs text-muted-foreground">
               <strong>Recomendado:</strong> Faça um backup antes de importar. Acesse{' '}
               <strong>Mais → Backups</strong> para criar um snapshot de segurança.
             </p>
           </div>
 
-          {/* File upload */}
           {!result && (
             <>
+              {/* File upload */}
               <div>
                 <Label className="text-sm font-medium">Arquivo CSV</Label>
                 <input
                   ref={fileRef}
                   type="file"
-                  accept=".csv"
+                  accept=".csv,.txt"
                   onChange={handleFileSelect}
                   className="mt-1 block w-full text-sm text-muted-foreground file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
                 />
                 {fileName && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    {fileName} — {totalLines} transações encontradas
+                    {fileName} — {totalLines} linhas · delimitador: <code className="bg-secondary/50 px-1 rounded">{delimiter === '\t' ? 'TAB' : delimiter}</code>
                   </p>
                 )}
               </div>
 
+              {/* Column mapping */}
+              {headers.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Mapeamento de colunas</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Associe cada campo à coluna correspondente do seu CSV. Campos com <span className="text-destructive">*</span> são obrigatórios.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(Object.keys(FIELD_LABELS) as FieldKey[]).map(field => (
+                      <div key={field} className="space-y-1">
+                        <Label className="text-xs">
+                          {FIELD_LABELS[field]}
+                          {REQUIRED_FIELDS.includes(field) && <span className="text-destructive ml-0.5">*</span>}
+                        </Label>
+                        <Select
+                          value={columnMapping[field] === -1 ? 'none' : String(columnMapping[field])}
+                          onValueChange={(v) => handleMappingChange(field, v)}
+                        >
+                          <SelectTrigger className="h-8 text-xs">
+                            <SelectValue placeholder="Não mapeado" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">— Ignorar —</SelectItem>
+                            {headers.map((h, idx) => (
+                              <SelectItem key={idx} value={String(idx)}>
+                                {h}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Preview */}
-              {preview.length > 0 && (
+              {previewMapped.length > 0 && columnMapping.date >= 0 && (
                 <div>
                   <Label className="text-sm font-medium mb-2 block">
-                    Preview (primeiras {preview.length} linhas)
+                    Preview ({previewMapped.length} linhas)
                   </Label>
                   <div className="rounded-lg border border-border overflow-hidden">
                     <div className="overflow-x-auto max-h-48">
@@ -189,7 +312,7 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border/40">
-                          {preview.map((row, i) => (
+                          {previewMapped.map((row, i) => (
                             <tr key={i} className="hover:bg-secondary/20">
                               <td className="px-2 py-1 whitespace-nowrap">{row.date}</td>
                               <td className="px-2 py-1 max-w-[120px] truncate">{row.description}</td>
@@ -208,7 +331,7 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
               )}
 
               {/* Mode selection */}
-              {csvText && (
+              {csvText && headers.length > 0 && (
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">Modo de importação</Label>
                   <RadioGroup value={mode} onValueChange={(v) => setMode(v as any)} className="space-y-2">
@@ -233,18 +356,24 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
                   </RadioGroup>
 
                   {mode === 'full_migration' && (
-                    <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 border border-amber-500/30 p-3">
-                      <AppIcon name="AlertTriangle" size={16} className="text-amber-500 mt-0.5 shrink-0" />
-                      <p className="text-xs text-amber-200/80">
+                    <div className="flex items-start gap-2 rounded-lg bg-accent/10 border border-accent/30 p-3">
+                      <AppIcon name="AlertTriangle" size={16} className="text-accent mt-0.5 shrink-0" />
+                      <p className="text-xs text-muted-foreground">
                         <strong>Atenção:</strong> Os saldos atuais das suas contas serão afetados pelas transações
                         importadas. Recomendamos fortemente criar um backup antes.
                       </p>
                     </div>
                   )}
 
+                  {missingRequired.length > 0 && (
+                    <p className="text-xs text-destructive">
+                      Mapeie as colunas obrigatórias: {missingRequired.map(f => FIELD_LABELS[f]).join(', ')}
+                    </p>
+                  )}
+
                   <Button
                     onClick={handleImport}
-                    disabled={isImporting || !csvText}
+                    disabled={isImporting || !csvText || missingRequired.length > 0}
                     className="w-full"
                   >
                     {isImporting ? (
@@ -267,8 +396,8 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
           {/* Result */}
           {result && (
             <div className="space-y-3">
-              <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 p-4 text-center">
-                <AppIcon name="CheckCircle2" size={32} className="text-emerald-500 mx-auto mb-2" />
+              <div className="rounded-lg bg-primary/10 border border-primary/30 p-4 text-center">
+                <AppIcon name="CheckCircle2" size={32} className="text-primary mx-auto mb-2" />
                 <p className="text-lg font-semibold text-foreground">{result.imported} importadas</p>
                 {result.skipped > 0 && (
                   <p className="text-xs text-muted-foreground">{result.skipped} linhas ignoradas</p>
@@ -276,11 +405,11 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
               </div>
 
               {result.unmatchedCategories.length > 0 && (
-                <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3">
-                  <p className="text-xs font-medium text-amber-300 mb-1">Categorias não encontradas:</p>
+                <div className="rounded-lg bg-accent/10 border border-accent/30 p-3">
+                  <p className="text-xs font-medium text-accent-foreground mb-1">Categorias não encontradas:</p>
                   <div className="flex flex-wrap gap-1">
                     {result.unmatchedCategories.map((c) => (
-                      <span key={c} className="text-xs bg-amber-500/20 px-2 py-0.5 rounded-full text-amber-200">
+                      <span key={c} className="text-xs bg-accent/20 px-2 py-0.5 rounded-full text-muted-foreground">
                         {c}
                       </span>
                     ))}
@@ -289,11 +418,11 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
               )}
 
               {result.unmatchedAccounts.length > 0 && (
-                <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3">
-                  <p className="text-xs font-medium text-amber-300 mb-1">Contas não encontradas:</p>
+                <div className="rounded-lg bg-accent/10 border border-accent/30 p-3">
+                  <p className="text-xs font-medium text-accent-foreground mb-1">Contas não encontradas:</p>
                   <div className="flex flex-wrap gap-1">
                     {result.unmatchedAccounts.map((a) => (
-                      <span key={a} className="text-xs bg-amber-500/20 px-2 py-0.5 rounded-full text-amber-200">
+                      <span key={a} className="text-xs bg-accent/20 px-2 py-0.5 rounded-full text-muted-foreground">
                         {a}
                       </span>
                     ))}
