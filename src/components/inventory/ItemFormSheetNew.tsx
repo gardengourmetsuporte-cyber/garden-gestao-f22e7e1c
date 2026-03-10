@@ -54,11 +54,7 @@ export function ItemFormSheetNew({
   const [currentStock, setCurrentStock] = useState('');
   const [minStock, setMinStock] = useState('');
   const [unitPrice, setUnitPrice] = useState('');
-  const [recipeUnitType, setRecipeUnitType] = useState<string>('');
-  const [recipeUnitPrice, setRecipeUnitPrice] = useState('');
-  const [showRecipeSection, setShowRecipeSection] = useState(false);
   const [stockUnitLabel, setStockUnitLabel] = useState('');
-  const [stockToRecipeFactor, setStockToRecipeFactor] = useState('');
   const [purchaseUnitLabel, setPurchaseUnitLabel] = useState('');
   const [purchaseToStockFactor, setPurchaseToStockFactor] = useState('');
   const [showPurchaseSection, setShowPurchaseSection] = useState(false);
