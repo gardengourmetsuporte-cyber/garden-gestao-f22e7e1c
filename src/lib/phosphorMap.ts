@@ -378,7 +378,7 @@ export const PHOSPHOR_MAP: Record<string, PhosphorIcon> = {
   LineChart: ChartLine,
   Activity: Pulse,
   Repeat: Repeat,
-  FileSignature: FileSignature,
+  FileSignature: Signature,
 
   // Building & Places
   Briefcase: Briefcase,
