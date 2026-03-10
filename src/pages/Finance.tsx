@@ -303,6 +303,8 @@ export default function Finance() {
             getEmployeeStats={getEmployeeStats}
             transactions={transactions}
             categories={categories}
+            unitId={activeUnitId}
+            isPersonal={false}
           />
         )}
 
