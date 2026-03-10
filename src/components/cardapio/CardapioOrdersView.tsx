@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
+import type { HubOrder } from '@/hooks/useDeliveryHub';
 
 interface OrderItem {
   id: string;
@@ -16,6 +17,7 @@ interface OrderItem {
 
 interface Props {
   orders: OrderItem[];
+  hubOrders?: HubOrder[];
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; dotColor: string }> = {
@@ -30,9 +32,12 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; dotColor: st
   sent_to_pdv: { label: 'Enviado PDV', color: 'bg-emerald-500/15 text-emerald-400', dotColor: 'bg-emerald-400' },
   cancelled: { label: 'Cancelado', color: 'bg-destructive/15 text-destructive', dotColor: 'bg-destructive' },
   error: { label: 'Erro', color: 'bg-destructive/15 text-destructive', dotColor: 'bg-destructive' },
+  // Hub statuses
+  new: { label: 'Novo', color: 'bg-warning/15 text-warning', dotColor: 'bg-warning' },
+  accepted: { label: 'Aceito', color: 'bg-primary/15 text-primary', dotColor: 'bg-primary' },
 };
 
-type Channel = 'todos' | 'delivery' | 'mesa' | 'balcao' | 'qrcode';
+type Channel = 'todos' | 'delivery' | 'mesa' | 'balcao' | 'qrcode' | 'ifood';
 
 const CHANNELS: { id: Channel; label: string; icon: string; emptyTitle: string; emptySubtitle: string }[] = [
   { id: 'todos', label: 'Todos', icon: 'LayoutGrid', emptyTitle: 'Nenhum pedido', emptySubtitle: 'Os pedidos aparecerão aqui' },
@@ -40,9 +45,23 @@ const CHANNELS: { id: Channel; label: string; icon: string; emptyTitle: string; 
   { id: 'mesa', label: 'Mesa', icon: 'Utensils', emptyTitle: 'Nenhum pedido de mesa', emptySubtitle: 'Pedidos do tablet nas mesas aparecerão aqui' },
   { id: 'balcao', label: 'Balcão', icon: 'Store', emptyTitle: 'Nenhum pedido no balcão', emptySubtitle: 'Pedidos para retirada aparecerão aqui' },
   { id: 'qrcode', label: 'QR Code', icon: 'QrCode', emptyTitle: 'Nenhum pedido QR', emptySubtitle: 'Pedidos via QR Code aparecerão aqui' },
+  { id: 'ifood', label: 'iFood', icon: 'ShoppingBag', emptyTitle: 'Nenhum pedido iFood', emptySubtitle: 'Pedidos do iFood aparecerão aqui' },
 ];
 
+function normalizeHubOrders(hubOrders: HubOrder[]): OrderItem[] {
+  return hubOrders.map(o => ({
+    id: o.id,
+    created_at: o.received_at || o.created_at,
+    total: o.total,
+    status: o.status,
+    source: 'ifood',
+    customer_name: o.customer_name,
+    table_number: 0,
+  }));
+}
+
 function getOrderChannel(order: OrderItem): Channel {
+  if (order.source === 'ifood') return 'ifood';
   if (order.source === 'delivery') return 'delivery';
   if (order.source === 'balcao') return 'balcao';
   if (order.source === 'qrcode') return 'qrcode';
@@ -51,6 +70,7 @@ function getOrderChannel(order: OrderItem): Channel {
 }
 
 function getSourceLabel(order: OrderItem) {
+  if (order.source === 'ifood') return order.customer_name || 'iFood';
   if (order.source === 'delivery') return 'Delivery';
   if (order.source === 'balcao') return 'Balcão';
   if (order.source === 'qrcode') return 'QR Code';
@@ -62,40 +82,53 @@ function getSourceLabel(order: OrderItem) {
 const formatPrice = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const getStatus = (s: string) => STATUS_CONFIG[s] || { label: s, color: 'bg-secondary text-muted-foreground', dotColor: 'bg-muted-foreground' };
 
-export function CardapioOrdersView({ orders }: Props) {
+const CHANNEL_STYLE: Record<Channel, { bg: string; text: string }> = {
+  todos: { bg: 'bg-secondary/10', text: 'text-muted-foreground' },
+  delivery: { bg: 'bg-blue-500/10', text: 'text-blue-400' },
+  mesa: { bg: 'bg-amber-500/10', text: 'text-amber-400' },
+  balcao: { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
+  qrcode: { bg: 'bg-purple-500/10', text: 'text-purple-400' },
+  ifood: { bg: 'bg-red-500/10', text: 'text-red-400' },
+};
+
+export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   const [channel, setChannel] = useState<Channel>('todos');
+
+  const allOrders = useMemo(() => {
+    const normalized = normalizeHubOrders(hubOrders);
+    return [...orders, ...normalized];
+  }, [orders, hubOrders]);
 
   const today = new Date().toISOString().slice(0, 10);
 
   const channelCounts = useMemo(() => {
-    const counts: Record<Channel, number> = { todos: 0, delivery: 0, mesa: 0, balcao: 0, qrcode: 0 };
-    const todayOrders = orders.filter(o => o.created_at.slice(0, 10) === today);
+    const counts: Record<Channel, number> = { todos: 0, delivery: 0, mesa: 0, balcao: 0, qrcode: 0, ifood: 0 };
+    const todayOrders = allOrders.filter(o => o.created_at.slice(0, 10) === today);
     counts.todos = todayOrders.length;
     todayOrders.forEach(o => { counts[getOrderChannel(o)]++; });
     return counts;
-  }, [orders, today]);
+  }, [allOrders, today]);
 
   const filtered = useMemo(() => {
-    const sorted = [...orders].sort((a, b) => b.created_at.localeCompare(a.created_at));
+    const sorted = [...allOrders].sort((a, b) => b.created_at.localeCompare(a.created_at));
     if (channel === 'todos') return sorted;
     return sorted.filter(o => getOrderChannel(o) === channel);
-  }, [orders, channel]);
+  }, [allOrders, channel]);
 
   const todayOrders = filtered.filter(o => o.created_at.slice(0, 10) === today);
   const olderOrders = filtered.filter(o => o.created_at.slice(0, 10) !== today);
   const activeChannel = CHANNELS.find(c => c.id === channel)!;
 
-  // Stats for top row
   const stats = useMemo(() => {
-    const active = channel === 'todos' ? orders : filtered;
+    const active = channel === 'todos' ? allOrders : filtered;
     const todayActive = active.filter(o => o.created_at.slice(0, 10) === today);
     return {
-      pending: todayActive.filter(o => ['awaiting_confirmation', 'pending', 'confirmed'].includes(o.status)).length,
-      preparing: todayActive.filter(o => ['preparing', 'ready'].includes(o.status)).length,
+      pending: todayActive.filter(o => ['awaiting_confirmation', 'pending', 'confirmed', 'new'].includes(o.status)).length,
+      preparing: todayActive.filter(o => ['preparing', 'ready', 'accepted'].includes(o.status)).length,
       done: todayActive.filter(o => ['sent_to_pdv', 'delivered', 'dispatched'].includes(o.status)).length,
       errors: todayActive.filter(o => ['error', 'cancelled'].includes(o.status)).length,
     };
-  }, [orders, filtered, channel, today]);
+  }, [allOrders, filtered, channel, today]);
 
   return (
     <div className="px-4 py-3 lg:px-6 space-y-4">
@@ -178,10 +211,13 @@ export function CardapioOrdersView({ orders }: Props) {
 function OrderCard({ order, index, showSource }: { order: OrderItem; index: number; showSource: boolean }) {
   const st = getStatus(order.status);
   const items = order.tablet_order_items || [];
-  const channelIcon = getOrderChannel(order) === 'delivery' ? 'Truck'
-    : getOrderChannel(order) === 'mesa' ? 'Utensils'
-    : getOrderChannel(order) === 'qrcode' ? 'QrCode'
+  const ch = getOrderChannel(order);
+  const channelIcon = ch === 'ifood' ? 'ShoppingBag'
+    : ch === 'delivery' ? 'Truck'
+    : ch === 'mesa' ? 'Utensils'
+    : ch === 'qrcode' ? 'QrCode'
     : 'Store';
+  const style = CHANNEL_STYLE[ch];
 
   return (
     <div
@@ -190,18 +226,8 @@ function OrderCard({ order, index, showSource }: { order: OrderItem; index: numb
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2.5">
-          <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center shrink-0",
-            getOrderChannel(order) === 'delivery' ? 'bg-blue-500/10' :
-            getOrderChannel(order) === 'mesa' ? 'bg-amber-500/10' :
-            getOrderChannel(order) === 'qrcode' ? 'bg-purple-500/10' :
-            'bg-emerald-500/10'
-          )}>
-            <AppIcon name={channelIcon} size={16} className={
-              getOrderChannel(order) === 'delivery' ? 'text-blue-400' :
-              getOrderChannel(order) === 'mesa' ? 'text-amber-400' :
-              getOrderChannel(order) === 'qrcode' ? 'text-purple-400' :
-              'text-emerald-400'
-            } />
+          <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center shrink-0", style.bg)}>
+            <AppIcon name={channelIcon} size={16} className={style.text} />
           </div>
           <div>
             <p className="text-sm font-bold text-foreground leading-tight">{getSourceLabel(order)}</p>
@@ -238,28 +264,21 @@ function OrderCard({ order, index, showSource }: { order: OrderItem; index: numb
 
 function OrderCardCompact({ order, index, showSource }: { order: OrderItem; index: number; showSource: boolean }) {
   const st = getStatus(order.status);
-  const channelIcon = getOrderChannel(order) === 'delivery' ? 'Truck'
-    : getOrderChannel(order) === 'mesa' ? 'Utensils'
-    : getOrderChannel(order) === 'qrcode' ? 'QrCode'
+  const ch = getOrderChannel(order);
+  const channelIcon = ch === 'ifood' ? 'ShoppingBag'
+    : ch === 'delivery' ? 'Truck'
+    : ch === 'mesa' ? 'Utensils'
+    : ch === 'qrcode' ? 'QrCode'
     : 'Store';
+  const style = CHANNEL_STYLE[ch];
 
   return (
     <div
       className="rounded-2xl bg-card border border-border/40 p-3.5 flex items-center gap-3 animate-fade-in"
       style={{ animationDelay: `${index * 20}ms` }}
     >
-      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
-        getOrderChannel(order) === 'delivery' ? 'bg-blue-500/10' :
-        getOrderChannel(order) === 'mesa' ? 'bg-amber-500/10' :
-        getOrderChannel(order) === 'qrcode' ? 'bg-purple-500/10' :
-        'bg-emerald-500/10'
-      )}>
-        <AppIcon name={channelIcon} size={13} className={
-          getOrderChannel(order) === 'delivery' ? 'text-blue-400' :
-          getOrderChannel(order) === 'mesa' ? 'text-amber-400' :
-          getOrderChannel(order) === 'qrcode' ? 'text-purple-400' :
-          'text-emerald-400'
-        } />
+      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", style.bg)}>
+        <AppIcon name={channelIcon} size={13} className={style.text} />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-bold text-foreground leading-tight truncate">{getSourceLabel(order)}</p>

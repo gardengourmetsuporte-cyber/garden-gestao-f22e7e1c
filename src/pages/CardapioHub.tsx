@@ -4,6 +4,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useMenuAdmin, MenuProduct, MenuOptionGroup } from '@/hooks/useMenuAdmin';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
+import { useDeliveryHub } from '@/hooks/useDeliveryHub';
 import { useUnit } from '@/contexts/UnitContext';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -64,6 +65,7 @@ export default function CardapioHub() {
   // Tablet admin hook (for orders)
   const tabletAdmin = useTabletAdmin();
   const { orders, pdvConfig, retryPDV } = tabletAdmin;
+  const { orders: hubOrders } = useDeliveryHub(activeUnit?.id);
 
   // Recipe sync
 
@@ -234,7 +236,7 @@ export default function CardapioHub() {
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
           <Suspense fallback={<div className="p-4 space-y-4"><Skeleton className="h-10 w-full rounded-xl" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-24 w-full rounded-2xl" /></div>}>
-            <CardapioOrdersViewLazy orders={orders} />
+            <CardapioOrdersViewLazy orders={orders} hubOrders={hubOrders} />
           </Suspense>
         </div>
       </AppLayout>
