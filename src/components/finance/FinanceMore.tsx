@@ -90,6 +90,12 @@ export function FinanceMore({
         onRestore={backup.restoreSnapshot}
         onDelete={backup.deleteSnapshot}
       />
+
+      <FinanceImportSheet
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onRefreshAll={onRefreshAll}
+      />
     </>
   );
 }

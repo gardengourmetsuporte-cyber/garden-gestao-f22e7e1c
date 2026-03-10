@@ -86,3 +86,6 @@ verify_jwt = false
 
 [functions.agenda-ai-prioritize]
 verify_jwt = false
+
+[functions.import-finance-csv]
+verify_jwt = false
