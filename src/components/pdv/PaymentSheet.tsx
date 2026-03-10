@@ -269,7 +269,7 @@ export function PaymentSheet({
                   inputMode="numeric"
                 />
               </div>
-            )
+            )}
 
             {/* Notes */}
             <Textarea
