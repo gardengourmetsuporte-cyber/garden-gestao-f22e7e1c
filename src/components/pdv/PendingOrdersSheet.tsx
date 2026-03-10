@@ -328,7 +328,7 @@ function OrderDetailSheet({
 }
 
 // ─── Main Sheet ───
-export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoadOrder }: PendingOrdersSheetProps) {
+export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoadOrder, onChargeOrder }: PendingOrdersSheetProps) {
   const [filterSource, setFilterSource] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<(PendingOrder & { sequentialNumber: number }) | null>(null);
   const [dispatching, setDispatching] = useState<string | null>(null);
