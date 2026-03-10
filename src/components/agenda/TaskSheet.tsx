@@ -69,6 +69,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
     setDueDate(new Date());
     setHasTime(false);
     setDueTime('09:00');
+    setHasAlarm(false);
     setCategoryId(null);
   };
 
