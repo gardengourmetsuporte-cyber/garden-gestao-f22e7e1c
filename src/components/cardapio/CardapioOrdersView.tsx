@@ -1,9 +1,13 @@
 import { useState, useMemo, useCallback } from 'react';
+import { startOfDay, subDays, isWithinInterval, format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { DatePicker } from '@/components/ui/date-picker';
 import type { HubOrder } from '@/hooks/useDeliveryHub';
 
 /* ─── Types ─── */
@@ -52,6 +56,36 @@ const CHANNELS: { id: Channel; label: string; icon: string }[] = [
   { id: 'balcao', label: 'Balcão', icon: 'Store' },
   { id: 'ifood', label: 'iFood', icon: 'ShoppingBag' },
 ];
+
+/* ─── Date Filter ─── */
+type DateFilter = 'today' | 'yesterday' | '7days' | 'custom';
+
+const DATE_PILLS: { id: DateFilter; label: string; icon?: string }[] = [
+  { id: 'today', label: 'Hoje' },
+  { id: 'yesterday', label: 'Ontem' },
+  { id: '7days', label: '7 dias' },
+  { id: 'custom', label: '', icon: 'CalendarDays' },
+];
+
+/* ─── Operational Groups ─── */
+type OpGroup = 'novos' | 'emPreparo' | 'prontos' | 'entregues' | 'cancelados';
+
+const OP_GROUPS: { id: OpGroup; label: string; icon: string; color: string; dotColor: string; pulse?: boolean }[] = [
+  { id: 'novos', label: 'Novos', icon: 'Bell', color: 'text-amber-400', dotColor: 'bg-amber-400', pulse: true },
+  { id: 'emPreparo', label: 'Em Preparo', icon: 'Flame', color: 'text-orange-400', dotColor: 'bg-orange-400', pulse: true },
+  { id: 'prontos', label: 'Prontos', icon: 'PackageCheck', color: 'text-emerald-400', dotColor: 'bg-emerald-400' },
+  { id: 'entregues', label: 'Entregues', icon: 'CircleCheckBig', color: 'text-muted-foreground', dotColor: 'bg-muted-foreground' },
+  { id: 'cancelados', label: 'Cancelados', icon: 'XCircle', color: 'text-red-400/60', dotColor: 'bg-red-400/60' },
+];
+
+function getOpGroup(status: string): OpGroup {
+  if (['pending', 'awaiting_confirmation', 'new', 'confirmed', 'accepted'].includes(status)) return 'novos';
+  if (status === 'preparing') return 'emPreparo';
+  if (status === 'ready') return 'prontos';
+  if (['delivered', 'sent_to_pdv', 'dispatched'].includes(status)) return 'entregues';
+  if (['cancelled', 'error'].includes(status)) return 'cancelados';
+  return 'novos';
+}
 
 /* ─── Helpers ─── */
 function normalizeHubOrders(hubOrders: HubOrder[]): OrderItem[] {
@@ -104,10 +138,6 @@ const CHANNEL_ACCENT: Record<Channel, string> = {
   ifood: 'border-l-red-500',
 };
 
-const isActive = (status: string) => ['awaiting_confirmation', 'pending', 'confirmed', 'new', 'accepted', 'preparing', 'ready'].includes(status);
-const isDone = (status: string) => ['delivered', 'sent_to_pdv', 'dispatched'].includes(status);
-const isError = (status: string) => ['cancelled', 'error'].includes(status);
-
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -118,9 +148,40 @@ function timeAgo(dateStr: string) {
   return `${Math.floor(hrs / 24)}d`;
 }
 
+function getDateRange(filter: DateFilter, customDate?: Date): { start: Date; end: Date } {
+  const now = new Date();
+  const todayStart = startOfDay(now);
+  switch (filter) {
+    case 'today':
+      return { start: todayStart, end: now };
+    case 'yesterday': {
+      const yd = subDays(todayStart, 1);
+      return { start: yd, end: todayStart };
+    }
+    case '7days':
+      return { start: subDays(todayStart, 6), end: now };
+    case 'custom': {
+      if (customDate) {
+        const cs = startOfDay(customDate);
+        const ce = new Date(cs);
+        ce.setDate(ce.getDate() + 1);
+        return { start: cs, end: ce };
+      }
+      return { start: todayStart, end: now };
+    }
+  }
+}
+
+function isInRange(dateStr: string, range: { start: Date; end: Date }) {
+  const d = new Date(dateStr);
+  return isWithinInterval(d, { start: range.start, end: range.end });
+}
+
 /* ─── Main Component ─── */
 export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   const [channel, setChannel] = useState<Channel>('todos');
+  const [dateFilter, setDateFilter] = useState<DateFilter>('today');
+  const [customDate, setCustomDate] = useState<Date | undefined>(undefined);
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
 
   const allOrders = useMemo(() => {
@@ -128,41 +189,52 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
     return [...orders, ...normalized];
   }, [orders, hubOrders]);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const dateRange = useMemo(() => getDateRange(dateFilter, customDate), [dateFilter, customDate]);
 
   const channelCounts = useMemo(() => {
     const counts: Record<Channel, number> = { todos: 0, delivery: 0, mesa: 0, balcao: 0, qrcode: 0, ifood: 0 };
-    const todayOrders = allOrders.filter(o => o.created_at.slice(0, 10) === today);
-    counts.todos = todayOrders.length;
-    todayOrders.forEach(o => { counts[getOrderChannel(o)]++; });
+    const rangeOrders = allOrders.filter(o => isInRange(o.created_at, dateRange));
+    counts.todos = rangeOrders.length;
+    rangeOrders.forEach(o => { counts[getOrderChannel(o)]++; });
     return counts;
-  }, [allOrders, today]);
+  }, [allOrders, dateRange]);
 
   const filtered = useMemo(() => {
-    const sorted = [...allOrders].sort((a, b) => b.created_at.localeCompare(a.created_at));
-    if (channel === 'todos') return sorted;
-    return sorted.filter(o => getOrderChannel(o) === channel);
-  }, [allOrders, channel]);
+    let result = allOrders.filter(o => isInRange(o.created_at, dateRange));
+    if (channel !== 'todos') result = result.filter(o => getOrderChannel(o) === channel);
+    return result.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  }, [allOrders, channel, dateRange]);
 
-  // Split: active orders (in progress) vs completed
-  const activeOrders = filtered.filter(o => isActive(o.status));
-  const doneOrders = filtered.filter(o => isDone(o.status));
-  const errorOrders = filtered.filter(o => isError(o.status));
-  const otherOrders = filtered.filter(o => !isActive(o.status) && !isDone(o.status) && !isError(o.status));
+  // Group by operational status
+  const grouped = useMemo(() => {
+    const groups: Record<OpGroup, OrderItem[]> = {
+      novos: [], emPreparo: [], prontos: [], entregues: [], cancelados: [],
+    };
+    filtered.forEach(o => {
+      groups[getOpGroup(o.status)].push(o);
+    });
+    return groups;
+  }, [filtered]);
 
   const stats = useMemo(() => {
-    const todayAll = allOrders.filter(o => o.created_at.slice(0, 10) === today);
-    const scoped = channel === 'todos' ? todayAll : todayAll.filter(o => getOrderChannel(o) === channel);
-    return {
-      active: scoped.filter(o => isActive(o.status)).length,
-      done: scoped.filter(o => isDone(o.status)).length,
-      errors: scoped.filter(o => isError(o.status)).length,
-      revenue: scoped.filter(o => !isError(o.status)).reduce((sum, o) => sum + o.total, 0),
-    };
-  }, [allOrders, channel, today]);
+    const active = grouped.novos.length + grouped.emPreparo.length + grouped.prontos.length;
+    const done = grouped.entregues.length;
+    const revenue = filtered.filter(o => getOpGroup(o.status) !== 'cancelados').reduce((sum, o) => sum + o.total, 0);
+    return { active, done, revenue };
+  }, [grouped, filtered]);
 
   const handleOrderClick = useCallback((order: OrderItem) => {
     setSelectedOrder(order);
+  }, []);
+
+  const handleDateFilterChange = useCallback((f: DateFilter) => {
+    setDateFilter(f);
+    if (f !== 'custom') setCustomDate(undefined);
+  }, []);
+
+  const handleCustomDate = useCallback((d: Date) => {
+    setCustomDate(d);
+    setDateFilter('custom');
   }, []);
 
   return (
@@ -198,16 +270,61 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
         })}
       </div>
 
+      {/* ─── Date Filter Pills ─── */}
+      <div className="flex items-center gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
+        {DATE_PILLS.map(pill => {
+          if (pill.id === 'custom') {
+            return (
+              <div key={pill.id} className="shrink-0">
+                <DatePicker
+                  date={customDate}
+                  onSelect={handleCustomDate}
+                  formatStr="dd/MM"
+                  placeholder=""
+                  className={cn(
+                    "h-9 min-w-9 w-auto px-2.5 rounded-xl text-xs font-bold border",
+                    dateFilter === 'custom'
+                      ? "bg-primary/15 border-primary/40 text-primary"
+                      : "bg-card/60 border-border/30 text-muted-foreground"
+                  )}
+                />
+              </div>
+            );
+          }
+          const isActive = dateFilter === pill.id;
+          return (
+            <button
+              key={pill.id}
+              onClick={() => handleDateFilterChange(pill.id)}
+              className={cn(
+                "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0",
+                isActive
+                  ? "bg-primary/15 border border-primary/40 text-primary"
+                  : "bg-card/60 border border-border/30 text-muted-foreground active:scale-95"
+              )}
+            >
+              {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
+              {pill.label}
+            </button>
+          );
+        })}
+        {dateFilter === 'custom' && customDate && (
+          <span className="text-[11px] font-semibold text-primary shrink-0">
+            {format(customDate, "dd 'de' MMM", { locale: ptBR })}
+          </span>
+        )}
+      </div>
+
       {/* ─── Live Stats Bar ─── */}
       <div className="grid grid-cols-3 gap-2">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/15 to-amber-600/5 border border-amber-500/20 p-3 text-center">
           {stats.active > 0 && <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-400 animate-pulse" />}
           <p className="text-2xl font-black tabular-nums text-amber-400">{stats.active}</p>
-          <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400/70 mt-0.5">Em preparo</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400/70 mt-0.5">Ativos</p>
         </div>
         <div className="rounded-2xl bg-gradient-to-br from-emerald-500/15 to-emerald-600/5 border border-emerald-500/20 p-3 text-center">
           <p className="text-2xl font-black tabular-nums text-emerald-400">{stats.done}</p>
-          <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/70 mt-0.5">Concluídos</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/70 mt-0.5">Entregues</p>
         </div>
         <div className="rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 p-3 text-center">
           <p className="text-lg font-black tabular-nums text-primary">{formatPrice(stats.revenue)}</p>
@@ -215,97 +332,105 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
         </div>
       </div>
 
-      {/* ─── Orders Feed ─── */}
+      {/* ─── Orders Feed (Operational Groups) ─── */}
       {filtered.length === 0 ? (
         <EmptyState icon="ShoppingBag" title="Nenhum pedido" subtitle="Os pedidos aparecerão aqui em tempo real" />
       ) : (
-        <div className="space-y-5">
-          {/* Active orders — priority section */}
-          {activeOrders.length > 0 && (
-            <section className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-amber-400">
-                  Em andamento ({activeOrders.length})
-                </p>
-              </div>
-              <div className="space-y-2">
-                {activeOrders.map((order, i) => (
-                  <TimelineOrderCard
-                    key={order.id}
-                    order={order}
-                    index={i}
-                    onClick={() => handleOrderClick(order)}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
+        <div className="space-y-4">
+          {OP_GROUPS.map(group => {
+            const items = grouped[group.id];
+            if (items.length === 0) return null;
 
-          {/* Completed orders */}
-          {doneOrders.length > 0 && (
-            <section className="space-y-2">
-              <div className="flex items-center gap-2">
-                <AppIcon name="CircleCheckBig" size={12} className="text-emerald-400" />
-                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-400/70">
-                  Concluídos ({doneOrders.length})
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                {doneOrders.slice(0, 10).map((order, i) => (
-                  <CompactOrderCard
-                    key={order.id}
-                    order={order}
-                    index={i}
-                    onClick={() => handleOrderClick(order)}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
+            const isCollapsible = group.id === 'entregues' || group.id === 'cancelados';
+            const defaultOpen = !isCollapsible || items.length <= 3;
 
-          {/* Errors/Cancelled */}
-          {errorOrders.length > 0 && (
-            <section className="space-y-2">
-              <div className="flex items-center gap-2">
-                <AppIcon name="XCircle" size={12} className="text-red-400/70" />
-                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-red-400/60">
-                  Cancelados ({errorOrders.length})
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                {errorOrders.slice(0, 5).map((order, i) => (
-                  <CompactOrderCard
-                    key={order.id}
-                    order={order}
-                    index={i}
-                    onClick={() => handleOrderClick(order)}
-                    dimmed
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Other (drafts, etc) */}
-          {otherOrders.length > 0 && (
-            <section className="space-y-1.5">
-              {otherOrders.slice(0, 10).map((order, i) => (
-                <CompactOrderCard
-                  key={order.id}
-                  order={order}
-                  index={i}
-                  onClick={() => handleOrderClick(order)}
-                />
-              ))}
-            </section>
-          )}
+            return (
+              <OrderSection
+                key={group.id}
+                group={group}
+                items={items}
+                collapsible={isCollapsible}
+                defaultOpen={defaultOpen}
+                onOrderClick={handleOrderClick}
+              />
+            );
+          })}
         </div>
       )}
 
       {/* ─── Order Detail Sheet ─── */}
       <OrderDetailSheet order={selectedOrder} onClose={() => setSelectedOrder(null)} />
     </div>
+  );
+}
+
+/* ─── Order Section (collapsible) ─── */
+function OrderSection({
+  group,
+  items,
+  collapsible,
+  defaultOpen,
+  onOrderClick,
+}: {
+  group: typeof OP_GROUPS[number];
+  items: OrderItem[];
+  collapsible: boolean;
+  defaultOpen: boolean;
+  onOrderClick: (o: OrderItem) => void;
+}) {
+  const header = (
+    <div className="flex items-center gap-2">
+      {group.pulse
+        ? <div className={cn("w-2 h-2 rounded-full animate-pulse", group.dotColor)} />
+        : <AppIcon name={group.icon} size={12} className={group.color} />
+      }
+      <p className={cn("text-[11px] font-bold uppercase tracking-[0.15em]", group.color)}>
+        {group.label} ({items.length})
+      </p>
+      {collapsible && (
+        <AppIcon name="ChevronDown" size={12} className={cn("ml-auto transition-transform text-muted-foreground/40", "group-data-[state=open]:rotate-180")} />
+      )}
+    </div>
+  );
+
+  const isActiveGroup = group.id === 'novos' || group.id === 'emPreparo' || group.id === 'prontos';
+
+  const content = (
+    <div className={cn(isActiveGroup ? "space-y-2" : "space-y-1.5")}>
+      {items.map((order, i) =>
+        isActiveGroup ? (
+          <TimelineOrderCard key={order.id} order={order} index={i} onClick={() => onOrderClick(order)} />
+        ) : (
+          <CompactOrderCard
+            key={order.id}
+            order={order}
+            index={i}
+            onClick={() => onOrderClick(order)}
+            dimmed={group.id === 'cancelados'}
+          />
+        )
+      )}
+    </div>
+  );
+
+  if (collapsible) {
+    return (
+      <Collapsible defaultOpen={defaultOpen} className="group">
+        <CollapsibleTrigger className="w-full text-left mb-2">
+          {header}
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          {content}
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  }
+
+  return (
+    <section className="space-y-2">
+      {header}
+      {content}
+    </section>
   );
 }
 
@@ -327,7 +452,6 @@ function TimelineOrderCard({ order, index, onClick }: { order: OrderItem; index:
       )}
       style={{ animationDelay: `${index * 40}ms` }}
     >
-      {/* Header */}
       <div className="p-4 pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -341,9 +465,7 @@ function TimelineOrderCard({ order, index, onClick }: { order: OrderItem; index:
               </div>
               <div className="flex items-center gap-1.5 mt-0.5">
                 {st.pulse && <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse", st.color.replace('text-', 'bg-'))} />}
-                <span className={cn("text-[11px] font-bold uppercase tracking-wide", st.color)}>
-                  {st.label}
-                </span>
+                <span className={cn("text-[11px] font-bold uppercase tracking-wide", st.color)}>{st.label}</span>
                 <span className="text-[10px] text-muted-foreground/40">·</span>
                 <span className="text-[10px] text-muted-foreground/60">
                   {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
@@ -351,13 +473,10 @@ function TimelineOrderCard({ order, index, onClick }: { order: OrderItem; index:
               </div>
             </div>
           </div>
-          <p className="text-base font-black text-foreground tabular-nums shrink-0">
-            {formatPrice(order.total)}
-          </p>
+          <p className="text-base font-black text-foreground tabular-nums shrink-0">{formatPrice(order.total)}</p>
         </div>
       </div>
 
-      {/* Items Preview */}
       {items.length > 0 && (
         <div className="px-4 pb-3">
           <div className="flex flex-wrap gap-1.5">
@@ -374,7 +493,6 @@ function TimelineOrderCard({ order, index, onClick }: { order: OrderItem; index:
         </div>
       )}
 
-      {/* Progress Steps (for active orders) */}
       <div className="px-4 pb-3">
         <div className="flex items-center gap-1">
           {STATUS_FLOW.map((step, i) => {
@@ -385,9 +503,7 @@ function TimelineOrderCard({ order, index, onClick }: { order: OrderItem; index:
               <div key={step} className="flex items-center flex-1 gap-1">
                 <div className={cn(
                   "h-1 flex-1 rounded-full transition-all duration-500",
-                  filled
-                    ? isCurrent ? "bg-primary animate-pulse" : "bg-primary/60"
-                    : "bg-secondary/60"
+                  filled ? isCurrent ? "bg-primary animate-pulse" : "bg-primary/60" : "bg-secondary/60"
                 )} />
               </div>
             );
@@ -475,14 +591,12 @@ function OrderDetailSheet({ order, onClose }: { order: OrderItem | null; onClose
           </SheetTitle>
         </SheetHeader>
 
-        {/* Status Badge */}
         <div className={cn("flex items-center gap-2 px-4 py-3 rounded-xl mb-4", st.bg)}>
           {st.pulse && <div className={cn("w-2 h-2 rounded-full animate-pulse", st.color.replace('text-', 'bg-'))} />}
           <AppIcon name={st.icon} size={16} className={st.color} />
           <span className={cn("text-sm font-bold", st.color)}>{st.label}</span>
         </div>
 
-        {/* Progress */}
         <div className="mb-5">
           <div className="flex items-center gap-1.5">
             {STATUS_FLOW.map((step, i) => {
@@ -508,7 +622,6 @@ function OrderDetailSheet({ order, onClose }: { order: OrderItem | null; onClose
           </div>
         </div>
 
-        {/* Items */}
         {items.length > 0 && (
           <div className="space-y-2 mb-5">
             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Itens do pedido</p>
@@ -530,7 +643,6 @@ function OrderDetailSheet({ order, onClose }: { order: OrderItem | null; onClose
           </div>
         )}
 
-        {/* Info */}
         <div className="space-y-2 mb-5">
           <div className="flex justify-between py-2 border-b border-border/30">
             <span className="text-sm text-muted-foreground">Canal</span>
