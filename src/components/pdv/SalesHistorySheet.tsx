@@ -323,8 +323,23 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
       {sale.notes && <div className="text-xs text-muted-foreground italic">Obs: {sale.notes}</div>}
       {sale.discount > 0 && <div className="text-xs text-muted-foreground">Desconto: -{formatCurrency(sale.discount)}</div>}
 
+      {/* Fiscal status */}
+      {sale.fiscal_status && (
+        <div className={cn(
+          'flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs',
+          sale.fiscal_status === 'autorizada' ? 'bg-emerald-500/10 text-emerald-600' :
+          sale.fiscal_status === 'erro' ? 'bg-destructive/10 text-destructive' :
+          'bg-amber-500/10 text-amber-600'
+        )}>
+          <AppIcon name={sale.fiscal_status === 'autorizada' ? 'CheckCircle' : sale.fiscal_status === 'erro' ? 'AlertCircle' : 'Clock'} size={13} />
+          <span className="font-medium">
+            NFC-e {sale.fiscal_status === 'autorizada' ? `#${sale.fiscal_number}` : sale.fiscal_status === 'erro' ? 'com erro' : sale.fiscal_status}
+          </span>
+        </div>
+      )}
+
       {sale.status === 'paid' && (
-        <div className="flex gap-2 pt-2 border-t border-border/30">
+        <div className="flex gap-2 pt-2 border-t border-border/30 flex-wrap">
           <Button
             variant="outline"
             size="sm"
@@ -333,6 +348,20 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
           >
             <AppIcon name="Receipt" size={13} />
             Nota Fiscal
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 h-8 text-[11px] gap-1.5"
+            disabled={reemittingId === sale.id}
+            onClick={() => handleReemitNfce(sale)}
+          >
+            {reemittingId === sale.id ? (
+              <AppIcon name="Loader2" size={13} className="animate-spin" />
+            ) : (
+              <AppIcon name="FileText" size={13} />
+            )}
+            {sale.fiscal_status === 'autorizada' ? 'Reemitir NFC-e' : 'Emitir NFC-e'}
           </Button>
           {sale.customer_phone && (
             <Button
