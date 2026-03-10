@@ -56,7 +56,7 @@ export function AICopilotWidget() {
               </>
             ) : isLoading ? (
               <>
-                <p className="text-xs font-semibold text-foreground leading-tight">Copiloto IA</p>
+                <p className="text-xs font-semibold text-foreground leading-tight">Copilot IA</p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
