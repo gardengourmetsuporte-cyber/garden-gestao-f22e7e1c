@@ -247,6 +247,7 @@ export function useChecklistPage() {
 
   // Handlers
   const handleToggleItem = useCallback(async (itemId: string, points: number = 1, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean) => {
+    lastManualToggleRef.current = Date.now();
     try {
       await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points, completedByUserId, isSkipped, photoUrl, preserveTimerOnUncheck, bypassGrace);
     } catch (error: any) {
