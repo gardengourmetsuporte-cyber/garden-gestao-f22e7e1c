@@ -66,7 +66,7 @@ export function AICopilotWidget() {
               </>
             ) : (
               <>
-                <p className="text-sm font-bold text-foreground leading-tight">Olá! Sou seu Copiloto 🌿</p>
+                <p className="text-sm font-bold text-foreground leading-tight">Olá! Sou o Copilot IA 🌿</p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">Seu assistente de gestão</p>
               </>
             )}
