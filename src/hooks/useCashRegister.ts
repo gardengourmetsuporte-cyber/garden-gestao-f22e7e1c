@@ -183,9 +183,6 @@ export function useCashRegister() {
       if (regError) throw regError;
 
       // Create cash_closing record for approval
-      const totalAmount = summary.total_cash + summary.total_debit + summary.total_credit +
-        summary.total_pix + summary.total_meal_voucher + summary.total_delivery + summary.total_signed_account;
-
       const { data: closing, error: closingError } = await supabase
         .from('cash_closings')
         .insert({
@@ -201,14 +198,14 @@ export function useCashRegister() {
           meal_voucher_amount: summary.total_meal_voucher,
           delivery_amount: summary.total_delivery,
           signed_account_amount: summary.total_signed_account,
-          
           cash_difference: cashDifference,
           receipt_url: '',
           status: 'pending',
           notes: notes ? `[PDV] ${notes}` : '[PDV] Fechamento automático via PDV',
           expenses: expenses && expenses.length > 0 ? expenses : null,
+          financial_integrated: true,
         })
-        .select('id')
+        .select('*')
         .single();
 
       if (closingError) throw closingError;
@@ -219,6 +216,15 @@ export function useCashRegister() {
           .from('pos_cash_registers')
           .update({ cash_closing_id: closing.id })
           .eq('id', currentRegister.id);
+
+        // Trigger financial integration via callback
+        if (onFinancialIntegrate) {
+          try {
+            await onFinancialIntegrate(closing as any);
+          } catch (err) {
+            console.error('Financial integration error (non-blocking):', err);
+          }
+        }
       }
 
       setCurrentRegister(null);
@@ -230,7 +236,7 @@ export function useCashRegister() {
     } finally {
       setSaving(false);
     }
-  }, [activeUnitId, user, currentRegister, activeUnit, fetchSalesSummary]);
+  }, [activeUnitId, user, currentRegister, activeUnit, fetchSalesSummary, onFinancialIntegrate]);
 
   return {
     currentRegister,
