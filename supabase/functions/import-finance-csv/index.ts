@@ -69,6 +69,92 @@ const INCOME_MAPPINGS: Record<string, { parent: string; sub: string }> = {
   rappi: { parent: "vendas delivery", sub: "rappi" },
 };
 
+// Alias map: normalized CSV name → normalized system category name
+// Handles typos, abbreviations, and alternative names from common Brazilian finance apps
+const CATEGORY_ALIASES: Record<string, string> = {
+  // Pró-labore
+  "prolabore": "pro-labore",
+  "pro labore": "pro-labore",
+  "pro-labore": "pro-labore",
+  "retirada socio": "pro-labore",
+  "retirada sócio": "pro-labore",
+  // Despesas Administrativas (common typo)
+  "despesas adiministrativas": "despesas administrativas",
+  "desp administrativas": "despesas administrativas",
+  "desp. administrativas": "despesas administrativas",
+  "despesas adm": "despesas administrativas",
+  // Limpeza
+  "limpesa": "limpeza",
+  "produtos limpesa": "limpeza",
+  "produtos limpeza": "limpeza",
+  "produtos de limpeza": "limpeza",
+  "material limpeza": "limpeza",
+  // Embalagem → Embalagens
+  "embalagem": "embalagens",
+  "embalagen": "embalagens",
+  // Matéria-prima
+  "materia prima": "materia-prima",
+  "matéria prima": "materia-prima",
+  // Descartáveis
+  "descartaveis": "descartaveis",
+  "descartavel": "descartaveis",
+  // Seguros
+  "seguros": "seguros",
+  "seguro": "seguros",
+  // Financiamentos
+  "emprestimo": "financiamentos",
+  "empréstimo": "financiamentos",
+  "emprestimo porto": "financiamentos",
+  "empréstimo porto": "financiamentos",
+  "financiamento": "financiamentos",
+  // Tarifa Bancária
+  "tarifa banco": "tarifa bancaria",
+  "tarifa bancaria": "tarifa bancaria",
+  "tarifas bancarias": "tarifa bancaria",
+  // Taxa Funcionamento → Laudos e Prefeitura
+  "taxa funcionamento": "laudos e prefeitura",
+  "taxa prefeitura": "laudos e prefeitura",
+  "alvara": "alvara",
+  // Combustível
+  "combustivel": "combustivel",
+  "gasolina": "combustivel",
+  // Doces
+  "doces": "doces",
+  "doce": "doces",
+  // Extorno
+  "extorno": "extorno",
+  // Detetização
+  "detetizador": "limpeza",
+  "dedetizacao": "limpeza",
+  "dedetização": "limpeza",
+  // Venda de imobilizado
+  "venda imbilizado": "outros",
+  "venda imobilizado": "outros",
+};
+
+function resolveAlias(name: string): string {
+  const n = normalize(name);
+  return CATEGORY_ALIASES[n] || n;
+}
+
+function fuzzyMatch(needle: string, haystack: string): boolean {
+  // Check if one contains the other
+  if (haystack.includes(needle) || needle.includes(haystack)) return true;
+  // Check Levenshtein-like similarity for short strings
+  if (needle.length >= 4 && haystack.length >= 4) {
+    const shorter = needle.length < haystack.length ? needle : haystack;
+    const longer = needle.length < haystack.length ? haystack : needle;
+    if (shorter.length / longer.length > 0.6) {
+      let matches = 0;
+      for (let i = 0; i < shorter.length; i++) {
+        if (longer.includes(shorter[i])) matches++;
+      }
+      return matches / shorter.length > 0.8;
+    }
+  }
+  return false;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
