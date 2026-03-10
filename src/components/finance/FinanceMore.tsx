@@ -3,6 +3,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { AccountManagement } from './AccountManagement';
 import { CategoryManagement } from './CategoryManagement';
 import { FinanceBackupSheet } from './FinanceBackupSheet';
+import { FinanceImportSheet } from './FinanceImportSheet';
 import { FinanceAccount, FinanceCategory, FinanceTransaction } from '@/types/finance';
 import { useFinanceBackup } from '@/hooks/useFinanceBackup';
 
