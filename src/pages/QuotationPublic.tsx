@@ -371,8 +371,8 @@ export default function QuotationPublic() {
 
               <div className="space-y-2">
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">
-                    Preço/{item.item.unit_type === 'unidade' ? 'un' : item.item.unit_type}
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                    💰 Preço por {item.item.unit_type === 'unidade' ? 'Unidade' : item.item.unit_type.toUpperCase()} (R$)
                   </label>
                   <Input
                     type="number"

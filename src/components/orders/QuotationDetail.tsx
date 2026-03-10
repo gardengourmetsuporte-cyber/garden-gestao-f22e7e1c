@@ -201,8 +201,13 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                 {comparison.map((row, i) => (
                   <tr key={row.item.id} className={cn(i < comparison.length - 1 && 'border-b border-border/50')}>
                     <td className="p-3">
-                      <p className="font-medium">{row.item.item?.name}</p>
-                      <p className="text-xs text-muted-foreground">×{row.item.quantity} {row.item.item?.unit_type}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-medium">{row.item.item?.name}</p>
+                        <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                          {row.item.item?.unit_type === 'unidade' ? 'UN' : row.item.item?.unit_type?.toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">×{row.item.quantity}</p>
                     </td>
                     {row.supplierPrices.map(sp => {
                       const isWinner = sp.price && row.minPrice !== null && sp.price.unit_price === row.minPrice;
