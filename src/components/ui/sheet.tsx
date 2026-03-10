@@ -134,6 +134,13 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
     if (isMobile) {
       // Extract padding from className to apply to inner wrapper
       const hasCustomPadding = className && /\bp-0\b/.test(className);
+      // Strip overflow classes from outer container — they break vaul's swipe-to-close
+      // gesture. Only the inner wrapper should scroll.
+      const outerClassName = className
+        ?.replace(/\boverflow-y-auto\b/g, '')
+        .replace(/\boverflow-y-scroll\b/g, '')
+        .replace(/\boverflow-auto\b/g, '')
+        .replace(/\boverflow-hidden\b/g, '');
       return (
         <DrawerPrimitive.Portal>
           <DrawerPrimitive.Overlay className="fixed inset-0 z-[80] bg-black/60 backdrop-blur-sm" />
@@ -141,7 +148,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
             ref={ref as React.Ref<HTMLDivElement>}
             className={cn(
               "fixed inset-x-0 bottom-0 z-[90] mt-24 flex h-auto min-h-[55vh] max-h-[96dvh] flex-col rounded-t-3xl border border-border bg-card overscroll-contain",
-              className,
+              outerClassName,
             )}
             {...(props as any)}
           >
