@@ -235,7 +235,7 @@ export default function CardapioHub() {
       <AppLayout>
         <div className="min-h-screen bg-background pb-24">
           <Suspense fallback={<div className="p-4 space-y-4"><Skeleton className="h-10 w-full rounded-xl" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-24 w-full rounded-2xl" /></div>}>
-            <CardapioOrdersViewLazy orders={orders} />
+            <CardapioOrdersViewLazy orders={orders} hubOrders={hubOrders} />
           </Suspense>
         </div>
       </AppLayout>
