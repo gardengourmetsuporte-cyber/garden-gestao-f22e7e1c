@@ -3,6 +3,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { AccountManagement } from './AccountManagement';
 import { CategoryManagement } from './CategoryManagement';
 import { FinanceBackupSheet } from './FinanceBackupSheet';
+import { FinanceImportSheet } from './FinanceImportSheet';
 import { FinanceAccount, FinanceCategory, FinanceTransaction } from '@/types/finance';
 import { useFinanceBackup } from '@/hooks/useFinanceBackup';
 
@@ -32,6 +33,7 @@ export function FinanceMore({
   const [accountsOpen, setAccountsOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const backup = useFinanceBackup(accounts, transactions, selectedMonth, onRefreshAll);
 
@@ -39,6 +41,7 @@ export function FinanceMore({
     { icon: 'Wallet', label: 'Gerenciar Contas', onClick: () => setAccountsOpen(true), color: 'hsl(var(--neon-cyan))' },
     { icon: 'Hash', label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true), color: 'hsl(var(--neon-amber))' },
     { icon: 'Archive', label: 'Backups', onClick: () => setBackupOpen(true), color: 'hsl(var(--neon-purple, 270 70% 60%))' },
+    { icon: 'Upload', label: 'Importar CSV (Mobills)', onClick: () => setImportOpen(true), color: 'hsl(var(--neon-green, 142 70% 45%))' },
   ];
 
   return (
@@ -86,6 +89,12 @@ export function FinanceMore({
         onCompare={backup.compareSnapshot}
         onRestore={backup.restoreSnapshot}
         onDelete={backup.deleteSnapshot}
+      />
+
+      <FinanceImportSheet
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onRefreshAll={onRefreshAll}
       />
     </>
   );
