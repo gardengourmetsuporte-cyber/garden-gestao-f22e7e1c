@@ -565,6 +565,7 @@ export function useCashClosing() {
     closings, isLoading, uploadReceipt,
     createClosing, approveClosing, markDivergent,
     deleteClosing, updateClosing, checkChecklistCompleted,
+    integrateWithFinancial,
     refetch: invalidate,
   };
 }
