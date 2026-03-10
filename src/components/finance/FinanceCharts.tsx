@@ -11,6 +11,9 @@ import { CategoryStats, FinanceCategory, FinanceTransaction } from '@/types/fina
 import { DREReport } from './DREReport';
 import { EntityStats } from '@/hooks/useFinanceStats';
 import { cn } from '@/lib/utils';
+import { useAnnualFinanceStats } from '@/hooks/useAnnualFinanceStats';
+import { AnnualFinanceView } from './AnnualFinanceView';
+import { setMonth, setYear } from 'date-fns';
 
 interface FinanceChartsProps {
   selectedMonth: Date;
@@ -58,16 +61,29 @@ export function FinanceCharts({
   transactions,
   categories: categoriesProp = [],
 }: FinanceChartsProps) {
-  const [viewType, setViewType] = useState<'categories' | 'timeline' | 'cumulative' | 'weekly'>('categories');
+  const [viewType, setViewType] = useState<'categories' | 'timeline' | 'cumulative' | 'weekly' | 'annual'>('categories');
   const [dataType, setDataType] = useState<'expense' | 'income'>('expense');
   const [drillDownCategory, setDrillDownCategory] = useState<FinanceCategory | null>(null);
   const [entityView, setEntityView] = useState<'employees' | 'suppliers' | null>(null);
   const [entityData, setEntityData] = useState<EntityStats[]>([]);
 
+  const annualStats = useAnnualFinanceStats(selectedMonth.getFullYear(), categoriesProp);
+
   const categoryData = dataType === 'expense' ? expensesByCategory : incomeByCategory;
   const subcategoryData = drillDownCategory ? getSubcategoryStats(drillDownCategory.id, dataType) : [];
   const displayData = drillDownCategory ? subcategoryData : categoryData;
   const displayTotal = displayData.reduce((sum, c) => sum + c.amount, 0);
+
+  const handleYearChange = (delta: number) => {
+    const newDate = setYear(selectedMonth, selectedMonth.getFullYear() + delta);
+    onMonthChange(newDate);
+  };
+
+  const handleAnnualMonthClick = (monthIndex: number) => {
+    const newDate = setMonth(setYear(selectedMonth, annualStats.year), monthIndex);
+    onMonthChange(newDate);
+    setViewType('categories');
+  };
 
   const detectEntityData = useCallback((categoryId: string): { type: 'employees' | 'suppliers' | null; data: EntityStats[] } => {
     const relevantTxs = transactions.filter(t => {
@@ -163,12 +179,33 @@ export function FinanceCharts({
 
   return (
     <div className="space-y-4">
+      {/* Month / Year Navigation */}
       <div className="px-4 pt-3 lg:px-6">
-        <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
+        {viewType === 'annual' ? (
+          <div className="flex items-center justify-center gap-3">
+            <button
+              className="w-9 h-9 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all active:scale-90"
+              onClick={() => handleYearChange(-1)}
+            >
+              <AppIcon name="ChevronLeft" size={16} />
+            </button>
+            <span className="text-sm font-bold text-foreground tabular-nums min-w-[60px] text-center">
+              {selectedMonth.getFullYear()}
+            </span>
+            <button
+              className="w-9 h-9 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all active:scale-90"
+              onClick={() => handleYearChange(1)}
+            >
+              <AppIcon name="ChevronRight" size={16} />
+            </button>
+          </div>
+        ) : (
+          <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
+        )}
       </div>
 
       {/* Data Type Toggle — hidden on weekly view */}
-      {viewType !== 'weekly' && viewType !== 'timeline' && viewType !== 'cumulative' && (
+      {viewType !== 'weekly' && viewType !== 'timeline' && viewType !== 'cumulative' && viewType !== 'annual' && (
         <div className="px-4">
           <div className="tab-command">
             {['expense', 'income'].map(type => (
@@ -192,10 +229,11 @@ export function FinanceCharts({
             { value: 'timeline', label: 'Linha' },
             { value: 'cumulative', label: 'Acumulado' },
             { value: 'weekly', label: 'Semanal' },
+            { value: 'annual', label: 'Anual' },
           ].map(tab => (
             <button
               key={tab.value}
-              onClick={() => setViewType(tab.value as 'categories' | 'timeline' | 'cumulative' | 'weekly')}
+              onClick={() => setViewType(tab.value as typeof viewType)}
               className={cn("tab-command-item", viewType === tab.value && "tab-command-item-active")}
             >
               {tab.label}
@@ -595,6 +633,11 @@ export function FinanceCharts({
               </div>
             )}
           </div>
+        )}
+
+        {/* ═══ ANNUAL VIEW ═══ */}
+        {viewType === 'annual' && (
+          <AnnualFinanceView stats={annualStats} onMonthClick={handleAnnualMonthClick} />
         )}
 
         {/* DRE Report - only on pie/categories view */}
