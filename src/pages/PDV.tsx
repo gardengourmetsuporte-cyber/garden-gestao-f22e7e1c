@@ -11,7 +11,6 @@ import { usePOS, type POSProduct, type PaymentLine, type PendingOrder } from '@/
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { useCashRegister } from '@/hooks/useCashRegister';
-import { useCashClosing } from '@/hooks/useCashClosing';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
 import { DeliveryPaymentSheet } from '@/components/pdv/DeliveryPaymentSheet';
 import { SaleSourceSheet } from '@/components/pdv/SaleSourceSheet';
@@ -29,11 +28,7 @@ import { toast } from 'sonner';
 export default function PDV() {
   const pos = usePOS();
   const { activeUnitId } = useUnit();
-  const { integrateWithFinancial, refetch: refetchClosings } = useCashClosing();
-  const cashRegister = useCashRegister(async (closing) => {
-    await integrateWithFinancial(closing);
-    refetchClosings();
-  });
+  const cashRegister = useCashRegister();
   const ifoodScanner = useIfoodScanner();
   const ifoodCameraRef = useRef<HTMLInputElement>(null);
   const [ifoodScannerOpen, setIfoodScannerOpen] = useState(false);

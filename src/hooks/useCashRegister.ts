@@ -51,7 +51,7 @@ const PAYMENT_METHOD_MAP: Record<string, keyof CashRegisterSummary> = {
   conta_assinada: 'total_signed_account',
 };
 
-export function useCashRegister(onFinancialIntegrate?: (closing: any) => Promise<void>) {
+export function useCashRegister() {
   const { activeUnitId, activeUnit } = useUnit();
   const { user } = useAuth();
   const [currentRegister, setCurrentRegister] = useState<CashRegister | null>(null);
@@ -183,6 +183,9 @@ export function useCashRegister(onFinancialIntegrate?: (closing: any) => Promise
       if (regError) throw regError;
 
       // Create cash_closing record for approval
+      const totalAmount = summary.total_cash + summary.total_debit + summary.total_credit +
+        summary.total_pix + summary.total_meal_voucher + summary.total_delivery + summary.total_signed_account;
+
       const { data: closing, error: closingError } = await supabase
         .from('cash_closings')
         .insert({
@@ -198,14 +201,14 @@ export function useCashRegister(onFinancialIntegrate?: (closing: any) => Promise
           meal_voucher_amount: summary.total_meal_voucher,
           delivery_amount: summary.total_delivery,
           signed_account_amount: summary.total_signed_account,
+          
           cash_difference: cashDifference,
           receipt_url: '',
           status: 'pending',
           notes: notes ? `[PDV] ${notes}` : '[PDV] Fechamento automático via PDV',
           expenses: expenses && expenses.length > 0 ? expenses : null,
-          financial_integrated: true,
         })
-        .select('*')
+        .select('id')
         .single();
 
       if (closingError) throw closingError;
@@ -216,15 +219,6 @@ export function useCashRegister(onFinancialIntegrate?: (closing: any) => Promise
           .from('pos_cash_registers')
           .update({ cash_closing_id: closing.id })
           .eq('id', currentRegister.id);
-
-        // Trigger financial integration via callback
-        if (onFinancialIntegrate) {
-          try {
-            await onFinancialIntegrate(closing as any);
-          } catch (err) {
-            console.error('Financial integration error (non-blocking):', err);
-          }
-        }
       }
 
       setCurrentRegister(null);
@@ -236,7 +230,7 @@ export function useCashRegister(onFinancialIntegrate?: (closing: any) => Promise
     } finally {
       setSaving(false);
     }
-  }, [activeUnitId, user, currentRegister, activeUnit, fetchSalesSummary, onFinancialIntegrate]);
+  }, [activeUnitId, user, currentRegister, activeUnit, fetchSalesSummary]);
 
   return {
     currentRegister,
