@@ -120,7 +120,7 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
   const [columnMapping, setColumnMapping] = useState<Record<FieldKey, number>>({
     date: -1, description: -1, category: -1, subcategory: -1, account: -1, amount: -1,
   });
-  const [mode, setMode] = useState<'historical' | 'full_migration'>('historical');
+  const [compensateBalance, setCompensateBalance] = useState(true);
   const [isImporting, setIsImporting] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
 
