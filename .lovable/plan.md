@@ -1,27 +1,19 @@
+## Plano: Rateio Proporcional de Custos Fixos ✅
 
+### Implementado
 
-## Análise
+O cálculo de custos fixos foi alterado de **divisão igualitária** para **rateio proporcional por preço de venda**.
 
-O campo `unit_type` já existe em cada item do inventário (valores: `unidade`, `kg`, `litro`). Ele já é retornado pela edge function `quotation-public` e exibido na tela pública da cotação, mas de forma discreta — apenas no texto pequeno "×5 kg" e no label "Preço/kg".
+**Fórmula anterior:** `Custo Fixo / Nº Produtos = valor igual para todos`  
+**Fórmula nova:** `(Preço do Produto / Faturamento Mensal) × Custo Fixo Mensal`
 
-O fornecedor quer ver de forma mais clara e destacada se o preço é por **unidade** ou por **kg** (ou litro).
+Exemplo (custo fixo = R$ 6.974, faturamento = R$ 50.000):
+- Água (R$ 5): R$ 0,70 de custo fixo
+- Lanche (R$ 45): R$ 6,28 de custo fixo
 
-## Plano
-
-### Mudança na tela pública (`src/pages/QuotationPublic.tsx`)
-
-Tornar o tipo de unidade visualmente proeminente em cada card de item:
-
-1. **Badge de unidade destacado** — Adicionar um chip/tag colorido ao lado do nome do item mostrando "POR KG", "POR UNIDADE" ou "POR LITRO" em destaque, para o fornecedor saber exatamente o que está cotando.
-
-2. **Label do campo de preço mais explícito** — Mudar de "Preço/kg" para algo como "💰 Preço por KG (R$)" com mais destaque visual.
-
-3. **Tabela de comparação no painel interno** (`src/components/orders/QuotationDetail.tsx`) — Exibir a unidade de medida junto ao nome do item na coluna, para o gestor também ver claramente.
-
-### Escopo de arquivos
-
-- `src/pages/QuotationPublic.tsx` — Badge de unidade + label de preço mais claro
-- `src/components/orders/QuotationDetail.tsx` — Exibir unit_type na tabela de comparação
-
-Nenhuma mudança de banco de dados necessária — o campo já existe e é retornado corretamente.
-
+### Arquivos alterados
+- Migration: adicionada coluna `monthly_revenue` em `recipe_cost_settings`
+- `src/hooks/useRecipeCostSettings.ts` — `calculateOperationalCosts` agora aceita `sellingPrice` opcional
+- `src/components/settings/RecipeCostSettings.tsx` — campo "Faturamento mensal estimado" no lugar de "Média de produtos vendidos"
+- `src/components/recipes/RecipeSheet.tsx` — passa preço de venda para cálculo proporcional
+- `src/hooks/useRecipeMenuSync.ts` — usa preço do produto vinculado no cardápio
