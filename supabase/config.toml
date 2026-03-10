@@ -83,3 +83,6 @@ verify_jwt = false
 
 [functions.ifood-order-scanner]
 verify_jwt = false
+
+[functions.agenda-ai-prioritize]
+verify_jwt = false
