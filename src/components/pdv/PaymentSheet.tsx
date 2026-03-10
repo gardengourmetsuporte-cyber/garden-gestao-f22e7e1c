@@ -48,6 +48,7 @@ export function PaymentSheet({
   const [payAmount, setPayAmount] = useState('');
   const [emitInvoice, setEmitInvoice] = useState(false);
   const [notes, setNotes] = useState('');
+  const [customerDocument, setCustomerDocument] = useState(initialCustomerDocument || '');
 
   const paymentTotal = payments.reduce((s, p) => s + p.amount, 0);
   const remaining = Math.max(0, total - paymentTotal);
