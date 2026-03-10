@@ -15,6 +15,7 @@ import { ptBR } from 'date-fns/locale';
 import type { MarketingPost, MarketingChannel } from '@/types/marketing';
 import { PostAIChat } from './PostAIChat';
 import { useUnit } from '@/contexts/UnitContext';
+import { cn } from '@/lib/utils';
 
 interface PostSheetProps {
   open: boolean;
@@ -128,183 +129,186 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
     return `${String(h).padStart(2, '0')}:${m}`;
   });
 
-    const handleApplyPost = (data: { title: string; caption: string; tags: string[]; image_prompt: string; best_time?: string }) => {
-      setTitle(data.title);
-      setCaption(data.caption);
-      setTags(data.tags.join(', '));
-      if (data.best_time) {
-        setScheduledTime(data.best_time);
-        if (!scheduledAt) setScheduledAt(new Date());
-      }
-      setMode('manual');
-    };
+  const handleApplyPost = (data: { title: string; caption: string; tags: string[]; image_prompt: string; best_time?: string }) => {
+    setTitle(data.title);
+    setCaption(data.caption);
+    setTags(data.tags.join(', '));
+    if (data.best_time) {
+      setScheduledTime(data.best_time);
+      if (!scheduledAt) setScheduledAt(new Date());
+    }
+    setMode('manual');
+  };
 
-    return (
+  return (
     <Sheet open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setMode('manual'); }}>
-      <SheetContent side="bottom" className="space-y-4 max-h-[90vh] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>{post ? 'Editar Post' : 'Novo Post'}</SheetTitle>
-          <SheetDescription>Planeje seu conteúdo de marketing</SheetDescription>
-        </SheetHeader>
+      <SheetContent side="bottom" className="h-[92dvh] rounded-t-2xl p-0 flex flex-col">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-3 space-y-3 shrink-0">
+          <SheetHeader>
+            <SheetTitle className="text-center">{post ? 'Editar Post' : 'Novo Post'}</SheetTitle>
+            <SheetDescription className="text-center">Planeje seu conteúdo de marketing</SheetDescription>
+          </SheetHeader>
 
-        {/* Mode toggle - only for new posts */}
-        {!post && (
-          <div className="flex gap-1 p-1 rounded-xl bg-secondary/40 border border-border/30">
-            <button
-              onClick={() => setMode('manual')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                mode === 'manual' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <AppIcon name="PenLine" size={14} /> Manual
-            </button>
-            <button
-              onClick={() => setMode('ai')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                mode === 'ai' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <AppIcon name="Sparkles" size={14} /> Criar com IA
-            </button>
-          </div>
-        )}
-
-        {mode === 'ai' && activeUnitId ? (
-          <PostAIChat unitId={activeUnitId} onApplyPost={handleApplyPost} />
-        ) : (
-        <div className="space-y-4">
-          <div>
-            <Label>Título</Label>
-            <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Título do post" />
-          </div>
-
-          <div>
-            <Label>Legenda <span className="text-muted-foreground text-xs">({caption.length}/2200)</span></Label>
-            <Textarea
-              value={caption}
-              onChange={e => setCaption(e.target.value)}
-              placeholder="Escreva a legenda..."
-              rows={4}
-              maxLength={2200}
-            />
-          </div>
-
-          {/* Media */}
-          <div>
-            <Label>Mídia</Label>
-            <div className="flex gap-2 flex-wrap mt-1">
-              {mediaUrls.map((url, i) => (
-                <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/40">
-                  <img src={url} alt="" className="w-full h-full object-cover" />
-                  <button
-                    onClick={() => removeMedia(i)}
-                    className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center"
-                  >
-                    <AppIcon name="X" size={10} style={{ color: 'white' }} />
-                  </button>
-                </div>
-              ))}
+          {/* Mode toggle */}
+          {!post && (
+            <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 border border-border/30">
               <button
-                onClick={() => fileRef.current?.click()}
-                disabled={uploading}
-                className="w-16 h-16 rounded-lg border-2 border-dashed border-border/60 flex items-center justify-center hover:bg-secondary transition-colors"
+                onClick={() => setMode('manual')}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-all",
+                  mode === 'manual' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+                )}
               >
-                <AppIcon name="add_photo_alternate" size={20} className="text-muted-foreground" />
+                <AppIcon name="PenLine" size={15} /> Manual
+              </button>
+              <button
+                onClick={() => setMode('ai')}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-all",
+                  mode === 'ai' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <AppIcon name="Sparkles" size={15} /> Criar com IA
               </button>
             </div>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*,video/*"
-              multiple
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-          </div>
-
-          {/* Channels */}
-          <div>
-            <Label>Canais</Label>
-            <div className="flex gap-3 mt-1">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <Checkbox checked={channels.includes('instagram')} onCheckedChange={() => toggleChannel('instagram')} />
-                <AppIcon name="photo_camera" size={16} className="text-pink-400" />
-                <span className="text-sm">Instagram</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <Checkbox checked={channels.includes('whatsapp_status')} onCheckedChange={() => toggleChannel('whatsapp_status')} />
-                <AppIcon name="MessageCircle" size={16} className="text-emerald-400" />
-                <span className="text-sm">WhatsApp</span>
-              </label>
-            </div>
-          </div>
-
-          {/* Schedule with time */}
-          <div className="space-y-2">
-            <Label>Agendar para</Label>
-            <div className="flex gap-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="flex-1 justify-start text-left font-normal">
-                    <AppIcon name="CalendarDays" size={16} className="mr-2" />
-                    {scheduledAt ? format(scheduledAt, "dd/MM/yyyy", { locale: ptBR }) : 'Sem agendamento'}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={scheduledAt} onSelect={setScheduledAt} locale={ptBR} />
-                </PopoverContent>
-              </Popover>
-              {scheduledAt && (
-                <Select value={scheduledTime} onValueChange={setScheduledTime}>
-                  <SelectTrigger className="w-[100px]">
-                    <AppIcon name="Clock" size={14} className="mr-1 text-muted-foreground" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[200px]">
-                    {timeOptions.map(t => (
-                      <SelectItem key={t} value={t}>{t}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-          </div>
-
-          {/* Tags */}
-          <div>
-            <Label>Tags <span className="text-muted-foreground text-xs">(separadas por vírgula)</span></Label>
-            <Input value={tags} onChange={e => setTags(e.target.value)} placeholder="promoção, cardápio, novidade" />
-          </div>
-
-          {/* Notes */}
-          <div>
-            <Label>Notas internas</Label>
-            <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Anotações..." rows={2} />
-          </div>
-
-          <div className="flex gap-2 pt-2">
-            <LoadingButton
-              variant="outline"
-              className="flex-1"
-              onClick={() => { onSave(buildData()); onOpenChange(false); }}
-              disabled={!title.trim()}
-              loading={isSaving}
-              loadingText="Salvando..."
-            >
-              <AppIcon name="Save" size={16} className="mr-2" /> Salvar
-            </LoadingButton>
-            {post && post.media_urls.length > 0 && channels.length > 0 && (
-              <Button
-                className="flex-1"
-                onClick={() => { onSave(buildData()); onPublish({ ...post, ...buildData() } as MarketingPost); }}
-                disabled={isSaving}
-              >
-                <AppIcon name="Send" size={16} className="mr-2" /> Publicar
-              </Button>
-            )}
-          </div>
+          )}
         </div>
-        )}
+
+        {/* Content */}
+        <div className="flex-1 min-h-0 flex flex-col px-6 pb-6">
+          {mode === 'ai' && activeUnitId ? (
+            <PostAIChat unitId={activeUnitId} onApplyPost={handleApplyPost} />
+          ) : (
+            <div className="flex-1 overflow-y-auto space-y-4 pb-2">
+              <div>
+                <Label>Título</Label>
+                <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Título do post" className="h-11 rounded-xl" />
+              </div>
+
+              <div>
+                <Label>Legenda <span className="text-muted-foreground text-xs">({caption.length}/2200)</span></Label>
+                <Textarea
+                  value={caption}
+                  onChange={e => setCaption(e.target.value)}
+                  placeholder="Escreva a legenda..."
+                  rows={4}
+                  maxLength={2200}
+                  className="rounded-xl"
+                />
+              </div>
+
+              {/* Media */}
+              <div>
+                <Label>Mídia</Label>
+                <div className="flex gap-2 flex-wrap mt-1.5">
+                  {mediaUrls.map((url, i) => (
+                    <div key={i} className="relative w-16 h-16 rounded-xl overflow-hidden border border-border/40">
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => removeMedia(i)}
+                        className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center"
+                      >
+                        <AppIcon name="X" size={10} style={{ color: 'white' }} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => fileRef.current?.click()}
+                    disabled={uploading}
+                    className="w-16 h-16 rounded-xl border-2 border-dashed border-border/50 flex items-center justify-center hover:bg-secondary/60 transition-colors"
+                  >
+                    <AppIcon name="add_photo_alternate" size={20} className="text-muted-foreground" />
+                  </button>
+                </div>
+                <input ref={fileRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleFileUpload} />
+              </div>
+
+              {/* Channels */}
+              <div>
+                <Label>Canais</Label>
+                <div className="flex gap-4 mt-1.5">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox checked={channels.includes('instagram')} onCheckedChange={() => toggleChannel('instagram')} />
+                    <AppIcon name="photo_camera" size={16} className="text-pink-400" />
+                    <span className="text-sm">Instagram</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox checked={channels.includes('whatsapp_status')} onCheckedChange={() => toggleChannel('whatsapp_status')} />
+                    <AppIcon name="MessageCircle" size={16} className="text-emerald-400" />
+                    <span className="text-sm">WhatsApp</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Schedule */}
+              <div className="space-y-2">
+                <Label>Agendar para</Label>
+                <div className="flex gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="flex-1 justify-start text-left font-normal h-11 rounded-xl">
+                        <AppIcon name="CalendarDays" size={16} className="mr-2" />
+                        {scheduledAt ? format(scheduledAt, "dd/MM/yyyy", { locale: ptBR }) : 'Sem agendamento'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={scheduledAt} onSelect={setScheduledAt} locale={ptBR} />
+                    </PopoverContent>
+                  </Popover>
+                  {scheduledAt && (
+                    <Select value={scheduledTime} onValueChange={setScheduledTime}>
+                      <SelectTrigger className="w-[100px] h-11 rounded-xl">
+                        <AppIcon name="Clock" size={14} className="mr-1 text-muted-foreground" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[200px]">
+                        {timeOptions.map(t => (
+                          <SelectItem key={t} value={t}>{t}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <Label>Tags <span className="text-muted-foreground text-xs">(separadas por vírgula)</span></Label>
+                <Input value={tags} onChange={e => setTags(e.target.value)} placeholder="promoção, cardápio, novidade" className="h-11 rounded-xl" />
+              </div>
+
+              {/* Notes */}
+              <div>
+                <Label>Notas internas</Label>
+                <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Anotações..." rows={2} className="rounded-xl" />
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2 pt-2">
+                <LoadingButton
+                  variant="outline"
+                  className="flex-1 h-11 rounded-xl"
+                  onClick={() => { onSave(buildData()); onOpenChange(false); }}
+                  disabled={!title.trim()}
+                  loading={isSaving}
+                  loadingText="Salvando..."
+                >
+                  <AppIcon name="Save" size={16} className="mr-2" /> Salvar
+                </LoadingButton>
+                {post && post.media_urls.length > 0 && channels.length > 0 && (
+                  <Button
+                    className="flex-1 h-11 rounded-xl"
+                    onClick={() => { onSave(buildData()); onPublish({ ...post, ...buildData() } as MarketingPost); }}
+                    disabled={isSaving}
+                  >
+                    <AppIcon name="Send" size={16} className="mr-2" /> Publicar
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   );
