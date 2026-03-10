@@ -323,7 +323,7 @@ export function ItemFormSheetNew({
             <CollapsibleContent className="pt-4 space-y-4">
               <p className="text-sm text-muted-foreground">
                 Configure a unidade usada para pedir ao fornecedor.
-                Ex: você compra por "caixa", cada caixa vem com 8 {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'litro' ? 'litros' : 'unidades')}.
+                Ex: você compra por "caixa", cada caixa vem com 8 {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'litros' : unitType === 'ml' ? 'ml' : 'unidades')}.
               </p>
 
               <div className="space-y-2">
