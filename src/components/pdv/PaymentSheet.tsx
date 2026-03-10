@@ -107,6 +107,7 @@ export function PaymentSheet({
     setPayMethod('pix');
     setEmitInvoice(false);
     setNotes('');
+    setCustomerDocument(initialCustomerDocument || '');
   };
 
   const handleOpenChange = (v: boolean) => {
