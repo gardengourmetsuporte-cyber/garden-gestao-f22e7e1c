@@ -198,7 +198,8 @@ Deno.serve(async (req) => {
 
     if (action === 'check-status') {
       const focusApiKey = Deno.env.get('FOCUS_NFE_API_KEY');
-      const focusEnv = Deno.env.get('FOCUS_NFE_ENV') || 'homologacao';
+      const focusEnvRaw2 = Deno.env.get('FOCUS_NFE_ENV') || 'producao';
+      const focusEnv2 = (focusEnvRaw2 === 'homologacao' || focusEnvRaw2 === 'producao') ? focusEnvRaw2 : 'producao';
 
       if (!focusApiKey) {
         return new Response(JSON.stringify({ configured: false }), {
