@@ -29,6 +29,9 @@ export default function PDV() {
   const pos = usePOS();
   const { activeUnitId } = useUnit();
   const cashRegister = useCashRegister();
+  const ifoodScanner = useIfoodScanner();
+  const ifoodCameraRef = useRef<HTMLInputElement>(null);
+  const [ifoodScannerOpen, setIfoodScannerOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentOpen, setPaymentOpen] = useState(false);
@@ -51,6 +54,14 @@ export default function PDV() {
     payments: { method: string; amount: number }[];
     items: { name: string; quantity: number; unit_price: number }[];
   } | null>(null);
+
+  const handleIfoodFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIfoodScannerOpen(true);
+    ifoodScanner.scanImage(file);
+    e.target.value = '';
+  };
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
