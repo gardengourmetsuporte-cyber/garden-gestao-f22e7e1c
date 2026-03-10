@@ -103,6 +103,9 @@ export default function Agenda() {
   // Use tempTasks if available (during reorder), else server data
   const displayTasks = useMemo(() => tempTasks || tasks, [tempTasks, tasks]);
 
+  // Alarm system
+  useTaskAlarms(displayTasks);
+
   // Clear temp after server catches up
   useEffect(() => {
     if (tempTasks && tasks) {
