@@ -635,6 +635,11 @@ export function FinanceCharts({
           </div>
         )}
 
+        {/* ═══ ANNUAL VIEW ═══ */}
+        {viewType === 'annual' && (
+          <AnnualFinanceView stats={annualStats} onMonthClick={handleAnnualMonthClick} />
+        )}
+
         {/* DRE Report - only on pie/categories view */}
         {viewType === 'categories' && (
           <div className="mt-8">
