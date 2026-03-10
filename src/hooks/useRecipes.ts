@@ -427,26 +427,14 @@ import { useUnit } from '@/contexts/UnitContext';
 
    // Update inventory item price globally
    const updateItemPriceMutation = useMutation({
-    mutationFn: async ({ itemId, price }: { itemId: string; price: number }) => {
-      // Check if item has recipe-specific unit/price configured
-      const { data: item } = await supabase
-        .from('inventory_items')
-        .select('recipe_unit_type, recipe_unit_price')
-        .eq('id', itemId)
-        .single();
+     mutationFn: async ({ itemId, price }: { itemId: string; price: number }) => {
+       const { error } = await supabase
+         .from('inventory_items')
+         .update({ unit_price: price })
+         .eq('id', itemId);
 
-      // Update the appropriate price field
-      const updateData = item?.recipe_unit_type
-        ? { recipe_unit_price: price }
-        : { unit_price: price };
-
-      const { error } = await supabase
-        .from('inventory_items')
-        .update(updateData)
-        .eq('id', itemId);
-
-      if (error) throw error;
-    },
+       if (error) throw error;
+     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
       queryClient.invalidateQueries({ queryKey: ['inventory-items-for-recipes'] });

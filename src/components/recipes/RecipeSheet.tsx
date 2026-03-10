@@ -221,8 +221,8 @@ export function RecipeSheet({
   const isNegativeMargin = effectiveMargin < 0;
 
   const handleAddInventoryItem = (item: InventoryItem) => {
-    const effectiveUnit = (item.recipe_unit_type || item.unit_type) as RecipeUnitType;
-    const effectivePrice = item.recipe_unit_price ?? item.unit_price ?? 0;
+    const effectiveUnit = item.unit_type as RecipeUnitType;
+    const effectivePrice = item.unit_price ?? 0;
     const defaultQuantity = 1;
     const cost = calculateIngredientCost(effectivePrice, effectiveUnit, defaultQuantity, effectiveUnit);
 
