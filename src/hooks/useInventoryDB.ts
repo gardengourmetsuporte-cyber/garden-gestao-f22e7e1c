@@ -115,7 +115,7 @@ export function useInventoryDB() {
       const { category, supplier, ...updateData } = updates;
       const { data, error } = await supabase
         .from('inventory_items')
-        .update(updateData)
+        .update(updateData as any)
         .eq('id', id)
         .select('*, category:categories(*), supplier:suppliers(*)')
         .single();
