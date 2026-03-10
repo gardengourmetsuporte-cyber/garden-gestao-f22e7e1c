@@ -98,6 +98,7 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
       .select(`
         id, sale_number, total, subtotal, discount, status, source,
         customer_name, customer_phone, customer_document, table_number, paid_at, created_at, notes,
+        fiscal_status, fiscal_key, fiscal_number,
         pos_sale_items(product_name, quantity, unit_price),
         pos_sale_payments(method, amount)
       `)
