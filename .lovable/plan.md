@@ -1,19 +1,27 @@
-## Plano: Rateio Proporcional de Custos Fixos ✅
 
-### Implementado
 
-O cálculo de custos fixos foi alterado de **divisão igualitária** para **rateio proporcional por preço de venda**.
+# Corrigir Erro de Relacionamento Ambíguo
 
-**Fórmula anterior:** `Custo Fixo / Nº Produtos = valor igual para todos`  
-**Fórmula nova:** `(Preço do Produto / Faturamento Mensal) × Custo Fixo Mensal`
+## Problema
+O PostgREST retorna o erro **"Could not embed because more than one relationship was found for 'recipes' and 'recipe_ingredients'"** porque a tabela `recipe_ingredients` tem **duas** foreign keys para `recipes`: `recipe_id` e `source_recipe_id`. Quando a query não especifica qual FK usar, o PostgREST não consegue decidir.
 
-Exemplo (custo fixo = R$ 6.974, faturamento = R$ 50.000):
-- Água (R$ 5): R$ 0,70 de custo fixo
-- Lanche (R$ 45): R$ 6,28 de custo fixo
+## Correções (2 arquivos)
 
-### Arquivos alterados
-- Migration: adicionada coluna `monthly_revenue` em `recipe_cost_settings`
-- `src/hooks/useRecipeCostSettings.ts` — `calculateOperationalCosts` agora aceita `sellingPrice` opcional
-- `src/components/settings/RecipeCostSettings.tsx` — campo "Faturamento mensal estimado" no lugar de "Média de produtos vendidos"
-- `src/components/recipes/RecipeSheet.tsx` — passa preço de venda para cálculo proporcional
-- `src/hooks/useRecipeMenuSync.ts` — usa preço do produto vinculado no cardápio
+### 1. `src/pages/KDS.tsx` — linha 200
+Adicionar hint `!recipe_ingredients_recipe_id_fkey` na query do KDS:
+```
+recipes(recipe_ingredients!recipe_ingredients_recipe_id_fkey(...))
+```
+
+### 2. `src/hooks/useRecipes.ts` — linha 290
+Na mutation de duplicar receita, trocar:
+```
+ingredients:recipe_ingredients(*)
+```
+por:
+```
+ingredients:recipe_ingredients!recipe_ingredients_recipe_id_fkey(*)
+```
+
+Ambas as correções são de uma linha cada. A lógica principal em `useRecipes` (linha 36) já usa o hint correto — apenas esses dois pontos estão faltando.
+
