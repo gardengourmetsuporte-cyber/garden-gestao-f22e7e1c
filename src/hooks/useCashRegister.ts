@@ -51,7 +51,7 @@ const PAYMENT_METHOD_MAP: Record<string, keyof CashRegisterSummary> = {
   conta_assinada: 'total_signed_account',
 };
 
-export function useCashRegister() {
+export function useCashRegister(onFinancialIntegrate?: (closing: any) => Promise<void>) {
   const { activeUnitId, activeUnit } = useUnit();
   const { user } = useAuth();
   const [currentRegister, setCurrentRegister] = useState<CashRegister | null>(null);
