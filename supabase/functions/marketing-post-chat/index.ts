@@ -35,10 +35,6 @@ serve(async (req) => {
     const assets = assetsRes.data || [];
     const products = productsRes.data || [];
     const recipes = recipesRes.data || [];
-    const categories = categoriesRes.data || [];
-
-    const catMap: Record<string, string> = {};
-    categories.forEach((c: any) => { catMap[c.id] = c.name; });
 
     const today = new Date();
     const dayOfWeek = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"][today.getDay()];
