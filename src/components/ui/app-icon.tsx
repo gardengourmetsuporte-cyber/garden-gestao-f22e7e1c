@@ -1,6 +1,7 @@
 import { forwardRef, memo } from 'react';
 import { cn } from '@/lib/utils';
-import { ICON_MAP, CUSTOM_SVG_PATHS } from '@/lib/iconMap';
+import { CUSTOM_SVG_PATHS } from '@/lib/iconMap';
+import { PHOSPHOR_MAP } from '@/lib/phosphorMap';
 
 interface AppIconProps {
   name: string;
@@ -9,14 +10,14 @@ interface AppIconProps {
   style?: React.CSSProperties;
   /** 0 = outlined, 1 = filled (default) */
   fill?: 0 | 1;
-  /** Weight: 100-700, default 400 */
+  /** Weight: 100-700, default 400 (unused with Phosphor, kept for API compat) */
   weight?: number;
 }
 
 export const AppIcon = memo(forwardRef<HTMLSpanElement, AppIconProps>(
-  ({ name, size = 24, className, style, fill = 1, weight = 400 }, ref) => {
+  ({ name, size = 24, className, style, fill = 1 }, ref) => {
+    // 1. Custom SVG paths (highest priority)
     const customPaths = CUSTOM_SVG_PATHS[name];
-
     if (customPaths) {
       const hasGalaxyClass = (className ?? '').includes('tab-icon-galaxy');
       const safeClassName = hasGalaxyClass
@@ -50,23 +51,46 @@ export const AppIcon = memo(forwardRef<HTMLSpanElement, AppIconProps>(
       );
     }
 
-    const materialName = ICON_MAP[name] || name;
+    // 2. Phosphor icon (solid fill)
+    const PhosphorComponent = PHOSPHOR_MAP[name];
+    if (PhosphorComponent) {
+      return (
+        <span
+          ref={ref}
+          className={cn("select-none leading-none", className)}
+          style={{
+            width: size,
+            height: size,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            ...style,
+          }}
+        >
+          <PhosphorComponent
+            size={size}
+            weight={fill === 1 ? 'fill' : 'regular'}
+          />
+        </span>
+      );
+    }
 
+    // 3. Fallback: render name as text (shouldn't happen)
     return (
       <span
         ref={ref}
-        className={cn("material-symbols-rounded select-none leading-none", className)}
+        className={cn("select-none leading-none text-muted-foreground", className)}
         style={{
-          fontSize: size,
+          fontSize: size * 0.5,
           width: size,
           height: size,
-          overflow: 'hidden',
-          display: 'inline-block',
-          fontVariationSettings: `'FILL' ${fill}, 'wght' ${weight}, 'GRAD' 200, 'opsz' 20`,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           ...style,
         }}
       >
-        {materialName}
+        ?
       </span>
     );
   }
