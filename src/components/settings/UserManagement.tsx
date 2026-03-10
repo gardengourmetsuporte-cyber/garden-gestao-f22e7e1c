@@ -27,6 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { PinDialog } from '@/components/checklists/PinDialog';
 
 const ROLES: { value: AppRole; label: string; icon: string }[] = [
   { value: 'super_admin', label: 'Super Admin', icon: 'Shield' },
