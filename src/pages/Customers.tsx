@@ -141,22 +141,27 @@ export default function Customers() {
 
         {/* Select mode bar */}
         {selectMode && (
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
-            <span className="text-sm font-bold text-primary whitespace-nowrap">
-              {selectedForMessage.size} selecionado{selectedForMessage.size !== 1 ? 's' : ''}
-            </span>
-            <div className="flex-1" />
-            <Button size="sm" variant="ghost" className="text-xs h-7 whitespace-nowrap" onClick={selectAll}>
-              Selecionar todos com telefone
-            </Button>
-            <Button size="sm" variant="ghost" className="text-xs h-7" onClick={exitSelectMode}>
-              Cancelar
-            </Button>
+          <div className="rounded-xl bg-primary/10 border border-primary/20 overflow-hidden">
+            <div className="flex items-center justify-between p-3">
+              <span className="text-sm font-bold text-primary">
+                {selectedForMessage.size} selecionado{selectedForMessage.size !== 1 ? 's' : ''}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="ghost" className="text-xs h-8 px-3" onClick={selectAll}>
+                  Selecionar todos
+                </Button>
+                <Button size="sm" variant="ghost" className="text-xs h-8 px-3" onClick={exitSelectMode}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
             {selectedForMessage.size > 0 && (
-              <Button size="sm" className="text-xs h-7" onClick={() => setCampaignOpen(true)}>
-                <AppIcon name="Send" size={14} className="mr-1" />
-                Enviar
-              </Button>
+              <div className="px-3 pb-3">
+                <Button size="sm" className="w-full h-9 text-xs font-semibold" onClick={() => setCampaignOpen(true)}>
+                  <AppIcon name="Send" size={14} className="mr-1.5" />
+                  Enviar para {selectedForMessage.size} cliente{selectedForMessage.size !== 1 ? 's' : ''}
+                </Button>
+              </div>
             )}
           </div>
         )}
