@@ -168,12 +168,12 @@ export default function PDV() {
   useFabActions(
     cashRegister.isOpen
       ? [
-          { icon: 'Receipt', label: 'Pedidos', onClick: () => setOrdersOpen(true), badge: pos.pendingOrders?.length || 0 },
+          { icon: 'Camera', label: 'Scanner iFood', onClick: () => ifoodCameraRef.current?.click() },
           { icon: 'History', label: 'Vendas', onClick: () => setHistoryOpen(true) },
           { icon: 'LockKeyhole', label: 'Fechar Caixa', onClick: () => setCloseRegisterSheet(true) },
         ]
       : [],
-    [cashRegister.isOpen, pos.pendingOrders?.length]
+    [cashRegister.isOpen]
   );
 
   // Loading
