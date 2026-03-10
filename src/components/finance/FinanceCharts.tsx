@@ -229,6 +229,7 @@ export function FinanceCharts({
             { value: 'timeline', label: 'Linha' },
             { value: 'cumulative', label: 'Acumulado' },
             { value: 'weekly', label: 'Semanal' },
+            { value: 'annual', label: 'Anual' },
           ].map(tab => (
             <button
               key={tab.value}
