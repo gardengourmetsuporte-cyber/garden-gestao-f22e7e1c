@@ -301,94 +301,12 @@ export function ItemFormSheetNew({
             </div>
           </div>
 
-          {/* Recipe-specific pricing section */}
-          <Collapsible open={showRecipeSection} onOpenChange={setShowRecipeSection}>
-            <CollapsibleTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full h-12 justify-between text-base font-medium"
-              >
-                <span>📋 Configurar para Fichas Técnicas</span>
-                {showRecipeSection ? <AppIcon name="ExpandLess" size={20} /> : <AppIcon name="ExpandMore" size={20} />}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="pt-4 space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Configure a unidade usada nas fichas técnicas e o fator de conversão.
-                {stockUnitLabel.trim() ? ` Ex: cada ${stockUnitLabel.trim()} tem quantas unidades?` : ''}
-              </p>
-
-              {stockUnitLabel.trim() && (
-                <div className="space-y-2">
-                  <Label htmlFor="stockToRecipeFactor" className="text-base font-medium">
-                    Quantidades por {stockUnitLabel.trim()}
-                  </Label>
-                  <Input
-                    id="stockToRecipeFactor"
-                    type="number"
-                    value={stockToRecipeFactor}
-                    onChange={(e) => {
-                      setStockToRecipeFactor(e.target.value);
-                      // Auto-calculate recipe_unit_price
-                      const factor = parseFloat(e.target.value);
-                      const price = parseFloat(unitPrice);
-                      if (factor > 0 && price > 0) {
-                        setRecipeUnitPrice((price / factor).toFixed(2));
-                      }
-                    }}
-                    placeholder="Ex: 6"
-                    className="input-large"
-                    step={1}
-                    min={1}
-                  />
-                  {parseFloat(stockToRecipeFactor) > 0 && parseFloat(unitPrice) > 0 && (
-                    <p className="text-sm text-primary font-medium">
-                      = R$ {(parseFloat(unitPrice) / parseFloat(stockToRecipeFactor)).toFixed(2)} por unidade na ficha
-                    </p>
-                  )}
-                </div>
-              )}
-              
-              <div className="space-y-2">
-                <Label className="text-base font-medium">Unidade para Fichas</Label>
-                <Select value={recipeUnitType} onValueChange={setRecipeUnitType}>
-                  <SelectTrigger className="h-14 text-lg rounded-xl">
-                    <SelectValue placeholder="Mesma do estoque" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__same__" className="text-base py-3">Mesma do estoque</SelectItem>
-                    {getRecipeUnitOptions().map((option) => (
-                      <SelectItem key={option.value} value={option.value} className="text-base py-3">
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {recipeUnitType && recipeUnitType !== '__same__' && !stockUnitLabel.trim() && (
-                <div className="space-y-2">
-                  <Label htmlFor="recipeUnitPrice" className="text-base font-medium">
-                    Preço por {recipeUnitType === 'kg' ? 'kg' : recipeUnitType === 'g' ? 'g' : recipeUnitType === 'litro' ? 'L' : recipeUnitType === 'ml' ? 'ml' : 'un'}
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
-                    <Input
-                      id="recipeUnitPrice"
-                      type="number"
-                      value={recipeUnitPrice}
-                      onChange={(e) => setRecipeUnitPrice(e.target.value)}
-                      placeholder="0,00"
-                      className="input-large pl-12"
-                      step={0.01}
-                      min={0}
-                    />
-                  </div>
-                </div>
-              )}
-            </CollapsibleContent>
-          </Collapsible>
+          {/* Recipe info note */}
+          <div className="rounded-xl bg-primary/5 border border-primary/20 p-3">
+            <p className="text-sm text-muted-foreground">
+              💡 Nas fichas técnicas, você poderá usar unidades compatíveis (ex: kg↔g, L↔ml) e a conversão será automática.
+            </p>
+          </div>
 
           {/* Purchase unit section */}
           <Collapsible open={showPurchaseSection} onOpenChange={setShowPurchaseSection}>
