@@ -393,7 +393,7 @@ export const PHOSPHOR_MAP: Record<string, PhosphorIcon> = {
   Sofa: Armchair,
   Droplets: Drop,
   Zap: Lightning,
-  Wifi: Wifi,
+  Wifi: WifiHigh,
   Wrench: Wrench,
   Hammer: Hammer,
   Paintbrush: PaintBrush,
