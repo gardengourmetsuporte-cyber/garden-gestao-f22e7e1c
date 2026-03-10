@@ -13,10 +13,10 @@ const CardapioSettings = lazy(() =>
 );
 
 const LINKS_DATA = [
-  { key: 'public', icon: 'Globe', label: 'Cardápio Digital', buildUrl: (baseUrl: string, unitId: string) => `${baseUrl}/m/${unitId}` },
-  { key: 'qrcode', icon: 'QrCode', label: 'QR Code Balcão', buildUrl: (baseUrl: string, unitId: string) => `${baseUrl}/m/${unitId}?source=qrcode` },
-  { key: 'tablet', icon: 'Tablet', label: 'Cardápio Tablet', buildUrl: (baseUrl: string, unitId: string) => `${baseUrl}/tablet/${unitId}/menu?mesa=1` },
-  { key: 'kds', icon: 'ChefHat', label: 'KDS - Cozinha', buildUrl: (baseUrl: string, unitId: string) => `${baseUrl}/kds/${unitId}` },
+  { key: 'public', icon: 'Globe', label: 'Cardápio Digital', buildPath: (unitId: string) => `/m/${unitId}` },
+  { key: 'qrcode', icon: 'QrCode', label: 'QR Code Balcão', buildPath: (unitId: string) => `/m/${unitId}?source=qrcode` },
+  { key: 'tablet', icon: 'Tablet', label: 'Cardápio Tablet', buildPath: (unitId: string) => `/tablet/${unitId}/menu?mesa=1` },
+  { key: 'kds', icon: 'ChefHat', label: 'KDS - Cozinha', buildPath: (unitId: string) => `/kds/${unitId}` },
 ] as const;
 
 const SECTIONS = [
@@ -50,7 +50,8 @@ export function CardapioConfigHub() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Links & Acessos</p>
           <div className="space-y-1.5">
             {LINKS_DATA.map(link => {
-              const url = link.buildUrl(baseUrl, activeUnit.id);
+              const path = link.buildPath(activeUnit.id);
+              const fullUrl = `${baseUrl}${path}`;
               return (
                 <div key={link.key} className="rounded-2xl bg-card border border-border/30 p-3 flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -58,7 +59,7 @@ export function CardapioConfigHub() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold text-foreground truncate">{link.label}</p>
-                    <p className="text-[9px] text-muted-foreground truncate">{url.replace(/^https?:\/\//, '')}</p>
+                    <p className="text-[9px] text-muted-foreground truncate">{path}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <button
@@ -68,13 +69,13 @@ export function CardapioConfigHub() {
                       <AppIcon name="QrCode" size={12} className="text-muted-foreground" />
                     </button>
                     <button
-                      onClick={() => copyLink(url, link.label)}
+                      onClick={() => copyLink(fullUrl, link.label)}
                       className="w-7 h-7 rounded-lg bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
                     >
                       <AppIcon name="Copy" size={12} className="text-muted-foreground" />
                     </button>
                     <a
-                      href={url}
+                      href={path}
                       target="_blank"
                       rel="noopener"
                       className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
@@ -129,7 +130,7 @@ export function CardapioConfigHub() {
       {qrOpen && activeUnit && (() => {
         const link = LINKS_DATA.find(l => l.key === qrOpen);
         if (!link) return null;
-        const url = link.buildUrl(baseUrl, activeUnit.id);
+        const fullUrl = `${baseUrl}${link.buildPath(activeUnit.id)}`;
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setQrOpen(null)}>
             <div
@@ -141,10 +142,10 @@ export function CardapioConfigHub() {
                 <p className="text-xs text-muted-foreground mt-1">Escaneie para acessar</p>
               </div>
               <div className="bg-white rounded-2xl p-5">
-                <QRCodeSVG value={url} size={200} level="H" bgColor="#ffffff" fgColor="#000000" />
+                <QRCodeSVG value={fullUrl} size={200} level="H" bgColor="#ffffff" fgColor="#000000" />
               </div>
               <button
-                onClick={() => copyLink(url, link.label)}
+                onClick={() => copyLink(fullUrl, link.label)}
                 className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
               >
                 <AppIcon name="Copy" size={16} /> Copiar link
