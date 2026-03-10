@@ -77,7 +77,7 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
   const maxExpense = Math.max(...months.map(m => m.expense), 1);
 
   return (
-    <div className="space-y-4 -mx-4">
+    <div className="space-y-4">
       {/* ═══ SUMMARY CARDS ═══ */}
       <div className="grid grid-cols-3 gap-2">
         <div className="card-base p-3 text-center">
