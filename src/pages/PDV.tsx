@@ -476,6 +476,7 @@ export default function PDV() {
         orders={pos.pendingOrders}
         loading={pos.loadingOrders}
         onLoadOrder={handleLoadOrder}
+        onChargeOrder={handleChargeOrder}
       />
 
       <SalesHistorySheet open={historyOpen} onOpenChange={setHistoryOpen} />
