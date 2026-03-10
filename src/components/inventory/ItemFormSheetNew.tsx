@@ -204,17 +204,19 @@ export function ItemFormSheetNew({
           {/* Unit Type */}
           <div className="space-y-2">
             <Label className="text-base font-medium">Tipo de Controle *</Label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-5 gap-1.5">
               {[
-                { value: 'unidade', label: 'Unidades' },
-                { value: 'kg', label: 'Quilos (kg)' },
-                { value: 'litro', label: 'Litros (L)' },
+                { value: 'unidade', label: 'un' },
+                { value: 'kg', label: 'kg' },
+                { value: 'g', label: 'g' },
+                { value: 'litro', label: 'L' },
+                { value: 'ml', label: 'ml' },
               ].map((option) => (
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => setUnitType(option.value as 'unidade' | 'kg' | 'litro')}
-                  className={`h-14 rounded-xl font-medium transition-all ${
+                  onClick={() => setUnitType(option.value as any)}
+                  className={`h-12 rounded-xl font-medium transition-all text-sm ${
                     unitType === option.value
                       ? 'gradient-primary text-white'
                       : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
