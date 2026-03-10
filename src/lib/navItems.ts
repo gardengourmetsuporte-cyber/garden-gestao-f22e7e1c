@@ -5,6 +5,8 @@ export interface NavItem {
   icon: string;
   /** Optional custom image icon (public path) */
   customIcon?: string;
+  /** If true, customIcon keeps its original colors (no invert/brightness filters) */
+  keepIconColor?: boolean;
   label: string;
   href: string;
   /** If true, only shown to admin/super_admin (when no access-level is assigned) */
@@ -42,7 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Truck', customIcon: '/icons/motocicleta.png', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Monitor', label: 'PDV', href: '/pdv', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'RestaurantMenu', customIcon: '/icons/cardapio.png', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
-  { icon: 'MessageCircle', customIcon: '/icons/whatsapp.png', label: 'WhatsApp IA', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
+  { icon: 'MessageCircle', customIcon: '/icons/whatsapp.png', keepIconColor: true, label: 'WhatsApp IA', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
 
   // ── Pessoas ──
   { icon: 'Users', customIcon: '/icons/funcionarios.png', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
