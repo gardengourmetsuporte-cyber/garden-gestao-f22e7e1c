@@ -22,7 +22,7 @@ serve(async (req) => {
     if (!messages || !Array.isArray(messages)) throw new Error("messages required");
 
     // Fetch brand context (RAG)
-    const [unitRes, brandRes, assetsRes, productsRes, recipesRes, categoriesRes] = await Promise.all([
+    const [unitRes, brandRes, assetsRes, productsRes, recipesRes] = await Promise.all([
       supabase.from("units").select("name").eq("id", unit_id).maybeSingle(),
       supabase.from("brand_identity").select("*").eq("unit_id", unit_id).maybeSingle(),
       supabase.from("brand_assets").select("title, type, tags, file_url").eq("unit_id", unit_id).limit(10),
