@@ -83,6 +83,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
       due_date: hasDate ? format(dueDate, 'yyyy-MM-dd') : undefined,
       due_time: hasTime ? dueTime : undefined,
       category_id: categoryId || undefined,
+      has_alarm: hasTime && hasAlarm,
     };
 
     if (editingTask && onUpdate) onUpdate({ ...formData, id: editingTask.id });
