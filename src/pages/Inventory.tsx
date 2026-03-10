@@ -136,7 +136,7 @@ export default function InventoryPage() {
         // Scroll to the edited item after sheet closes
         setTimeout(() => scrollToItem(editingItem.id), 400);
       } else {
-        const newItem = await addItem(data);
+        const newItem = await addItem(data as any);
         if (newItem?.id) setTimeout(() => scrollToItem(newItem.id), 400);
       }
     } catch { toast.error('Erro ao salvar item'); }
