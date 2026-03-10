@@ -113,6 +113,7 @@ function MembersTab() {
   const [transferUser, setTransferUser] = useState<UserWithRole | null>(null);
   const [targetUnitId, setTargetUnitId] = useState<string>('');
   const [processing, setProcessing] = useState(false);
+  const [showDeletePin, setShowDeletePin] = useState(false);
 
   // Access level picker
   const [pickerUserId, setPickerUserId] = useState<string | null>(null);
