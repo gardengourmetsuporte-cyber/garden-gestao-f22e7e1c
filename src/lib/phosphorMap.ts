@@ -410,7 +410,7 @@ export const PHOSPHOR_MAP: Record<string, PhosphorIcon> = {
   Music: MusicNote,
   Film: FilmSlate,
   Gamepad2: GameController,
-  Dices: Dice,
+  Dices: DiceFive,
   Ticket: Ticket,
   Coffee: Coffee,
   Wine: Wine,
