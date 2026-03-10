@@ -109,6 +109,9 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
     if (!error && data) {
       setSales(data.map(s => ({
         ...s,
+        fiscal_status: s.fiscal_status || null,
+        fiscal_key: s.fiscal_key || null,
+        fiscal_number: s.fiscal_number || null,
         items: s.pos_sale_items || [],
         payments: s.pos_sale_payments || [],
       })));
