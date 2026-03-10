@@ -13,6 +13,7 @@ import { TransactionSheet } from '@/components/finance/TransactionSheet';
 import { ReceiptOCRSheet } from '@/components/finance/ReceiptOCRSheet';
 import { AccountManagement } from '@/components/finance/AccountManagement';
 import { useFinance } from '@/hooks/useFinance';
+import { useUnit } from '@/contexts/UnitContext';
 import { usePreviousMonthStats } from '@/hooks/usePreviousMonthStats';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
 import { useSuppliers } from '@/hooks/useSuppliers';
