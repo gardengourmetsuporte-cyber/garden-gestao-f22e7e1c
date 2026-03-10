@@ -416,7 +416,7 @@ export const PHOSPHOR_MAP: Record<string, PhosphorIcon> = {
   Wine: Wine,
   Beer: BeerStein,
   Pizza: Pizza,
-  Apple: Apple,
+  Apple: Orange,
   Croissant: Bread,
   Beef: Hamburger,
   Drumstick: Hamburger,
