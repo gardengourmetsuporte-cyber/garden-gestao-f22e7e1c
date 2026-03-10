@@ -45,18 +45,18 @@ export function AICopilotWidget() {
           onClick={() => setExpanded(true)}
           className="card-stat-holo p-4 flex items-center gap-3 cursor-pointer group"
         >
-          <img src={mascotImg} alt="Garden Copiloto" className="w-12 h-12 rounded-2xl object-cover ring-2 ring-primary/20 shrink-0" />
-          <div className="flex-1 min-w-0">
-            {lastAssistantMsg ? (
-              <>
-                <p className="text-xs font-semibold text-foreground leading-tight">Copiloto IA</p>
+           <img src={mascotImg} alt="Copilot IA" className="w-12 h-12 rounded-2xl object-cover ring-2 ring-primary/20 shrink-0" />
+           <div className="flex-1 min-w-0">
+             {lastAssistantMsg ? (
+               <>
+                 <p className="text-xs font-semibold text-foreground leading-tight">Copilot IA</p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2 mt-0.5">
                   {lastAssistantMsg.content}
                 </p>
               </>
             ) : isLoading ? (
               <>
-                <p className="text-xs font-semibold text-foreground leading-tight">Copiloto IA</p>
+                <p className="text-xs font-semibold text-foreground leading-tight">Copilot IA</p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -66,7 +66,7 @@ export function AICopilotWidget() {
               </>
             ) : (
               <>
-                <p className="text-sm font-bold text-foreground leading-tight">Olá! Sou seu Copiloto 🌿</p>
+                <p className="text-sm font-bold text-foreground leading-tight">Olá! Sou o Copilot IA 🌿</p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">Seu assistente de gestão</p>
               </>
             )}
@@ -84,9 +84,9 @@ export function AICopilotWidget() {
         <div className="card-stat-holo rounded-2xl overflow-hidden">
           {/* Chat header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-border/30">
-            <img src={mascotImg} alt="Copiloto" className="w-8 h-8 rounded-xl object-cover" />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-foreground">Copiloto IA</p>
+             <img src={mascotImg} alt="Copilot IA" className="w-8 h-8 rounded-xl object-cover" />
+             <div className="flex-1 min-w-0">
+               <p className="text-xs font-bold text-foreground">Copilot IA</p>
               <p className="text-[10px] text-muted-foreground">Online</p>
             </div>
             <button onClick={() => setExpanded(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors">

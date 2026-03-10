@@ -175,11 +175,11 @@ export default function CopilotPage() {
           <div className="flex items-center gap-3 h-12 px-4">
             <img
               src={mascotImg}
-              alt="Copiloto"
-              className="w-8 h-8 rounded-xl object-cover border border-primary/20"
-            />
-            <div className="flex-1 min-w-0">
-              <h1 className="text-sm font-bold text-foreground leading-none">Copiloto IA</h1>
+               alt="Copilot IA"
+               className="w-8 h-8 rounded-xl object-cover border border-primary/20"
+             />
+             <div className="flex-1 min-w-0">
+               <h1 className="text-sm font-bold text-foreground leading-none">Copilot IA</h1>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span className="text-[10px] text-muted-foreground">Online</span>
@@ -351,7 +351,7 @@ export default function CopilotPage() {
             <Input
               value={question}
               onChange={e => setQuestion(e.target.value)}
-              placeholder="Pergunte ao Copiloto..."
+              placeholder="Pergunte ao Copilot..."
               className="h-11 text-sm rounded-full bg-secondary/50 border-border/30"
               disabled={isLoading}
             />
