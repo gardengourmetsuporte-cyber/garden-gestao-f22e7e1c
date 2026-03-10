@@ -58,7 +58,8 @@ Deno.serve(async (req) => {
     if (action === 'emit-nfce') {
       // Get Focus NFe API key from secrets
       const focusApiKey = Deno.env.get('FOCUS_NFE_API_KEY');
-      const focusEnv = Deno.env.get('FOCUS_NFE_ENV') || 'homologacao'; // homologacao or producao
+      const focusEnvRaw = Deno.env.get('FOCUS_NFE_ENV') || 'producao';
+      const focusEnv = (focusEnvRaw === 'homologacao' || focusEnvRaw === 'producao') ? focusEnvRaw : 'producao';
 
       if (!focusApiKey) {
         return new Response(JSON.stringify({
