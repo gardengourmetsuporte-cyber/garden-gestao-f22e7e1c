@@ -224,7 +224,7 @@ export default function QuotationPublic() {
             <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
               <AppIcon name="Store" className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-xl font-bold text-foreground">{data.quotation_title || 'Cotação de Preços'}</h1>
+            <h1 className="text-xl font-bold text-foreground">{data.quotation_title ? `${data.quotation_title} — ${data.supplier_name}` : `Cotação — ${data.supplier_name}`}</h1>
             <p className="text-sm text-muted-foreground">
               Para acessar, informe o telefone cadastrado do fornecedor.
             </p>
