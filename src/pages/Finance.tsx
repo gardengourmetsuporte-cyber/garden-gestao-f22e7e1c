@@ -13,6 +13,7 @@ import { TransactionSheet } from '@/components/finance/TransactionSheet';
 import { ReceiptOCRSheet } from '@/components/finance/ReceiptOCRSheet';
 import { AccountManagement } from '@/components/finance/AccountManagement';
 import { useFinance } from '@/hooks/useFinance';
+import { useUnit } from '@/contexts/UnitContext';
 import { usePreviousMonthStats } from '@/hooks/usePreviousMonthStats';
 import { useFinanceStats } from '@/hooks/useFinanceStats';
 import { useSuppliers } from '@/hooks/useSuppliers';
@@ -26,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function Finance() {
+  const { activeUnitId } = useUnit();
   const [activeTab, setActiveTab] = useState<FinanceTab>('home');
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
   const [searchParams, setSearchParams] = useSearchParams();
@@ -302,6 +304,8 @@ export default function Finance() {
             getEmployeeStats={getEmployeeStats}
             transactions={transactions}
             categories={categories}
+            unitId={activeUnitId}
+            isPersonal={false}
           />
         )}
 

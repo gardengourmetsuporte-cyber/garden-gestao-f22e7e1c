@@ -62,7 +62,8 @@ async function fetchYearTransactions(
     .eq('user_id', userId)
     .gte('date', startDate)
     .lte('date', endDate)
-    .order('date', { ascending: true });
+    .order('date', { ascending: true })
+    .limit(5000);
 
   if (isPersonal) query = query.is('unit_id', null);
   else if (unitId) query = query.eq('unit_id', unitId);

@@ -27,6 +27,10 @@ interface FinanceChartsProps {
   getEmployeeStats: (categoryId: string) => EntityStats[];
   transactions: FinanceTransaction[];
   categories?: FinanceCategory[];
+  /** For annual stats — pass unitId for business finance */
+  unitId?: string | null;
+  /** For annual stats — personal or business */
+  isPersonal?: boolean;
 }
 
 import { formatCurrency } from '@/lib/format';
@@ -60,6 +64,8 @@ export function FinanceCharts({
   getEmployeeStats,
   transactions,
   categories: categoriesProp = [],
+  unitId = null,
+  isPersonal = true,
 }: FinanceChartsProps) {
   const [viewType, setViewType] = useState<'categories' | 'timeline' | 'cumulative' | 'weekly' | 'annual'>('categories');
   const [dataType, setDataType] = useState<'expense' | 'income'>('expense');
@@ -67,7 +73,7 @@ export function FinanceCharts({
   const [entityView, setEntityView] = useState<'employees' | 'suppliers' | null>(null);
   const [entityData, setEntityData] = useState<EntityStats[]>([]);
 
-  const annualStats = useAnnualFinanceStats(selectedMonth.getFullYear(), categoriesProp);
+  const annualStats = useAnnualFinanceStats(selectedMonth.getFullYear(), categoriesProp, unitId, isPersonal);
 
   const categoryData = dataType === 'expense' ? expensesByCategory : incomeByCategory;
   const subcategoryData = drillDownCategory ? getSubcategoryStats(drillDownCategory.id, dataType) : [];
