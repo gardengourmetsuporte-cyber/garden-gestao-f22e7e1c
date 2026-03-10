@@ -437,20 +437,36 @@ Deno.serve(async (req) => {
       }
 
       if (!categoryId) {
-        if (normSubcat && catMap.has(normSubcat)) {
-          categoryId = catMap.get(normSubcat)!.id;
-        } else if (normCat && catMap.has(normCat)) {
-          categoryId = catMap.get(normCat)!.id;
-        } else {
-          for (const [key, val] of catMap.entries()) {
-            if ((normSubcat && key.includes(normSubcat)) || (normCat && key.includes(normCat))) {
-              categoryId = val.id;
-              break;
+        // Resolve aliases first
+        const aliasedCat = resolveAlias(catName);
+        const aliasedSubcat = subcatName ? resolveAlias(subcatName) : "";
+
+        // Try subcategory first (aliased), then category (aliased)
+        const candidates = [aliasedSubcat, aliasedCat, normSubcat, normCat].filter(Boolean);
+        
+        for (const candidate of candidates) {
+          if (catMap.has(candidate)) {
+            categoryId = catMap.get(candidate)!.id;
+            break;
+          }
+        }
+
+        // Fuzzy match if still not found
+        if (!categoryId) {
+          for (const candidate of candidates) {
+            if (!candidate) continue;
+            for (const [key, val] of catMap.entries()) {
+              if (fuzzyMatch(candidate, key)) {
+                categoryId = val.id;
+                break;
+              }
             }
+            if (categoryId) break;
           }
-          if (!categoryId && (catName || subcatName)) {
-            unmatchedCategories.add(subcatName || catName);
-          }
+        }
+
+        if (!categoryId && (catName || subcatName)) {
+          unmatchedCategories.add(subcatName || catName);
         }
       }
 
