@@ -19,6 +19,7 @@ interface TaskFormData {
   due_date?: string;
   due_time?: string;
   category_id?: string;
+  has_alarm?: boolean;
 }
 
 interface TaskSheetProps {

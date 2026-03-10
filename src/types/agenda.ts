@@ -27,6 +27,7 @@ export interface ManagerTask {
   category_id?: string | null;
   category?: TaskCategory | null;
   parent_id?: string | null;
+  has_alarm?: boolean;
   subtasks?: ManagerTask[];
   created_at: string;
   updated_at: string;
