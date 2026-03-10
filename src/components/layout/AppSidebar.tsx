@@ -167,7 +167,18 @@ export function AppSidebar() {
                           to={targetHref}
                           onMouseEnter={() => void preloadRoute(targetHref)}
                         >
-                          <AppIcon name={item.icon} size={20} fill={isActive ? 1 : 0} />
+                          {item.customIcon ? (
+                            <img
+                              src={item.customIcon}
+                              alt=""
+                              className={cn(
+                                "w-5 h-5 object-contain shrink-0",
+                                item.keepIconColor ? "opacity-90" : "dark:invert dark:brightness-90"
+                              )}
+                            />
+                          ) : (
+                            <AppIcon name={item.icon} size={20} fill={isActive ? 1 : 0} />
+                          )}
                           <span className="truncate flex-1">{item.label}</span>
                           {item.badge && (
                             <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-orange-500/15 text-orange-400 shrink-0">

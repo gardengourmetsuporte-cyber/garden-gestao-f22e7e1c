@@ -165,6 +165,7 @@ export const ICON_MAP: Record<string, string> = {
   User: 'person',
   UserPlus: 'person_add',
   Users: 'group',
+  Handshake: 'handshake',
   UserSearch: 'person_search',
   UserCheck: 'how_to_reg',
   MessageCircle: 'chat_bubble',
