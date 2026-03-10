@@ -142,10 +142,10 @@ export function CardapioConfigHub() {
                 <p className="text-xs text-muted-foreground mt-1">Escaneie para acessar</p>
               </div>
               <div className="bg-white rounded-2xl p-5">
-                <QRCodeSVG value={url} size={200} level="H" bgColor="#ffffff" fgColor="#000000" />
+                <QRCodeSVG value={fullUrl} size={200} level="H" bgColor="#ffffff" fgColor="#000000" />
               </div>
               <button
-                onClick={() => copyLink(url, link.label)}
+                onClick={() => copyLink(fullUrl, link.label)}
                 className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
               >
                 <AppIcon name="Copy" size={16} /> Copiar link
