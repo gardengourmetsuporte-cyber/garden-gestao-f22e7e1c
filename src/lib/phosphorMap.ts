@@ -147,7 +147,7 @@ import {
   MusicNote,
   FilmSlate,
   GameController,
-  Dice,
+  DiceFive,
   Ticket,
   Coffee,
   Wine,
