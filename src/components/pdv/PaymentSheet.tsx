@@ -257,6 +257,20 @@ export function PaymentSheet({
               <Switch id="emit-invoice" checked={emitInvoice} onCheckedChange={setEmitInvoice} />
             </div>
 
+            {/* CPF field (shown when emitInvoice is on) */}
+            {emitInvoice && (
+              <div className="flex items-center gap-2 bg-secondary/40 rounded-xl px-3 py-2">
+                <AppIcon name="User" size={16} className="text-muted-foreground shrink-0" />
+                <Input
+                  placeholder="CPF na nota (opcional)"
+                  value={customerDocument}
+                  onChange={e => setCustomerDocument(e.target.value)}
+                  className="h-8 text-sm border-0 bg-transparent p-0 focus-visible:ring-0"
+                  inputMode="numeric"
+                />
+              </div>
+            )
+
             {/* Notes */}
             <Textarea
               placeholder="Observações da venda (opcional)"
