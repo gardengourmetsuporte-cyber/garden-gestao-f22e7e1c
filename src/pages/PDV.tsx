@@ -25,6 +25,7 @@ import { toast } from 'sonner';
 
 export default function PDV() {
   const pos = usePOS();
+  const { activeUnitId } = useUnit();
   const cashRegister = useCashRegister();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
