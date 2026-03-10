@@ -27,6 +27,10 @@ interface FinanceChartsProps {
   getEmployeeStats: (categoryId: string) => EntityStats[];
   transactions: FinanceTransaction[];
   categories?: FinanceCategory[];
+  /** For annual stats — pass unitId for business finance */
+  unitId?: string | null;
+  /** For annual stats — personal or business */
+  isPersonal?: boolean;
 }
 
 import { formatCurrency } from '@/lib/format';
