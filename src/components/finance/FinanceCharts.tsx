@@ -221,21 +221,27 @@ export function FinanceCharts({
         </div>
       )}
 
-      {/* View Type Toggle */}
+      {/* View Type Toggle — horizontally scrollable pills */}
       <div className="px-4">
-        <div className="tab-command">
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
           {[
-            { value: 'categories', label: 'Categorias' },
-            { value: 'timeline', label: 'Linha' },
-            { value: 'cumulative', label: 'Acumulado' },
-            { value: 'weekly', label: 'Semanal' },
-            { value: 'annual', label: 'Anual' },
+            { value: 'categories', label: 'Categorias', icon: 'PieChart' },
+            { value: 'timeline', label: 'Linha', icon: 'TrendingUp' },
+            { value: 'cumulative', label: 'Acumulado', icon: 'BarChart3' },
+            { value: 'weekly', label: 'Semanal', icon: 'Calendar' },
+            { value: 'annual', label: 'Anual', icon: 'CalendarRange' },
           ].map(tab => (
             <button
               key={tab.value}
               onClick={() => setViewType(tab.value as typeof viewType)}
-              className={cn("tab-command-item", viewType === tab.value && "tab-command-item-active")}
+              className={cn(
+                "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0",
+                viewType === tab.value
+                  ? "bg-primary/15 text-primary ring-1 ring-primary/20"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
+              )}
             >
+              <AppIcon name={tab.icon as any} size={14} />
               {tab.label}
             </button>
           ))}
