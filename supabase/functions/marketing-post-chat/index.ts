@@ -22,13 +22,12 @@ serve(async (req) => {
     if (!messages || !Array.isArray(messages)) throw new Error("messages required");
 
     // Fetch brand context (RAG)
-    const [unitRes, brandRes, assetsRes, productsRes, recipesRes, categoriesRes] = await Promise.all([
+    const [unitRes, brandRes, assetsRes, productsRes, recipesRes] = await Promise.all([
       supabase.from("units").select("name").eq("id", unit_id).maybeSingle(),
       supabase.from("brand_identity").select("*").eq("unit_id", unit_id).maybeSingle(),
       supabase.from("brand_assets").select("title, type, tags, file_url").eq("unit_id", unit_id).limit(10),
-      supabase.from("tablet_products").select("name, description, price, image_url, is_highlight, category_id, is_active").eq("unit_id", unit_id).eq("is_active", true).limit(50),
+      supabase.from("tablet_products").select("name, description, price, image_url, is_highlight, category, is_active").eq("unit_id", unit_id).eq("is_active", true).limit(50),
       supabase.from("recipes").select("name, description, cost_per_portion, yield_quantity").eq("unit_id", unit_id).limit(20),
-      supabase.from("categories").select("id, name").eq("unit_id", unit_id),
     ]);
 
     const unitName = unitRes.data?.name || "Restaurante";
@@ -36,17 +35,13 @@ serve(async (req) => {
     const assets = assetsRes.data || [];
     const products = productsRes.data || [];
     const recipes = recipesRes.data || [];
-    const categories = categoriesRes.data || [];
-
-    const catMap: Record<string, string> = {};
-    categories.forEach((c: any) => { catMap[c.id] = c.name; });
 
     const today = new Date();
     const dayOfWeek = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"][today.getDay()];
     const dateStr = today.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
 
     const formatProduct = (p: any) => {
-      const cat = p.category_id ? catMap[p.category_id] || "" : "";
+      const cat = p.category || "";
       return `- ${p.name}: R$${Number(p.price).toFixed(2)}${p.is_highlight ? ' ⭐DESTAQUE' : ''}${cat ? ` [${cat}]` : ''}${p.description ? ` — ${p.description}` : ''}`;
     };
 
