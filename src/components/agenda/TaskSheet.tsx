@@ -205,6 +205,18 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
                   </div>
                   <Switch checked={hasTime} onCheckedChange={setHasTime} />
                 </div>
+                {hasTime && (
+                  <div className="flex items-center justify-between p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-xl bg-amber-500/10"><AppIcon name="Bell" size={16} className="text-amber-400" /></div>
+                      <div>
+                        <p className="font-semibold text-sm">Alarme</p>
+                        <p className="text-[11px] text-muted-foreground">Notificação no horário</p>
+                      </div>
+                    </div>
+                    <Switch checked={hasAlarm} onCheckedChange={setHasAlarm} />
+                  </div>
+                )}
               </div>
             </div>
             <div className="sticky bottom-0 pt-3 pb-4 flex gap-2">
