@@ -50,7 +50,7 @@ export function ItemFormSheetNew({
   const [name, setName] = useState('');
   const [categoryId, setCategoryId] = useState<string>('');
   const [supplierId, setSupplierId] = useState<string>('');
-  const [unitType, setUnitType] = useState<'unidade' | 'kg' | 'litro'>('unidade');
+  const [unitType, setUnitType] = useState<'unidade' | 'kg' | 'g' | 'litro' | 'ml'>('unidade');
   const [currentStock, setCurrentStock] = useState('');
   const [minStock, setMinStock] = useState('');
   const [unitPrice, setUnitPrice] = useState('');
