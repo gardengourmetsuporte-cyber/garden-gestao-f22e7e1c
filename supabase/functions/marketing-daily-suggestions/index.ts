@@ -21,13 +21,12 @@ serve(async (req) => {
     if (!unit_id) throw new Error("unit_id required");
 
     // Fetch all business context in parallel
-    const [unitRes, brandRes, assetsRes, productsRes, recipesRes, categoriesRes] = await Promise.all([
+    const [unitRes, brandRes, assetsRes, productsRes, recipesRes] = await Promise.all([
       supabase.from("units").select("name").eq("id", unit_id).maybeSingle(),
       supabase.from("brand_identity").select("*").eq("unit_id", unit_id).maybeSingle(),
       supabase.from("brand_assets").select("title, type, tags, file_url").eq("unit_id", unit_id).limit(10),
-      supabase.from("tablet_products").select("name, description, price, image_url, is_highlight, category_id, is_active").eq("unit_id", unit_id).eq("is_active", true).limit(50),
+      supabase.from("tablet_products").select("name, description, price, image_url, is_highlight, category, is_active").eq("unit_id", unit_id).eq("is_active", true).limit(50),
       supabase.from("recipes").select("name, description, cost_per_portion, yield_quantity").eq("unit_id", unit_id).limit(20),
-      supabase.from("categories").select("id, name").eq("unit_id", unit_id),
     ]);
 
     const unitName = unitRes.data?.name || "Restaurante";
@@ -35,11 +34,6 @@ serve(async (req) => {
     const assets = assetsRes.data || [];
     const products = productsRes.data || [];
     const recipes = recipesRes.data || [];
-    const categories = categoriesRes.data || [];
-
-    // Map category names
-    const catMap: Record<string, string> = {};
-    categories.forEach((c: any) => { catMap[c.id] = c.name; });
 
     // Build date context
     const today = new Date();
