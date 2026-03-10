@@ -31,7 +31,6 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   useEffect(() => {
     loadPrices();
 
-    // Subscribe to realtime price updates
     const channel = supabase
       .channel(`quotation-prices-${quotation.id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'quotation_prices' }, () => {
@@ -49,33 +48,22 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   const suppliers = quotation.quotation_suppliers || [];
   const items = quotation.quotation_items || [];
 
-  // Build comparison matrix
   const comparison = useMemo(() => {
     return items.map(item => {
       const supplierPrices = suppliers.map(qs => {
         const itemPrices = prices
           .filter(p => p.quotation_item_id === item.id && p.quotation_supplier_id === qs.id)
           .sort((a, b) => b.round - a.round);
-        return {
-          supplier: qs,
-          price: itemPrices[0] || null,
-        };
+        return { supplier: qs, price: itemPrices[0] || null };
       });
-
       const respondedPrices = supplierPrices.filter(sp => sp.price);
       const minPrice = respondedPrices.length > 0
         ? Math.min(...respondedPrices.map(sp => sp.price!.unit_price))
         : null;
-
-      return {
-        item,
-        supplierPrices,
-        minPrice,
-      };
+      return { item, supplierPrices, minPrice };
     });
   }, [items, suppliers, prices]);
 
-  // Calculate economy
   const economy = useMemo(() => {
     let savings = 0;
     comparison.forEach(row => {
@@ -90,7 +78,6 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   }, [comparison]);
 
   const getPublicUrl = (token: string) => {
-    // Always use published URL so suppliers don't need Lovable auth
     const publishedUrl = import.meta.env.VITE_PUBLISHED_URL || window.location.origin;
     return `${publishedUrl}/cotacao/${token}`;
   };
@@ -133,126 +120,156 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   const allResponded = suppliers.every(s => s.status === 'responded');
   const canResolve = allResponded && prices.length > 0 && quotation.status !== 'resolved';
 
+  const respondedCount = suppliers.filter(s => s.status === 'responded').length;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl">
-          <AppIcon name="ArrowLeft" className="w-5 h-5" />
-        </Button>
+        <button
+          onClick={onBack}
+          className="w-9 h-9 rounded-xl bg-card border border-border/40 flex items-center justify-center shrink-0 hover:bg-secondary/60 transition-colors"
+        >
+          <AppIcon name="ArrowLeft" size={18} className="text-muted-foreground" />
+        </button>
         <div className="flex-1 min-w-0">
-          <h2 className="font-bold text-lg truncate">{quotation.title || 'Cotação'}</h2>
-          <p className="text-xs text-muted-foreground">
-            {items.length} itens · {suppliers.length} fornecedores
-          </p>
+          <h2 className="font-bold text-base text-foreground truncate">
+            {quotation.title || 'Cotação'}
+          </h2>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-[11px] text-muted-foreground">{items.length} itens</span>
+            <span className="w-1 h-1 rounded-full bg-border" />
+            <span className="text-[11px] text-muted-foreground">{suppliers.length} fornecedores</span>
+            {respondedCount > 0 && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-border" />
+                <span className="text-[11px] text-success font-medium">{respondedCount} responderam</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Supplier links */}
-      <div className="space-y-2">
-        <p className="text-sm font-semibold text-foreground">Links dos Fornecedores</p>
-        {suppliers.map(qs => (
-          <div key={qs.id} className="flex items-center gap-2 p-3 rounded-xl bg-[#0a1a10] border border-emerald-500/10">
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm">{qs.supplier?.name}</p>
-              <p className={cn(
-                'text-xs',
-                qs.status === 'responded' ? 'text-success' :
-                qs.status === 'contested' ? 'text-orange-500' :
-                'text-muted-foreground'
-              )}>
-                {qs.status === 'responded' ? '✅ Respondeu' :
-                 qs.status === 'contested' ? '⚠️ Contestado' :
-                 '⏳ Aguardando'}
-              </p>
-            </div>
-            <Button size="sm" variant="outline" className="rounded-xl gap-1" onClick={() => copyLink(qs.token)}>
-              <AppIcon name="Copy" className="w-3.5 h-3.5" />
-            </Button>
-            {qs.supplier?.phone && (
-              <Button size="sm" className="rounded-xl gap-1 bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)]" onClick={() => sendWhatsApp(qs)}>
-                <AppIcon name="MessageCircle" className="w-3.5 h-3.5" />
-              </Button>
-            )}
-          </div>
-        ))}
-      </div>
+      {/* Supplier Cards */}
+      <section className="space-y-2">
+        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+          Fornecedores
+        </p>
+        <div className="space-y-2">
+          {suppliers.map(qs => {
+            const statusConfig = qs.status === 'responded'
+              ? { color: 'text-success', bg: 'bg-success/10', icon: 'CheckCircle2', label: 'Respondeu' }
+              : qs.status === 'contested'
+              ? { color: 'text-warning', bg: 'bg-warning/10', icon: 'AlertTriangle', label: 'Contestado' }
+              : { color: 'text-muted-foreground', bg: 'bg-muted/50', icon: 'Clock', label: 'Aguardando' };
+
+            return (
+              <div
+                key={qs.id}
+                className="rounded-2xl bg-card border border-border/30 p-3 flex items-center gap-3"
+              >
+                <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', statusConfig.bg)}>
+                  <AppIcon name={statusConfig.icon} size={16} className={statusConfig.color} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate">{qs.supplier?.name}</p>
+                  <p className={cn('text-[11px] font-medium', statusConfig.color)}>{statusConfig.label}</p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={() => copyLink(qs.token)}
+                    className="w-8 h-8 rounded-xl bg-secondary/60 hover:bg-secondary flex items-center justify-center transition-colors"
+                  >
+                    <AppIcon name="Copy" size={14} className="text-muted-foreground" />
+                  </button>
+                  {qs.supplier?.phone && (
+                    <button
+                      onClick={() => sendWhatsApp(qs)}
+                      className="w-8 h-8 rounded-xl bg-primary/15 hover:bg-primary/25 flex items-center justify-center transition-colors"
+                    >
+                      <AppIcon name="MessageCircle" size={14} className="text-primary" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Comparison Table */}
       {prices.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <AppIcon name="Scale" className="w-4 h-4" />
+        <section className="space-y-2">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
             Comparação de Preços
           </p>
-           <div className="overflow-x-auto rounded-2xl border border-emerald-500/10 bg-[#0a1a10]">
-             <table className="w-full text-sm">
-               <thead>
-                 <tr className="border-b border-emerald-500/10 bg-emerald-500/5">
-                  <th className="text-left p-3 font-semibold">Item</th>
-                  {suppliers.map(qs => (
-                    <th key={qs.id} className="text-center p-3 font-semibold whitespace-nowrap">
-                      {qs.supplier?.name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {comparison.map((row, i) => (
-                  <tr key={row.item.id} className={cn(i < comparison.length - 1 && 'border-b border-border/50')}>
-                    <td className="p-3">
-                      <div className="flex items-center gap-1.5">
-                        <p className="font-medium">{row.item.item?.name}</p>
-                        <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                          {row.item.item?.unit_type === 'unidade' ? 'UN' : row.item.item?.unit_type?.toUpperCase()}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">×{row.item.quantity}</p>
-                    </td>
-                    {row.supplierPrices.map(sp => {
-                      const isWinner = sp.price && row.minPrice !== null && sp.price.unit_price === row.minPrice;
-                      const isLoser = sp.price && row.minPrice !== null && sp.price.unit_price > row.minPrice;
-                      return (
-                        <td key={sp.supplier.id} className="p-3 text-center">
-                          {sp.price ? (
-                            <div>
-                              <span className={cn(
-                                'font-bold',
-                                isWinner ? 'text-success' : isLoser ? 'text-destructive' : ''
-                              )}>
-                                R$ {sp.price.unit_price.toFixed(2).replace('.', ',')}
-                                {isWinner && ' 🏆'}
-                              </span>
-                              {sp.price.brand && (
-                                <p className="text-xs text-muted-foreground mt-0.5">{sp.price.brand}</p>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
 
-          {/* Economy */}
+          {/* Economy highlight */}
           {economy > 0 && (
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-success/10 border border-success/20">
-              <AppIcon name="Sparkles" className="w-5 h-5 text-success" />
-              <p className="text-sm font-semibold text-success">
-                Economia estimada: R$ {economy.toFixed(2).replace('.', ',')}
-              </p>
+            <div className="rounded-2xl bg-success/8 border border-success/15 p-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-success/15 flex items-center justify-center shrink-0">
+                <AppIcon name="TrendingDown" size={16} className="text-success" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Economia estimada</p>
+                <p className="text-sm font-bold text-success">
+                  R$ {economy.toFixed(2).replace('.', ',')}
+                </p>
+              </div>
             </div>
           )}
 
+          {/* Card-based comparison */}
+          <div className="space-y-2">
+            {comparison.map((row) => (
+              <div key={row.item.id} className="rounded-2xl bg-card border border-border/30 overflow-hidden">
+                {/* Item header */}
+                <div className="px-3.5 py-2.5 border-b border-border/20 flex items-center gap-2">
+                  <p className="text-sm font-semibold text-foreground flex-1 truncate">
+                    {row.item.item?.name}
+                  </p>
+                  <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md bg-secondary text-muted-foreground shrink-0">
+                    {row.item.item?.unit_type === 'unidade' ? 'UN' : row.item.item?.unit_type?.toUpperCase()}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground shrink-0">×{row.item.quantity}</span>
+                </div>
+                {/* Supplier prices row */}
+                <div className="grid divide-x divide-border/20" style={{ gridTemplateColumns: `repeat(${suppliers.length}, 1fr)` }}>
+                  {row.supplierPrices.map(sp => {
+                    const isWinner = sp.price && row.minPrice !== null && sp.price.unit_price === row.minPrice;
+                    const isLoser = sp.price && row.minPrice !== null && sp.price.unit_price > row.minPrice;
+                    return (
+                      <div key={sp.supplier.id} className="p-3 text-center">
+                        <p className="text-[10px] text-muted-foreground mb-1 truncate">{sp.supplier.supplier?.name}</p>
+                        {sp.price ? (
+                          <div>
+                            <div className="flex items-center justify-center gap-1">
+                              <span className={cn(
+                                'text-sm font-bold',
+                                isWinner ? 'text-success' : isLoser ? 'text-destructive' : 'text-foreground'
+                              )}>
+                                R$ {sp.price.unit_price.toFixed(2).replace('.', ',')}
+                              </span>
+                              {isWinner && <AppIcon name="Trophy" size={14} className="text-warning" />}
+                            </div>
+                            {sp.price.brand && (
+                              <p className="text-[10px] text-muted-foreground mt-0.5">{sp.price.brand}</p>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-muted-foreground/50">—</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Actions */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col gap-2 pt-1">
             {suppliers.map(qs => {
-              // Show contest button if supplier has higher prices on some items
               const hasLosing = comparison.some(row => {
                 const sp = row.supplierPrices.find(s => s.supplier.id === qs.id);
                 return sp?.price && row.minPrice !== null && sp.price.unit_price > row.minPrice;
@@ -265,10 +282,10 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                   key={qs.id}
                   variant="outline"
                   size="sm"
-                  className="rounded-xl gap-1.5 border-orange-500/30 text-orange-500 hover:bg-orange-500/10"
+                  className="rounded-xl gap-1.5 border-warning/30 text-warning hover:bg-warning/10 w-full justify-center"
                   onClick={() => handleContest(qs.supplier_id)}
                 >
-                  <AppIcon name="AlertTriangle" className="w-3.5 h-3.5" />
+                  <AppIcon name="AlertTriangle" size={14} />
                   Contestar {qs.supplier?.name}
                 </Button>
               );
@@ -278,21 +295,24 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
               <Button
                 onClick={handleResolve}
                 disabled={resolving}
-                className="rounded-xl gap-1.5 shadow-lg shadow-emerald-500/20"
+                className="rounded-xl gap-1.5 shadow-glow-primary w-full h-11"
               >
                 {resolving ? (
-                  <><AppIcon name="Loader2" className="w-4 h-4 animate-spin" /> Gerando pedidos...</>
+                  <><AppIcon name="Loader2" size={16} className="animate-spin" /> Gerando pedidos...</>
                 ) : (
-                  <><AppIcon name="Trophy" className="w-4 h-4" /> Gerar Pedidos Otimizados</>
+                  <><AppIcon name="Trophy" size={16} /> Gerar Pedidos Otimizados</>
                 )}
               </Button>
             )}
           </div>
-        </div>
+        </section>
       )}
 
       {loading && prices.length === 0 && (
-        <p className="text-center text-muted-foreground text-sm py-8">Carregando preços...</p>
+        <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
+          <AppIcon name="Loader2" size={20} className="animate-spin" />
+          <p className="text-sm">Carregando preços...</p>
+        </div>
       )}
     </div>
   );
