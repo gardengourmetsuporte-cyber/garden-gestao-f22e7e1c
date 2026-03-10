@@ -103,7 +103,7 @@ export function useAgenda() {
 
   // Update task mutation
   const updateTaskMutation = useMutation({
-    mutationFn: async ({ id, ...task }: { id: string; title: string; notes?: string; due_date?: string; due_time?: string; category_id?: string }) => {
+    mutationFn: async ({ id, ...task }: { id: string; title: string; notes?: string; due_date?: string; due_time?: string; category_id?: string; has_alarm?: boolean }) => {
       const { error } = await supabase
         .from('manager_tasks')
         .update({
@@ -112,6 +112,7 @@ export function useAgenda() {
           due_date: task.due_date || null,
           due_time: task.due_time || null,
           category_id: task.category_id || null,
+          has_alarm: task.has_alarm || false,
         })
         .eq('id', id);
       if (error) throw error;
