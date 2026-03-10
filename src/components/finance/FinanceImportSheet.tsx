@@ -437,6 +437,22 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
                 </div>
               )}
 
+              {result.adjustments && result.adjustments.length > 0 && (
+                <div className="rounded-lg bg-primary/10 border border-primary/30 p-3">
+                  <p className="text-xs font-medium text-foreground mb-2">💰 Ajustes de saldo criados:</p>
+                  <div className="space-y-1.5">
+                    {result.adjustments.map((adj, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">{adj.accountName}</span>
+                        <span className="font-medium text-foreground">
+                          R$ {adj.adjustmentAmount.toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <Button variant="outline" onClick={handleReset} className="w-full">
                 Importar outro arquivo
               </Button>
