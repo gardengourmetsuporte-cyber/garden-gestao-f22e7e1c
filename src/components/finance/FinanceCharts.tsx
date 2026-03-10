@@ -205,7 +205,7 @@ export function FinanceCharts({
       </div>
 
       {/* Data Type Toggle — hidden on weekly view */}
-      {viewType !== 'weekly' && viewType !== 'timeline' && viewType !== 'cumulative' && (
+      {viewType !== 'weekly' && viewType !== 'timeline' && viewType !== 'cumulative' && viewType !== 'annual' && (
         <div className="px-4">
           <div className="tab-command">
             {['expense', 'income'].map(type => (
