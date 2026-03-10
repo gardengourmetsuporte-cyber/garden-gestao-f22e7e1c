@@ -65,6 +65,7 @@ export default function CardapioHub() {
   // Tablet admin hook (for orders)
   const tabletAdmin = useTabletAdmin();
   const { orders, pdvConfig, retryPDV } = tabletAdmin;
+  const { orders: hubOrders } = useDeliveryHub(activeUnit?.id);
 
   // Recipe sync
 
