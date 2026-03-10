@@ -16,11 +16,19 @@ interface FinanceImportSheetProps {
   onRefreshAll: () => Promise<void>;
 }
 
+interface ImportAdjustment {
+  accountName: string;
+  oldBalance: number;
+  newBalance: number;
+  adjustmentAmount: number;
+}
+
 interface ImportResult {
   imported: number;
   skipped: number;
   unmatchedCategories: string[];
   unmatchedAccounts: string[];
+  adjustments: ImportAdjustment[];
 }
 
 type FieldKey = 'date' | 'description' | 'category' | 'subcategory' | 'account' | 'amount';
