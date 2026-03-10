@@ -173,21 +173,20 @@ interface SubRecipeItem {
                    open={expandedCategories.has(categoryId) || search.length > 0}
                    onOpenChange={() => toggleCategory(categoryId)}
                  >
-                   <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-xl hover:bg-secondary/50 transition-colors">
-                     {expandedCategories.has(categoryId) || search.length > 0 ? (
-                       <AppIcon name="ChevronDown" className="h-4 w-4 text-muted-foreground" />
-                     ) : (
-                       <AppIcon name="ChevronRight" className="h-4 w-4 text-muted-foreground" />
-                     )}
-                     <div
-                       className="w-3 h-3 rounded-full"
-                       style={{ backgroundColor: category.color }}
-                     />
-                     <span className="font-medium">{category.name}</span>
-                     <span className="text-sm text-muted-foreground ml-auto">
-                       ({category.items.length})
-                     </span>
-                   </CollapsibleTrigger>
+                    <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-xl hover:bg-secondary/50 transition-colors">
+                      <AppIcon
+                        name={expandedCategories.has(categoryId) || search.length > 0 ? 'ChevronDown' : 'ChevronRight'}
+                        className="h-4 w-4 text-muted-foreground shrink-0"
+                      />
+                      <div
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: category.color }}
+                      />
+                      <span className="font-medium text-left flex-1 min-w-0">{category.name}</span>
+                      <span className="text-sm text-muted-foreground shrink-0">
+                        ({category.items.length})
+                      </span>
+                    </CollapsibleTrigger>
                    
                    <CollapsibleContent>
                      <div className="ml-6 space-y-1 mt-1">
