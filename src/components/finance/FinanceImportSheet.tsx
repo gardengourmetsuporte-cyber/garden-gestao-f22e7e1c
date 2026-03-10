@@ -341,34 +341,33 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
               {/* Mode selection */}
               {csvText && headers.length > 0 && (
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium">Modo de importação</Label>
-                  <RadioGroup value={mode} onValueChange={(v) => setMode(v as any)} className="space-y-2">
+                 <Label className="text-sm font-medium">O que fazer com os saldos?</Label>
+                  <RadioGroup value={compensateBalance ? 'compensate' : 'recalculate'} onValueChange={(v) => setCompensateBalance(v === 'compensate')} className="space-y-2">
                     <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer hover:bg-secondary/20 transition-colors">
-                      <RadioGroupItem value="historical" className="mt-0.5" />
+                      <RadioGroupItem value="compensate" className="mt-0.5" />
                       <div>
-                        <span className="text-sm font-medium">📋 Somente Histórico</span>
+                        <span className="text-sm font-medium">💰 Manter saldos atuais</span>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          Transações ficam como <strong>não pagas</strong>. Seus saldos atuais não mudam.
+                          Os saldos das contas permanecem como estão. Um <strong>ajuste de caixa</strong> será criado automaticamente para compensar.
                         </p>
                       </div>
                     </label>
                     <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer hover:bg-secondary/20 transition-colors">
-                      <RadioGroupItem value="full_migration" className="mt-0.5" />
+                      <RadioGroupItem value="recalculate" className="mt-0.5" />
                       <div>
-                        <span className="text-sm font-medium">🔄 Migração Completa</span>
+                        <span className="text-sm font-medium">📊 Recalcular saldos</span>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          Transações entram como <strong>pagas</strong>. Saldos recalculados do zero.
+                          Os saldos das contas serão <strong>alterados</strong> conforme o histórico importado.
                         </p>
                       </div>
                     </label>
                   </RadioGroup>
 
-                  {mode === 'full_migration' && (
+                  {!compensateBalance && (
                     <div className="flex items-start gap-2 rounded-lg bg-accent/10 border border-accent/30 p-3">
                       <AppIcon name="AlertTriangle" size={16} className="text-accent mt-0.5 shrink-0" />
                       <p className="text-xs text-muted-foreground">
-                        <strong>Atenção:</strong> Os saldos atuais das suas contas serão afetados pelas transações
-                        importadas. Recomendamos fortemente criar um backup antes.
+                        <strong>Atenção:</strong> Os saldos atuais das suas contas serão afetados pelas transações importadas.
                       </p>
                     </div>
                   )}
