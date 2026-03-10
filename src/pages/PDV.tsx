@@ -471,6 +471,7 @@ export default function PDV() {
         saleSource={pos.saleSource}
         customerName={pos.customerName}
         tableNumber={pos.tableNumber}
+        initialCustomerDocument={pos.customerDocument}
       />
 
       <PendingOrdersSheet
