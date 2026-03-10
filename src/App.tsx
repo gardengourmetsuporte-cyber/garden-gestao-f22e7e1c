@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useRef } from "react";
+// App entry
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
