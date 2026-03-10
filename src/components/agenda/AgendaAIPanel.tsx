@@ -207,41 +207,26 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
               )}
             </div>
 
-            {/* Organize button — premium glassmorphism */}
+            {/* Organize button — inline pill style */}
             <button
               onClick={handleOrganize}
               disabled={isOrganizing || stats.pending.length === 0}
-              className="group mt-3 w-full relative flex items-center justify-center gap-2.5 h-11 rounded-2xl overflow-hidden transition-all duration-300 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none"
+              className="group mt-3 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/15 backdrop-blur-sm hover:bg-white/15 hover:border-white/25 transition-all duration-200 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none"
             >
-              {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary via-emerald-400 to-primary bg-[length:200%_100%] group-hover:animate-[shimmer_2s_linear_infinite] opacity-90" />
-              {/* Glass overlay */}
-              <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
-              {/* Glow */}
-              <div className="absolute -inset-1 bg-primary/30 blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500" />
-              {/* Border */}
-              <div className="absolute inset-[1px] rounded-[15px] border border-white/25" />
-
-              {/* Content */}
-              <div className="relative flex items-center justify-center gap-2.5">
-                {isOrganizing ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span className="text-sm font-bold text-white tracking-wide">Analisando...</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/20 backdrop-blur-sm">
-                      <AppIcon name="Sparkles" size={14} className="text-white" />
-                    </div>
-                    <span className="text-sm font-bold text-white tracking-wide">Organizar com IA</span>
-                    <AppIcon name="ChevronRight" size={14} className="text-white/70 group-hover:translate-x-0.5 transition-transform" />
-                  </>
-                )}
-              </div>
+              {isOrganizing ? (
+                <>
+                  <svg className="animate-spin h-3.5 w-3.5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span className="text-xs font-semibold text-white/90">Analisando...</span>
+                </>
+              ) : (
+                <>
+                  <AppIcon name="Sparkles" size={13} className="text-primary" />
+                  <span className="text-xs font-semibold text-white/80">Organizar com IA</span>
+                </>
+              )}
             </button>
           </div>
         </div>
