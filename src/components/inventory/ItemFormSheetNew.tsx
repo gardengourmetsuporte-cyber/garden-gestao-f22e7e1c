@@ -24,10 +24,7 @@ interface ItemFormSheetProps {
     current_stock: number;
     min_stock: number;
     unit_price: number | null;
-    recipe_unit_type: string | null;
-    recipe_unit_price: number | null;
     stock_unit_label: string | null;
-    stock_to_recipe_factor: number | null;
     purchase_unit_label: string | null;
     purchase_to_stock_factor: number | null;
   }) => void;
@@ -100,10 +97,7 @@ export function ItemFormSheetNew({
       current_stock: parseFloat(currentStock) || 0,
       min_stock: parseFloat(minStock) || 0,
       unit_price: unitPrice ? parseFloat(unitPrice) : null,
-      recipe_unit_type: null,
-      recipe_unit_price: null,
       stock_unit_label: stockUnitLabel.trim() || null,
-      stock_to_recipe_factor: null,
       purchase_unit_label: purchaseUnitLabel.trim() || null,
       purchase_to_stock_factor: purchaseToStockFactor ? parseFloat(purchaseToStockFactor) : null,
     });
@@ -118,22 +112,6 @@ export function ItemFormSheetNew({
     }
   };
 
-  // Get recipe unit options based on stock unit type
-  const getRecipeUnitOptions = () => {
-    if (unitType === 'kg') return [
-      { value: 'kg', label: 'Quilos (kg)' },
-      { value: 'g', label: 'Gramas (g)' },
-    ];
-    if (unitType === 'litro') return [
-      { value: 'litro', label: 'Litros (L)' },
-      { value: 'ml', label: 'Mililitros (ml)' },
-    ];
-    return [
-      { value: 'unidade', label: 'Unidade' },
-      { value: 'kg', label: 'Quilos (kg)' },
-      { value: 'g', label: 'Gramas (g)' },
-    ];
-  };
 
   const isValid = name.trim();
 
