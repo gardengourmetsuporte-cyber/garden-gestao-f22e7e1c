@@ -340,11 +340,20 @@ export default function QuotationPublic() {
               }`}
             >
               <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="font-semibold text-foreground">{item.item.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    ×{item.quantity} {item.item.unit_type}
-                  </p>
+                <div className="flex items-center gap-2">
+                  <div>
+                    <p className="font-semibold text-foreground">{item.item.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Qtd: {item.quantity}
+                    </p>
+                  </div>
+                  <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-lg tracking-wider ${
+                    item.item.unit_type === 'kg' ? 'bg-blue-500/15 text-blue-500 border border-blue-500/20' :
+                    item.item.unit_type === 'litro' ? 'bg-cyan-500/15 text-cyan-500 border border-cyan-500/20' :
+                    'bg-violet-500/15 text-violet-500 border border-violet-500/20'
+                  }`}>
+                    POR {item.item.unit_type === 'unidade' ? 'UN' : item.item.unit_type.toUpperCase()}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {lastPrice && (
