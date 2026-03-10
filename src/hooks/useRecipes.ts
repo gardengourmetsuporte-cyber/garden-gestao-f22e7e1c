@@ -28,7 +28,7 @@ import { useUnit } from '@/contexts/UnitContext';
    const { data: recipes = [], isLoading: recipesLoading } = useQuery({
      queryKey: ['recipes', activeUnitId],
      queryFn: async () => {
-       let query = supabase
+       const baseQuery = supabase
          .from('recipes')
          .select(`
            *,
@@ -53,9 +53,9 @@ import { useUnit } from '@/contexts/UnitContext';
          `)
          .order('name');
 
-       if (activeUnitId) {
-         query = query.eq('unit_id', activeUnitId);
-       }
+       const query = activeUnitId
+         ? (baseQuery as any).eq('unit_id', activeUnitId)
+         : baseQuery;
        
        const { data, error } = await query;
        if (error) throw error;
