@@ -125,7 +125,10 @@ export default function InventoryPage() {
 
   const handleSaveItem = async (data: {
     name: string; category_id: string | null; supplier_id: string | null;
-    unit_type: 'unidade' | 'kg' | 'litro'; current_stock: number; min_stock: number;
+    unit_type: 'unidade' | 'kg' | 'g' | 'litro' | 'ml'; current_stock: number; min_stock: number;
+    unit_price?: number | null; recipe_unit_type?: string | null; recipe_unit_price?: number | null;
+    stock_unit_label?: string | null; stock_to_recipe_factor?: number | null;
+    purchase_unit_label?: string | null; purchase_to_stock_factor?: number | null;
   }) => {
     try {
       if (editingItem) {
