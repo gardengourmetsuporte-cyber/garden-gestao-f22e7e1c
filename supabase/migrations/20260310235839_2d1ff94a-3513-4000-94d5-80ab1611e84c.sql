@@ -1,0 +1,1 @@
+UPDATE profiles SET plan = 'business' WHERE user_id = 'c99b1195-8624-4ace-b307-7f2de00ab1f0'
