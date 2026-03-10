@@ -5,6 +5,8 @@ export interface NavItem {
   icon: string;
   /** Optional custom image icon (public path) */
   customIcon?: string;
+  /** If true, customIcon keeps its original colors (no invert/brightness filters) */
+  keepIconColor?: boolean;
   label: string;
   href: string;
   /** If true, only shown to admin/super_admin (when no access-level is assigned) */
