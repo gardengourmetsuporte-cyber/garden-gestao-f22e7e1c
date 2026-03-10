@@ -290,7 +290,7 @@ export default function QuotationPublic() {
             <AppIcon name="Store" className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="font-bold text-lg">{data.quotation_title || 'Cotação de Preços'}</h1>
+            <h1 className="font-bold text-lg">{data.quotation_title || 'Cotação de Preços'} — {data.supplier_name}</h1>
             <p className="text-xs text-muted-foreground">{data.unit_name}</p>
           </div>
         </div>
