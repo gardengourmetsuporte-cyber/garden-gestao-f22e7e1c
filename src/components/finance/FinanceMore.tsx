@@ -6,6 +6,9 @@ import { FinanceBackupSheet } from './FinanceBackupSheet';
 import { FinanceImportSheet } from './FinanceImportSheet';
 import { FinanceAccount, FinanceCategory, FinanceTransaction } from '@/types/finance';
 import { useFinanceBackup } from '@/hooks/useFinanceBackup';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface FinanceMoreProps {
   accounts: FinanceAccount[];
@@ -34,14 +37,46 @@ export function FinanceMore({
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [isFixing, setIsFixing] = useState(false);
 
+  const { activeUnit } = useUnit();
   const backup = useFinanceBackup(accounts, transactions, selectedMonth, onRefreshAll);
+
+  const handleFixImported = async () => {
+    if (!activeUnit?.id) return;
+    setIsFixing(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { toast.error('Sessão expirada'); return; }
+
+      const { data, error } = await supabase.functions.invoke('import-finance-csv', {
+        body: { action: 'fix_imported', unitId: activeUnit.id },
+      });
+
+      if (error) throw error;
+
+      if (data.updated === 0) {
+        toast.info('Nenhuma transação importada pendente encontrada.');
+      } else {
+        const adjText = data.adjustments?.length
+          ? `\n${data.adjustments.map((a: any) => `• ${a.accountName}: ajuste de R$ ${a.adjustmentAmount.toFixed(2)}`).join('\n')}`
+          : '';
+        toast.success(`✅ ${data.updated} transações corrigidas!${adjText}`);
+        onRefreshAll();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao corrigir transações');
+    } finally {
+      setIsFixing(false);
+    }
+  };
 
   const menuItems = [
     { icon: 'Wallet', label: 'Gerenciar Contas', onClick: () => setAccountsOpen(true), color: 'hsl(var(--neon-cyan))' },
     { icon: 'Hash', label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true), color: 'hsl(var(--neon-amber))' },
     { icon: 'Archive', label: 'Backups', onClick: () => setBackupOpen(true), color: 'hsl(var(--neon-purple, 270 70% 60%))' },
     { icon: 'Upload', label: 'Importar CSV', onClick: () => setImportOpen(true), color: 'hsl(var(--neon-green, 142 70% 45%))' },
+    { icon: 'Wrench', label: isFixing ? 'Corrigindo...' : 'Corrigir importação anterior', onClick: handleFixImported, color: 'hsl(var(--neon-amber))' },
   ];
 
   return (

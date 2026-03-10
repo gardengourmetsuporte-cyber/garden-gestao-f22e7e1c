@@ -1,26 +1,19 @@
+## Plano: Rateio Proporcional de Custos Fixos ✅
 
+### Implementado
 
-## Plano: Corrigir transações importadas + ajuste em Janeiro/2020
+O cálculo de custos fixos foi alterado de **divisão igualitária** para **rateio proporcional por preço de venda**.
 
-### O que será feito
+**Fórmula anterior:** `Custo Fixo / Nº Produtos = valor igual para todos`  
+**Fórmula nova:** `(Preço do Produto / Faturamento Mensal) × Custo Fixo Mensal`
 
-Adicionar uma nova action `fix_imported` na edge function `import-finance-csv` que:
-
-1. Busca todas as transações com `[Importado]` nas notas e `is_paid = false` na unidade
-2. Salva o saldo atual de cada `finance_account` da unidade
-3. Faz UPDATE em batch para `is_paid = true` (trigger atualiza saldos)
-4. Consulta os novos saldos e calcula a diferença
-5. Cria transações de ajuste com data **2020-01-01** para cada conta afetada, restaurando o saldo original
+Exemplo (custo fixo = R$ 6.974, faturamento = R$ 50.000):
+- Água (R$ 5): R$ 0,70 de custo fixo
+- Lanche (R$ 45): R$ 6,28 de custo fixo
 
 ### Arquivos alterados
-
-#### 1. `supabase/functions/import-finance-csv/index.ts`
-- Novo branch: quando `body.action === 'fix_imported'`
-- Recebe apenas `unitId`
-- Lógica idêntica à compensação já existente, mas operando sobre transações já inseridas
-
-#### 2. `src/components/finance/FinanceMore.tsx`
-- Adicionar botão temporário "Corrigir importação anterior" que chama a action `fix_imported`
-- Mostra resultado (quantas atualizadas, ajustes criados)
-- Pode ser removido depois de usado
-
+- Migration: adicionada coluna `monthly_revenue` em `recipe_cost_settings`
+- `src/hooks/useRecipeCostSettings.ts` — `calculateOperationalCosts` agora aceita `sellingPrice` opcional
+- `src/components/settings/RecipeCostSettings.tsx` — campo "Faturamento mensal estimado" no lugar de "Média de produtos vendidos"
+- `src/components/recipes/RecipeSheet.tsx` — passa preço de venda para cálculo proporcional
+- `src/hooks/useRecipeMenuSync.ts` — usa preço do produto vinculado no cardápio
