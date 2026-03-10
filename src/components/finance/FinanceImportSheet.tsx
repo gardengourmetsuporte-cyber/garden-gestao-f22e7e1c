@@ -184,7 +184,7 @@ export function FinanceImportSheet({ open, onOpenChange, onRefreshAll }: Finance
         body: {
           csvText,
           unitId: activeUnitId,
-          mode,
+          compensateBalance,
           delimiter,
           columnMapping,
         },
