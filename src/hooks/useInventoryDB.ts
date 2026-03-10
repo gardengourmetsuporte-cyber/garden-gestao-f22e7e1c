@@ -88,7 +88,7 @@ export function useInventoryDB() {
       name: string;
       category_id: string | null;
       supplier_id?: string | null;
-      unit_type: 'unidade' | 'kg' | 'litro';
+      unit_type: string;
       current_stock: number;
       min_stock: number;
       unit_price?: number | null;
@@ -101,7 +101,7 @@ export function useInventoryDB() {
     }) => {
       const { data, error } = await supabase
         .from('inventory_items')
-        .insert({ ...item, unit_id: activeUnitId })
+        .insert({ ...item, unit_id: activeUnitId } as any)
         .select('*, category:categories(*), supplier:suppliers(*)')
         .single();
       if (error) throw error;
@@ -115,7 +115,7 @@ export function useInventoryDB() {
       const { category, supplier, ...updateData } = updates;
       const { data, error } = await supabase
         .from('inventory_items')
-        .update(updateData)
+        .update(updateData as any)
         .eq('id', id)
         .select('*, category:categories(*), supplier:suppliers(*)')
         .single();

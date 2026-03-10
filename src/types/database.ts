@@ -11,7 +11,7 @@
 // ---- Enum-like string unions ----
 
 export type AppRole = 'admin' | 'funcionario' | 'super_admin';
-export type UnitType = 'unidade' | 'kg' | 'litro';
+export type UnitType = 'unidade' | 'kg' | 'g' | 'litro' | 'ml';
 export type MovementType = 'entrada' | 'saida';
 export type OrderStatus = 'draft' | 'sent' | 'received' | 'cancelled';
 export type ChecklistType = 'abertura' | 'fechamento' | 'bonus';

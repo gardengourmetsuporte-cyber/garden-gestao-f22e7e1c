@@ -42,8 +42,6 @@ interface InventoryItem {
   name: string;
   unit_type: string;
   unit_price: number;
-  recipe_unit_type?: string | null;
-  recipe_unit_price?: number | null;
   category?: { id: string; name: string; color: string } | null;
 }
 
@@ -133,8 +131,8 @@ export function RecipeSheet({
           source_type: (ing.source_type || 'inventory') as IngredientSourceType,
           item_id: ing.item_id || null,
           item_name: ing.item?.name || null,
-          item_unit: ing.item?.recipe_unit_type || ing.item?.unit_type || null,
-          item_price: ing.unit_cost || ing.item?.recipe_unit_price || ing.item?.unit_price || null,
+          item_unit: ing.item?.unit_type || null,
+          item_price: ing.unit_cost || ing.item?.unit_price || null,
           source_recipe_id: ing.source_recipe_id || null,
           source_recipe_name: ing.source_recipe?.name || null,
           source_recipe_unit: ing.source_recipe?.yield_unit || null,
@@ -223,8 +221,8 @@ export function RecipeSheet({
   const isNegativeMargin = effectiveMargin < 0;
 
   const handleAddInventoryItem = (item: InventoryItem) => {
-    const effectiveUnit = (item.recipe_unit_type || item.unit_type) as RecipeUnitType;
-    const effectivePrice = item.recipe_unit_price ?? item.unit_price ?? 0;
+    const effectiveUnit = item.unit_type as RecipeUnitType;
+    const effectivePrice = item.unit_price ?? 0;
     const defaultQuantity = 1;
     const cost = calculateIngredientCost(effectivePrice, effectiveUnit, defaultQuantity, effectiveUnit);
 

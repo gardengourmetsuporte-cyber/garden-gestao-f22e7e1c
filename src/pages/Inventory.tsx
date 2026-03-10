@@ -125,7 +125,10 @@ export default function InventoryPage() {
 
   const handleSaveItem = async (data: {
     name: string; category_id: string | null; supplier_id: string | null;
-    unit_type: 'unidade' | 'kg' | 'litro'; current_stock: number; min_stock: number;
+    unit_type: 'unidade' | 'kg' | 'g' | 'litro' | 'ml'; current_stock: number; min_stock: number;
+    unit_price?: number | null; recipe_unit_type?: string | null; recipe_unit_price?: number | null;
+    stock_unit_label?: string | null; stock_to_recipe_factor?: number | null;
+    purchase_unit_label?: string | null; purchase_to_stock_factor?: number | null;
   }) => {
     try {
       if (editingItem) {
@@ -133,7 +136,7 @@ export default function InventoryPage() {
         // Scroll to the edited item after sheet closes
         setTimeout(() => scrollToItem(editingItem.id), 400);
       } else {
-        const newItem = await addItem(data);
+        const newItem = await addItem(data as any);
         if (newItem?.id) setTimeout(() => scrollToItem(newItem.id), 400);
       }
     } catch { toast.error('Erro ao salvar item'); }
