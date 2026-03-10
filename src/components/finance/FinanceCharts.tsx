@@ -179,8 +179,29 @@ export function FinanceCharts({
 
   return (
     <div className="space-y-4">
+      {/* Month / Year Navigation */}
       <div className="px-4 pt-3 lg:px-6">
-        <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
+        {viewType === 'annual' ? (
+          <div className="flex items-center justify-center gap-3">
+            <button
+              className="w-9 h-9 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all active:scale-90"
+              onClick={() => handleYearChange(-1)}
+            >
+              <AppIcon name="ChevronLeft" size={16} />
+            </button>
+            <span className="text-sm font-bold text-foreground tabular-nums min-w-[60px] text-center">
+              {selectedMonth.getFullYear()}
+            </span>
+            <button
+              className="w-9 h-9 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all active:scale-90"
+              onClick={() => handleYearChange(1)}
+            >
+              <AppIcon name="ChevronRight" size={16} />
+            </button>
+          </div>
+        ) : (
+          <UnifiedMonthNav currentMonth={selectedMonth} onMonthChange={onMonthChange} />
+        )}
       </div>
 
       {/* Data Type Toggle — hidden on weekly view */}
