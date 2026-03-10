@@ -330,6 +330,7 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
   const [selectedOrder, setSelectedOrder] = useState<(PendingOrder & { sequentialNumber: number }) | null>(null);
   const [dispatching, setDispatching] = useState<string | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'blocks'>('list');
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
   const queryClient = useQueryClient();
@@ -456,6 +457,24 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
           <div className="px-5 pt-5 pb-3 border-b border-border space-y-3">
             <div className="flex items-center justify-between">
               <SheetTitle className="text-base font-bold">Pedidos Pendentes ({orders.length})</SheetTitle>
+              <div className="flex items-center gap-0.5 bg-secondary rounded-lg p-0.5">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn('h-8 w-8', viewMode === 'blocks' && 'bg-background shadow-sm')}
+                  onClick={() => setViewMode('blocks')}
+                >
+                  <AppIcon name="LayoutGrid" size={16} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn('h-8 w-8', viewMode === 'list' && 'bg-background shadow-sm')}
+                  onClick={() => setViewMode('list')}
+                >
+                  <AppIcon name="List" size={16} />
+                </Button>
+              </div>
             </div>
 
             {sourceKeys.length > 1 && (
@@ -494,6 +513,53 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
               <p className="text-center text-muted-foreground text-sm py-8">Carregando...</p>
             ) : orders.length === 0 ? (
               <p className="text-center text-muted-foreground text-sm py-8">Nenhum pedido pendente</p>
+            ) : viewMode === 'blocks' ? (
+              <div className="space-y-4">
+                {Object.entries(filteredGrouped).map(([sourceKey, sourceOrders]) => {
+                  const cfg = SOURCE_CONFIG[sourceKey] || { icon: 'ShoppingBag', label: sourceKey };
+                  return (
+                    <div key={sourceKey}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <AppIcon name={cfg.icon} size={14} className="text-muted-foreground" />
+                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{cfg.label}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {sourceOrders.map(order => {
+                          const orderNumber = order.order_number || order.id.slice(0, 4).toUpperCase();
+                          return (
+                            <button
+                              key={order.id}
+                              onClick={() => setSelectedOrder(order)}
+                              className="bg-card border border-border/50 rounded-xl p-3 text-left active:bg-secondary/30 transition-colors flex flex-col gap-2"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-[11px] font-bold text-primary">
+                                  {order.sequentialNumber}
+                                </span>
+                                <Badge variant="outline" className={cn('text-[8px] border px-1.5', STATUS_COLORS[order.status] || 'bg-secondary text-muted-foreground')}>
+                                  {STATUS_LABELS[order.status] || order.status}
+                                </Badge>
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold truncate">
+                                  {sourceKey === 'mesa' && order.table_number ? `Mesa ${order.table_number}` : cfg.label}
+                                </p>
+                                {order.customer_name && (
+                                  <p className="text-[10px] text-muted-foreground truncate">{order.customer_name}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center justify-between mt-auto">
+                                <span className="text-[10px] text-muted-foreground">{format(new Date(order.created_at), 'HH:mm')}</span>
+                                <span className="text-xs font-bold text-primary">{formatCurrency(order.total)}</span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               <div className="space-y-4">
                 {Object.entries(filteredGrouped).map(([sourceKey, sourceOrders]) => {
