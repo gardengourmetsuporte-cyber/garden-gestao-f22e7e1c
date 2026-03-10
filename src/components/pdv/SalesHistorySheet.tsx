@@ -26,6 +26,9 @@ interface Sale {
   paid_at: string | null;
   created_at: string;
   notes: string | null;
+  fiscal_status: string | null;
+  fiscal_key: string | null;
+  fiscal_number: string | null;
   items: { product_name: string; quantity: number; unit_price: number }[];
   payments: { method: string; amount: number }[];
 }
