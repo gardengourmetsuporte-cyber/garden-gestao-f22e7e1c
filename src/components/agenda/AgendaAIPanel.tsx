@@ -207,26 +207,41 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
               )}
             </div>
 
-            {/* Organize button */}
+            {/* Organize button — premium glassmorphism */}
             <button
               onClick={handleOrganize}
               disabled={isOrganizing || stats.pending.length === 0}
-              className="mt-3 w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-primary/90 hover:bg-primary active:scale-[0.98] text-sm font-bold text-primary-foreground shadow-lg shadow-primary/30 transition-all disabled:opacity-50 disabled:pointer-events-none backdrop-blur-md border border-primary/40"
+              className="group mt-3 w-full relative flex items-center justify-center gap-2.5 h-11 rounded-2xl overflow-hidden transition-all duration-300 active:scale-[0.97] disabled:opacity-40 disabled:pointer-events-none"
             >
-              {isOrganizing ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Analisando...
-                </>
-              ) : (
-                <>
-                  <AppIcon name="Sparkles" size={16} />
-                  Organizar com IA
-                </>
-              )}
+              {/* Animated gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary via-emerald-400 to-primary bg-[length:200%_100%] group-hover:animate-[shimmer_2s_linear_infinite] opacity-90" />
+              {/* Glass overlay */}
+              <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
+              {/* Glow */}
+              <div className="absolute -inset-1 bg-primary/30 blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500" />
+              {/* Border */}
+              <div className="absolute inset-[1px] rounded-[15px] border border-white/25" />
+
+              {/* Content */}
+              <div className="relative flex items-center justify-center gap-2.5">
+                {isOrganizing ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span className="text-sm font-bold text-white tracking-wide">Analisando...</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/20 backdrop-blur-sm">
+                      <AppIcon name="Sparkles" size={14} className="text-white" />
+                    </div>
+                    <span className="text-sm font-bold text-white tracking-wide">Organizar com IA</span>
+                    <AppIcon name="ChevronRight" size={14} className="text-white/70 group-hover:translate-x-0.5 transition-transform" />
+                  </>
+                )}
+              </div>
             </button>
           </div>
         </div>
