@@ -43,6 +43,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
   const [dueDate, setDueDate] = useState<Date>(new Date());
   const [hasTime, setHasTime] = useState(false);
   const [dueTime, setDueTime] = useState('09:00');
+  const [hasAlarm, setHasAlarm] = useState(false);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
 
