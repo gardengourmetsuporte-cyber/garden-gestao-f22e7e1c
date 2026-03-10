@@ -351,7 +351,7 @@ export default function CopilotPage() {
             <Input
               value={question}
               onChange={e => setQuestion(e.target.value)}
-              placeholder="Pergunte ao Copiloto..."
+              placeholder="Pergunte ao Copilot..."
               className="h-11 text-sm rounded-full bg-secondary/50 border-border/30"
               disabled={isLoading}
             />

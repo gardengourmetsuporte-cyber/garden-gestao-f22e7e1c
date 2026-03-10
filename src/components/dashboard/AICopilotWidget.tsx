@@ -84,9 +84,9 @@ export function AICopilotWidget() {
         <div className="card-stat-holo rounded-2xl overflow-hidden">
           {/* Chat header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-border/30">
-            <img src={mascotImg} alt="Copiloto" className="w-8 h-8 rounded-xl object-cover" />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-foreground">Copiloto IA</p>
+             <img src={mascotImg} alt="Copilot IA" className="w-8 h-8 rounded-xl object-cover" />
+             <div className="flex-1 min-w-0">
+               <p className="text-xs font-bold text-foreground">Copilot IA</p>
               <p className="text-[10px] text-muted-foreground">Online</p>
             </div>
             <button onClick={() => setExpanded(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors">
