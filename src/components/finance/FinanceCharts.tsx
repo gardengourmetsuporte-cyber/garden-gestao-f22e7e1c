@@ -233,7 +233,7 @@ export function FinanceCharts({
           ].map(tab => (
             <button
               key={tab.value}
-              onClick={() => setViewType(tab.value as 'categories' | 'timeline' | 'cumulative' | 'weekly')}
+              onClick={() => setViewType(tab.value as typeof viewType)}
               className={cn("tab-command-item", viewType === tab.value && "tab-command-item-active")}
             >
               {tab.label}
