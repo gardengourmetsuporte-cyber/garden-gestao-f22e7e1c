@@ -133,7 +133,7 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="px-4 py-3 lg:px-8 lg:py-6 max-w-[1400px] mx-auto">
+    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto">
 
       {/* Upgrade Banner for free users */}
       <UpgradeBanner />
