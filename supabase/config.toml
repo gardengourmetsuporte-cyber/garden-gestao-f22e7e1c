@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.marketing-post-chat]
 verify_jwt = false
+
+[functions.fiscal-nfce]
+verify_jwt = false

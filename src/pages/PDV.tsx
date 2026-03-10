@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
+import { supabase } from '@/integrations/supabase/client';
+import { useUnit } from '@/contexts/UnitContext';
 import { useCashRegister } from '@/hooks/useCashRegister';
 import { PaymentSheet } from '@/components/pdv/PaymentSheet';
 import { DeliveryPaymentSheet } from '@/components/pdv/DeliveryPaymentSheet';
@@ -23,6 +25,7 @@ import { toast } from 'sonner';
 
 export default function PDV() {
   const pos = usePOS();
+  const { activeUnitId } = useUnit();
   const cashRegister = useCashRegister();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -57,8 +60,9 @@ export default function PDV() {
     return list;
   }, [pos.products, selectedCategory, search]);
 
-  const handleFinalize = async (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string }) => {
+  const handleFinalize = async (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string; customerDocument?: string }) => {
     if (options.notes) pos.setSaleNotes(options.notes);
+    if (options.customerDocument) pos.setCustomerDocument(options.customerDocument);
     // Capture cart before finalize clears it
     const cartSnapshot = pos.cart.map(i => ({
       name: i.product.name,
@@ -70,16 +74,45 @@ export default function PDV() {
     if (saleId) {
       setPaymentOpen(false);
       setActiveOrderId(null);
-      // Open invoice sheet if emitInvoice
+
+      // Emit NFC-e if requested
       if (options.emitInvoice) {
-        setInvoiceData({
-          saleId,
-          total: totalSnapshot,
-          payments: payments.map(p => ({ method: p.method, amount: p.amount })),
-          items: cartSnapshot,
-        });
+        try {
+          const { data, error } = await supabase.functions.invoke('fiscal-nfce', {
+            body: { action: 'emit-nfce', sale_id: saleId, unit_id: activeUnitId },
+          });
+          // unit_id is validated server-side from user access
+          if (error) {
+            console.error('Fiscal error:', error);
+            toast.error('Erro ao emitir NFC-e. Verifique no histórico.');
+          } else if (data?.success) {
+            toast.success('NFC-e emitida com sucesso!');
+          } else if (data?.error) {
+            toast.error(data.error);
+          }
+        } catch (err) {
+          console.error('Fiscal invocation error:', err);
+        }
       }
+
+      // Open invoice sheet for customer linking
+      setInvoiceData({
+        saleId,
+        total: totalSnapshot,
+        payments: payments.map(p => ({ method: p.method, amount: p.amount })),
+        items: cartSnapshot,
+      });
     }
+  };
+
+  const handleChargeOrder = (order: PendingOrder) => {
+    pos.loadOrderIntoCart(order);
+    setActiveOrderId(order.id);
+    setOriginalCartSize(order.items.length);
+    setOrdersOpen(false);
+    // Directly open payment flow
+    setSaleSourceAction('charge');
+    setSaleSourceOpen(true);
   };
 
   const handleLoadOrder = (order: PendingOrder) => {
@@ -438,6 +471,7 @@ export default function PDV() {
         saleSource={pos.saleSource}
         customerName={pos.customerName}
         tableNumber={pos.tableNumber}
+        initialCustomerDocument={pos.customerDocument}
       />
 
       <PendingOrdersSheet
@@ -446,6 +480,7 @@ export default function PDV() {
         orders={pos.pendingOrders}
         loading={pos.loadingOrders}
         onLoadOrder={handleLoadOrder}
+        onChargeOrder={handleChargeOrder}
       />
 
       <SalesHistorySheet open={historyOpen} onOpenChange={setHistoryOpen} />

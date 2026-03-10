@@ -11,34 +11,41 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const userId = claimsData.claims.sub;
+
+    // Service role client for data operations
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    // Validate JWT
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
     const { action, sale_id, unit_id } = await req.json();
 
     // Validate unit access
-    const { data: access } = await supabase
+    const { data: access } = await supabaseAdmin
       .from('user_units')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('unit_id', unit_id)
       .single();
 
@@ -63,7 +70,7 @@ Deno.serve(async (req) => {
       }
 
       // Fetch sale data
-      const { data: sale, error: saleError } = await supabase
+      const { data: sale, error: saleError } = await supabaseAdmin
         .from('pos_sales')
         .select('*, pos_sale_items(*), pos_sale_payments(*)')
         .eq('id', sale_id)
@@ -76,7 +83,7 @@ Deno.serve(async (req) => {
       }
 
       // Fetch unit fiscal data
-      const { data: unitData } = await supabase
+      const { data: unitData } = await supabaseAdmin
         .from('units')
         .select('name, cnpj, inscricao_estadual, endereco_fiscal')
         .eq('id', unit_id)
@@ -148,7 +155,7 @@ Deno.serve(async (req) => {
 
       if (response.ok && (result.status === 'processando_autorizacao' || result.status === 'autorizado')) {
         // Update sale with fiscal data
-        await supabase
+        await supabaseAdmin
           .from('pos_sales')
           .update({
             fiscal_status: 'issued',
@@ -170,7 +177,7 @@ Deno.serve(async (req) => {
         });
       } else {
         // Update sale with error
-        await supabase
+        await supabaseAdmin
           .from('pos_sales')
           .update({
             fiscal_status: 'error',

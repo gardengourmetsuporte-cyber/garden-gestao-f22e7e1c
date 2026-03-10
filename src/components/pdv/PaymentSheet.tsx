@@ -32,7 +32,8 @@ interface PaymentSheetProps {
   discount: number;
   itemCount: number;
   savingSale: boolean;
-  onFinalize: (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string }) => void;
+  onFinalize: (payments: PaymentLine[], options: { emitInvoice: boolean; notes: string; customerDocument?: string }) => void;
+  initialCustomerDocument?: string;
   saleSource?: 'balcao' | 'mesa' | 'delivery';
   customerName?: string;
   tableNumber?: number | null;
@@ -40,13 +41,14 @@ interface PaymentSheetProps {
 
 export function PaymentSheet({
   open, onOpenChange, total, subtotal, discount, itemCount, savingSale, onFinalize,
-  saleSource = 'balcao', customerName, tableNumber,
+  saleSource = 'balcao', customerName, tableNumber, initialCustomerDocument,
 }: PaymentSheetProps) {
   const [payments, setPayments] = useState<PaymentLine[]>([]);
   const [payMethod, setPayMethod] = useState('pix');
   const [payAmount, setPayAmount] = useState('');
   const [emitInvoice, setEmitInvoice] = useState(false);
   const [notes, setNotes] = useState('');
+  const [customerDocument, setCustomerDocument] = useState(initialCustomerDocument || '');
 
   const paymentTotal = payments.reduce((s, p) => s + p.amount, 0);
   const remaining = Math.max(0, total - paymentTotal);
@@ -96,7 +98,7 @@ export function PaymentSheet({
       effectivePayments[last] = { ...effectivePayments[last], change_amount: effectiveChange };
     }
 
-    onFinalize(effectivePayments, { emitInvoice, notes });
+    onFinalize(effectivePayments, { emitInvoice, notes, customerDocument: customerDocument.trim() || undefined });
   };
 
   const reset = () => {
@@ -105,6 +107,7 @@ export function PaymentSheet({
     setPayMethod('pix');
     setEmitInvoice(false);
     setNotes('');
+    setCustomerDocument(initialCustomerDocument || '');
   };
 
   const handleOpenChange = (v: boolean) => {
@@ -253,6 +256,20 @@ export function PaymentSheet({
               </div>
               <Switch id="emit-invoice" checked={emitInvoice} onCheckedChange={setEmitInvoice} />
             </div>
+
+            {/* CPF field (shown when emitInvoice is on) */}
+            {emitInvoice && (
+              <div className="flex items-center gap-2 bg-secondary/40 rounded-xl px-3 py-2">
+                <AppIcon name="User" size={16} className="text-muted-foreground shrink-0" />
+                <Input
+                  placeholder="CPF na nota (opcional)"
+                  value={customerDocument}
+                  onChange={e => setCustomerDocument(e.target.value)}
+                  className="h-8 text-sm border-0 bg-transparent p-0 focus-visible:ring-0"
+                  inputMode="numeric"
+                />
+              </div>
+            )}
 
             {/* Notes */}
             <Textarea

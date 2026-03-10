@@ -20,6 +20,7 @@ interface PendingOrdersSheetProps {
   orders: PendingOrder[];
   loading: boolean;
   onLoadOrder: (order: PendingOrder) => void;
+  onChargeOrder?: (order: PendingOrder) => void;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -63,6 +64,7 @@ function OrderDetailSheet({
   order,
   onClose,
   onLoadOrder,
+  onChargeOrder,
   onDispatch,
   dispatching,
   onUpdateStatus,
@@ -71,6 +73,7 @@ function OrderDetailSheet({
   order: (PendingOrder & { sequentialNumber: number }) | null;
   onClose: () => void;
   onLoadOrder: (order: PendingOrder) => void;
+  onChargeOrder?: (order: PendingOrder) => void;
   onDispatch: (order: PendingOrder) => void;
   dispatching: string | null;
   onUpdateStatus: (order: PendingOrder, status: string) => void;
@@ -262,7 +265,7 @@ function OrderDetailSheet({
               <AppIcon name="Plus" size={16} className="mr-1.5" />
               Adicionar itens
             </Button>
-            <Button size="sm" className="flex-1 h-11 rounded-xl text-sm" onClick={() => { onLoadOrder(order); onClose(); setShowItems(false); }}>
+            <Button size="sm" className="flex-1 h-11 rounded-xl text-sm" onClick={() => { if (onChargeOrder) { onChargeOrder(order); } else { onLoadOrder(order); } onClose(); setShowItems(false); }}>
               <AppIcon name="Banknote" size={16} className="mr-1.5" />
               Cobrar
             </Button>
@@ -325,7 +328,7 @@ function OrderDetailSheet({
 }
 
 // ─── Main Sheet ───
-export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoadOrder }: PendingOrdersSheetProps) {
+export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoadOrder, onChargeOrder }: PendingOrdersSheetProps) {
   const [filterSource, setFilterSource] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<(PendingOrder & { sequentialNumber: number }) | null>(null);
   const [dispatching, setDispatching] = useState<string | null>(null);
@@ -587,6 +590,7 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
         order={selectedOrder}
         onClose={() => setSelectedOrder(null)}
         onLoadOrder={onLoadOrder}
+        onChargeOrder={onChargeOrder}
         onDispatch={handleDispatch}
         dispatching={dispatching}
         onUpdateStatus={handleUpdateStatus}
