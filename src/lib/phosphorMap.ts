@@ -501,5 +501,5 @@ export const PHOSPHOR_MAP: Record<string, PhosphorIcon> = {
   // Material Symbol pass-through (now Phosphor)
   EmojiEvents: Trophy,
   Storefront: Storefront,
-  Casino: Dice,
+  Casino: DiceFive,
 };
