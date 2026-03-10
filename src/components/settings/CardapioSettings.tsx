@@ -93,6 +93,132 @@ function PixKeyConfig() {
   );
 }
 
+// ─── Collapsible config sections ───
+type ConfigSection = 'delivery' | 'address' | 'zones' | 'hours' | 'pix' | 'payment' | 'customization';
+
+const CONFIG_SECTIONS: { id: ConfigSection; label: string; icon: string }[] = [
+  { id: 'delivery', label: 'Delivery & Retirada', icon: 'Truck' },
+  { id: 'address', label: 'Endereço da Loja', icon: 'MapPin' },
+  { id: 'zones', label: 'Zonas de Entrega', icon: 'Map' },
+  { id: 'hours', label: 'Horários de Funcionamento', icon: 'Clock' },
+  { id: 'pix', label: 'Chave Pix', icon: 'QrCode' },
+  { id: 'payment', label: 'Pagamento no Cardápio', icon: 'CreditCard' },
+  { id: 'customization', label: 'Personalização', icon: 'Palette' },
+];
+
+function ConfigGeralAccordion({ activeUnit }: { activeUnit: any }) {
+  const [openSection, setOpenSection] = useState<ConfigSection | null>(null);
+
+  const toggle = (id: ConfigSection) => setOpenSection(prev => prev === id ? null : id);
+
+  return (
+    <div className="space-y-2">
+      {CONFIG_SECTIONS.map((section) => {
+        const isOpen = openSection === section.id;
+        return (
+          <div key={section.id} className="card-base rounded-2xl overflow-hidden">
+            <button
+              onClick={() => toggle(section.id)}
+              className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors"
+            >
+              <span className="flex items-center gap-2.5">
+                <AppIcon name={section.icon} size={16} className="text-primary" />
+                <span className="font-medium text-sm text-foreground">{section.label}</span>
+              </span>
+              <AppIcon
+                name="ChevronDown"
+                size={16}
+                className={`text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {isOpen && (
+              <div className="px-4 pb-4 pt-1 space-y-3 animate-fade-in">
+                {section.id === 'delivery' && (
+                  <>
+                    <div className="flex items-center justify-between py-1">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Aceitar delivery</p>
+                        <p className="text-[10px] text-muted-foreground">Clientes podem pedir para entrega</p>
+                      </div>
+                      <Switch />
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Aceitar retirada</p>
+                        <p className="text-[10px] text-muted-foreground">Clientes retiram no balcão</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                  </>
+                )}
+
+                {section.id === 'address' && <StoreAddressConfig />}
+
+                {section.id === 'zones' && <DeliveryZonesConfig />}
+
+                {section.id === 'hours' && (
+                  <>
+                    <div className="space-y-2">
+                      {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'].map(day => (
+                        <div key={day} className="flex items-center justify-between py-1.5 border-b border-border/20 last:border-0">
+                          <span className="text-sm text-foreground font-medium w-20">{day}</span>
+                          <div className="flex items-center gap-1">
+                            <Input className="w-16 h-7 text-xs text-center" placeholder="08:00" defaultValue="08:00" />
+                            <span className="text-muted-foreground text-xs">—</span>
+                            <Input className="w-16 h-7 text-xs text-center" placeholder="22:00" defaultValue="22:00" />
+                          </div>
+                          <Switch defaultChecked />
+                        </div>
+                      ))}
+                    </div>
+                    <Button className="w-full" size="sm">
+                      <AppIcon name="Save" size={14} className="mr-1" /> Salvar horários
+                    </Button>
+                  </>
+                )}
+
+                {section.id === 'pix' && <PixKeyConfig />}
+
+                {section.id === 'payment' && (
+                  <>
+                    {['Dinheiro', 'Pix', 'Crédito', 'Débito', 'Vale Refeição'].map(m => (
+                      <div key={m} className="flex items-center justify-between py-1">
+                        <span className="text-sm text-foreground">{m}</span>
+                        <Switch defaultChecked />
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {section.id === 'customization' && (
+                  <>
+                    <div>
+                      <Label className="text-xs">Nome exibido</Label>
+                      <Input placeholder="Nome do restaurante" defaultValue={activeUnit?.name || ''} />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Descrição curta</Label>
+                      <Input placeholder="Ex: Hambúrguers artesanais desde 2015" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Tempo estimado de preparo (min)</Label>
+                      <Input type="number" placeholder="30" defaultValue="30" />
+                    </div>
+                    <Button className="w-full" size="sm">
+                      <AppIcon name="Save" size={14} className="mr-1" /> Salvar personalização
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function CardapioSettings({ initialTab = null, embedded = false }: CardapioSettingsProps) {
   const { activeUnit } = useUnit();
   const tabletAdmin = useTabletAdmin();
@@ -435,92 +561,7 @@ export function CardapioSettings({ initialTab = null, embedded = false }: Cardap
 
       {/* ==================== CONFIGURAÇÕES GERAIS ==================== */}
       {activeTab === 'config' && (
-        <div className="space-y-4">
-          <div className="card-base p-4 space-y-3">
-            <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-              <AppIcon name="Truck" size={16} className="text-primary" /> Delivery & Retirada
-            </h3>
-            <div className="flex items-center justify-between py-1">
-              <div>
-                <p className="text-sm font-medium text-foreground">Aceitar delivery</p>
-                <p className="text-[10px] text-muted-foreground">Clientes podem pedir para entrega</p>
-              </div>
-              <Switch />
-            </div>
-            <div className="flex items-center justify-between py-1">
-              <div>
-                <p className="text-sm font-medium text-foreground">Aceitar retirada</p>
-                <p className="text-[10px] text-muted-foreground">Clientes retiram no balcão</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-          </div>
-
-          {/* Endereço da loja (origin para cálculo de distância) */}
-          <StoreAddressConfig />
-
-          {/* Zonas de entrega */}
-          <div className="card-base p-4">
-            <DeliveryZonesConfig />
-          </div>
-
-          <div className="card-base p-4 space-y-3">
-            <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-              <AppIcon name="Clock" size={16} className="text-primary" /> Horários de Funcionamento
-            </h3>
-            <div className="space-y-2">
-              {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'].map(day => (
-                <div key={day} className="flex items-center justify-between py-1.5 border-b border-border/20 last:border-0">
-                  <span className="text-sm text-foreground font-medium w-20">{day}</span>
-                  <div className="flex items-center gap-1">
-                    <Input className="w-16 h-7 text-xs text-center" placeholder="08:00" defaultValue="08:00" />
-                    <span className="text-muted-foreground text-xs">—</span>
-                    <Input className="w-16 h-7 text-xs text-center" placeholder="22:00" defaultValue="22:00" />
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              ))}
-            </div>
-            <Button className="w-full" size="sm">
-              <AppIcon name="Save" size={14} className="mr-1" /> Salvar horários
-            </Button>
-          </div>
-
-          <PixKeyConfig />
-
-          <div className="card-base p-4 space-y-3">
-            <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-              <AppIcon name="CreditCard" size={16} className="text-primary" /> Pagamento no Cardápio
-            </h3>
-            {['Dinheiro', 'Pix', 'Crédito', 'Débito', 'Vale Refeição'].map(m => (
-              <div key={m} className="flex items-center justify-between py-1">
-                <span className="text-sm text-foreground">{m}</span>
-                <Switch defaultChecked />
-              </div>
-            ))}
-          </div>
-
-          <div className="card-base p-4 space-y-3">
-            <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
-              <AppIcon name="Palette" size={16} className="text-primary" /> Personalização
-            </h3>
-            <div>
-              <Label className="text-xs">Nome exibido</Label>
-              <Input placeholder="Nome do restaurante" defaultValue={activeUnit?.name || ''} />
-            </div>
-            <div>
-              <Label className="text-xs">Descrição curta</Label>
-              <Input placeholder="Ex: Hambúrguers artesanais desde 2015" />
-            </div>
-            <div>
-              <Label className="text-xs">Tempo estimado de preparo (min)</Label>
-              <Input type="number" placeholder="30" defaultValue="30" />
-            </div>
-            <Button className="w-full" size="sm">
-              <AppIcon name="Save" size={14} className="mr-1" /> Salvar personalização
-            </Button>
-          </div>
-        </div>
+        <ConfigGeralAccordion activeUnit={activeUnit} />
       )}
 
       <PrizeSheet
