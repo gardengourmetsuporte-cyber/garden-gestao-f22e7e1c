@@ -204,46 +204,56 @@ export function FinanceCharts({
         )}
       </div>
 
-      {/* View Type Toggle — horizontally scrollable pills */}
+      {/* Primary toggle: Despesas / Receitas */}
       <div className="px-4">
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+        <div className="grid grid-cols-2 gap-2">
           {[
-            { value: 'cat-expense', label: 'Despesas', icon: 'ArrowDownCircle' },
-            { value: 'cat-income', label: 'Receitas', icon: 'ArrowUpCircle' },
-            { value: 'timeline', label: 'Linha', icon: 'TrendingUp' },
-            { value: 'cumulative', label: 'Acumulado', icon: 'BarChart3' },
-            { value: 'weekly', label: 'Semanal', icon: 'Calendar' },
-            { value: 'annual', label: 'Anual', icon: 'CalendarRange' },
+            { value: 'expense' as const, label: 'Despesas', icon: 'ArrowDownCircle', color: 'text-red-500' },
+            { value: 'income' as const, label: 'Receitas', icon: 'ArrowUpCircle', color: 'text-emerald-500' },
           ].map(tab => {
-            const isActive = tab.value === `cat-${dataType}` 
-              ? viewType === 'categories'
-              : viewType === tab.value;
+            const isActive = viewType === 'categories' && dataType === tab.value;
             return (
               <button
                 key={tab.value}
-                onClick={() => {
-                  if (tab.value === 'cat-expense') {
-                    setViewType('categories');
-                    setDataType('expense');
-                  } else if (tab.value === 'cat-income') {
-                    setViewType('categories');
-                    setDataType('income');
-                  } else {
-                    setViewType(tab.value as typeof viewType);
-                  }
-                }}
+                onClick={() => { setViewType('categories'); setDataType(tab.value); }}
                 className={cn(
-                  "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0",
+                  "flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all",
                   isActive
                     ? "bg-primary/15 text-primary ring-1 ring-primary/20"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
+                    : "card-base text-muted-foreground hover:text-foreground"
                 )}
               >
-                <AppIcon name={tab.icon as any} size={14} />
+                <AppIcon name={tab.icon as any} size={16} />
                 {tab.label}
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* Secondary views */}
+      <div className="px-4">
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+          {[
+            { value: 'timeline', label: 'Linha', icon: 'TrendingUp' },
+            { value: 'cumulative', label: 'Acumulado', icon: 'BarChart3' },
+            { value: 'weekly', label: 'Semanal', icon: 'Calendar' },
+            { value: 'annual', label: 'Anual', icon: 'CalendarRange' },
+          ].map(tab => (
+            <button
+              key={tab.value}
+              onClick={() => setViewType(tab.value as typeof viewType)}
+              className={cn(
+                "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0",
+                viewType === tab.value
+                  ? "bg-primary/15 text-primary ring-1 ring-primary/20"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
+              )}
+            >
+              <AppIcon name={tab.icon as any} size={14} />
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
