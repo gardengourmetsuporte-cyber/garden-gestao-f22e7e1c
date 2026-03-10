@@ -590,6 +590,7 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
         order={selectedOrder}
         onClose={() => setSelectedOrder(null)}
         onLoadOrder={onLoadOrder}
+        onChargeOrder={onChargeOrder}
         onDispatch={handleDispatch}
         dispatching={dispatching}
         onUpdateStatus={handleUpdateStatus}
