@@ -101,7 +101,7 @@ export function useInventoryDB() {
     }) => {
       const { data, error } = await supabase
         .from('inventory_items')
-        .insert({ ...item, unit_id: activeUnitId })
+        .insert({ ...item, unit_id: activeUnitId } as any)
         .select('*, category:categories(*), supplier:suppliers(*)')
         .single();
       if (error) throw error;
