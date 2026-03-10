@@ -376,7 +376,7 @@ export const PHOSPHOR_MAP: Record<string, PhosphorIcon> = {
   BarChart3: ChartBar,
   BarChart: ChartBar,
   LineChart: ChartLine,
-  Activity: Activity,
+  Activity: Pulse,
   Repeat: Repeat,
   FileSignature: FileSignature,
 
