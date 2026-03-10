@@ -265,7 +265,7 @@ function OrderDetailSheet({
               <AppIcon name="Plus" size={16} className="mr-1.5" />
               Adicionar itens
             </Button>
-            <Button size="sm" className="flex-1 h-11 rounded-xl text-sm" onClick={() => { onLoadOrder(order); onClose(); setShowItems(false); }}>
+            <Button size="sm" className="flex-1 h-11 rounded-xl text-sm" onClick={() => { if (onChargeOrder) { onChargeOrder(order); } else { onLoadOrder(order); } onClose(); setShowItems(false); }}>
               <AppIcon name="Banknote" size={16} className="mr-1.5" />
               Cobrar
             </Button>
