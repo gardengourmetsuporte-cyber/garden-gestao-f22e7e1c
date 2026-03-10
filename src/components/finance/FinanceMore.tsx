@@ -41,6 +41,7 @@ export function FinanceMore({
     { icon: 'Wallet', label: 'Gerenciar Contas', onClick: () => setAccountsOpen(true), color: 'hsl(var(--neon-cyan))' },
     { icon: 'Hash', label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true), color: 'hsl(var(--neon-amber))' },
     { icon: 'Archive', label: 'Backups', onClick: () => setBackupOpen(true), color: 'hsl(var(--neon-purple, 270 70% 60%))' },
+    { icon: 'Upload', label: 'Importar CSV (Mobills)', onClick: () => setImportOpen(true), color: 'hsl(var(--neon-green, 142 70% 45%))' },
   ];
 
   return (
