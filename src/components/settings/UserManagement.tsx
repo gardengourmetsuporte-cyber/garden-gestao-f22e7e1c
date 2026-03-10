@@ -62,6 +62,7 @@ export function UserManagement() {
   const [transferUser, setTransferUser] = useState<UserWithRole | null>(null);
   const [targetUnitId, setTargetUnitId] = useState<string>('');
   const [processing, setProcessing] = useState(false);
+  const [showDeletePin, setShowDeletePin] = useState(false);
 
   const handleRoleChange = async (userId: string, newRole: AppRole) => {
     setRoleDialogUser(null);
