@@ -170,7 +170,7 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
               <div className={cn(
                 "px-2 py-0.5 rounded-md text-[10px] font-bold uppercase",
                 task.priority === 'high' ? 'bg-destructive/15 text-destructive' :
-                  task.priority === 'medium' ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400' :
+                  task.priority === 'medium' ? 'bg-warning/15 text-warning' :
                     'bg-muted text-muted-foreground'
               )}>
                 {task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Média' : 'Baixa'}
