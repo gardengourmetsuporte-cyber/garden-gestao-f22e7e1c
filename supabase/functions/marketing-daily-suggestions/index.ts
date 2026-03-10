@@ -45,7 +45,7 @@ serve(async (req) => {
     const regularProducts = products.filter((p: any) => !p.is_highlight);
 
     const formatProduct = (p: any) => {
-      const cat = p.category_id ? catMap[p.category_id] || "" : "";
+      const cat = p.category || "";
       return `- ${p.name}: R$${Number(p.price).toFixed(2)}${p.is_highlight ? ' ⭐DESTAQUE' : ''}${cat ? ` [${cat}]` : ''}${p.description ? ` — ${p.description}` : ''}`;
     };
 
