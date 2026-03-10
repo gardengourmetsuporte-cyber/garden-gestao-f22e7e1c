@@ -27,6 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { PinDialog } from '@/components/checklists/PinDialog';
 
 const ROLES: { value: AppRole; label: string; icon: string }[] = [
   { value: 'super_admin', label: 'Super Admin', icon: 'Shield' },
@@ -61,6 +62,7 @@ export function UserManagement() {
   const [transferUser, setTransferUser] = useState<UserWithRole | null>(null);
   const [targetUnitId, setTargetUnitId] = useState<string>('');
   const [processing, setProcessing] = useState(false);
+  const [showDeletePin, setShowDeletePin] = useState(false);
 
   const handleRoleChange = async (userId: string, newRole: AppRole) => {
     setRoleDialogUser(null);
@@ -398,8 +400,8 @@ export function UserManagement() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Confirm Delete Account */}
-      <AlertDialog open={!!confirmDelete} onOpenChange={(open) => !open && setConfirmDelete(null)}>
+      {/* Confirm Delete Account - opens PIN */}
+      <AlertDialog open={!!confirmDelete && !showDeletePin} onOpenChange={(open) => { if (!open) setConfirmDelete(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir conta de {confirmDelete?.full_name}?</AlertDialogTitle>
@@ -409,12 +411,49 @@ export function UserManagement() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={processing}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteAccount} disabled={processing} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              {processing ? 'Excluindo...' : 'Excluir permanentemente'}
+            <AlertDialogAction onClick={() => setShowDeletePin(true)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir permanentemente
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Admin PIN for delete */}
+      <PinDialog
+        open={showDeletePin}
+        onOpenChange={(open) => { if (!open) { setShowDeletePin(false); setConfirmDelete(null); } }}
+        title="PIN de administrador"
+        subtitle="Digite o PIN de um administrador para confirmar"
+        onSubmit={async (pin) => {
+          if (!activeUnitId || !confirmDelete) return false;
+          const { data: emp } = await supabase
+            .from('employees')
+            .select('user_id, full_name')
+            .eq('unit_id', activeUnitId)
+            .eq('quick_pin', pin)
+            .eq('is_active', true)
+            .not('user_id', 'is', null)
+            .maybeSingle();
+          if (!emp?.user_id) return false;
+          const { data: uu } = await supabase
+            .from('user_units')
+            .select('role')
+            .eq('user_id', emp.user_id)
+            .eq('unit_id', activeUnitId)
+            .maybeSingle();
+          const isUnitAdmin = uu?.role === 'owner' || uu?.role === 'admin';
+          const { data: globalRole } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', emp.user_id)
+            .in('role', ['admin', 'super_admin'])
+            .maybeSingle();
+          if (!isUnitAdmin && !globalRole) return false;
+          setShowDeletePin(false);
+          await handleDeleteAccount();
+          return true;
+        }}
+      />
 
       {/* Transfer Dialog */}
       <Dialog open={!!transferUser} onOpenChange={(open) => { if (!open) { setTransferUser(null); setTargetUnitId(''); } }}>

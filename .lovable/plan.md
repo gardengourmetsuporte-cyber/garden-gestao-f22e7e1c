@@ -1,32 +1,19 @@
+## Plano: Rateio Proporcional de Custos Fixos ✅
 
+### Implementado
 
-# Plano: Exigir PIN de admin para excluir conta
+O cálculo de custos fixos foi alterado de **divisão igualitária** para **rateio proporcional por preço de venda**.
 
-## Contexto
-Atualmente, ao excluir uma conta no TeamHub ou UserManagement, basta confirmar no AlertDialog. O pedido é adicionar uma etapa de validação por PIN de administrador (o `quick_pin` de 4 dígitos já cadastrado nos funcionários) antes de permitir a exclusão.
+**Fórmula anterior:** `Custo Fixo / Nº Produtos = valor igual para todos`  
+**Fórmula nova:** `(Preço do Produto / Faturamento Mensal) × Custo Fixo Mensal`
 
-## Alterações
+Exemplo (custo fixo = R$ 6.974, faturamento = R$ 50.000):
+- Água (R$ 5): R$ 0,70 de custo fixo
+- Lanche (R$ 45): R$ 6,28 de custo fixo
 
-### 1. Criar componente `AdminPinDialog`
-- Novo componente reutilizável em `src/components/ui/AdminPinDialog.tsx`
-- Input de 4 dígitos numéricos com visual de PIN (estilo OTP)
-- Ao confirmar, valida o PIN contra a tabela `employees` (busca por `quick_pin` na unidade ativa, onde o funcionário tem role owner/admin)
-- Exibe erro se PIN inválido; chama callback `onAuthorized()` se válido
-- Reutiliza o mesmo padrão de `validatePinWithPermission` do `usePOS.ts`
-
-### 2. Atualizar `TeamHub.tsx`
-- Ao clicar "Excluir permanentemente" no AlertDialog, em vez de chamar `handleDeleteAccount` diretamente, abre o `AdminPinDialog`
-- Só executa a exclusão após PIN validado com sucesso
-
-### 3. Atualizar `UserManagement.tsx`
-- Mesma lógica: AlertDialog de exclusão abre o `AdminPinDialog` antes de executar
-
-### Fluxo
-```text
-Clicar "Excluir conta" → AlertDialog confirma intenção
-  → Clicar "Excluir permanentemente" → Abre AdminPinDialog
-  → Digitar PIN 4 dígitos → Valida contra employees (owner/admin)
-  → PIN correto → Executa delete_account
-  → PIN errado → Mostra erro, tenta novamente
-```
-
+### Arquivos alterados
+- Migration: adicionada coluna `monthly_revenue` em `recipe_cost_settings`
+- `src/hooks/useRecipeCostSettings.ts` — `calculateOperationalCosts` agora aceita `sellingPrice` opcional
+- `src/components/settings/RecipeCostSettings.tsx` — campo "Faturamento mensal estimado" no lugar de "Média de produtos vendidos"
+- `src/components/recipes/RecipeSheet.tsx` — passa preço de venda para cálculo proporcional
+- `src/hooks/useRecipeMenuSync.ts` — usa preço do produto vinculado no cardápio
