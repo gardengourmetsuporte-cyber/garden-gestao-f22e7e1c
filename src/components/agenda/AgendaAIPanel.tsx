@@ -141,80 +141,97 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
   return (
     <>
       <div className="space-y-3">
-        {/* Smart Summary Card */}
-        <div className="rounded-2xl bg-card border border-border/50 p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center relative">
-                <img src="/icons/copilot-ai.png" alt="" className="w-5 h-5" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden'); }} />
-                <AppIcon name="Sparkles" size={18} className="text-primary hidden" />
-              </div>
+        {/* Folhinha Mascot Card — immersive style like Scanner */}
+        <div className="relative overflow-hidden rounded-2xl" style={{ minHeight: 170 }}>
+          {/* Full background image */}
+          <img
+            src="/images/folhinha-mascot.png"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+
+          {/* Dark overlay for readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-transparent" />
+
+          {/* Shimmer effect */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" style={{ animation: 'shimmer 3s ease-in-out infinite' }} />
+
+          {/* Content */}
+          <div className="relative flex flex-col justify-between p-4 h-full" style={{ minHeight: 170 }}>
+            {/* Top row: title + chat */}
+            <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-semibold text-foreground">Copilot IA</p>
-                <p className="text-[11px] text-muted-foreground">Análise inteligente da agenda</p>
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary drop-shadow-sm">Copilot IA</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                </div>
+                <p className="text-base font-bold text-white leading-tight drop-shadow-md">
+                  Folhinha
+                </p>
+                <p className="text-xs text-white/70 mt-0.5">
+                  Seu assistente inteligente
+                </p>
               </div>
+              <button
+                onClick={() => navigate('/copilot')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 active:scale-95 transition-all backdrop-blur-md"
+              >
+                <AppIcon name="MessageSquare" size={14} className="text-white" />
+                <span className="text-xs font-semibold text-white">Chat</span>
+              </button>
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="rounded-xl text-xs h-8 px-3"
-              onClick={() => navigate('/copilot')}
+
+            {/* Stats chips */}
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {stats.overdue.length > 0 && (
+                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-red-500/25 border border-red-400/30 backdrop-blur-sm">
+                  <AppIcon name="AlertTriangle" size={11} className="text-red-300" />
+                  <span className="text-[11px] font-semibold text-red-200">{stats.overdue.length} atrasada{stats.overdue.length > 1 ? 's' : ''}</span>
+                </div>
+              )}
+              {stats.todayTasks.length > 0 && (
+                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/25 border border-amber-400/30 backdrop-blur-sm">
+                  <AppIcon name="Clock" size={11} className="text-amber-300" />
+                  <span className="text-[11px] font-semibold text-amber-200">{stats.todayTasks.length} para hoje</span>
+                </div>
+              )}
+              {stats.upcoming.length > 0 && (
+                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-primary/25 border border-primary/30 backdrop-blur-sm">
+                  <AppIcon name="Calendar" size={11} className="text-emerald-300" />
+                  <span className="text-[11px] font-semibold text-emerald-200">{stats.upcoming.length} próxima{stats.upcoming.length > 1 ? 's' : ''}</span>
+                </div>
+              )}
+              {stats.noDate.length > 0 && (
+                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 border border-white/15 backdrop-blur-sm">
+                  <AppIcon name="Minus" size={11} className="text-white/60" />
+                  <span className="text-[11px] font-medium text-white/60">{stats.noDate.length} sem data</span>
+                </div>
+              )}
+            </div>
+
+            {/* Organize button */}
+            <button
+              onClick={handleOrganize}
+              disabled={isOrganizing || stats.pending.length === 0}
+              className="mt-3 w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-primary/90 hover:bg-primary active:scale-[0.98] text-sm font-bold text-primary-foreground shadow-lg shadow-primary/30 transition-all disabled:opacity-50 disabled:pointer-events-none backdrop-blur-md border border-primary/40"
             >
-              <AppIcon name="MessageSquare" size={14} className="mr-1" />
-              Chat
-            </Button>
+              {isOrganizing ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Analisando...
+                </>
+              ) : (
+                <>
+                  <AppIcon name="Sparkles" size={16} />
+                  Organizar com IA
+                </>
+              )}
+            </button>
           </div>
-
-          {/* Stats chips */}
-          <div className="flex flex-wrap gap-2">
-            {stats.overdue.length > 0 && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-destructive/10 border border-destructive/20">
-                <AppIcon name="AlertTriangle" size={13} className="text-destructive" />
-                <span className="text-xs font-semibold text-destructive">{stats.overdue.length} atrasada{stats.overdue.length > 1 ? 's' : ''}</span>
-              </div>
-            )}
-            {stats.todayTasks.length > 0 && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-warning/10 border border-warning/20">
-                <AppIcon name="Clock" size={13} className="text-warning" />
-                <span className="text-xs font-semibold text-warning">{stats.todayTasks.length} para hoje</span>
-              </div>
-            )}
-            {stats.upcoming.length > 0 && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-primary/10 border border-primary/20">
-                <AppIcon name="Calendar" size={13} className="text-primary" />
-                <span className="text-xs font-semibold text-primary">{stats.upcoming.length} próxima{stats.upcoming.length > 1 ? 's' : ''}</span>
-              </div>
-            )}
-            {stats.noDate.length > 0 && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted border border-border/40">
-                <AppIcon name="Minus" size={13} className="text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">{stats.noDate.length} sem data</span>
-              </div>
-            )}
-          </div>
-
-          {/* Organize button */}
-          <Button
-            onClick={handleOrganize}
-            disabled={isOrganizing || stats.pending.length === 0}
-            className="w-full rounded-xl h-10 text-sm font-semibold"
-            variant="default"
-          >
-            {isOrganizing ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Analisando com IA...
-              </>
-            ) : (
-              <>
-                <AppIcon name="Sparkles" size={16} className="mr-1" />
-                Organizar com IA
-              </>
-            )}
-          </Button>
         </div>
 
         {/* Overdue alerts */}
