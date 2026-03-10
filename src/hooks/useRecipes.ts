@@ -26,9 +26,9 @@ import { useUnit } from '@/contexts/UnitContext';
  
    // Fetch all recipes with ingredients
    const { data: recipes = [], isLoading: recipesLoading } = useQuery({
-     queryKey: ['recipes'],
+     queryKey: ['recipes', activeUnitId],
      queryFn: async () => {
-       const { data, error } = await supabase
+       let query = supabase
          .from('recipes')
          .select(`
            *,
@@ -52,10 +52,16 @@ import { useUnit } from '@/contexts/UnitContext';
            )
          `)
          .order('name');
+
+       if (activeUnitId) {
+         query = query.eq('unit_id', activeUnitId);
+       }
        
+       const { data, error } = await query;
        if (error) throw error;
        return data as Recipe[];
      },
+     enabled: !!activeUnitId,
    });
  
   // Get available sub-recipes (excluding current recipe to avoid cycles)
