@@ -61,7 +61,7 @@ export function FinanceCharts({
   transactions,
   categories: categoriesProp = [],
 }: FinanceChartsProps) {
-  const [viewType, setViewType] = useState<'categories' | 'timeline' | 'cumulative' | 'weekly'>('categories');
+  const [viewType, setViewType] = useState<'categories' | 'timeline' | 'cumulative' | 'weekly' | 'annual'>('categories');
   const [dataType, setDataType] = useState<'expense' | 'income'>('expense');
   const [drillDownCategory, setDrillDownCategory] = useState<FinanceCategory | null>(null);
   const [entityView, setEntityView] = useState<'employees' | 'suppliers' | null>(null);
