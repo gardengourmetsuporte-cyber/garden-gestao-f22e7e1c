@@ -177,7 +177,7 @@ Deno.serve(async (req) => {
         });
       } else {
         // Update sale with error
-        await supabase
+        await supabaseAdmin
           .from('pos_sales')
           .update({
             fiscal_status: 'error',
