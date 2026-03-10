@@ -407,14 +407,14 @@ import { useUnit } from '@/contexts/UnitContext';
 
    // Update inventory item base unit for recipes
    const updateItemUnitMutation = useMutation({
-     mutationFn: async ({ itemId, unitType }: { itemId: string; unitType: string }) => {
-       const { error } = await supabase
-         .from('inventory_items')
-         .update({ recipe_unit_type: unitType })
-         .eq('id', itemId);
+      mutationFn: async ({ itemId, unitType }: { itemId: string; unitType: string }) => {
+        const { error } = await supabase
+          .from('inventory_items')
+          .update({ unit_type: unitType } as any)
+          .eq('id', itemId);
 
-       if (error) throw error;
-     },
+        if (error) throw error;
+      },
      onSuccess: () => {
        queryClient.invalidateQueries({ queryKey: ['recipes'] });
        queryClient.invalidateQueries({ queryKey: ['inventory-items-for-recipes'] });
