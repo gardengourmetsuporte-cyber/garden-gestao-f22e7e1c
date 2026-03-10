@@ -30,15 +30,28 @@ serve(async (req) => {
     }
     const userId = claimsData.claims.sub;
 
-    const { tasks } = await req.json();
+    const { tasks, apply, approved_tasks } = await req.json();
 
+    // === APPLY MODE: user approved suggestions ===
+    if (apply && Array.isArray(approved_tasks)) {
+      const validTasks = approved_tasks.filter((t: any) =>
+        t.id && ["low", "medium", "high"].includes(t.suggested_priority)
+      );
+      const updatePromises = validTasks.map((t: any) =>
+        supabase.from("manager_tasks").update({ priority: t.suggested_priority }).eq("id", t.id).eq("user_id", userId)
+      );
+      await Promise.all(updatePromises);
+      return new Response(JSON.stringify({ applied: true, updated_count: validTasks.length }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // === SUGGEST MODE: analyze and return suggestions ===
     if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
       return new Response(JSON.stringify({ error: "No tasks provided" }), { status: 400, headers: corsHeaders });
     }
 
-    // Limit to 50 tasks
     const limitedTasks = tasks.slice(0, 50);
-
     const today = new Date().toISOString().split("T")[0];
     const dayOfWeek = new Date().toLocaleDateString("pt-BR", { weekday: "long" });
 
@@ -115,7 +128,6 @@ Use a ferramenta reprioritize_tasks para retornar as prioridades atualizadas.`;
       const status = response.status;
       const text = await response.text();
       console.error("AI gateway error:", status, text);
-
       if (status === 429) {
         return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente em alguns minutos." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -137,21 +149,14 @@ Use a ferramenta reprioritize_tasks para retornar as prioridades atualizadas.`;
     }
 
     const result = JSON.parse(toolCall.function.arguments);
-
-    // Apply priority updates in batch
     const validTasks = result.tasks?.filter((t: any) =>
       t.id && ["low", "medium", "high"].includes(t.suggested_priority)
     ) || [];
 
-    const updatePromises = validTasks.map((t: any) =>
-      supabase.from("manager_tasks").update({ priority: t.suggested_priority }).eq("id", t.id).eq("user_id", userId)
-    );
-    await Promise.all(updatePromises);
-
+    // Return suggestions WITHOUT applying
     return new Response(JSON.stringify({
-      tasks: validTasks,
-      summary: result.summary || "Prioridades atualizadas com sucesso.",
-      updated_count: validTasks.length,
+      suggestions: validTasks,
+      summary: result.summary || "Análise concluída.",
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
