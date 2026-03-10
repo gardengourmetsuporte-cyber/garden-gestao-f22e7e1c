@@ -55,6 +55,7 @@ export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, is
       setDueDate(editingTask.due_date ? new Date(editingTask.due_date + 'T12:00:00') : new Date());
       setHasTime(!!editingTask.due_time);
       setDueTime(editingTask.due_time || '09:00');
+      setHasAlarm(!!(editingTask as any).has_alarm);
       setCategoryId(editingTask.category_id || null);
     } else {
       resetForm();
