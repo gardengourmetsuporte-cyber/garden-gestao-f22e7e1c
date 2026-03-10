@@ -284,7 +284,7 @@ export function ItemFormSheetNew({
           {/* Unit Price */}
           <div className="space-y-2">
             <Label htmlFor="unitPrice" className="text-base font-medium">
-              Preço por {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'litro' ? 'litro' : 'unidade')}
+              Preço por {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'L' : unitType === 'ml' ? 'ml' : 'unidade')}
             </Label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
