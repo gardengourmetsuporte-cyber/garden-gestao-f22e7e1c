@@ -64,6 +64,7 @@ function OrderDetailSheet({
   order,
   onClose,
   onLoadOrder,
+  onChargeOrder,
   onDispatch,
   dispatching,
   onUpdateStatus,
@@ -72,6 +73,7 @@ function OrderDetailSheet({
   order: (PendingOrder & { sequentialNumber: number }) | null;
   onClose: () => void;
   onLoadOrder: (order: PendingOrder) => void;
+  onChargeOrder?: (order: PendingOrder) => void;
   onDispatch: (order: PendingOrder) => void;
   dispatching: string | null;
   onUpdateStatus: (order: PendingOrder, status: string) => void;
