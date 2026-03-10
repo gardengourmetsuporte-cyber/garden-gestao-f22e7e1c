@@ -1,5 +1,7 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import { useFabActions } from '@/contexts/FabActionContext';
+import { useIfoodScanner } from '@/hooks/useIfoodScanner';
+import { IfoodScannerSheet } from '@/components/pdv/IfoodScannerSheet';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
@@ -27,6 +29,9 @@ export default function PDV() {
   const pos = usePOS();
   const { activeUnitId } = useUnit();
   const cashRegister = useCashRegister();
+  const ifoodScanner = useIfoodScanner();
+  const ifoodCameraRef = useRef<HTMLInputElement>(null);
+  const [ifoodScannerOpen, setIfoodScannerOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [paymentOpen, setPaymentOpen] = useState(false);
@@ -49,6 +54,14 @@ export default function PDV() {
     payments: { method: string; amount: number }[];
     items: { name: string; quantity: number; unit_price: number }[];
   } | null>(null);
+
+  const handleIfoodFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIfoodScannerOpen(true);
+    ifoodScanner.scanImage(file);
+    e.target.value = '';
+  };
 
   const filteredProducts = useMemo(() => {
     let list = pos.products;
@@ -155,12 +168,12 @@ export default function PDV() {
   useFabActions(
     cashRegister.isOpen
       ? [
-          { icon: 'Receipt', label: 'Pedidos', onClick: () => setOrdersOpen(true), badge: pos.pendingOrders?.length || 0 },
+          { icon: 'Camera', label: 'Scanner iFood', onClick: () => ifoodCameraRef.current?.click() },
           { icon: 'History', label: 'Vendas', onClick: () => setHistoryOpen(true) },
           { icon: 'LockKeyhole', label: 'Fechar Caixa', onClick: () => setCloseRegisterSheet(true) },
         ]
       : [],
-    [cashRegister.isOpen, pos.pendingOrders?.length]
+    [cashRegister.isOpen]
   );
 
   // Loading
@@ -559,6 +572,23 @@ export default function PDV() {
             }
           }
         }}
+      />
+
+      {/* iFood Scanner */}
+      <input ref={ifoodCameraRef} type="file" accept="image/*" className="hidden" onChange={handleIfoodFileChange} />
+      <IfoodScannerSheet
+        open={ifoodScannerOpen}
+        onOpenChange={(v) => { if (!v) { ifoodScanner.reset(); } setIfoodScannerOpen(v); }}
+        state={ifoodScanner.state}
+        result={ifoodScanner.result}
+        error={ifoodScanner.error}
+        onScan={(file) => ifoodScanner.scanImage(file)}
+        onConfirm={async (data) => {
+          const ok = await ifoodScanner.confirmOrder(data);
+          if (ok) setTimeout(() => { setIfoodScannerOpen(false); ifoodScanner.reset(); }, 2000);
+        }}
+        onReset={ifoodScanner.reset}
+        onUpdateResult={(data) => ifoodScanner.setResult(data)}
       />
     </AppLayout>
   );

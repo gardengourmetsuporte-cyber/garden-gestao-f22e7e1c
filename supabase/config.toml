@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.fiscal-nfce]
 verify_jwt = false
+
+[functions.ifood-order-scanner]
+verify_jwt = false
