@@ -76,6 +76,18 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
 
   const maxExpense = Math.max(...months.map(m => m.expense), 1);
 
+  const hasAnyData = totalIncome > 0 || totalExpense > 0;
+
+  if (!hasAnyData && !isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <AppIcon name="CalendarRange" size={40} className="text-muted-foreground/30 mb-3" />
+        <p className="text-sm font-medium text-muted-foreground">Sem dados para {stats.year}</p>
+        <p className="text-xs text-muted-foreground/60 mt-1">Navegue para um ano com transações registradas</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* ═══ SUMMARY CARDS ═══ */}
