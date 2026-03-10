@@ -153,7 +153,7 @@ import {
   Wine,
   BeerStein,
   Pizza,
-  FruitApple,
+  Orange,
   Bread,
   Hamburger,
   Leaf,
