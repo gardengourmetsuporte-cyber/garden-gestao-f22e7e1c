@@ -88,18 +88,16 @@ import { useUnit } from '@/contexts/UnitContext';
    const { data: inventoryItems = [] } = useQuery({
      queryKey: ['inventory-items-for-recipes'],
      queryFn: async () => {
-       const { data, error } = await supabase
-         .from('inventory_items')
-         .select(`
-           id,
-           name,
-           unit_type,
-           unit_price,
-          recipe_unit_type,
-          recipe_unit_price,
-           category:categories(id, name, color)
-         `)
-         .order('name');
+        const { data, error } = await supabase
+          .from('inventory_items')
+          .select(`
+            id,
+            name,
+            unit_type,
+            unit_price,
+            category:categories(id, name, color)
+          `)
+          .order('name');
        
        if (error) throw error;
        return data;
