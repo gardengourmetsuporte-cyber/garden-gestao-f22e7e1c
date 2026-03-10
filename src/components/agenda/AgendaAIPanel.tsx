@@ -109,9 +109,9 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
             </div>
           )}
           {stats.todayTasks.length > 0 && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
-              <AppIcon name="Clock" size={13} className="text-amber-500" />
-              <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">{stats.todayTasks.length} para hoje</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-warning/10 border border-warning/20">
+              <AppIcon name="Clock" size={13} className="text-warning" />
+              <span className="text-xs font-semibold text-warning">{stats.todayTasks.length} para hoje</span>
             </div>
           )}
           {stats.upcoming.length > 0 && (
