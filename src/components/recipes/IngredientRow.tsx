@@ -171,14 +171,16 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
           <div className="flex items-center gap-0.5 shrink-0">
             {/* Edit button - only for inventory items */}
             {!isSubRecipe && (onUpdateGlobalPrice || onUpdateItemUnit) && (
-              <Popover open={editPopoverOpen} onOpenChange={setEditPopoverOpen}>
+              <Popover open={editPopoverOpen} onOpenChange={(open) => {
+                if (open) handleOpenEditPopover();
+                else setEditPopoverOpen(false);
+              }}>
                 <PopoverTrigger asChild>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7 text-muted-foreground hover:text-primary"
-                    onClick={handleOpenEditPopover}
                   >
                     <AppIcon name="Pencil" className="h-3.5 w-3.5" />
                   </Button>
