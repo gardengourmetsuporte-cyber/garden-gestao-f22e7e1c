@@ -573,6 +573,23 @@ export default function PDV() {
           }
         }}
       />
+
+      {/* iFood Scanner */}
+      <input ref={ifoodCameraRef} type="file" accept="image/*" className="hidden" onChange={handleIfoodFileChange} />
+      <IfoodScannerSheet
+        open={ifoodScannerOpen}
+        onOpenChange={(v) => { if (!v) { ifoodScanner.reset(); } setIfoodScannerOpen(v); }}
+        state={ifoodScanner.state}
+        result={ifoodScanner.result}
+        error={ifoodScanner.error}
+        onScan={(file) => ifoodScanner.scanImage(file)}
+        onConfirm={async (data) => {
+          const ok = await ifoodScanner.confirmOrder(data);
+          if (ok) setTimeout(() => { setIfoodScannerOpen(false); ifoodScanner.reset(); }, 2000);
+        }}
+        onReset={ifoodScanner.reset}
+        onUpdateResult={(data) => ifoodScanner.setResult(data)}
+      />
     </AppLayout>
   );
 }
