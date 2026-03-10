@@ -112,22 +112,6 @@ export function ItemFormSheetNew({
     }
   };
 
-  // Get recipe unit options based on stock unit type
-  const getRecipeUnitOptions = () => {
-    if (unitType === 'kg') return [
-      { value: 'kg', label: 'Quilos (kg)' },
-      { value: 'g', label: 'Gramas (g)' },
-    ];
-    if (unitType === 'litro') return [
-      { value: 'litro', label: 'Litros (L)' },
-      { value: 'ml', label: 'Mililitros (ml)' },
-    ];
-    return [
-      { value: 'unidade', label: 'Unidade' },
-      { value: 'kg', label: 'Quilos (kg)' },
-      { value: 'g', label: 'Gramas (g)' },
-    ];
-  };
 
   const isValid = name.trim();
 

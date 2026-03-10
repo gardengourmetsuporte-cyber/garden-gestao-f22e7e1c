@@ -86,9 +86,9 @@ import { useUnit } from '@/contexts/UnitContext';
 
    // Fetch inventory items for ingredient picker
    const { data: inventoryItems = [] } = useQuery({
-     queryKey: ['inventory-items-for-recipes'],
+     queryKey: ['inventory-items-for-recipes', activeUnitId],
      queryFn: async () => {
-        const { data, error } = await supabase
+        let query = supabase
           .from('inventory_items')
           .select(`
             id,
@@ -97,11 +97,18 @@ import { useUnit } from '@/contexts/UnitContext';
             unit_price,
             category:categories(id, name, color)
           `)
+          .is('deleted_at' as any, null)
           .order('name');
+
+        if (activeUnitId) {
+          query = query.eq('unit_id', activeUnitId);
+        }
        
+       const { data, error } = await query;
        if (error) throw error;
        return data;
      },
+     enabled: !!activeUnitId,
    });
  
    // Add recipe mutation
