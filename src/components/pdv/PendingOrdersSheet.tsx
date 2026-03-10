@@ -305,7 +305,7 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
   const [selectedOrder, setSelectedOrder] = useState<(PendingOrder & { sequentialNumber: number }) | null>(null);
   const [dispatching, setDispatching] = useState<string | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'blocks'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'blocks'>('blocks');
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
   const queryClient = useQueryClient();
