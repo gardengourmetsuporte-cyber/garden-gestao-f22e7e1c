@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
       }
 
       // Fetch unit fiscal data
-      const { data: unitData } = await supabase
+      const { data: unitData } = await supabaseAdmin
         .from('units')
         .select('name, cnpj, inscricao_estadual, endereco_fiscal')
         .eq('id', unit_id)
