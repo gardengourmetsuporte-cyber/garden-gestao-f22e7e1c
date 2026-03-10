@@ -10,6 +10,7 @@ import { useUnit } from '@/contexts/UnitContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface Sale {
   id: string;
@@ -26,6 +27,9 @@ interface Sale {
   paid_at: string | null;
   created_at: string;
   notes: string | null;
+  fiscal_status: string | null;
+  fiscal_key: string | null;
+  fiscal_number: string | null;
   items: { product_name: string; quantity: number; unit_price: number }[];
   payments: { method: string; amount: number }[];
 }
@@ -95,6 +99,7 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
       .select(`
         id, sale_number, total, subtotal, discount, status, source,
         customer_name, customer_phone, customer_document, table_number, paid_at, created_at, notes,
+        fiscal_status, fiscal_key, fiscal_number,
         pos_sale_items(product_name, quantity, unit_price),
         pos_sale_payments(method, amount)
       `)
@@ -105,6 +110,9 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
     if (!error && data) {
       setSales(data.map(s => ({
         ...s,
+        fiscal_status: s.fiscal_status || null,
+        fiscal_key: s.fiscal_key || null,
+        fiscal_number: s.fiscal_number || null,
         items: s.pos_sale_items || [],
         payments: s.pos_sale_payments || [],
       })));
@@ -124,6 +132,32 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
     const phoneFormatted = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
     window.open(`https://wa.me/${phoneFormatted}?text=${encodeURIComponent(msg)}`, '_blank');
   }, []);
+
+  const [reemittingId, setReemittingId] = useState<string | null>(null);
+
+  const handleReemitNfce = useCallback(async (sale: Sale) => {
+    if (!activeUnitId) return;
+    setReemittingId(sale.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('fiscal-nfce', {
+        body: { action: 'emit-nfce', sale_id: sale.id, unit_id: activeUnitId },
+      });
+      if (error) {
+        toast.error('Erro ao emitir NFC-e');
+        console.error('Fiscal error:', error);
+      } else if (data?.success) {
+        toast.success(`NFC-e emitida: ${data.fiscal_number || ''}`);
+        fetchSales(); // Refresh to show updated fiscal status
+      } else {
+        toast.error(data?.error || 'Erro ao emitir NFC-e');
+      }
+    } catch (err) {
+      console.error('Fiscal invocation error:', err);
+      toast.error('Erro ao conectar com o serviço fiscal');
+    } finally {
+      setReemittingId(null);
+    }
+  }, [activeUnitId]);
 
   const paymentSummary = sales.filter(s => s.status === 'paid').reduce((acc, sale) => {
     sale.payments.forEach(p => {
@@ -289,8 +323,23 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
       {sale.notes && <div className="text-xs text-muted-foreground italic">Obs: {sale.notes}</div>}
       {sale.discount > 0 && <div className="text-xs text-muted-foreground">Desconto: -{formatCurrency(sale.discount)}</div>}
 
+      {/* Fiscal status */}
+      {sale.fiscal_status && (
+        <div className={cn(
+          'flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs',
+          sale.fiscal_status === 'autorizada' ? 'bg-emerald-500/10 text-emerald-600' :
+          sale.fiscal_status === 'erro' ? 'bg-destructive/10 text-destructive' :
+          'bg-amber-500/10 text-amber-600'
+        )}>
+          <AppIcon name={sale.fiscal_status === 'autorizada' ? 'CheckCircle' : sale.fiscal_status === 'erro' ? 'AlertCircle' : 'Clock'} size={13} />
+          <span className="font-medium">
+            NFC-e {sale.fiscal_status === 'autorizada' ? `#${sale.fiscal_number}` : sale.fiscal_status === 'erro' ? 'com erro' : sale.fiscal_status}
+          </span>
+        </div>
+      )}
+
       {sale.status === 'paid' && (
-        <div className="flex gap-2 pt-2 border-t border-border/30">
+        <div className="flex gap-2 pt-2 border-t border-border/30 flex-wrap">
           <Button
             variant="outline"
             size="sm"
@@ -299,6 +348,20 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
           >
             <AppIcon name="Receipt" size={13} />
             Nota Fiscal
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 h-8 text-[11px] gap-1.5"
+            disabled={reemittingId === sale.id}
+            onClick={() => handleReemitNfce(sale)}
+          >
+            {reemittingId === sale.id ? (
+              <AppIcon name="Loader2" size={13} className="animate-spin" />
+            ) : (
+              <AppIcon name="FileText" size={13} />
+            )}
+            {sale.fiscal_status === 'autorizada' ? 'Reemitir NFC-e' : 'Emitir NFC-e'}
           </Button>
           {sale.customer_phone && (
             <Button
