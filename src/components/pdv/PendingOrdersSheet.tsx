@@ -107,50 +107,44 @@ function OrderDetailSheet({
         {/* Drag handle */}
         <div className="w-10 h-1 bg-border rounded-full mx-auto mt-3 mb-1 shrink-0" />
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-border/30 shrink-0">
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto px-5 py-3 space-y-3">
+
+          {/* Compact header: # + status + time + close */}
           <div className="flex items-center gap-2.5">
             <span className="text-2xl font-black tracking-tight">#{orderNumber}</span>
-            <Badge className={cn("text-xs font-bold px-2.5 py-1 border", STATUS_COLORS[order.status] || 'bg-secondary text-muted-foreground')}>
+            <Badge className={cn("text-[10px] font-bold px-2 py-0.5 border", STATUS_COLORS[order.status] || 'bg-secondary text-muted-foreground')}>
               {STATUS_LABELS[order.status] || order.status}
             </Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-muted-foreground">há cerca de {timeAgo}</span>
+            <span className="text-[10px] text-muted-foreground ml-auto">
+              <AppIcon name="Clock" size={11} className="inline mr-0.5 -mt-px" />
+              {formattedDate}
+            </span>
             <button
               onClick={() => { onClose(); setShowItems(false); }}
-              className="w-8 h-8 rounded-xl bg-secondary/60 flex items-center justify-center hover:bg-secondary transition-colors"
+              className="w-7 h-7 rounded-lg bg-secondary/60 flex items-center justify-center hover:bg-secondary transition-colors shrink-0"
             >
-              <AppIcon name="X" size={15} className="text-muted-foreground" />
+              <AppIcon name="X" size={14} className="text-muted-foreground" />
             </button>
           </div>
-        </div>
 
-        {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-
-          {/* Customer card */}
-          <div className="rounded-2xl border border-border/30 bg-secondary/20 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <AppIcon name="User" size={20} className="text-primary" />
-                </div>
-                <div>
-                  <p className="text-base font-bold text-foreground leading-tight">{order.customer_name || 'Cliente'}</p>
-                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                    {isDelivery ? (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold">Entrega</span>
-                    ) : sourceKey === 'mesa' && order.table_number ? (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">Mesa {order.table_number}</span>
-                    ) : (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">{cfg.label}</span>
-                    )}
-                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                      <AppIcon name="Clock" size={11} />
-                      {formattedDate}
-                    </span>
-                  </div>
+          {/* Grouped info card */}
+          <div className="card-surface rounded-2xl divide-y divide-border/20 overflow-hidden">
+            {/* Customer row */}
+            <div className="flex items-center gap-3 p-3.5">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <AppIcon name="User" size={18} className="text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-foreground truncate">{order.customer_name || 'Cliente'}</p>
+                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                  {isDelivery ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold">Entrega</span>
+                  ) : sourceKey === 'mesa' && order.table_number ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">Mesa {order.table_number}</span>
+                  ) : (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">{cfg.label}</span>
+                  )}
                 </div>
               </div>
               {whatsappLink && (
@@ -158,109 +152,90 @@ function OrderDetailSheet({
                   href={whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center gap-0.5 p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors"
+                  className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors flex items-center justify-center shrink-0"
                 >
                   <AppIcon name="MessageCircle" size={18} />
-                  <span className="text-[9px] font-bold">WhatsApp</span>
                 </a>
               )}
             </div>
 
-            {/* Address */}
+            {/* Address row (if delivery) */}
             {order.customer_address && (
-              <div className="rounded-xl bg-background/60 p-3 space-y-1.5">
-                <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <AppIcon name="MapPin" size={14} className="text-primary" />
-                  Endereço
-                </p>
-                <p className="text-sm text-muted-foreground pl-5">{order.customer_address}</p>
-                {googleMapsLink && (
-                  <a
-                    href={googleMapsLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-primary font-semibold flex items-center gap-1 pl-5 hover:underline"
-                  >
-                    <AppIcon name="ExternalLink" size={12} />
-                    Ver no Google Maps
-                  </a>
-                )}
+              <div className="px-3.5 py-3 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-primary/5 flex items-center justify-center shrink-0">
+                  <AppIcon name="MapPin" size={16} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-muted-foreground leading-relaxed">{order.customer_address}</p>
+                  {googleMapsLink && (
+                    <a
+                      href={googleMapsLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-primary font-semibold flex items-center gap-1 mt-1 hover:underline"
+                    >
+                      <AppIcon name="ExternalLink" size={11} />
+                      Google Maps
+                    </a>
+                  )}
+                </div>
               </div>
             )}
-          </div>
 
-          {/* Items section — collapsible */}
-          {!showItems ? (
-            <button
-              onClick={() => setShowItems(true)}
-              className="w-full flex items-center justify-between rounded-2xl border border-border/30 bg-secondary/20 p-4 hover:bg-secondary/30 transition-colors active:scale-[0.99]"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <AppIcon name="ShoppingBag" size={18} className="text-primary" />
+            {/* Items row — collapsible */}
+            {!showItems ? (
+              <button
+                onClick={() => setShowItems(true)}
+                className="w-full flex items-center gap-3 p-3.5 hover:bg-secondary/30 transition-colors active:scale-[0.99] text-left"
+              >
+                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <AppIcon name="ShoppingBag" size={16} className="text-primary" />
                 </div>
-                <div className="text-left">
+                <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-foreground">Itens do pedido</p>
                   <p className="text-[11px] text-muted-foreground">
                     {order.items.length} {order.items.length === 1 ? 'item' : 'itens'} • {formatCurrency(order.total)}
                   </p>
                 </div>
-              </div>
-              <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
-            </button>
-          ) : (
-            <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <button onClick={() => setShowItems(false)} className="flex items-center gap-1.5 text-sm font-bold text-foreground hover:text-primary transition-colors">
-                  <AppIcon name="ChevronLeft" size={16} />
-                  Itens do pedido
+                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+              </button>
+            ) : (
+              <div className="p-3.5">
+                <button onClick={() => setShowItems(false)} className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors mb-2.5">
+                  <AppIcon name="ChevronLeft" size={14} />
+                  Itens ({order.items.length})
                 </button>
-                <span className="text-[10px] text-muted-foreground bg-secondary/60 px-2 py-0.5 rounded-full">
-                  {order.items.length} {order.items.length === 1 ? 'item' : 'itens'}
-                </span>
-              </div>
 
-              {order.items.length === 0 ? (
-                <p className="text-sm text-muted-foreground bg-secondary/30 rounded-xl p-4 text-center">Sem itens registrados</p>
-              ) : (
-                <div className="rounded-2xl border border-border/20 overflow-hidden">
-                  <div className="grid grid-cols-[36px_1fr_76px] gap-1 px-3.5 py-2.5 bg-secondary/40 text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-                    <span>Qtd</span>
-                    <span>Item</span>
-                    <span className="text-right">Preço</span>
-                  </div>
-                  {order.items.map((item, i) => (
-                    <div key={i} className="border-t border-border/10">
-                      <div className="grid grid-cols-[36px_1fr_76px] gap-1 px-3.5 py-3 items-start">
-                        <span className="text-sm font-black text-foreground">{item.quantity}</span>
-                        <p className="text-sm font-semibold text-foreground">{item.name}</p>
-                        <span className="text-sm font-bold text-foreground text-right tabular-nums">
+                {order.items.length === 0 ? (
+                  <p className="text-sm text-muted-foreground bg-secondary/30 rounded-xl p-4 text-center">Sem itens registrados</p>
+                ) : (
+                  <div className="space-y-1">
+                    {order.items.map((item, i) => (
+                      <div key={i} className="flex items-center justify-between py-1.5">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="text-xs font-black text-primary w-5 text-center shrink-0">{item.quantity}×</span>
+                          <span className="text-sm font-medium text-foreground truncate">{item.name}</span>
+                        </div>
+                        <span className="text-sm font-bold text-foreground tabular-nums shrink-0 ml-2">
                           {formatCurrency(item.unit_price * item.quantity)}
                         </span>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
 
-              {/* Totals */}
-              <div className="rounded-2xl bg-secondary/20 border border-border/20 p-4 space-y-2 mt-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-semibold tabular-nums">{formatCurrency(itemsSubtotal > 0 ? itemsSubtotal : order.total)}</span>
-                </div>
-                <div className="flex justify-between text-xl font-black pt-2.5 border-t border-border/20">
-                  <span>Total</span>
-                  <span className="text-primary tabular-nums">{formatCurrency(order.total)}</span>
+                <div className="flex justify-between items-center pt-3 mt-2 border-t border-border/20">
+                  <span className="text-sm font-bold text-foreground">Total</span>
+                  <span className="text-lg font-black text-primary tabular-nums">{formatCurrency(order.total)}</span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Footer actions */}
-        <div className="shrink-0 border-t border-border/20 bg-background/80 backdrop-blur-sm px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex flex-col gap-2">
-          <div className="flex gap-3">
+        <div className="shrink-0 border-t border-border/20 bg-background/80 backdrop-blur-sm px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-2">
+          <div className="flex gap-2.5">
             <Button size="sm" variant="outline" className="flex-1 h-11 rounded-xl text-sm" onClick={() => { onLoadOrder(order); onClose(); setShowItems(false); }}>
               <AppIcon name="Plus" size={16} className="mr-1.5" />
               Adicionar itens
@@ -271,11 +246,10 @@ function OrderDetailSheet({
             </Button>
           </div>
 
-          {/* Contextual status buttons */}
           {order.status === 'preparing' && (
             <Button
               size="sm"
-              className="w-full h-12 rounded-xl text-sm bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full h-11 rounded-xl text-sm"
               onClick={() => onUpdateStatus(order, 'ready')}
               disabled={updatingStatus === order.id}
             >
@@ -287,7 +261,7 @@ function OrderDetailSheet({
           {order.status === 'ready' && !isDelivery && (
             <Button
               size="sm"
-              className="w-full h-12 rounded-xl text-sm bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full h-11 rounded-xl text-sm"
               onClick={() => onUpdateStatus(order, 'delivered')}
               disabled={updatingStatus === order.id}
             >
@@ -300,7 +274,7 @@ function OrderDetailSheet({
             <Button
               size="sm"
               variant="outline"
-              className="w-full h-12 rounded-xl text-sm"
+              className="w-full h-11 rounded-xl text-sm"
               onClick={() => onDispatch(order)}
               disabled={dispatching === order.id}
             >
@@ -310,16 +284,14 @@ function OrderDetailSheet({
           )}
 
           {!['delivered', 'dispatched', 'cancelled'].includes(order.status) && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="w-full h-10 rounded-xl text-xs text-destructive hover:bg-destructive/10"
+            <button
+              className="w-full py-2 text-xs text-destructive font-medium flex items-center justify-center gap-1 hover:bg-destructive/5 rounded-xl transition-colors"
               onClick={() => onUpdateStatus(order, 'cancelled')}
               disabled={updatingStatus === order.id}
             >
-              <AppIcon name="X" size={14} className="mr-1" />
+              <AppIcon name="X" size={13} />
               Cancelar pedido
-            </Button>
+            </button>
           )}
         </div>
       </SheetContent>
