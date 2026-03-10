@@ -80,9 +80,9 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
       <div className="rounded-2xl bg-card border border-border/50 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <img src="/icons/copilot-ai.png" alt="" className="w-5 h-5" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-              <AppIcon name="Sparkles" size={18} className="text-primary absolute opacity-0 [img[style*='display: none']+&]:opacity-100" />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center relative">
+              <img src="/icons/copilot-ai.png" alt="" className="w-5 h-5" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden'); }} />
+              <AppIcon name="Sparkles" size={18} className="text-primary hidden" />
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">Copilot IA</p>
