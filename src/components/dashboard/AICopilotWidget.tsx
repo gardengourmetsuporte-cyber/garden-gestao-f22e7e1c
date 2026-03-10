@@ -45,11 +45,11 @@ export function AICopilotWidget() {
           onClick={() => setExpanded(true)}
           className="card-stat-holo p-4 flex items-center gap-3 cursor-pointer group"
         >
-          <img src={mascotImg} alt="Garden Copiloto" className="w-12 h-12 rounded-2xl object-cover ring-2 ring-primary/20 shrink-0" />
-          <div className="flex-1 min-w-0">
-            {lastAssistantMsg ? (
-              <>
-                <p className="text-xs font-semibold text-foreground leading-tight">Copiloto IA</p>
+           <img src={mascotImg} alt="Copilot IA" className="w-12 h-12 rounded-2xl object-cover ring-2 ring-primary/20 shrink-0" />
+           <div className="flex-1 min-w-0">
+             {lastAssistantMsg ? (
+               <>
+                 <p className="text-xs font-semibold text-foreground leading-tight">Copilot IA</p>
                 <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2 mt-0.5">
                   {lastAssistantMsg.content}
                 </p>
