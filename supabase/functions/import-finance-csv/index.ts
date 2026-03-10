@@ -14,7 +14,7 @@ function normalize(str: string): string {
     .trim();
 }
 
-function parseCSVLine(line: string): string[] {
+function splitCSVLine(line: string, delimiter: string): string[] {
   const result: string[] = [];
   let current = "";
   let inQuotes = false;
@@ -22,36 +22,52 @@ function parseCSVLine(line: string): string[] {
     const ch = line[i];
     if (ch === '"') {
       inQuotes = !inQuotes;
-    } else if (ch === ";" && !inQuotes) {
-      result.push(current.trim());
+    } else if (ch === delimiter && !inQuotes) {
+      result.push(current.trim().replace(/^"|"$/g, ""));
       current = "";
     } else {
       current += ch;
     }
   }
-  result.push(current.trim());
+  result.push(current.trim().replace(/^"|"$/g, ""));
   return result;
 }
 
 function parseDate(dateStr: string): string | null {
-  // DD/MM/YYYY → YYYY-MM-DD
-  const m = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (!m) return null;
-  return `${m[3]}-${m[2]}-${m[1]}`;
+  // DD/MM/YYYY
+  const m1 = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m1) return `${m1[3]}-${m1[2].padStart(2, "0")}-${m1[1].padStart(2, "0")}`;
+  // YYYY-MM-DD (already ISO)
+  const m2 = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m2) return dateStr;
+  // DD-MM-YYYY
+  const m3 = dateStr.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (m3) return `${m3[3]}-${m3[2].padStart(2, "0")}-${m3[1].padStart(2, "0")}`;
+  return null;
 }
 
 function parseAmount(amountStr: string): number {
-  // Remove R$, spaces, handle negative with "-" prefix
   let cleaned = amountStr.replace(/[R$\s]/g, "").trim();
   const negative = cleaned.startsWith("-");
   if (negative) cleaned = cleaned.substring(1);
-  // Brazilian format: 1.234,56 → 1234.56
-  cleaned = cleaned.replace(/\./g, "").replace(",", ".");
+  // Detect format: if has both . and , → Brazilian (1.234,56)
+  if (cleaned.includes(",") && cleaned.includes(".")) {
+    if (cleaned.lastIndexOf(",") > cleaned.lastIndexOf(".")) {
+      // Brazilian: 1.234,56
+      cleaned = cleaned.replace(/\./g, "").replace(",", ".");
+    } else {
+      // US: 1,234.56
+      cleaned = cleaned.replace(/,/g, "");
+    }
+  } else if (cleaned.includes(",")) {
+    // Could be decimal comma: 1234,56
+    cleaned = cleaned.replace(",", ".");
+  }
   const val = parseFloat(cleaned);
   return isNaN(val) ? 0 : negative ? -val : val;
 }
 
-// Mobills income category mappings
+// Smart income category mappings (Mobills and common PT-BR patterns)
 const INCOME_MAPPINGS: Record<string, { parent: string; sub: string }> = {
   pix: { parent: "vendas balcao", sub: "pix" },
   debito: { parent: "vendas balcao", sub: "debito" },
@@ -79,14 +95,10 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Auth client to validate user
     const authClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
-    const {
-      data: { user },
-      error: authError,
-    } = await authClient.auth.getUser();
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -94,16 +106,26 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Service client for privileged operations
     const admin = createClient(supabaseUrl, serviceKey);
 
-    const { csvText, unitId, mode } = await req.json();
+    const body = await req.json();
+    const { csvText, unitId, mode, delimiter: delimiterInput, columnMapping } = body;
+
     if (!csvText || !unitId || !["historical", "full_migration"].includes(mode)) {
       return new Response(
         JSON.stringify({ error: "Missing csvText, unitId, or invalid mode" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    if (!columnMapping || columnMapping.date < 0 || columnMapping.amount < 0) {
+      return new Response(
+        JSON.stringify({ error: "Mapeamento de colunas obrigatórias (Data e Valor) ausente" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const delimiter = delimiterInput || ";";
 
     // Verify unit access
     const { data: hasAccess } = await admin.rpc("user_has_unit_access", {
@@ -117,7 +139,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Fetch accounts and categories for matching
+    // Fetch accounts and categories
     const { data: accounts } = await admin
       .from("finance_accounts")
       .select("id, name")
@@ -134,13 +156,19 @@ Deno.serve(async (req) => {
       accountMap.set(normalize(a.name), a.id);
     }
 
-    // Build category lookup: normalized name → id (parent + children)
     const catMap = new Map<string, { id: string; type: string; parent_id: string | null }>();
     for (const c of categories || []) {
       catMap.set(normalize(c.name), { id: c.id, type: c.type, parent_id: c.parent_id });
     }
 
-    // Parse CSV lines
+    // Column indices from client mapping
+    const idxDate = columnMapping.date ?? -1;
+    const idxDesc = columnMapping.description ?? -1;
+    const idxCat = columnMapping.category ?? -1;
+    const idxSubcat = columnMapping.subcategory ?? -1;
+    const idxAccount = columnMapping.account ?? -1;
+    const idxAmount = columnMapping.amount ?? -1;
+
     const lines = csvText.split(/\r?\n/).filter((l: string) => l.trim());
     if (lines.length < 2) {
       return new Response(JSON.stringify({ error: "CSV vazio ou inválido" }), {
@@ -149,51 +177,27 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Detect headers
-    const headers = parseCSVLine(lines[0]).map((h: string) => normalize(h));
-    const idxDate = headers.findIndex((h: string) => h === "data");
-    const idxDesc = headers.findIndex((h: string) => h === "descricao" || h === "descrição");
-    const idxCat = headers.findIndex((h: string) => h === "categoria");
-    const idxSubcat = headers.findIndex((h: string) => h === "subcategoria");
-    const idxAccount = headers.findIndex((h: string) => h === "conta");
-    const idxAmount = headers.findIndex((h: string) => h === "valor");
-
-    if (idxDate === -1 || idxAmount === -1) {
-      return new Response(
-        JSON.stringify({ error: "CSV deve ter colunas 'Data' e 'Valor'" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     const unmatchedCategories = new Set<string>();
     const unmatchedAccounts = new Set<string>();
     const toInsert: any[] = [];
     let skipped = 0;
 
+    // Skip header (line 0)
     for (let i = 1; i < lines.length; i++) {
-      const cols = parseCSVLine(lines[i]);
-      if (cols.length < 2) {
-        skipped++;
-        continue;
-      }
+      const cols = splitCSVLine(lines[i], delimiter);
+      if (cols.length < 2) { skipped++; continue; }
 
-      const dateStr = cols[idxDate] || "";
-      const parsedDate = parseDate(dateStr);
-      if (!parsedDate) {
-        skipped++;
-        continue;
-      }
+      const dateStr = (idxDate >= 0 ? cols[idxDate] : "") || "";
+      const parsedDate = parseDate(dateStr.trim());
+      if (!parsedDate) { skipped++; continue; }
 
-      const rawAmount = parseAmount(cols[idxAmount] || "0");
-      if (rawAmount === 0) {
-        skipped++;
-        continue;
-      }
+      const rawAmount = parseAmount((idxAmount >= 0 ? cols[idxAmount] : "0") || "0");
+      if (rawAmount === 0) { skipped++; continue; }
 
-      const description = cols[idxDesc] || "";
-      const catName = cols[idxCat] || "";
-      const subcatName = cols[idxSubcat] || "";
-      const accountName = cols[idxAccount] || "";
+      const description = (idxDesc >= 0 ? cols[idxDesc] : "") || "";
+      const catName = (idxCat >= 0 ? cols[idxCat] : "") || "";
+      const subcatName = (idxSubcat >= 0 ? cols[idxSubcat] : "") || "";
+      const accountName = (idxAccount >= 0 ? cols[idxAccount] : "") || "";
 
       const isIncome = rawAmount > 0;
       const amount = Math.abs(rawAmount);
@@ -202,10 +206,17 @@ Deno.serve(async (req) => {
       // Match account
       let accountId: string | null = null;
       const normAccount = normalize(accountName);
-      if (accountMap.has(normAccount)) {
+      if (normAccount && accountMap.has(normAccount)) {
         accountId = accountMap.get(normAccount)!;
       } else if (accountName) {
-        unmatchedAccounts.add(accountName);
+        // Fuzzy: partial match
+        for (const [key, id] of accountMap.entries()) {
+          if (key.includes(normAccount) || normAccount.includes(key)) {
+            accountId = id;
+            break;
+          }
+        }
+        if (!accountId) unmatchedAccounts.add(accountName);
       }
 
       // Match category
@@ -213,38 +224,30 @@ Deno.serve(async (req) => {
       const normCat = normalize(catName);
       const normSubcat = normalize(subcatName);
 
+      // Try smart income mappings
       if (isIncome) {
-        // Try income-specific mappings first
         const incomeKey = normSubcat || normCat;
         const mapping = INCOME_MAPPINGS[incomeKey];
         if (mapping) {
-          // Find subcategory by name under matching parent
           const parentEntry = catMap.get(normalize(mapping.parent));
           if (parentEntry) {
             const subEntry = catMap.get(normalize(mapping.sub));
-            if (subEntry && subEntry.parent_id === parentEntry.id) {
-              categoryId = subEntry.id;
-            } else {
-              categoryId = parentEntry.id;
-            }
+            categoryId = subEntry && subEntry.parent_id === parentEntry.id
+              ? subEntry.id
+              : parentEntry.id;
           }
         }
       }
 
       if (!categoryId) {
-        // Try subcategory first, then parent category
         if (normSubcat && catMap.has(normSubcat)) {
           categoryId = catMap.get(normSubcat)!.id;
         } else if (normCat && catMap.has(normCat)) {
           categoryId = catMap.get(normCat)!.id;
         } else {
-          // Fuzzy: try contains match
+          // Fuzzy contains
           for (const [key, val] of catMap.entries()) {
-            if (normSubcat && key.includes(normSubcat)) {
-              categoryId = val.id;
-              break;
-            }
-            if (normCat && key.includes(normCat)) {
+            if ((normSubcat && key.includes(normSubcat)) || (normCat && key.includes(normCat))) {
               categoryId = val.id;
               break;
             }
@@ -260,21 +263,21 @@ Deno.serve(async (req) => {
         unit_id: unitId,
         type,
         amount,
-        description,
+        description: description.substring(0, 500),
         category_id: categoryId,
         account_id: accountId,
         date: parsedDate,
-        is_paid: false, // Always insert as false first
+        is_paid: false,
         is_fixed: false,
         is_recurring: false,
-        notes: `[Importado do Mobills] ${catName}${subcatName ? " > " + subcatName : ""}`,
+        notes: `[Importado] ${catName}${subcatName ? " > " + subcatName : ""}`.substring(0, 500),
         sort_order: i,
       });
     }
 
     if (toInsert.length === 0) {
       return new Response(
-        JSON.stringify({ imported: 0, skipped, unmatchedCategories: [], unmatchedAccounts: [] }),
+        JSON.stringify({ imported: 0, skipped, unmatchedCategories: [...unmatchedCategories], unmatchedAccounts: [...unmatchedAccounts] }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -298,10 +301,8 @@ Deno.serve(async (req) => {
       if (data) insertedIds.push(...data.map((d: any) => d.id));
     }
 
-    // If full_migration mode, update all inserted to is_paid = true
-    // The trigger will handle balance adjustments incrementally
+    // Full migration: mark as paid (trigger handles balances)
     if (mode === "full_migration" && insertedIds.length > 0) {
-      // Update in chunks
       for (let i = 0; i < insertedIds.length; i += CHUNK) {
         const ids = insertedIds.slice(i, i + CHUNK);
         const { error } = await admin
@@ -312,13 +313,6 @@ Deno.serve(async (req) => {
           console.error("Update is_paid error:", error);
         }
       }
-
-      // Final forced recalculation to ensure consistency
-      // Reset all account balances for this unit, then recalculate
-      await admin.rpc("recalculate_unit_balances" as any, { p_unit_id: unitId }).catch(() => {
-        // If the RPC doesn't exist, do manual recalculation via individual queries
-        console.log("recalculate_unit_balances RPC not found, skipping forced recalc");
-      });
     }
 
     return new Response(
