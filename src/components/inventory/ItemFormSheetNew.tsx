@@ -20,7 +20,7 @@ interface ItemFormSheetProps {
     name: string;
     category_id: string | null;
     supplier_id: string | null;
-    unit_type: 'unidade' | 'kg' | 'litro';
+    unit_type: 'unidade' | 'kg' | 'g' | 'litro' | 'ml';
     current_stock: number;
     min_stock: number;
     unit_price: number | null;
