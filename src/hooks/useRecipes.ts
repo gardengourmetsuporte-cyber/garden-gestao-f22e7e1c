@@ -36,13 +36,11 @@ import { useUnit } from '@/contexts/UnitContext';
            ingredients:recipe_ingredients!recipe_ingredients_recipe_id_fkey(
              *,
              item:inventory_items(
-               id,
-               name,
-               unit_type,
-               unit_price,
-              recipe_unit_type,
-              recipe_unit_price,
-               category:categories(name, color)
+              id,
+              name,
+              unit_type,
+              unit_price,
+              category:categories(name, color)
             ),
             source_recipe:recipes!recipe_ingredients_source_recipe_id_fkey(
               id,
