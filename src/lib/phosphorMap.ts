@@ -123,7 +123,7 @@ import {
   PiggyBank,
   ChartBar,
   ChartLine,
-  Activity,
+  Pulse,
   Repeat,
   FileSignature,
   Briefcase,
