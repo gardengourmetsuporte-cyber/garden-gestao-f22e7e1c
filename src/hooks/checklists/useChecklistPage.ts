@@ -151,6 +151,8 @@ export function useChecklistPage() {
 
   // Auto-close
   const autoClosedRef = useRef<string>('');
+  // Track last manual toggle timestamp to avoid auto-closing while user is active
+  const lastManualToggleRef = useRef<number>(0);
 
   useEffect(() => {
     fetchCompletions(currentDate, checklistType);
@@ -163,6 +165,12 @@ export function useChecklistPage() {
     if (sectors.length === 0 || !completionsFetched) return;
     if (!isAdmin) { autoClosedRef.current = key; return; }
     if (!shouldAutoClose(currentDate, checklistType, deadlineSettings)) { autoClosedRef.current = key; return; }
+
+    // Don't auto-close if someone toggled an item in the last 10 minutes (active usage)
+    const minutesSinceLastToggle = (Date.now() - lastManualToggleRef.current) / 60_000;
+    if (lastManualToggleRef.current > 0 && minutesSinceLastToggle < 10) {
+      return; // Will re-check on next effect run
+    }
 
     const activeItemIds: string[] = [];
     sectors.forEach((s: any) => {
@@ -181,9 +189,18 @@ export function useChecklistPage() {
     autoClosedRef.current = key;
 
     (async () => {
-      let q = supabase.from('checklist_completions').select('item_id').eq('date', currentDate).eq('checklist_type', checklistType);
+      // Double-check with fresh data from DB before auto-closing
+      let q = supabase.from('checklist_completions').select('item_id,completed_at').eq('date', currentDate).eq('checklist_type', checklistType);
       if (activeUnitId) q = q.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
       const { data: freshCompletions } = await q;
+
+      // Check if anyone completed items recently (last 10 min) — means team is active
+      const recentActivity = (freshCompletions || []).some((c: any) => {
+        const completedAt = new Date(c.completed_at).getTime();
+        return (Date.now() - completedAt) < 10 * 60_000;
+      });
+      if (recentActivity) return; // Someone is actively working, skip auto-close
+
       const freshIds = new Set((freshCompletions || []).map((c: any) => c.item_id));
       const realPending = pendingIds.filter(id => !freshIds.has(id));
       if (realPending.length === 0) return;
@@ -200,17 +217,32 @@ export function useChecklistPage() {
     })();
   }, [deadlinePassed, currentDate, checklistType, sectors, completions, completionsFetched, user?.id, isAdmin, activeUnitId, fetchCompletions, queryClient, deadlineSettings]);
 
-  // Realtime
+  // Realtime — debounced to prevent render storms from bulk operations
   useEffect(() => {
-    const channel = supabase
-      .channel('checklist-completions-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'checklist_completions' }, () => {
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const handleChange = () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, 'abertura', activeUnitId] });
         queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, 'fechamento', activeUnitId] });
         fetchCompletions(currentDate, checklistType);
-      })
+      }, 1500); // 1.5s debounce — batches rapid changes
+    };
+
+    const channel = supabase
+      .channel('checklist-completions-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'checklist_completions',
+        ...(activeUnitId ? { filter: `unit_id=eq.${activeUnitId}` } : {}),
+      }, handleChange)
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      supabase.removeChannel(channel);
+    };
   }, [currentDate, activeUnitId, checklistType, queryClient, fetchCompletions]);
 
   // Handlers
