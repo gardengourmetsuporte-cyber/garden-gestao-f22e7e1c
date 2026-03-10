@@ -132,6 +132,32 @@ export function SalesHistorySheet({ open, onOpenChange }: SalesHistorySheetProps
     window.open(`https://wa.me/${phoneFormatted}?text=${encodeURIComponent(msg)}`, '_blank');
   }, []);
 
+  const [reemittingId, setReemittingId] = useState<string | null>(null);
+
+  const handleReemitNfce = useCallback(async (sale: Sale) => {
+    if (!activeUnitId) return;
+    setReemittingId(sale.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('fiscal-nfce', {
+        body: { action: 'emit-nfce', sale_id: sale.id, unit_id: activeUnitId },
+      });
+      if (error) {
+        toast.error('Erro ao emitir NFC-e');
+        console.error('Fiscal error:', error);
+      } else if (data?.success) {
+        toast.success(`NFC-e emitida: ${data.fiscal_number || ''}`);
+        fetchSales(); // Refresh to show updated fiscal status
+      } else {
+        toast.error(data?.error || 'Erro ao emitir NFC-e');
+      }
+    } catch (err) {
+      console.error('Fiscal invocation error:', err);
+      toast.error('Erro ao conectar com o serviço fiscal');
+    } finally {
+      setReemittingId(null);
+    }
+  }, [activeUnitId]);
+
   const paymentSummary = sales.filter(s => s.status === 'paid').reduce((acc, sale) => {
     sale.payments.forEach(p => {
       acc[p.method] = (acc[p.method] || 0) + p.amount;
