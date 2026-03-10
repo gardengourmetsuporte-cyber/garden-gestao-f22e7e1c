@@ -11,6 +11,9 @@ import { CategoryStats, FinanceCategory, FinanceTransaction } from '@/types/fina
 import { DREReport } from './DREReport';
 import { EntityStats } from '@/hooks/useFinanceStats';
 import { cn } from '@/lib/utils';
+import { useAnnualFinanceStats } from '@/hooks/useAnnualFinanceStats';
+import { AnnualFinanceView } from './AnnualFinanceView';
+import { setMonth, setYear } from 'date-fns';
 
 interface FinanceChartsProps {
   selectedMonth: Date;
