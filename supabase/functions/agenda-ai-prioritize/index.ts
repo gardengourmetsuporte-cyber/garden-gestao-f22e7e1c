@@ -1,0 +1,165 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  try {
+    // Auth
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+    }
+    const userId = claimsData.claims.sub;
+
+    const { tasks } = await req.json();
+
+    if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
+      return new Response(JSON.stringify({ error: "No tasks provided" }), { status: 400, headers: corsHeaders });
+    }
+
+    // Limit to 50 tasks
+    const limitedTasks = tasks.slice(0, 50);
+
+    const today = new Date().toISOString().split("T")[0];
+    const dayOfWeek = new Date().toLocaleDateString("pt-BR", { weekday: "long" });
+
+    const tasksSummary = limitedTasks.map((t: any) => {
+      const overdueDays = t.due_date && t.due_date < today
+        ? Math.floor((new Date(today).getTime() - new Date(t.due_date).getTime()) / 86400000)
+        : 0;
+      return `- "${t.title}" | Prioridade: ${t.priority} | Data: ${t.due_date || "sem data"} | Categoria: ${t.category_name || "nenhuma"} | Notas: ${t.notes || "nenhuma"} | Atraso: ${overdueDays > 0 ? overdueDays + " dias" : "no prazo"} | ID: ${t.id}`;
+    }).join("\n");
+
+    const systemPrompt = `Você é um assistente de gestão especializado em priorização de tarefas para donos de negócios de food service. Analise as tarefas pendentes e reorganize por prioridade real considerando:
+
+1. Tarefas atrasadas (maior urgência)
+2. Tarefas com data de hoje
+3. Impacto no negócio (financeiro > operacional > administrativo)
+4. Tarefas sem data (menor urgência)
+
+Hoje é ${today} (${dayOfWeek}).
+
+Use a ferramenta reprioritize_tasks para retornar as prioridades atualizadas.`;
+
+    const userPrompt = `Analise e repriorize estas tarefas pendentes:\n\n${tasksSummary}`;
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "reprioritize_tasks",
+              description: "Retorna a lista de tarefas com prioridades atualizadas e um resumo da análise.",
+              parameters: {
+                type: "object",
+                properties: {
+                  tasks: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string", description: "ID da tarefa" },
+                        suggested_priority: { type: "string", enum: ["low", "medium", "high"] },
+                        reason: { type: "string", description: "Motivo curto da prioridade" },
+                      },
+                      required: ["id", "suggested_priority", "reason"],
+                      additionalProperties: false,
+                    },
+                  },
+                  summary: { type: "string", description: "Resumo geral da análise em 1-2 frases" },
+                },
+                required: ["tasks", "summary"],
+                additionalProperties: false,
+              },
+            },
+          },
+        ],
+        tool_choice: { type: "function", function: { name: "reprioritize_tasks" } },
+      }),
+    });
+
+    if (!response.ok) {
+      const status = response.status;
+      const text = await response.text();
+      console.error("AI gateway error:", status, text);
+
+      if (status === 429) {
+        return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente em alguns minutos." }), {
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (status === 402) {
+        return new Response(JSON.stringify({ error: "Créditos insuficientes." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw new Error("AI gateway error");
+    }
+
+    const aiData = await response.json();
+    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+
+    if (!toolCall?.function?.arguments) {
+      throw new Error("No tool call in response");
+    }
+
+    const result = JSON.parse(toolCall.function.arguments);
+
+    // Apply priority updates in batch
+    const validTasks = result.tasks?.filter((t: any) =>
+      t.id && ["low", "medium", "high"].includes(t.suggested_priority)
+    ) || [];
+
+    const updatePromises = validTasks.map((t: any) =>
+      supabase.from("manager_tasks").update({ priority: t.suggested_priority }).eq("id", t.id).eq("user_id", userId)
+    );
+    await Promise.all(updatePromises);
+
+    return new Response(JSON.stringify({
+      tasks: validTasks,
+      summary: result.summary || "Prioridades atualizadas com sucesso.",
+      updated_count: validTasks.length,
+    }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
+  } catch (err) {
+    console.error("agenda-ai-prioritize error:", err);
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : "Erro interno" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
