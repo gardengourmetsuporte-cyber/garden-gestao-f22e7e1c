@@ -10,6 +10,7 @@ import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
 import { DeliveryMap, type DeliveryMapHandle } from '@/components/deliveries/DeliveryMap';
 import { DeliveryLocationPicker } from '@/components/deliveries/DeliveryLocationPicker';
 import { DeliveryEditSheet } from '@/components/deliveries/DeliveryEditSheet';
+import { ManualDeliverySheet } from '@/components/deliveries/ManualDeliverySheet';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { useQuery } from '@tanstack/react-query';
@@ -31,10 +32,12 @@ export default function Deliveries() {
   const {
     deliveries, allDeliveries, groupedByNeighborhood, isLoading, isProcessing,
     statusFilter, setStatusFilter, stats,
-    processImage, uploadPhoto, createDelivery, updateStatus, updateAddress, deleteDelivery, invalidate,
+    processImage, uploadPhoto, createDelivery, createManualDelivery, isCreatingManual,
+    updateStatus, updateAddress, deleteDelivery, invalidate,
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [manualSheetOpen, setManualSheetOpen] = useState(false);
   const [locationPickerDelivery, setLocationPickerDelivery] = useState<Delivery | null>(null);
   const [editDelivery, setEditDelivery] = useState<Delivery | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -280,6 +283,28 @@ export default function Deliveries() {
           </Button>
         )}
 
+        {/* Quick add buttons */}
+        {!dispatchMode && (
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant="outline"
+              className="h-10 rounded-xl text-xs font-semibold gap-2"
+              onClick={() => setSheetOpen(true)}
+            >
+              <AppIcon name="Camera" size={16} className="text-primary" />
+              Scanner (Foto)
+            </Button>
+            <Button
+              variant="outline"
+              className="h-10 rounded-xl text-xs font-semibold gap-2"
+              onClick={() => setManualSheetOpen(true)}
+            >
+              <AppIcon name="Edit3" size={16} className="text-primary" />
+              Manual
+            </Button>
+          </div>
+        )}
+
         {/* Main content */}
         <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-5 gap-4">
           {/* Map */}
@@ -378,6 +403,13 @@ export default function Deliveries() {
         onOpenChange={(open) => { if (!open) setEditDelivery(null); }}
         delivery={editDelivery}
         onSaved={invalidate}
+      />
+
+      <ManualDeliverySheet
+        open={manualSheetOpen}
+        onOpenChange={setManualSheetOpen}
+        onSubmit={createManualDelivery}
+        isPending={isCreatingManual}
       />
     </AppLayout>
   );

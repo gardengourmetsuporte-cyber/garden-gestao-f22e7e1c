@@ -397,6 +397,60 @@ export function useDeliveries() {
     },
   });
 
+  // Create manual delivery (typed by hand, no OCR)
+  const createManualDelivery = useMutation({
+    mutationFn: async (params: {
+      order_number: string;
+      full_address: string;
+      neighborhood: string;
+      customer_name: string;
+      notes?: string;
+    }) => {
+      const city = resolveGeocodeCity('', activeUnit?.name || '');
+      const coords = await geocodeAddress(params.full_address, city);
+
+      const { data: address, error: addrError } = await supabase
+        .from('delivery_addresses')
+        .insert({
+          unit_id: activeUnitId!,
+          customer_name: params.customer_name || 'Cliente',
+          full_address: params.full_address,
+          neighborhood: params.neighborhood || 'Centro',
+          city,
+          lat: coords?.lat ?? null,
+          lng: coords?.lng ?? null,
+        })
+        .select()
+        .single();
+
+      if (addrError) throw addrError;
+
+      const { data: delivery, error: delError } = await supabase
+        .from('deliveries')
+        .insert({
+          unit_id: activeUnitId!,
+          address_id: address.id,
+          status: 'pending' as DeliveryStatus,
+          order_number: params.order_number,
+          notes: params.notes || null,
+          total: 0,
+          created_by: user!.id,
+        })
+        .select('*, address:delivery_addresses(*)')
+        .single();
+
+      if (delError) throw delError;
+      return delivery as Delivery;
+    },
+    onSuccess: () => {
+      invalidate();
+      toast.success('Entrega cadastrada!');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Erro ao cadastrar entrega');
+    },
+  });
+
   // Stats
   const stats = useMemo(() => {
     const pending = deliveries.filter(d => d.status === 'pending').length;
@@ -417,7 +471,9 @@ export function useDeliveries() {
     processImage,
     uploadPhoto,
     createDelivery: createDelivery.mutateAsync,
+    createManualDelivery: createManualDelivery.mutateAsync,
     isCreating: createDelivery.isPending,
+    isCreatingManual: createManualDelivery.isPending,
     updateStatus: updateStatus.mutateAsync,
     updateAddress: updateAddress.mutateAsync,
     deleteDelivery: deleteDelivery.mutateAsync,
