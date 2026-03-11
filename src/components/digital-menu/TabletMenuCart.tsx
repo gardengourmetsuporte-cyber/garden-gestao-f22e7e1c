@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppIcon } from '@/components/ui/app-icon';
 import { CartItemsList } from '@/components/digital-menu/MenuCart';
 import { CustomerAuthBanner } from '@/components/digital-menu/CustomerAuthBanner';
+import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
@@ -32,6 +33,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [orderType, setOrderType] = useState<'dine-in' | 'takeout'>('dine-in');
   const [payWithCoins, setPayWithCoins] = useState(false);
   const [customerCoins, setCustomerCoins] = useState<number | null>(null);
+  const [showScanner, setShowScanner] = useState(false);
+  const [comandaNumber, setComandaNumber] = useState<number | null>(null);
 
   // Check customer coin balance
   const coinTotal = cart.reduce((sum, item) => {
@@ -70,7 +73,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             Pedido <span className="font-mono font-bold text-foreground">#{orderSent}</span>
           </p>
           <p className="text-muted-foreground text-xs mt-1">
-            Mesa {tableNumber} • {customerName} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            {comandaNumber ? `Comanda #${comandaNumber}` : `Mesa ${tableNumber}`} • {customerName || 'Cliente'} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
         <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
@@ -122,8 +125,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   };
 
   const handleSend = async () => {
-    if (!tableNumber.trim()) {
-      toast.error('Informe o número da mesa');
+    if (!comandaNumber && !tableNumber.trim()) {
+      toast.error('Escaneie uma comanda ou informe o número da mesa');
       return;
     }
     // Use logged-in user name or manual input
@@ -165,7 +168,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
               .from('tablet_orders')
               .insert({
                 unit_id: unitId,
-                table_number: parseInt(tableNumber) || 0,
+                table_number: comandaNumber || (parseInt(tableNumber) || 0),
+                comanda_number: comandaNumber || null,
                 status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
                 total: payWithCoins ? 0 : cartTotal,
                 source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
@@ -392,23 +396,54 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         </div>
       </div>
 
-      {/* Mesa + Name fields */}
+      {/* Comanda + Name fields */}
       <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
         <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-          <AppIcon name="TableRestaurant" size={16} className="text-primary" />
-          Identificação
+          <AppIcon name="QrCode" size={16} className="text-primary" />
+          Comanda
         </h3>
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1 block">Número da mesa</label>
-          <Input
-            placeholder="Ex: 5"
-            value={tableNumber}
-            onChange={e => setTableNumber(e.target.value)}
-            className="text-center h-14 text-xl font-bold rounded-xl"
-            type="number"
-            inputMode="numeric"
-          />
-        </div>
+
+        {comandaNumber ? (
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <span className="text-lg font-black text-primary">#{comandaNumber}</span>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-foreground">Comanda #{comandaNumber}</p>
+              <p className="text-[11px] text-muted-foreground">Escaneada com sucesso</p>
+            </div>
+            <button
+              onClick={() => setComandaNumber(null)}
+              className="p-2 rounded-lg hover:bg-secondary/50"
+            >
+              <AppIcon name="X" size={16} className="text-muted-foreground" />
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              className="w-full h-14 rounded-xl text-base font-semibold"
+              onClick={() => setShowScanner(true)}
+            >
+              <AppIcon name="Camera" size={20} className="mr-2" />
+              Escanear Comanda
+            </Button>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/30" /></div>
+              <div className="relative flex justify-center"><span className="bg-card px-3 text-[10px] text-muted-foreground uppercase">ou informe a mesa</span></div>
+            </div>
+            <Input
+              placeholder="Nº da mesa"
+              value={tableNumber}
+              onChange={e => setTableNumber(e.target.value)}
+              className="text-center h-12 text-lg font-bold rounded-xl"
+              type="number"
+              inputMode="numeric"
+            />
+          </div>
+        )}
+
         {!customerUser && (
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Seu nome</label>
@@ -421,6 +456,19 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           </div>
         )}
       </div>
+
+      {/* Comanda Scanner Modal */}
+      {showScanner && (
+        <ComandaScanner
+          unitId={unitId}
+          onScan={(num) => {
+            setComandaNumber(num);
+            setShowScanner(false);
+            toast.success(`Comanda #${num} escaneada!`);
+          }}
+          onCancel={() => setShowScanner(false)}
+        />
+      )}
 
       <Button
         className={`w-full h-14 text-base font-bold rounded-xl ${payWithCoins ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}

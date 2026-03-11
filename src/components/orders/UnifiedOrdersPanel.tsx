@@ -248,7 +248,13 @@ function TabletOrderList({ orders, emptyIcon, emptyTitle, emptySubtitle, onRetry
                   <AppIcon name={showTable ? "Hash" : "User"} size={14} className={isPending ? "text-warning" : "text-muted-foreground"} />
                 </div>
                 <div>
-                  {showTable && <p className="text-sm font-bold text-foreground">Mesa {order.table_number}</p>}
+                  {showTable && (
+                    <p className="text-sm font-bold text-foreground">
+                      {(order as any).comanda_number
+                        ? `Comanda #${(order as any).comanda_number}`
+                        : `Mesa ${order.table_number}`}
+                    </p>
+                  )}
                   {showCustomer && (
                     <p className="text-sm font-bold text-foreground">{order.customer_name || 'Cliente'}</p>
                   )}
