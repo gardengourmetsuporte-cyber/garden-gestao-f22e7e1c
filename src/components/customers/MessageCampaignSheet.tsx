@@ -44,6 +44,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
     if (!message.trim() || !activeUnit || recipients.length === 0) return;
 
     setSending(true);
+    setConfigError(false);
     try {
       const phones = recipients.map(c => c.phone!.replace(/\D/g, ''));
       const { data, error } = await supabase.functions.invoke('whatsapp-bulk-send', {
@@ -51,7 +52,14 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
       });
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (data?.error) {
+        if (typeof data.error === 'string' && data.error.includes('CANAL_SEM_CONFIG')) {
+          setConfigError(true);
+          toast.error('Canal WhatsApp não configurado. Complete a configuração primeiro.');
+          return;
+        }
+        throw new Error(data.error);
+      }
 
       toast.success(`${data.sent} mensagens enviadas com sucesso!${data.errors ? ` (${data.errors} erros)` : ''}`);
       setMessage('');
