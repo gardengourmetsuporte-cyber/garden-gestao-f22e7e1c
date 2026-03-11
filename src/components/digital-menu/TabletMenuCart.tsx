@@ -278,183 +278,184 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   };
 
   return (
-    <div className="px-4 pb-8 space-y-4 max-h-[80vh] overflow-y-auto">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-foreground">
-          Seu Pedido
-          <span className="text-sm font-normal text-muted-foreground ml-2">
-            ({cart.reduce((s, i) => s + i.quantity, 0)} itens)
-          </span>
-        </h2>
-        <button onClick={onClear} className="text-xs text-destructive font-medium">Limpar</button>
-      </div>
+    <div className="flex flex-col h-full">
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Cart items - Goomer style with images */}
+        <div className="divide-y divide-border/15">
+          {cart.map((item, idx) => {
+            const optionsPrice = item.selectedOptions.reduce((s, o) => s + o.price, 0);
+            const lineTotal = (item.product.price + optionsPrice) * item.quantity;
+            return (
+              <div key={idx} className="flex gap-3 p-4">
+                {/* Product image */}
+                {item.product.image_url ? (
+                  <img src={item.product.image_url} alt={item.product.name} className="w-20 h-20 rounded-xl object-cover shrink-0" />
+                ) : (
+                  <div className="w-20 h-20 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0">
+                    <AppIcon name="Image" size={20} className="text-muted-foreground/20" />
+                  </div>
+                )}
 
-      <CartItemsList cart={cart} onUpdateQuantity={onUpdateQuantity} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-foreground">
+                        {item.quantity}x {item.product.name}
+                      </p>
+                      {item.selectedOptions.length > 0 && (
+                        <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                          {item.selectedOptions.map(o => o.name).join(', ')}
+                        </p>
+                      )}
+                      {item.notes && (
+                        <p className="text-[11px] text-muted-foreground/70 mt-0.5 italic truncate">{item.notes}</p>
+                      )}
+                    </div>
+                    <span className="text-sm font-bold text-foreground shrink-0">{formatPrice(lineTotal)}</span>
+                  </div>
 
-      {/* Summary */}
-      <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Subtotal</span>
-          <span className="text-sm font-semibold text-foreground">{formatPrice(cartTotal)}</span>
+                  {/* Actions row */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-center bg-secondary/60 rounded-lg">
+                      <button
+                        onClick={() => onUpdateQuantity(idx, item.quantity - 1)}
+                        className="w-7 h-7 flex items-center justify-center text-foreground active:scale-90 transition-transform"
+                      >
+                        <AppIcon name="Minus" size={12} />
+                      </button>
+                      <span className="w-5 text-center text-xs font-bold text-foreground">{item.quantity}</span>
+                      <button
+                        onClick={() => onUpdateQuantity(idx, item.quantity + 1)}
+                        className="w-7 h-7 flex items-center justify-center text-foreground active:scale-90 transition-transform"
+                      >
+                        <AppIcon name="Plus" size={12} />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => onRemove(idx)}
+                      className="w-7 h-7 rounded-lg bg-destructive/10 flex items-center justify-center hover:bg-destructive/20 transition-colors"
+                    >
+                      <AppIcon name="Trash2" size={13} className="text-destructive" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <div className="border-t border-border/30" />
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-foreground">Total</span>
-          {payWithCoins ? (
-            <div className="flex items-center gap-1.5">
-              <span className="text-lg">🪙</span>
-              <span className="text-xl font-bold text-amber-500 tabular-nums">{coinTotal} moedas</span>
+
+        {/* Summary */}
+        <div className="px-4 py-3 space-y-2 border-t border-border/15">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">{cart.reduce((s, i) => s + i.quantity, 0)} item(ns) no pedido</span>
+            <span className="text-xs text-muted-foreground">Subtotal: {formatPrice(cartTotal)}</span>
+          </div>
+        </div>
+
+        {/* Auth banner */}
+        <div className="px-4 pb-3">
+          {!customerUser ? (
+            <CustomerAuthBanner
+              bonusPoints={signupBonusPoints}
+              onEmailLogin={onLoginClick}
+              onSkip={() => {}}
+            />
+          ) : (
+            <div className="rounded-xl bg-primary/5 border border-primary/20 p-2.5 flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <AppIcon name="Person" size={15} className="text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-foreground truncate">
+                  {customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || customerUser.email}
+                </p>
+              </div>
+              <AppIcon name="Check" size={14} className="text-primary shrink-0" />
+            </div>
+          )}
+        </div>
+
+        {/* Comanda / Mesa fields */}
+        <div className="px-4 pb-3 space-y-2">
+          {comandaNumber ? (
+            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-primary/5 border border-primary/20">
+              <span className="text-sm font-black text-primary">#{comandaNumber}</span>
+              <span className="flex-1 text-xs text-muted-foreground">Comanda escaneada</span>
+              <button onClick={() => setComandaNumber(null)} className="p-1 rounded hover:bg-secondary/50">
+                <AppIcon name="X" size={14} className="text-muted-foreground" />
+              </button>
             </div>
           ) : (
-            <span className="text-xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+            <div className="space-y-2">
+              <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowScanner(true)}>
+                <AppIcon name="Camera" size={16} className="mr-1.5" />
+                Escanear Comanda
+              </Button>
+              <Input
+                placeholder="Nº da mesa"
+                value={tableNumber}
+                onChange={e => setTableNumber(e.target.value)}
+                className="text-center h-10 text-sm font-bold rounded-xl"
+                type="number"
+                inputMode="numeric"
+              />
+            </div>
           )}
-        </div>
-      </div>
-
-      {/* Coin payment option */}
-      {customerUser && allProductsHaveCoinPrice && customerCoins !== null && (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center">
-                <span className="text-lg">🪙</span>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-foreground">Pagar com Moedas</p>
-                <p className="text-[11px] text-muted-foreground">Saldo: <span className="font-bold text-amber-600">{customerCoins}</span> moedas</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setPayWithCoins(!payWithCoins)}
-              className={`w-12 h-7 rounded-full transition-all relative ${payWithCoins ? 'bg-amber-500' : 'bg-secondary'}`}
-              disabled={!canPayWithCoins && !payWithCoins}
-            >
-              <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-all ${payWithCoins ? 'left-[22px]' : 'left-0.5'}`} />
-            </button>
-          </div>
-          {!canPayWithCoins && (
-            <p className="text-[11px] text-destructive font-medium">
-              {customerCoins < coinTotal
-                ? `Saldo insuficiente (faltam ${coinTotal - customerCoins} moedas)`
-                : 'Alguns produtos não possuem preço em moedas'}
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Auth banner or logged-in indicator */}
-      {!customerUser ? (
-        <CustomerAuthBanner
-          bonusPoints={signupBonusPoints}
-          onEmailLogin={onLoginClick}
-          onSkip={() => {}}
-        />
-      ) : (
-        <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <AppIcon name="Person" size={18} className="text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground truncate">
-              {customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || customerUser.email}
-            </p>
-            <p className="text-[11px] text-muted-foreground truncate">{customerUser.email}</p>
-          </div>
-          <AppIcon name="Check" size={16} className="text-primary shrink-0" />
-        </div>
-      )}
-
-      {/* Order type selector */}
-      <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
-        <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-          <AppIcon name="UtensilsCrossed" size={16} className="text-primary" />
-          Tipo do pedido
-        </h3>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setOrderType('dine-in')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all border ${
-              orderType === 'dine-in'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'bg-secondary/50 text-muted-foreground border-border/30'
-            }`}
-          >
-            <AppIcon name="UtensilsCrossed" size={18} />
-            Comer aqui
-          </button>
-          <button
-            onClick={() => setOrderType('takeout')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all border ${
-              orderType === 'takeout'
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'bg-secondary/50 text-muted-foreground border-border/30'
-            }`}
-          >
-            <AppIcon name="ShoppingBag" size={18} />
-            Levar
-          </button>
-        </div>
-      </div>
-
-      {/* Comanda + Name fields */}
-      <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
-        <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-          <AppIcon name="QrCode" size={16} className="text-primary" />
-          Comanda
-        </h3>
-
-        {comandaNumber ? (
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-              <span className="text-lg font-black text-primary">#{comandaNumber}</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-foreground">Comanda #{comandaNumber}</p>
-              <p className="text-[11px] text-muted-foreground">Escaneada com sucesso</p>
-            </div>
-            <button
-              onClick={() => setComandaNumber(null)}
-              className="p-2 rounded-lg hover:bg-secondary/50"
-            >
-              <AppIcon name="X" size={16} className="text-muted-foreground" />
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <Button
-              variant="outline"
-              className="w-full h-14 rounded-xl text-base font-semibold"
-              onClick={() => setShowScanner(true)}
-            >
-              <AppIcon name="Camera" size={20} className="mr-2" />
-              Escanear Comanda
-            </Button>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/30" /></div>
-              <div className="relative flex justify-center"><span className="bg-card px-3 text-[10px] text-muted-foreground uppercase">ou informe a mesa</span></div>
-            </div>
+          {!customerUser && (
             <Input
-              placeholder="Nº da mesa"
-              value={tableNumber}
-              onChange={e => setTableNumber(e.target.value)}
-              className="text-center h-12 text-lg font-bold rounded-xl"
-              type="number"
-              inputMode="numeric"
-            />
-          </div>
-        )}
-
-        {!customerUser && (
-          <div>
-            <label className="text-xs font-semibold text-muted-foreground mb-1 block">Seu nome</label>
-            <Input
-              placeholder="Como deseja ser chamado?"
+              placeholder="Seu nome"
               value={customerName}
               onChange={e => setCustomerName(e.target.value)}
-              className="h-12 rounded-xl"
+              className="h-10 rounded-xl text-sm"
             />
+          )}
+        </div>
+
+        {/* Coin option */}
+        {customerUser && allProductsHaveCoinPrice && customerCoins !== null && (
+          <div className="px-4 pb-3">
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🪙</span>
+                <div>
+                  <p className="text-xs font-bold text-foreground">Moedas</p>
+                  <p className="text-[10px] text-muted-foreground">Saldo: {customerCoins}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPayWithCoins(!payWithCoins)}
+                className={`w-10 h-6 rounded-full transition-all relative ${payWithCoins ? 'bg-amber-500' : 'bg-secondary'}`}
+                disabled={!canPayWithCoins && !payWithCoins}
+              >
+                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-all ${payWithCoins ? 'left-[18px]' : 'left-0.5'}`} />
+              </button>
+            </div>
           </div>
         )}
+      </div>
+
+      {/* ─── Sticky Bottom Actions (Goomer-style) ─── */}
+      <div className="shrink-0 border-t border-border/20 p-4 space-y-2 bg-card">
+        <Button
+          variant="outline"
+          className="w-full h-12 rounded-xl text-sm font-semibold"
+          onClick={onClose}
+        >
+          Adicionar mais itens
+        </Button>
+        <Button
+          className={`w-full h-12 rounded-xl text-sm font-bold ${payWithCoins ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
+          onClick={handleSend}
+          disabled={sending || (payWithCoins && !canPayWithCoins)}
+        >
+          {sending ? (
+            <AppIcon name="Loader2" size={18} className="animate-spin mr-2" />
+          ) : (
+            <AppIcon name="Send" size={18} className="mr-2" />
+          )}
+          {payWithCoins ? `Pagar com ${coinTotal} moedas` : 'Enviar pedido'}
+        </Button>
       </div>
 
       {/* Comanda Scanner Modal */}
@@ -469,21 +470,6 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           onCancel={() => setShowScanner(false)}
         />
       )}
-
-      <Button
-        className={`w-full h-14 text-base font-bold rounded-xl ${payWithCoins ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
-        onClick={handleSend}
-        disabled={sending || (payWithCoins && !canPayWithCoins)}
-      >
-        {sending ? (
-          <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
-        ) : payWithCoins ? (
-          <span className="mr-2 text-lg">🪙</span>
-        ) : (
-          <AppIcon name="Send" size={20} className="mr-2" />
-        )}
-        {payWithCoins ? `Pagar com ${coinTotal} moedas` : `Enviar Pedido • ${formatPrice(cartTotal)}`}
-      </Button>
     </div>
   );
 }
