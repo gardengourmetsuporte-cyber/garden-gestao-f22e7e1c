@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
+import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { useCashRegister } from '@/hooks/useCashRegister';
