@@ -5372,6 +5372,7 @@ export type Database = {
       }
       tablet_orders: {
         Row: {
+          comanda_number: number | null
           created_at: string
           customer_address: string | null
           customer_email: string | null
@@ -5393,6 +5394,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          comanda_number?: number | null
           created_at?: string
           customer_address?: string | null
           customer_email?: string | null
@@ -5414,6 +5416,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          comanda_number?: number | null
           created_at?: string
           customer_address?: string | null
           customer_email?: string | null
