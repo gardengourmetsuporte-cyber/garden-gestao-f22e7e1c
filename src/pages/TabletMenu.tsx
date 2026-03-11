@@ -39,7 +39,12 @@ export default function TabletMenu() {
     try {
       const result = await createOrder(tableNumber);
       setCartOpen(false);
-      navigate(`/tablet/${unitId}/confirm/${result.orderId}?token=${result.token}`);
+      // If queued offline, don't navigate to QR confirm (no real order yet)
+      if (orderStatus === 'queued_offline') {
+        // Stay on page — toast already shown by hook
+      } else {
+        navigate(`/tablet/${unitId}/confirm/${result.orderId}?token=${result.token}`);
+      }
     } catch (err: any) {
       alert('Erro: ' + err.message);
     } finally {
