@@ -68,7 +68,7 @@ export default function DigitalMenu() {
       // After OAuth login, check if customer profile is complete
       if (user && unitId && _event === 'SIGNED_IN') {
         setShowAuth(false);
-        const needsProfile = await checkNeedsProfile(user, unitId);
+        setAuthGatePassed(true);
         if (needsProfile) {
           setShowProfile(true);
         } else {
