@@ -12,7 +12,7 @@ import { DeliveryLocationPicker } from '@/components/deliveries/DeliveryLocation
 import { DeliveryEditSheet } from '@/components/deliveries/DeliveryEditSheet';
 import { ManualDeliverySheet } from '@/components/deliveries/ManualDeliverySheet';
 import { PageLoader } from '@/components/PageLoader';
-import { useFabAction } from '@/contexts/FabActionContext';
+import { useFabActions } from '@/contexts/FabActionContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -175,7 +175,10 @@ export default function Deliveries() {
     try { await deleteDelivery(delivery.id); } catch {}
   };
 
-  useFabAction({ icon: 'add', label: 'Nova Entrega', onClick: () => setSheetOpen(true) }, []);
+  useFabActions([
+    { icon: 'Camera', label: 'Scanner (Foto)', onClick: () => setSheetOpen(true) },
+    { icon: 'Edit3', label: 'Manual', onClick: () => setManualSheetOpen(true) },
+  ], []);
 
   const handleConfirm = async (ocrResult: any, file: File) => {
     try {
