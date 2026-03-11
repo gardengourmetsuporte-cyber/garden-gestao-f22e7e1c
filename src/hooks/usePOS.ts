@@ -48,6 +48,7 @@ export interface PaymentLine {
 export function usePOS() {
   const { activeUnitId } = useUnit();
   const { user } = useAuth();
+  const { isConnected } = useOnlineStatus();
   const [products, setProducts] = useState<POSProduct[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
