@@ -20,7 +20,7 @@ export default function TabletMenu() {
   const tableNumber = parseInt(searchParams.get('mesa') || '1');
   const navigate = useNavigate();
   const {
-    products, cart, cartTotal, loading,
+    products, cart, cartTotal, loading, orderStatus,
     fetchProducts, addToCart, removeFromCart, updateQuantity, updateNotes, createOrder,
   } = useTabletOrder(unitId || '');
   const [cartOpen, setCartOpen] = useState(false);
