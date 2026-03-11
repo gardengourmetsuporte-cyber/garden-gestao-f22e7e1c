@@ -69,19 +69,37 @@ export function usePOS() {
   const fetchProducts = useCallback(async () => {
     if (!activeUnitId) return;
     setLoadingProducts(true);
-    const { data } = await supabase
-      .from('tablet_products')
-      .select('id, name, price, image_url, category, codigo_pdv, is_active')
-      .eq('unit_id', activeUnitId)
-      .eq('is_active', true)
-      .order('category')
-      .order('name');
-    const prods = (data || []) as POSProduct[];
-    setProducts(prods);
-    const cats = [...new Set(prods.map(p => p.category).filter(Boolean))];
-    setCategories(cats);
+
+    if (isConnected) {
+      const { data } = await supabase
+        .from('tablet_products')
+        .select('id, name, price, image_url, category, codigo_pdv, is_active')
+        .eq('unit_id', activeUnitId)
+        .eq('is_active', true)
+        .order('category')
+        .order('name');
+      const prods = (data || []) as POSProduct[];
+      setProducts(prods);
+      const cats = [...new Set(prods.map(p => p.category).filter(Boolean))];
+      setCategories(cats);
+      // Cache for offline use
+      try {
+        await setCache({ key: `products-${activeUnitId}`, type: 'products', data: prods, updatedAt: new Date().toISOString() });
+      } catch {}
+    } else {
+      // Load from cache
+      try {
+        const cached = await getCache(`products-${activeUnitId}`);
+        if (cached?.data) {
+          const prods = cached.data as POSProduct[];
+          setProducts(prods);
+          setCategories([...new Set(prods.map(p => p.category).filter(Boolean))]);
+        }
+      } catch {}
+    }
+
     setLoadingProducts(false);
-  }, [activeUnitId]);
+  }, [activeUnitId, isConnected]);
 
   // Fetch pending orders (tablet + delivery hub)
   const fetchPendingOrders = useCallback(async () => {
