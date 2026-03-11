@@ -1,19 +1,20 @@
-## Plano: Rateio Proporcional de Custos Fixos ✅
+## Sistema de Comandas Físicas com QR Code ✅
 
 ### Implementado
 
-O cálculo de custos fixos foi alterado de **divisão igualitária** para **rateio proporcional por preço de venda**.
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-**Fórmula anterior:** `Custo Fixo / Nº Produtos = valor igual para todos`  
-**Fórmula nova:** `(Preço do Produto / Faturamento Mensal) × Custo Fixo Mensal`
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-Exemplo (custo fixo = R$ 6.974, faturamento = R$ 50.000):
-- Água (R$ 5): R$ 0,70 de custo fixo
-- Lanche (R$ 45): R$ 6,28 de custo fixo
-
-### Arquivos alterados
-- Migration: adicionada coluna `monthly_revenue` em `recipe_cost_settings`
-- `src/hooks/useRecipeCostSettings.ts` — `calculateOperationalCosts` agora aceita `sellingPrice` opcional
-- `src/components/settings/RecipeCostSettings.tsx` — campo "Faturamento mensal estimado" no lugar de "Média de produtos vendidos"
-- `src/components/recipes/RecipeSheet.tsx` — passa preço de venda para cálculo proporcional
-- `src/hooks/useRecipeMenuSync.ts` — usa preço do produto vinculado no cardápio
+### Arquivos criados/alterados
+- **Migration**: coluna `comanda_number` (integer, nullable) + índice na `tablet_orders`
+- `src/components/cardapio/ComandaQRGenerator.tsx` — gerador de QR codes para impressão
+- `src/components/digital-menu/ComandaScanner.tsx` — scanner de câmera com fallback manual
+- `src/components/digital-menu/TabletMenuCart.tsx` — botão "Escanear Comanda" no checkout
+- `src/components/orders/UnifiedOrdersPanel.tsx` — exibe "Comanda #N" nos cards
+- `src/components/cardapio/CardapioConfigHub.tsx` — seção "Comandas Físicas" no admin
+- `src/pages/TabletBill.tsx` — suporte a `?comanda=N` para agrupar pedidos por comanda
