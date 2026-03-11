@@ -422,24 +422,18 @@ export default function DigitalMenu() {
             </div>
           )}
 
-          {/* Quick category access */}
-          {categories.length > 0 && (
-            <div className="mt-6 px-5 md:px-8 pb-28">
-              <h3 className="text-sm font-bold text-foreground mb-3">Categorias</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
-                {categories.map(cat => (
-                  <button
-                    key={cat.id}
-                    onClick={() => { setSelectedCategory(cat.id); setActiveTab('menu'); }}
-                    className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-card border border-border/30 active:scale-[0.97] transition-transform text-left"
-                  >
-                    {cat.icon && <AppIcon name={cat.icon} size={20} className="text-muted-foreground" />}
-                    <span className="text-sm font-semibold text-foreground truncate">{cat.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Full menu listing */}
+          <div className="mt-5">
+            <MenuProductList
+              categories={categories}
+              groups={groups}
+              products={products}
+              getGroupProducts={getGroupProducts}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+              onSelectProduct={handleProductSelect}
+            />
+          </div>
         </div>
       )}
 
