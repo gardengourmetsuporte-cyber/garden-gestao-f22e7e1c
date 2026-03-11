@@ -271,6 +271,18 @@ export default function TabletMenu() {
           </button>
         </div>
       )}
+
+      {/* Comanda Scanner Modal */}
+      {showScanner && unitId && (
+        <ComandaScanner
+          unitId={unitId}
+          onScan={(num) => {
+            setComandaNumber(num);
+            setShowScanner(false);
+          }}
+          onCancel={() => setShowScanner(false)}
+        />
+      )}
     </div>
   );
 }
