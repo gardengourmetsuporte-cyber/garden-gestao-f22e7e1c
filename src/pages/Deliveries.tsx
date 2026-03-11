@@ -404,6 +404,13 @@ export default function Deliveries() {
         delivery={editDelivery}
         onSaved={invalidate}
       />
+
+      <ManualDeliverySheet
+        open={manualSheetOpen}
+        onOpenChange={setManualSheetOpen}
+        onSubmit={createManualDelivery}
+        isPending={isCreatingManual}
+      />
     </AppLayout>
   );
 }
