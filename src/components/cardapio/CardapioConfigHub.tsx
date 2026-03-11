@@ -8,6 +8,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { getPublicAppUrl } from '@/lib/publicAppUrl';
 
 const CardapioSettings = lazy(() =>
   import('@/components/settings/CardapioSettings').then(m => ({ default: m.CardapioSettings }))
@@ -31,7 +32,7 @@ const SECTIONS = [
 
 export function CardapioConfigHub() {
   const { activeUnit } = useUnit();
-  const baseUrl = import.meta.env.VITE_PUBLISHED_URL || 'https://garden-gestao.lovable.app';
+  const baseUrl = getPublicAppUrl();
   const [qrOpen, setQrOpen] = useState<string | null>(null);
 
   const copyLink = (url: string, label: string) => {

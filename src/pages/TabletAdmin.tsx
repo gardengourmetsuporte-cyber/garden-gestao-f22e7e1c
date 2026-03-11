@@ -15,6 +15,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { useUnit } from '@/contexts/UnitContext';
 import { useToast } from '@/hooks/use-toast';
 import { AppIcon } from '@/components/ui/app-icon';
+import { getPublicAppUrl } from '@/lib/publicAppUrl';
 
 export default function TabletAdmin() {
   const {
@@ -38,9 +39,7 @@ export default function TabletAdmin() {
   const [pdvActive, setPdvActive] = useState(true);
   const [testingConnection, setTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const basePublicUrl = window.location.hostname.includes('lovableproject.com') || window.location.hostname.includes('lovable.app')
-    ? 'https://garden-gestao.lovable.app'
-    : window.location.origin;
+  const basePublicUrl = getPublicAppUrl();
 
   // Sync pdvConfig state
   useEffect(() => {

@@ -19,6 +19,7 @@ import type { GamificationPrize } from '@/hooks/useGamification';
 import { RodizioSettings as RodizioSettingsPanel } from '@/components/settings/RodizioSettings';
 import { DeliveryZonesConfig } from '@/components/settings/DeliveryZonesConfig';
 import { StoreAddressConfig } from '@/components/settings/StoreAddressConfig';
+import { getPublicAppUrl } from '@/lib/publicAppUrl';
 
 type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'rodizio' | 'config';
 
@@ -228,8 +229,7 @@ export function CardapioSettings({ initialTab = null, embedded = false }: Cardap
   const [activeTab, setActiveTab] = useState<SettingsTab | null>(initialTab);
   const [newTableNum, setNewTableNum] = useState('');
 
-  // Use the current origin so the generated links always point to the currently deployed environment
-  const basePublicUrl = window.location.origin;
+  const basePublicUrl = getPublicAppUrl();
 
   // PDV form
   const [hubUrl, setHubUrl] = useState('');
