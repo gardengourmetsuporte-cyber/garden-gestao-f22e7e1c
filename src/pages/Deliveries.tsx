@@ -175,7 +175,10 @@ export default function Deliveries() {
     try { await deleteDelivery(delivery.id); } catch {}
   };
 
-  useFabAction({ icon: 'add', label: 'Nova Entrega', onClick: () => setSheetOpen(true) }, []);
+  useFabActions([
+    { icon: 'Camera', label: 'Scanner (Foto)', onClick: () => setSheetOpen(true) },
+    { icon: 'Edit3', label: 'Manual', onClick: () => setManualSheetOpen(true) },
+  ], []);
 
   const handleConfirm = async (ocrResult: any, file: File) => {
     try {
