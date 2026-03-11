@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 export function MyPayslips() {
   const { myEmployee, isLoading: loadingEmployee } = useEmployees();
