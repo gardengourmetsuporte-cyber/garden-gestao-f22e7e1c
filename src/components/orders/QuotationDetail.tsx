@@ -142,8 +142,47 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
 
   const allResponded = suppliers.every(s => s.status === 'responded');
   const canResolve = allResponded && prices.length > 0 && quotation.status !== 'resolved';
+  const isResolved = quotation.status === 'resolved';
 
   const respondedCount = suppliers.filter(s => s.status === 'responded').length;
+
+  // Build per-supplier order summary for resolved quotations
+  const supplierOrders = useMemo(() => {
+    if (!isResolved) return [];
+    return suppliers.map(qs => {
+      const wonItems = comparison
+        .filter(row => {
+          // Check if this supplier won this item (winner_supplier_id matches)
+          return row.item.winner_supplier_id === qs.supplier_id;
+        })
+        .map(row => {
+          const sp = row.supplierPrices.find(s => s.supplier.id === qs.id);
+          return {
+            name: row.item.item?.name || '',
+            quantity: row.item.quantity,
+            unit: row.item.item?.unit_type || '',
+            price: sp?.price?.unit_price || 0,
+          };
+        });
+      return { supplier: qs, items: wonItems };
+    }).filter(so => so.items.length > 0);
+  }, [isResolved, suppliers, comparison]);
+
+  const sendOrderWhatsApp = (so: typeof supplierOrders[0]) => {
+    const phone = so.supplier.supplier?.phone;
+    if (!phone) { toast.error('Sem telefone cadastrado'); return; }
+    const cleaned = phone.replace(/\D/g, '');
+    const formatted = cleaned.startsWith('55') ? cleaned : `55${cleaned}`;
+
+    const itemLines = so.items.map((item, i) =>
+      `${i + 1}. ${item.name} — ${item.quantity} ${item.unit}${item.price ? ` (R$ ${item.price.toFixed(2).replace('.', ',')})` : ''}`
+    ).join('\n');
+
+    const total = so.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+    const msg = `📦 *Pedido de Compra*\n\n${itemLines}\n\n💰 Total: R$ ${total.toFixed(2).replace('.', ',')}\n\nPor favor, confirme o recebimento. Obrigado!`;
+    window.open(`https://wa.me/${formatted}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
 
   // Count how many items have manual overrides (different from cheapest)
   const overrideCount = useMemo(() => {
