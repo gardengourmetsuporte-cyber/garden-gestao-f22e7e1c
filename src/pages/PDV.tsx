@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { usePOS, type POSProduct, type PaymentLine, type PendingOrder } from '@/hooks/usePOS';
+import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { useCashRegister } from '@/hooks/useCashRegister';
@@ -249,6 +250,7 @@ export default function PDV() {
             <button onClick={() => setCloseRegisterSheet(true)} className="w-9 h-9 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center shrink-0">
               <AppIcon name="LockKeyhole" size={15} className="text-destructive" />
             </button>
+           <SyncStatusIndicator />
           </div>
 
           {/* Categories */}

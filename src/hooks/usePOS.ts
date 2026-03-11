@@ -2,6 +2,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { enqueueOperation, setCache, getCache } from '@/lib/offlineDb';
 import { toast } from 'sonner';
 
 export interface POSProduct {
@@ -46,6 +48,7 @@ export interface PaymentLine {
 export function usePOS() {
   const { activeUnitId } = useUnit();
   const { user } = useAuth();
+  const { isConnected } = useOnlineStatus();
   const [products, setProducts] = useState<POSProduct[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -66,19 +69,37 @@ export function usePOS() {
   const fetchProducts = useCallback(async () => {
     if (!activeUnitId) return;
     setLoadingProducts(true);
-    const { data } = await supabase
-      .from('tablet_products')
-      .select('id, name, price, image_url, category, codigo_pdv, is_active')
-      .eq('unit_id', activeUnitId)
-      .eq('is_active', true)
-      .order('category')
-      .order('name');
-    const prods = (data || []) as POSProduct[];
-    setProducts(prods);
-    const cats = [...new Set(prods.map(p => p.category).filter(Boolean))];
-    setCategories(cats);
+
+    if (isConnected) {
+      const { data } = await supabase
+        .from('tablet_products')
+        .select('id, name, price, image_url, category, codigo_pdv, is_active')
+        .eq('unit_id', activeUnitId)
+        .eq('is_active', true)
+        .order('category')
+        .order('name');
+      const prods = (data || []) as POSProduct[];
+      setProducts(prods);
+      const cats = [...new Set(prods.map(p => p.category).filter(Boolean))];
+      setCategories(cats);
+      // Cache for offline use
+      try {
+        await setCache({ key: `products-${activeUnitId}`, type: 'products', data: prods, updatedAt: new Date().toISOString() });
+      } catch {}
+    } else {
+      // Load from cache
+      try {
+        const cached = await getCache(`products-${activeUnitId}`);
+        if (cached?.data) {
+          const prods = cached.data as POSProduct[];
+          setProducts(prods);
+          setCategories([...new Set(prods.map(p => p.category).filter(Boolean))]);
+        }
+      } catch {}
+    }
+
     setLoadingProducts(false);
-  }, [activeUnitId]);
+  }, [activeUnitId, isConnected]);
 
   // Fetch pending orders (tablet + delivery hub)
   const fetchPendingOrders = useCallback(async () => {
@@ -223,7 +244,7 @@ export function usePOS() {
   const subtotal = cart.reduce((sum, i) => sum + (i.quantity * i.unit_price - i.discount), 0);
   const total = Math.max(0, subtotal - discount);
 
-  // Finalize sale
+  // Finalize sale (with offline fallback)
   const finalizeSale = useCallback(async (payments: PaymentLine[], sourceOrderId?: string) => {
     if (!activeUnitId || !user?.id) return null;
     const paymentTotal = payments.reduce((s, p) => s + p.amount, 0);
@@ -232,61 +253,83 @@ export function usePOS() {
       return null;
     }
 
+    const saleData = {
+      unit_id: activeUnitId,
+      user_id: user.id,
+      source: sourceOrderId ? 'pedido' : saleSource,
+      source_order_id: sourceOrderId || null,
+      customer_name: customerName || null,
+      customer_document: customerDocument || null,
+      table_number: tableNumber,
+      subtotal,
+      discount,
+      total,
+      status: 'paid',
+      notes: saleNotes || null,
+      paid_at: new Date().toISOString(),
+    };
+
+    const itemsData = cart.map(i => ({
+      product_id: i.product.id || null,
+      product_name: i.product.name,
+      product_code: i.product.codigo_pdv || null,
+      quantity: i.quantity,
+      unit_price: i.unit_price,
+      discount: i.discount,
+      total_price: i.quantity * i.unit_price - i.discount,
+      notes: i.notes || null,
+    }));
+
+    const paymentsData = payments.map(p => ({
+      method: p.method,
+      amount: p.amount,
+      change_amount: p.change_amount,
+    }));
+
+    // ---- Offline path ----
+    if (!isConnected) {
+      try {
+        const offlineId = crypto.randomUUID();
+        await enqueueOperation({
+          id: offlineId,
+          type: 'pos_sale',
+          payload: { sale: saleData, items: itemsData, payments: paymentsData, sourceOrderId },
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+        });
+        toast.success('Venda salva offline!', { description: 'Será sincronizada quando a conexão voltar.' });
+        clearCart();
+        return offlineId;
+      } catch {
+        toast.error('Erro ao salvar venda offline');
+        return null;
+      }
+    }
+
+    // ---- Online path ----
     setSavingSale(true);
     try {
-      // Create sale
       const { data: sale, error: saleError } = await supabase
         .from('pos_sales')
-        .insert({
-          unit_id: activeUnitId,
-          user_id: user.id,
-          source: sourceOrderId ? 'pedido' : saleSource,
-          source_order_id: sourceOrderId || null,
-          customer_name: customerName || null,
-          customer_document: customerDocument || null,
-          table_number: tableNumber,
-          subtotal,
-          discount,
-          total,
-          status: 'paid',
-          notes: saleNotes || null,
-          paid_at: new Date().toISOString(),
-        })
+        .insert(saleData)
         .select('id')
         .single();
 
       if (saleError) throw saleError;
 
-      // Insert items
       if (cart.length > 0) {
         const { error: itemsError } = await supabase
           .from('pos_sale_items')
-          .insert(cart.map(i => ({
-            sale_id: sale.id,
-            product_id: i.product.id || null,
-            product_name: i.product.name,
-            product_code: i.product.codigo_pdv || null,
-            quantity: i.quantity,
-            unit_price: i.unit_price,
-            discount: i.discount,
-            total_price: i.quantity * i.unit_price - i.discount,
-            notes: i.notes || null,
-          })));
+          .insert(itemsData.map(i => ({ ...i, sale_id: sale.id })));
         if (itemsError) throw itemsError;
       }
 
-      // Insert payments
       const { error: payError } = await supabase
         .from('pos_sale_payments')
-        .insert(payments.map(p => ({
-          sale_id: sale.id,
-          method: p.method,
-          amount: p.amount,
-          change_amount: p.change_amount,
-        })));
+        .insert(paymentsData.map(p => ({ ...p, sale_id: sale.id })));
       if (payError) throw payError;
 
-      // If came from tablet order, mark as delivered
       if (sourceOrderId) {
         await supabase.from('tablet_orders').update({ status: 'delivered' }).eq('id', sourceOrderId);
       }
@@ -296,12 +339,29 @@ export function usePOS() {
       fetchPendingOrders();
       return sale.id;
     } catch (err: any) {
+      // If network error, try to queue offline
+      if (!navigator.onLine || err.message?.includes('fetch')) {
+        try {
+          const offlineId = crypto.randomUUID();
+          await enqueueOperation({
+            id: offlineId,
+            type: 'pos_sale',
+            payload: { sale: saleData, items: itemsData, payments: paymentsData, sourceOrderId },
+            createdAt: new Date().toISOString(),
+            retries: 0,
+            status: 'pending',
+          });
+          toast.success('Venda salva offline!', { description: 'Será sincronizada quando a conexão voltar.' });
+          clearCart();
+          return offlineId;
+        } catch {}
+      }
       toast.error('Erro ao finalizar venda: ' + err.message);
       return null;
     } finally {
       setSavingSale(false);
     }
-  }, [activeUnitId, user, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, clearCart, fetchPendingOrders]);
+  }, [activeUnitId, user, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, clearCart, fetchPendingOrders, isConnected]);
 
   // Send order (mesa/delivery) — creates a tablet_order instead of a sale
   const sendOrder = useCallback(async (paymentInfo?: { method: string; change: number }) => {
@@ -322,41 +382,64 @@ export function usePOS() {
       if (!deliveryAddress.trim()) { toast.error('Informe o endereço'); return null; }
     }
 
+    const orderData: any = {
+      unit_id: activeUnitId,
+      table_number: tableNumber || 0,
+      status: 'pending',
+      total,
+      source: saleSource,
+      customer_name: customerName.trim() || null,
+      customer_phone: saleSource === 'delivery' ? deliveryPhone.replace(/\D/g, '') : null,
+      customer_address: saleSource === 'delivery' ? deliveryAddress.trim() : null,
+    };
+
+    if (paymentInfo) {
+      orderData.payment_method = paymentInfo.method;
+      orderData.payment_change = paymentInfo.change;
+    }
+
+    const itemsData = cart.map(c => ({
+      product_id: c.product.id || null,
+      quantity: c.quantity,
+      notes: c.notes || null,
+      unit_price: c.unit_price,
+    }));
+
+    // ---- Offline path ----
+    if (!isConnected) {
+      try {
+        const offlineId = crypto.randomUUID();
+        await enqueueOperation({
+          id: offlineId,
+          type: 'tablet_order',
+          payload: { order: orderData, items: itemsData },
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+        });
+        toast.success('Pedido salvo offline!', { description: 'Será enviado quando a conexão voltar.' });
+        clearCart();
+        return offlineId;
+      } catch {
+        toast.error('Erro ao salvar pedido offline');
+        return null;
+      }
+    }
+
+    // ---- Online path ----
     setSavingSale(true);
     try {
-      const insertData: any = {
-        unit_id: activeUnitId,
-        table_number: tableNumber || 0,
-        status: 'pending',
-        total,
-        source: saleSource,
-        customer_name: customerName.trim() || null,
-        customer_phone: saleSource === 'delivery' ? deliveryPhone.replace(/\D/g, '') : null,
-        customer_address: saleSource === 'delivery' ? deliveryAddress.trim() : null,
-      };
-
-      if (paymentInfo) {
-        insertData.payment_method = paymentInfo.method;
-        insertData.payment_change = paymentInfo.change;
-      }
-
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
-        .insert(insertData)
+        .insert(orderData)
         .select('id')
         .single();
 
       if (orderError || !order) throw new Error(orderError?.message || 'Erro ao criar pedido');
 
-      const items = cart.map(c => ({
-        order_id: order.id,
-        product_id: c.product.id || null,
-        quantity: c.quantity,
-        notes: c.notes || null,
-        unit_price: c.unit_price,
-      }));
-
-      const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
+      const { error: itemsError } = await supabase
+        .from('tablet_order_items')
+        .insert(itemsData.map(i => ({ ...i, order_id: order.id })));
       if (itemsError) throw new Error(itemsError.message);
 
       toast.success('Pedido enviado!');
@@ -364,12 +447,29 @@ export function usePOS() {
       fetchPendingOrders();
       return order.id;
     } catch (err: any) {
+      // If network error, queue offline
+      if (!navigator.onLine || err.message?.includes('fetch')) {
+        try {
+          const offlineId = crypto.randomUUID();
+          await enqueueOperation({
+            id: offlineId,
+            type: 'tablet_order',
+            payload: { order: orderData, items: itemsData },
+            createdAt: new Date().toISOString(),
+            retries: 0,
+            status: 'pending',
+          });
+          toast.success('Pedido salvo offline!', { description: 'Será enviado quando a conexão voltar.' });
+          clearCart();
+          return offlineId;
+        } catch {}
+      }
       toast.error('Erro ao enviar pedido: ' + (err.message || 'erro desconhecido'));
       return null;
     } finally {
       setSavingSale(false);
     }
-  }, [activeUnitId, user, cart, saleSource, customerName, deliveryPhone, deliveryAddress, tableNumber, total, clearCart, fetchPendingOrders]);
+  }, [activeUnitId, user, cart, saleSource, customerName, deliveryPhone, deliveryAddress, tableNumber, total, clearCart, fetchPendingOrders, isConnected]);
 
   // Cancel order
   const cancelOrder = useCallback(async (orderId: string) => {
