@@ -209,24 +209,6 @@ export default function TabletDigitalMenu() {
           >
             <AppIcon name={searchOpen ? 'Close' : 'Search'} size={17} className="text-muted-foreground" />
           </button>
-
-          {/* Cart */}
-          <button
-            onClick={() => setCartOpen(true)}
-            className="relative h-8 px-3 rounded-lg bg-primary/10 hover:bg-primary/15 flex items-center gap-1.5 transition-colors"
-          >
-            <AppIcon name="ShoppingCart" size={16} className="text-primary" />
-            {cartCount > 0 ? (
-              <>
-                <span className="text-xs font-bold text-primary">{formatPrice(cartTotal)}</span>
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center">
-                  {cartCount}
-                </span>
-              </>
-            ) : (
-              <span className="text-xs text-muted-foreground font-medium">Pedido</span>
-            )}
-          </button>
         </div>
       </header>
 
@@ -237,10 +219,10 @@ export default function TabletDigitalMenu() {
         </div>
       )}
 
-      {/* ─── Main: Fixed Sidebar + Scrollable Content ─── */}
+      {/* ─── Main: Sidebar + Products + Cart Panel ─── */}
       <div className="flex flex-1 overflow-hidden">
         {/* Fixed sidebar */}
-        <aside className="w-44 lg:w-52 flex flex-col border-r border-border/20 bg-card/40 shrink-0">
+        <aside className="w-44 lg:w-48 flex flex-col border-r border-border/20 bg-card/40 shrink-0">
           {/* Logo at top of sidebar */}
           <div className="px-4 pt-4 pb-3 border-b border-border/15 shrink-0">
             <div className="w-14 h-14 rounded-xl overflow-hidden border border-border/20 bg-white flex items-center justify-center mx-auto shadow-sm">
@@ -284,6 +266,20 @@ export default function TabletDigitalMenu() {
         {/* Scrollable products area */}
         <main className="flex-1 overflow-y-auto">
           <div className="p-5 lg:p-6">
+            {/* Pending cart banner */}
+            {cartCount > 0 && !cartOpen && (
+              <button
+                onClick={() => setCartOpen(true)}
+                className="w-full mb-4 flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/10 border border-primary/20 text-left hover:bg-primary/15 transition-colors"
+              >
+                <AppIcon name="ShoppingCart" size={18} className="text-primary" />
+                <span className="flex-1 text-sm font-semibold text-foreground">
+                  Existem pedidos não enviados. Gostaria de enviar agora?
+                </span>
+                <AppIcon name="ArrowRight" size={16} className="text-primary" />
+              </button>
+            )}
+
             {/* Category title */}
             {activeCategory && (
               <div className="mb-5">
@@ -325,35 +321,35 @@ export default function TabletDigitalMenu() {
             )}
           </div>
         </main>
+
+        {/* ─── Right Cart Panel (persistent, Goomer-style) ─── */}
+        {cartOpen && cartCount > 0 && (
+          <aside className="w-[380px] flex flex-col border-l border-border/20 bg-card shrink-0 animate-in slide-in-from-right-5 duration-300">
+            <TabletMenuCart
+              cart={cart}
+              cartTotal={cartTotal}
+              unitId={unitId!}
+              autoConfirm={(unit?.store_info as any)?.auto_confirm?.mesa ?? false}
+              customerUser={customerUser}
+              signupBonusPoints={signupBonus}
+              onUpdateQuantity={updateCartQuantity}
+              onRemove={removeFromCart}
+              onClear={clearCart}
+              onClose={() => setCartOpen(false)}
+              onLoginClick={() => { setCartOpen(false); setShowAuth(true); }}
+            />
+          </aside>
+        )}
       </div>
 
-      {/* Product detail sheet */}
+      {/* Product detail */}
       <TabletProductDetail
         product={selectedProduct}
         optionGroups={selectedProduct ? getProductOptionGroups(selectedProduct.id) : []}
         open={!!selectedProduct}
         onClose={() => setSelectedProduct(null)}
-        onAddToCart={(item) => { addToCart(item); setSelectedProduct(null); }}
+        onAddToCart={(item) => { addToCart(item); setSelectedProduct(null); setCartOpen(true); }}
       />
-
-      {/* Cart sheet */}
-      <Sheet open={cartOpen} onOpenChange={setCartOpen}>
-        <SheetContent side="right" className="w-full max-w-md p-0 pt-6">
-          <TabletMenuCart
-            cart={cart}
-            cartTotal={cartTotal}
-            unitId={unitId!}
-            autoConfirm={(unit?.store_info as any)?.auto_confirm?.mesa ?? false}
-            customerUser={customerUser}
-            signupBonusPoints={signupBonus}
-            onUpdateQuantity={updateCartQuantity}
-            onRemove={removeFromCart}
-            onClear={clearCart}
-            onClose={() => setCartOpen(false)}
-            onLoginClick={() => { setCartOpen(false); setShowAuth(true); }}
-          />
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
