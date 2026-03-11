@@ -154,6 +154,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
 
         <CoinAnimationLayer />
         <PushNotificationPrompt />
+        <OfflineBanner />
       </div>
     </SidebarProvider>
   );
