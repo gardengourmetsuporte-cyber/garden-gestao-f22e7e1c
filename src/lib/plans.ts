@@ -40,6 +40,8 @@ export const PLANS: PlanDef[] = [
     highlight: false,
     features: [
       'Tudo do Pro',
+      'PDV completo',
+      'Entregas e logística',
       'Copilot IA',
       'WhatsApp IA',
       'Marketing',
