@@ -74,16 +74,83 @@ export default defineConfig(({ mode }) => ({
         cleanupOutdatedCaches: true,
         navigateFallback: "index.html",
         runtimeCaching: [
+          // Supabase API — network-first, fallback to cache
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/i,
             handler: "NetworkFirst",
             options: {
-              cacheName: "supabase-cache",
+              cacheName: "supabase-api",
               expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60,
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60, // 1h
+              },
+              networkTimeoutSeconds: 5,
+              cacheableResponse: {
+                statuses: [0, 200],
               },
             },
+          },
+          // Supabase Storage (images) — cache-first
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "supabase-storage",
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // Google Fonts stylesheets — stale-while-revalidate
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "google-fonts-stylesheets",
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
+          },
+          // Google Fonts files — cache-first (immutable)
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "google-fonts-webfonts",
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // Leaflet tiles & CSS — cache-first
+          {
+            urlPattern: /^https:\/\/unpkg\.com\/leaflet.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "leaflet-assets",
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 30 * 24 * 60 * 60,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // Supabase Auth — network-only (never serve stale auth)
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/auth\/.*/i,
+            handler: "NetworkOnly",
           },
         ],
       },
