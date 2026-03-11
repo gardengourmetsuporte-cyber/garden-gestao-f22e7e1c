@@ -308,6 +308,7 @@ export default function DigitalMenu() {
     };
     return (
       <MenuCustomerAuth
+        fullPage
         unitName={unit?.name}
         logoUrl={unit?.store_info?.logo_url}
         cuisineType={unit?.store_info?.cuisine_type}
