@@ -1,11 +1,11 @@
-import { useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
 import { formatCurrency } from '@/lib/format';
-import { CustomerLeaderboard } from '@/components/digital-menu/CustomerLeaderboard';
 import gardenLogo from '@/assets/logo.png';
+import tabletHero from '@/assets/tablet-hero.jpg';
 
 interface StoreInfo {
   logo_url?: string;
@@ -20,11 +20,127 @@ interface RodizioSettings {
   time_limit_minutes: number;
 }
 
+const TABLET_MESA_KEY = 'tablet_mesa_config';
+const TABLET_PIN_KEY = 'tablet_admin_pin';
+
+function getStoredMesa(): string | null {
+  try { return localStorage.getItem(TABLET_MESA_KEY); } catch { return null; }
+}
+function setStoredMesa(mesa: string) {
+  try { localStorage.setItem(TABLET_MESA_KEY, mesa); } catch {}
+}
+function getStoredPin(): string | null {
+  try { return localStorage.getItem(TABLET_PIN_KEY); } catch { return null; }
+}
+function setStoredPin(pin: string) {
+  try { localStorage.setItem(TABLET_PIN_KEY, pin); } catch {}
+}
+
+// ─── Table Config Dialog ───
+function TableConfigDialog({
+  currentMesa,
+  onConfirm,
+  onCancel,
+  requirePin,
+}: {
+  currentMesa: string;
+  onConfirm: (mesa: string, pin: string) => void;
+  onCancel?: () => void;
+  requirePin: boolean;
+}) {
+  const [mesa, setMesa] = useState(currentMesa);
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
+
+  const handleConfirm = () => {
+    if (!mesa || Number(mesa) < 1) { setError('Informe o número da mesa'); return; }
+    if (requirePin) {
+      const stored = getStoredPin();
+      if (stored && pin !== stored) { setError('Senha incorreta'); return; }
+    }
+    if (pin && pin.length >= 4) setStoredPin(pin);
+    onConfirm(mesa, pin);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="bg-card rounded-3xl shadow-2xl border border-border/30 w-full max-w-md mx-6 p-8 animate-in zoom-in-95 fade-in duration-200">
+        <h2 className="text-xl font-bold text-foreground text-center mb-6">Configurar Mesa</h2>
+
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Número da Mesa</label>
+            <input
+              type="number"
+              min={1}
+              value={mesa}
+              onChange={e => { setMesa(e.target.value); setError(''); }}
+              className="w-full h-12 rounded-xl bg-secondary/50 border border-border/40 px-4 text-lg font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-primary/50"
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
+              {requirePin ? 'Senha de admin' : 'Criar senha (4+ dígitos)'}
+            </label>
+            <input
+              type="password"
+              inputMode="numeric"
+              maxLength={8}
+              value={pin}
+              onChange={e => { setPin(e.target.value); setError(''); }}
+              placeholder={requirePin ? '••••' : 'Opcional'}
+              className="w-full h-12 rounded-xl bg-secondary/50 border border-border/40 px-4 text-lg font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-primary/50"
+            />
+          </div>
+        </div>
+
+        {error && (
+          <p className="text-xs text-destructive text-center mb-4 font-medium">{error}</p>
+        )}
+
+        <div className="flex gap-3">
+          {onCancel && (
+            <button
+              onClick={onCancel}
+              className="flex-1 h-12 rounded-xl border border-border/40 text-foreground font-semibold text-sm hover:bg-secondary/50 transition-colors"
+            >
+              Cancelar
+            </button>
+          )}
+          <button
+            onClick={handleConfirm}
+            className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TabletHome() {
   const { unitId } = useParams<{ unitId: string }>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const mesa = searchParams.get('mesa') || '1';
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const mesaParam = searchParams.get('mesa');
+  const storedMesa = getStoredMesa();
+  const hasPin = !!getStoredPin();
+
+  // Determine initial mesa: URL param → stored → null (show config)
+  const initialMesa = mesaParam || storedMesa || null;
+  const [mesa, setMesa] = useState<string | null>(initialMesa);
+  const [showConfig, setShowConfig] = useState(!initialMesa);
+
+  // Persist mesa on first load from URL param
+  useEffect(() => {
+    if (mesaParam && !storedMesa) {
+      setStoredMesa(mesaParam);
+      setMesa(mesaParam);
+    }
+  }, [mesaParam, storedMesa]);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['tablet-home', unitId],
@@ -37,31 +153,21 @@ export default function TabletHome() {
           new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout ao carregar página')), ms)),
         ]);
 
-      try {
-        const [unitRes, rodizioRes] = await withTimeout(Promise.all([
-          Promise.resolve(supabase.from('units').select('name, store_info').eq('id', unitId).single()),
-          Promise.resolve(supabase
-            .from('rodizio_settings')
-            .select('is_active, price, description, time_limit_minutes')
-            .eq('unit_id', unitId)
-            .eq('is_active', true)
-            .maybeSingle()),
-        ]));
+      const [unitRes, rodizioRes] = await withTimeout(Promise.all([
+        Promise.resolve(supabase.from('units').select('name, store_info').eq('id', unitId).single()),
+        Promise.resolve(supabase
+          .from('rodizio_settings')
+          .select('is_active, price, description, time_limit_minutes')
+          .eq('unit_id', unitId)
+          .eq('is_active', true)
+          .maybeSingle()),
+      ]));
 
-        if (unitRes.error) throw unitRes.error;
-        if (rodizioRes.error) throw rodizioRes.error;
-
-        return {
-          unit: (unitRes.data as { name: string; store_info: StoreInfo | null }) ?? null,
-          rodizio: (rodizioRes.data as RodizioSettings | null) ?? null,
-        };
-      } catch (err: any) {
-        console.error('[TabletHome] Fetch error:', err?.name, err?.message);
-        const msg = String(err?.message || '');
-        const isAbort = err?.name === 'AbortError' || msg.toLowerCase().includes('abort');
-        if (isAbort) throw new Error('Conexão instável. Tente novamente.');
-        throw err;
-      }
+      if (unitRes.error) throw unitRes.error;
+      return {
+        unit: (unitRes.data as { name: string; store_info: StoreInfo | null }) ?? null,
+        rodizio: (rodizioRes.data as RodizioSettings | null) ?? null,
+      };
     },
     enabled: !!unitId,
     staleTime: 3 * 60 * 1000,
@@ -75,67 +181,58 @@ export default function TabletHome() {
   const rodizio = data?.rodizio ?? null;
 
   const menuItems = useMemo(() => {
+    if (!mesa) return [];
     return [
-      {
-        id: 'cardapio',
-        icon: 'Restaurant',
-        label: 'Cardápio',
-        subtitle: 'Veja nosso menu completo',
-        color: 'hsl(var(--primary))',
-        bgColor: 'hsl(var(--primary) / 0.1)',
-        onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
-      },
       ...(rodizio?.is_active ? [{
         id: 'rodizio',
         icon: 'AllInclusive',
         label: 'Rodízio',
         subtitle: `${formatCurrency(rodizio.price)} • ${rodizio.time_limit_minutes}min`,
-        color: 'hsl(45 100% 50%)',
-        bgColor: 'hsl(45 100% 50% / 0.1)',
         onClick: () => navigate(`/tablet/${unitId}/rodizio?mesa=${mesa}`),
       }] : []),
+      {
+        id: 'cardapio',
+        icon: 'Restaurant',
+        label: 'A la Carte',
+        subtitle: 'Menu completo',
+        onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
+      },
       {
         id: 'mural',
         icon: 'Newspaper',
         label: 'Mural da Casa',
         subtitle: 'Novidades e avisos',
-        color: 'hsl(var(--accent-foreground))',
-        bgColor: 'hsl(var(--accent) / 0.5)',
-        onClick: () => {},
-      },
-      {
-        id: 'avalie',
-        icon: 'Star',
-        label: 'Avalie o Local',
-        subtitle: 'Deixe sua avaliação',
-        color: 'hsl(45 100% 50%)',
-        bgColor: 'hsl(45 100% 50% / 0.1)',
-        onClick: () => {},
-      },
-      {
-        id: 'jogos',
-        icon: 'Gamepad2',
-        label: 'Jogos',
-        subtitle: 'Divirta-se enquanto espera',
-        color: 'hsl(280 80% 60%)',
-        bgColor: 'hsl(280 80% 60% / 0.1)',
         onClick: () => {},
       },
       {
         id: 'conta',
         icon: 'Receipt',
         label: 'Minha Conta',
-        subtitle: 'Fechar conta da mesa',
-        color: 'hsl(var(--muted-foreground))',
-        bgColor: 'hsl(var(--secondary))',
+        subtitle: 'Pedidos e fechamento',
         onClick: () => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`),
+      },
+      {
+        id: 'avalie',
+        icon: 'Star',
+        label: 'Avalie o Local',
+        subtitle: 'Deixe sua opinião',
+        onClick: () => {},
       },
     ];
   }, [mesa, navigate, rodizio, unitId]);
 
+  const handleConfigConfirm = (newMesa: string) => {
+    setStoredMesa(newMesa);
+    setMesa(newMesa);
+    setShowConfig(false);
+    // Update URL without reload
+    setSearchParams({ mesa: newMesa }, { replace: true });
+  };
+
+  // ─── Loading ───
   if (isLoading) {
     return (
-      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
+      <div className="h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
         <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3 animate-pulse" style={{ animationDuration: '2s' }}>
           <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
         </div>
@@ -144,18 +241,16 @@ export default function TabletHome() {
     );
   }
 
+  // ─── Error ───
   if (isError) {
     return (
-      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-4 px-6 text-center">
+      <div className="h-[100dvh] bg-background flex flex-col items-center justify-center gap-4 px-6 text-center">
         <AppIcon name="WifiOff" size={34} className="text-destructive" />
         <div>
           <p className="text-base font-bold text-foreground">Falha ao abrir o tablet</p>
           <p className="text-sm text-muted-foreground mt-1">{(error as Error)?.message || 'Erro de conexão'}</p>
         </div>
-        <button
-          onClick={() => refetch()}
-          className="h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
-        >
+        <button onClick={() => refetch()} className="h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold">
           Tentar novamente
         </button>
       </div>
@@ -163,58 +258,100 @@ export default function TabletHome() {
   }
 
   const logoUrl = unit?.store_info?.logo_url;
+  const bannerUrl = unit?.store_info?.banner_url;
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col">
-      <header className="flex flex-col items-center pt-10 pb-6 px-6">
-        <div className="w-24 h-24 rounded-3xl overflow-hidden border-2 border-border/30 bg-white flex items-center justify-center shadow-lg mb-4">
-          {logoUrl ? (
-            <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
-          ) : (
-            <img src={gardenLogo} alt="Garden" className="w-16 h-16 object-contain" />
-          )}
-        </div>
-        <h1 className="text-2xl font-bold text-foreground">{unit?.name || 'Bem-vindo'}</h1>
-        <p className="text-sm text-muted-foreground mt-1">Mesa {mesa}</p>
-      </header>
-
-      <main className="flex-1 px-6 pb-10">
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl mx-auto">
-          {menuItems.map(item => (
+    <div className="h-[100dvh] bg-background flex overflow-hidden">
+      {/* ─── LEFT: Menu Panel ─── */}
+      <div className="w-full md:w-[45%] lg:w-[40%] flex flex-col h-full relative z-10">
+        {/* Mesa badge - top */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-2">
+          <button
+            onClick={() => {
+              if (hasPin) {
+                setShowConfig(true);
+              }
+            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-border/40 bg-card/80 backdrop-blur-sm hover:bg-secondary/50 transition-colors"
+          >
+            <AppIcon name="TableBar" size={14} className="text-muted-foreground" />
+            <span className="text-sm font-bold text-foreground">Mesa {mesa || '?'}</span>
+            {hasPin && <AppIcon name="Lock" size={12} className="text-muted-foreground/60" />}
+          </button>
+          <div className="flex items-center gap-2">
             <button
-              key={item.id}
-              onClick={item.onClick}
-              className="flex flex-col items-center gap-3 p-6 rounded-3xl bg-card border border-border/30 hover:border-primary/30 active:scale-[0.97] transition-all shadow-sm"
+              onClick={() => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-border/40 bg-card/80 backdrop-blur-sm hover:bg-secondary/50 transition-colors"
             >
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                style={{ backgroundColor: item.bgColor }}
-              >
-                <AppIcon name={item.icon} size={28} style={{ color: item.color }} />
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-bold text-foreground">{item.label}</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{item.subtitle}</p>
-              </div>
+              <AppIcon name="Receipt" size={14} className="text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">Pedido</span>
             </button>
-          ))}
+          </div>
         </div>
 
-        {/* Customer leaderboard widget */}
-        {unitId && (
-          <div className="max-w-2xl mx-auto mt-6">
-            <div className="rounded-3xl bg-card border border-border/30 p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <AppIcon name="EmojiEvents" size={20} style={{ color: 'hsl(45 100% 50%)' }} />
-                <h2 className="text-base font-bold text-foreground">🪙 Ranking de Clientes</h2>
-              </div>
-              <p className="text-[11px] text-muted-foreground mb-3">Clientes com mais moedas Garden</p>
-              <CustomerLeaderboard unitId={unitId} compact />
-            </div>
+        {/* Logo & brand */}
+        <div className="px-6 pt-4 pb-6">
+          <div className="w-20 h-20 rounded-2xl overflow-hidden border border-border/20 bg-white flex items-center justify-center shadow-lg mb-3">
+            {logoUrl ? (
+              <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
+            ) : (
+              <img src={gardenLogo} alt="Garden" className="w-14 h-14 object-contain" />
+            )}
           </div>
-        )}
-      </main>
+          <h1 className="text-xl font-bold text-foreground leading-tight">{unit?.name || 'Bem-vindo'}</h1>
+        </div>
+
+        {/* Menu items */}
+        <div className="flex-1 px-4 overflow-y-auto pb-6">
+          <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/20 overflow-hidden divide-y divide-border/20">
+            {menuItems.map(item => (
+              <button
+                key={item.id}
+                onClick={item.onClick}
+                className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-secondary/30 active:bg-secondary/50 transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                  <AppIcon name={item.icon} size={20} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-foreground">{item.label}</p>
+                  <p className="text-[11px] text-muted-foreground leading-tight">{item.subtitle}</p>
+                </div>
+                <AppIcon name="ChevronRight" size={18} className="text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-3 border-t border-border/20">
+          <p className="text-[10px] text-muted-foreground/50 text-center">
+            Powered by <span className="font-semibold text-primary/60">Garden</span>
+          </p>
+        </div>
+      </div>
+
+      {/* ─── RIGHT: Hero Image ─── */}
+      <div className="hidden md:block flex-1 relative">
+        <img
+          src={bannerUrl || tabletHero}
+          alt="Hero"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-background/20" />
+      </div>
+
+      {/* ─── Table Config Dialog ─── */}
+      {showConfig && (
+        <TableConfigDialog
+          currentMesa={mesa || '1'}
+          onConfirm={handleConfigConfirm}
+          onCancel={mesa ? () => setShowConfig(false) : undefined}
+          requirePin={hasPin}
+        />
+      )}
     </div>
   );
 }
-
