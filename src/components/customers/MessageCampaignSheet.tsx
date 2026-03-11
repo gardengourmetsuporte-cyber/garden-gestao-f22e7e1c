@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { SEGMENT_CONFIG, type Customer, type CustomerSegment } from '@/types/customer';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 const TEMPLATES = [
   { label: '🔥 Sentimos sua falta!', text: 'Olá! Sentimos sua falta por aqui. Que tal nos visitar novamente? Temos novidades esperando por você! 😊' },

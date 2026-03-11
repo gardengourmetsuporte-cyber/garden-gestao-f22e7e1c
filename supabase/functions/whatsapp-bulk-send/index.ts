@@ -63,6 +63,20 @@ serve(async (req) => {
       });
     }
 
+    if (!channel.api_url?.trim()) {
+      return new Response(JSON.stringify({ error: "CANAL_SEM_CONFIG: A URL da API do WhatsApp não está configurada. Vá em Configurações > WhatsApp e preencha a URL da API." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!channel.api_key_ref?.trim()) {
+      return new Response(JSON.stringify({ error: "CANAL_SEM_CONFIG: A chave de API do WhatsApp não está configurada. Vá em Configurações > WhatsApp e preencha a chave de API." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Create campaign record
     const { data: campaign, error: campErr } = await supabase
       .from("customer_campaigns")
