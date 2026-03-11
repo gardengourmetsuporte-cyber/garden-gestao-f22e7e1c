@@ -16,6 +16,7 @@ async function fetchOrdersData(unitId: string | null): Promise<Order[]> {
         item:inventory_items(*, category:categories(*))
       )
     `)
+    .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
   if (unitId) {
