@@ -54,8 +54,10 @@ export default function DigitalMenu() {
   // Check auth state on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setCustomerUser(session?.user ?? null);
+      const user = session?.user ?? null;
+      setCustomerUser(user);
       setAuthChecked(true);
+      if (user) setAuthGatePassed(true);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
