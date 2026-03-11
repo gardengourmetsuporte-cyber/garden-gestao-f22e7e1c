@@ -76,7 +76,7 @@ export function FinanceMore({
     { icon: 'Hash', label: 'Gerenciar Categorias', onClick: () => setCategoriesOpen(true), color: 'hsl(var(--neon-amber))' },
     { icon: 'Archive', label: 'Backups', onClick: () => setBackupOpen(true), color: 'hsl(var(--neon-purple, 270 70% 60%))' },
     { icon: 'Upload', label: 'Importar CSV', onClick: () => setImportOpen(true), color: 'hsl(var(--neon-green, 142 70% 45%))' },
-    { icon: 'Wrench', label: isFixing ? 'Corrigindo...' : 'Corrigir importação anterior', onClick: handleFixImported, color: 'hsl(var(--neon-amber))' },
+    
   ];
 
   return (
