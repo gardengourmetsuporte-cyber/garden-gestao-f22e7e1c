@@ -284,7 +284,7 @@ function TabletOrderList({ orders, emptyIcon, emptyTitle, emptySubtitle, onRetry
               <div className="bg-secondary/30 rounded-xl p-2.5 space-y-1">
                 {order.tablet_order_items.slice(0, 3).map((item: any) => (
                   <div key={item.id} className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">{item.quantity}x {item.tablet_products?.name || '?'}</span>
+                    <span className="text-muted-foreground">{item.quantity}x {item.tablet_products?.name || item.notes || 'Produto removido'}</span>
                   </div>
                 ))}
                 {order.tablet_order_items.length > 3 && (
@@ -488,7 +488,7 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
                       <div className="grid grid-cols-[36px_1fr_52px_76px] gap-1 px-3.5 py-3 items-start">
                         <span className="text-sm font-black text-foreground">{item.quantity || 1}</span>
                         <div>
-                          <p className="text-sm font-semibold text-foreground">{item.tablet_products?.name || item.name || '?'}</p>
+                          <p className="text-sm font-semibold text-foreground">{item.tablet_products?.name || item.name || 'Produto removido'}</p>
                           {item.notes && (
                             <p className="text-[11px] text-warning/80 mt-0.5 flex items-center gap-1">
                               <AppIcon name="StickyNote" size={10} />
