@@ -300,6 +300,29 @@ export default function DigitalMenu() {
     );
   }
 
+  // Auth gate: show login screen on first visit
+  if (authChecked && !customerUser && !authGatePassed) {
+    const handleSkipGate = () => {
+      setAuthGatePassed(true);
+      localStorage.setItem(`dm_auth_skipped_${unitId}`, '1');
+    };
+    return (
+      <MenuCustomerAuth
+        unitName={unit?.name}
+        logoUrl={unit?.store_info?.logo_url}
+        cuisineType={unit?.store_info?.cuisine_type}
+        city={unit?.store_info?.city}
+        isOpen={true}
+        bonusPoints={signupBonus}
+        onSkip={handleSkipGate}
+        onEmailLogin={() => {
+          handleSkipGate();
+          setShowAuth(true);
+        }}
+      />
+    );
+  }
+
   const unitInitials = unit?.name
     ?.split(' ')
     .slice(0, 2)
