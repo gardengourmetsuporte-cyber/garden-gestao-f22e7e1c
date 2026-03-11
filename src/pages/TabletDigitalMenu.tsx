@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDigitalMenu, DMProduct } from '@/hooks/useDigitalMenu';
-import { MenuProductDetail } from '@/components/digital-menu/MenuProductDetail';
+import { TabletProductDetail } from '@/components/digital-menu/TabletProductDetail';
 import { MenuSearch } from '@/components/digital-menu/MenuSearch';
 import { TabletMenuCart } from '@/components/digital-menu/TabletMenuCart';
 import { MenuCustomerAuth } from '@/components/digital-menu/MenuCustomerAuth';
@@ -328,7 +328,7 @@ export default function TabletDigitalMenu() {
       </div>
 
       {/* Product detail sheet */}
-      <MenuProductDetail
+      <TabletProductDetail
         product={selectedProduct}
         optionGroups={selectedProduct ? getProductOptionGroups(selectedProduct.id) : []}
         open={!!selectedProduct}
