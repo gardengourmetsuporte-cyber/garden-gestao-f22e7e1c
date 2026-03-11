@@ -1,7 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { AppIcon } from '@/components/ui/app-icon';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -21,12 +19,12 @@ interface Props {
   onRemove: (index: number) => void;
   onClear: () => void;
   onLogin?: () => void;
+  onBackToMenu?: () => void;
 }
 
-export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, source, onUpdateQuantity, onRemove, onClear, onLogin }: Props) {
+export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, source, onUpdateQuantity, onRemove, onClear, onLogin, onBackToMenu }: Props) {
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
-  const [sentAutoConfirmed, setSentAutoConfirmed] = useState(false);
   const isQrCode = source === 'qrcode';
   const isDelivery = !isQrCode;
 
@@ -35,6 +33,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [tableNumber, setTableNumber] = useState('');
+  const [orderType, setOrderType] = useState<'delivery' | 'pickup' | null>(null);
 
   // Address selection for delivery
   const [selectedAddress, setSelectedAddress] = useState<CustomerAddress | null>(null);
@@ -55,8 +54,6 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
     }
     const name = customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || '';
     setCustomerName(prev => prev || name);
-
-    // Fetch customer record
     const email = customerUser.email;
     if (email) {
       supabase
@@ -76,25 +73,21 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
 
   // Auto-select primary address
   useEffect(() => {
-    if (!selectedAddress && primaryAddress) {
-      setSelectedAddress(primaryAddress);
-    }
+    if (!selectedAddress && primaryAddress) setSelectedAddress(primaryAddress);
   }, [primaryAddress, selectedAddress]);
 
   // Calculate fee when address selected
   useEffect(() => {
-    if (selectedAddress && isDelivery) {
+    if (selectedAddress && orderType === 'delivery') {
       const fullAddr = `${selectedAddress.street}, ${selectedAddress.number}, ${selectedAddress.neighborhood}, ${selectedAddress.city}`;
       if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => {
-        calculateFee(unitId, fullAddr);
-      }, 500);
+      debounceRef.current = setTimeout(() => calculateFee(unitId, fullAddr), 500);
     } else {
       resetFee();
     }
-  }, [selectedAddress, unitId, isDelivery]);
+  }, [selectedAddress, unitId, orderType]);
 
-  const deliveryFee = feeResult?.fee ?? 0;
+  const deliveryFee = orderType === 'delivery' ? (feeResult?.fee ?? 0) : 0;
   const grandTotal = cartTotal + deliveryFee;
 
   const formatPhone = (val: string) => {
@@ -104,6 +97,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
 
+  // ===== Order sent success =====
   if (orderSent) {
     return (
       <div className="flex flex-col items-center justify-center px-6 py-16 text-center gap-5">
@@ -115,33 +109,19 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           <p className="text-muted-foreground text-sm mt-2">
             Pedido <span className="font-mono font-bold text-foreground">#{orderSent}</span>
           </p>
-          <p className="text-muted-foreground text-xs mt-1">
-            {customerName || 'Delivery'} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-          </p>
         </div>
-        <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
-          <div className="flex items-center gap-3 text-sm">
-            <div className={`w-10 h-10 rounded-xl ${isQrCode ? 'bg-primary/12' : 'bg-amber-500/12'} flex items-center justify-center shrink-0`}>
-              <AppIcon name={isQrCode ? 'HourglassEmpty' : 'Schedule'} size={20} className={isQrCode ? 'text-primary' : 'text-amber-500'} />
-            </div>
-            <div className="text-left">
-              <p className="font-semibold text-foreground">
-                {isQrCode ? 'Aguardando aprovação' : 'Aguardando preparo'}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {isQrCode ? 'Seu pedido será confirmado pelo restaurante' : 'Seu pedido foi confirmado automaticamente'}
-              </p>
-            </div>
-          </div>
-        </div>
-        <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => { setOrderSent(null); setSentAutoConfirmed(false); onClear(); resetFee(); }}>
-          <AppIcon name="Plus" size={18} className="mr-2" />
+        <button
+          onClick={() => { setOrderSent(null); onClear(); resetFee(); }}
+          className="h-14 w-full max-w-xs rounded-xl bg-foreground text-background font-bold text-sm active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+        >
+          <AppIcon name="Plus" size={18} />
           Fazer novo pedido
-        </Button>
+        </button>
       </div>
     );
   }
 
+  // ===== Empty cart =====
   if (cart.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center px-4 py-20 text-center gap-4">
@@ -161,48 +141,37 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
       if (!tableNumber.trim() || parseInt(tableNumber) <= 0) { toast.error('Informe o número da mesa'); return; }
     } else {
-      // Delivery requires login
-      if (!customerUser) { toast.error('Faça login para pedir delivery'); return; }
-      if (!selectedAddress) { toast.error('Selecione um endereço de entrega'); return; }
-      if (feeResult?.out_of_range) { toast.error('Endereço fora da área de entrega'); return; }
+      if (!customerUser) { toast.error('Faça login para pedir'); return; }
+      if (!customerName.trim()) { toast.error('Informe seu nome'); return; }
+      if (!customerPhone.replace(/\D/g, '') || customerPhone.replace(/\D/g, '').length < 10) { toast.error('Informe um celular válido'); return; }
+      if (!orderType) { toast.error('Escolha Entrega ou Retirada'); return; }
+      if (orderType === 'delivery' && !selectedAddress) { toast.error('Selecione um endereço de entrega'); return; }
+      if (orderType === 'delivery' && feeResult?.out_of_range) { toast.error('Endereço fora da área de entrega'); return; }
     }
-
     setSending(true);
-
     try {
-      const fullAddress = selectedAddress
+      const fullAddress = selectedAddress && orderType === 'delivery'
         ? `${selectedAddress.street}, ${selectedAddress.number}${selectedAddress.complement ? ' - ' + selectedAddress.complement : ''}, ${selectedAddress.neighborhood}, ${selectedAddress.city}${selectedAddress.reference ? ' (Ref: ' + selectedAddress.reference + ')' : ''}`
         : null;
 
       const orderData = isQrCode
         ? {
-            unit_id: unitId,
-            table_number: parseInt(tableNumber),
-            status: 'awaiting_confirmation',
-            total: cartTotal,
-            source: 'qrcode' as string,
-            customer_name: customerName.trim(),
-            customer_phone: null as string | null,
-            customer_address: null as string | null,
+            unit_id: unitId, table_number: parseInt(tableNumber),
+            status: 'awaiting_confirmation', total: cartTotal,
+            source: 'qrcode' as string, customer_name: customerName.trim(),
+            customer_phone: null as string | null, customer_address: null as string | null,
           }
         : {
-            unit_id: unitId,
-            table_number: 0,
-            status: 'confirmed',
-            total: grandTotal,
-            source: 'delivery' as string,
-            customer_name: customerName.trim() || customerUser?.user_metadata?.full_name || 'Cliente',
+            unit_id: unitId, table_number: 0,
+            status: 'confirmed', total: grandTotal,
+            source: (orderType === 'pickup' ? 'pickup' : 'delivery') as string,
+            customer_name: customerName.trim(),
             customer_phone: customerPhone.replace(/\D/g, ''),
             customer_address: fullAddress,
             customer_email: customerUser?.email || null,
           };
 
-      const { data: order, error: orderError } = await supabase
-        .from('tablet_orders')
-        .insert(orderData)
-        .select('id')
-        .single();
-
+      const { data: order, error: orderError } = await supabase.from('tablet_orders').insert(orderData).select('id').single();
       if (orderError || !order) throw new Error(orderError?.message || 'Erro');
 
       const items = cart.map(c => ({
@@ -212,31 +181,20 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         notes: [c.notes, c.selectedOptions.map(o => o.name).join(', ')].filter(Boolean).join(' | ') || null,
         unit_price: c.product.price + c.selectedOptions.reduce((s, o) => s + o.price, 0),
       }));
-
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
 
-      // Auto send to PDV (skip for qrcode)
       if (!isQrCode) {
         try {
-          await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              },
-              body: JSON.stringify({ order_id: (order as any).id }),
-            }
-          );
-        } catch (e) {
-          console.warn('[MenuCart] send-to-pdv failed:', e);
-        }
+          await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+            body: JSON.stringify({ order_id: (order as any).id }),
+          });
+        } catch (e) { console.warn('[MenuCart] send-to-pdv failed:', e); }
       }
 
       toast.success('Pedido enviado com sucesso!');
-      setSentAutoConfirmed(true);
       setOrderSent((order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8));
     } catch (err: any) {
       toast.error(err.message || 'Erro ao enviar pedido');
@@ -245,238 +203,302 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
     }
   };
 
+  const canSend = isQrCode
+    ? !!customerName.trim() && !!tableNumber.trim()
+    : !!customerUser && !!customerName.trim() && customerPhone.replace(/\D/g, '').length >= 10 && !!orderType && (orderType === 'pickup' || (!!selectedAddress && !feeResult?.out_of_range));
+
   return (
-    <div className="px-4 pb-28 space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-foreground">
-          Seu Pedido
-          <span className="text-sm font-normal text-muted-foreground ml-2">
-            ({cart.reduce((s, i) => s + i.quantity, 0)} itens)
-          </span>
-        </h2>
-        <button onClick={onClear} className="text-xs text-destructive font-medium">Limpar</button>
-      </div>
-
-      <CartItemsList cart={cart} onUpdateQuantity={onUpdateQuantity} />
-
-      {/* Summary */}
-      <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Subtotal</span>
-          <span className="text-sm font-semibold text-foreground">{formatPrice(cartTotal)}</span>
-        </div>
-
-        {isDelivery && (
-          <>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground flex items-center gap-1">
-                Taxa de entrega
-                {calculating && <AppIcon name="Loader2" size={12} className="animate-spin text-muted-foreground" />}
-              </span>
-              {feeResult?.out_of_range ? (
-                <span className="text-xs font-medium text-destructive">Fora da área</span>
-              ) : feeResult && feeResult.fee !== null ? (
-                <span className="text-sm font-semibold text-foreground">
-                  {feeResult.fee === 0 ? 'Grátis' : formatPrice(feeResult.fee)}
-                </span>
-              ) : (
-                <span className="text-xs text-muted-foreground">—</span>
-              )}
-            </div>
-            {feeResult && !feeResult.out_of_range && (
-              <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                <AppIcon name="MapPin" size={10} />
-                <span>{feeResult.distance_km} km · {feeResult.duration}</span>
-                {feeResult.zone_name && <span>· {feeResult.zone_name}</span>}
-              </div>
-            )}
-          </>
+    <div className="flex flex-col min-h-[100dvh] bg-background">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-background border-b border-border/30 px-4 h-14 flex items-center gap-3">
+        {onBackToMenu && (
+          <button onClick={onBackToMenu} className="w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-transform">
+            <AppIcon name="ArrowLeft" size={20} className="text-foreground" />
+          </button>
         )}
-
-        <div className="border-t border-border/30" />
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-foreground">Total</span>
-          <span className="text-xl font-bold text-primary">{formatPrice(isQrCode ? cartTotal : grandTotal)}</span>
-        </div>
+        <h1 className="text-base font-bold text-foreground flex-1">Meu pedido</h1>
+        <button onClick={onClear} className="text-xs text-destructive font-medium px-2 py-1">Limpar</button>
       </div>
 
-      {/* Out of range warning */}
-      {isDelivery && feeResult?.out_of_range && (
-        <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-3 flex items-center gap-2">
-          <AppIcon name="AlertTriangle" size={16} className="text-destructive shrink-0" />
-          <p className="text-xs text-destructive">
-            Infelizmente não entregamos neste endereço ({feeResult.distance_km} km). Tente outro endereço.
-          </p>
-        </div>
-      )}
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto pb-32">
+        {/* Cart items */}
+        <div className="px-4 pt-4">
+          <div className="rounded-2xl border border-border/40 divide-y divide-border/30 overflow-hidden">
+            {cart.map((item, i) => {
+              const unitPrice = item.product.price + item.selectedOptions.reduce((s, o) => s + o.price, 0);
+              return (
+                <div key={i} className="flex items-center gap-3 p-3 bg-card">
+                  {item.product.image_url ? (
+                    <img src={item.product.image_url} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" />
+                  ) : (
+                    <div className="w-14 h-14 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0">
+                      <AppIcon name="Package" size={18} className="text-muted-foreground/30" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{item.product.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{formatPrice(unitPrice)}</p>
+                    {item.selectedOptions.length > 0 && (
+                      <p className="text-[11px] text-muted-foreground/70 truncate">{item.selectedOptions.map(o => o.name).join(', ')}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => onUpdateQuantity(i, item.quantity - 1)}
+                      className="w-8 h-8 rounded-lg border border-border/40 flex items-center justify-center active:scale-90 transition-transform"
+                    >
+                      <AppIcon name={item.quantity === 1 ? 'Trash2' : 'Minus'} size={14} className={item.quantity === 1 ? 'text-destructive' : 'text-foreground'} />
+                    </button>
+                    <span className="w-7 text-center text-sm font-bold text-foreground">{item.quantity}</span>
+                    <button
+                      onClick={() => onUpdateQuantity(i, item.quantity + 1)}
+                      className="w-8 h-8 rounded-lg border border-border/40 flex items-center justify-center active:scale-90 transition-transform"
+                    >
+                      <AppIcon name="Plus" size={14} className="text-foreground" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-      {/* QR Code dine-in info */}
-      {isQrCode && (
-        <div className="rounded-xl bg-primary/5 border border-primary/20 p-3 flex items-center gap-2">
-          <AppIcon name="RestaurantMenu" size={16} className="text-primary shrink-0" />
-          <p className="text-xs text-muted-foreground">
-            Pedido para <span className="font-semibold text-foreground">comer no restaurante</span>. Será confirmado pelo atendente.
-          </p>
-        </div>
-      )}
+          {/* Add more items */}
+          {onBackToMenu && (
+            <button
+              onClick={onBackToMenu}
+              className="w-full mt-3 h-12 rounded-xl border border-border/50 text-sm font-semibold text-foreground flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+            >
+              Adicionar mais itens
+            </button>
+          )}
 
-      {/* ===== DELIVERY: Require login ===== */}
-      {isDelivery && !customerUser && (
-        <div className="rounded-2xl bg-card border border-primary/30 p-5 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <AppIcon name="LogIn" size={24} className="text-primary" />
-            </div>
+          {/* Total line */}
+          <div className="flex items-center justify-between mt-4 px-1">
+            <span className="text-sm font-bold text-foreground">Total</span>
+            <span className="text-sm font-bold text-foreground">{formatPrice(isQrCode ? cartTotal : grandTotal)}</span>
+          </div>
+        </div>
+
+        {/* Dotted divider */}
+        <div className="my-5 border-t-2 border-dashed border-border/40" />
+
+        {/* ===== Order type selection (delivery only) ===== */}
+        {isDelivery && (
+          <div className="px-4 space-y-6">
+            {/* Order type */}
             <div>
-              <p className="text-sm font-bold text-foreground">Faça login para continuar</p>
-              <p className="text-xs text-muted-foreground">Precisamos da sua conta para delivery</p>
-            </div>
-          </div>
-          <Button className="w-full h-12 rounded-xl font-bold" onClick={onLogin}>
-            <AppIcon name="LogIn" size={18} className="mr-2" />
-            Entrar na minha conta
-          </Button>
-        </div>
-      )}
-
-      {/* ===== DELIVERY: Logged in — show address picker ===== */}
-      {isDelivery && customerUser && (
-        <>
-          {/* User info */}
-          <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <AppIcon name="Person" size={18} className="text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">
-                {customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || customerUser.email}
-              </p>
-              <p className="text-[11px] text-muted-foreground truncate">{customerUser.email}</p>
-            </div>
-            <AppIcon name="Check" size={16} className="text-primary shrink-0" />
-          </div>
-
-          {/* Address selection */}
-          <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
-            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-              <AppIcon name="MapPin" size={16} className="text-primary" />
-              Endereço de entrega
-            </h3>
-
-            {loadingAddresses ? (
-              <div className="space-y-2">
-                <div className="h-16 rounded-xl bg-muted animate-pulse" />
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-base font-bold text-foreground">Escolha uma opção</h3>
+                <span className="text-[11px] font-semibold px-2 py-1 rounded-full bg-muted text-muted-foreground">Obrigatório</span>
               </div>
-            ) : addresses.length === 0 || showAddAddress ? (
-              <>
-                {customerId && (
-                  <CustomerAddressManager
-                    customerId={customerId}
-                    unitId={unitId}
-                    onSelect={(a) => { setSelectedAddress(a); setShowAddAddress(false); }}
-                    selectable
-                    selectedId={selectedAddress?.id || null}
-                  />
-                )}
-                {!customerId && (
-                  <div className="text-center py-4">
-                    <p className="text-xs text-muted-foreground">Faça seu primeiro pedido para cadastrar endereços</p>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setOrderType('delivery')}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all active:scale-[0.98] ${
+                    orderType === 'delivery' ? 'border-primary bg-primary/5' : 'border-border/40'
+                  }`}
+                >
+                  <span className="text-sm font-semibold text-foreground">Entrega</span>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    orderType === 'delivery' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                  }`}>
+                    {orderType === 'delivery' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                  </div>
+                </button>
+                <button
+                  onClick={() => setOrderType('pickup')}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all active:scale-[0.98] ${
+                    orderType === 'pickup' ? 'border-primary bg-primary/5' : 'border-border/40'
+                  }`}
+                >
+                  <div>
+                    <span className="text-sm font-semibold text-foreground">Retirada no local</span>
+                    <p className="text-xs text-muted-foreground mt-0.5">(30min)</p>
+                  </div>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    orderType === 'pickup' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                  }`}>
+                    {orderType === 'pickup' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Address picker (delivery) */}
+            {orderType === 'delivery' && customerUser && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-base font-bold text-foreground">Endereço de entrega</h3>
+                  <span className="text-[11px] font-semibold px-2 py-1 rounded-full bg-muted text-muted-foreground">Obrigatório</span>
+                </div>
+                {loadingAddresses ? (
+                  <div className="h-16 rounded-xl bg-muted animate-pulse" />
+                ) : addresses.length === 0 || showAddAddress ? (
+                  customerId ? (
+                    <CustomerAddressManager
+                      customerId={customerId} unitId={unitId}
+                      onSelect={(a) => { setSelectedAddress(a); setShowAddAddress(false); }}
+                      selectable selectedId={selectedAddress?.id || null}
+                    />
+                  ) : (
+                    <p className="text-xs text-muted-foreground text-center py-4">Cadastre um endereço abaixo</p>
+                  )
+                ) : (
+                  <div className="space-y-2">
+                    {addresses.map(a => {
+                      const isSelected = selectedAddress?.id === a.id;
+                      const fullAddr = `${a.street}, ${a.number}${a.complement ? ' - ' + a.complement : ''} · ${a.neighborhood}, ${a.city}`;
+                      return (
+                        <button key={a.id} onClick={() => setSelectedAddress(a)}
+                          className={`w-full flex items-center gap-3 p-3.5 rounded-xl border transition-all active:scale-[0.98] text-left ${
+                            isSelected ? 'border-primary bg-primary/5' : 'border-border/40'
+                          }`}
+                        >
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                            isSelected ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                          }`}>
+                            {isSelected && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <AppIcon name={a.label === 'Trabalho' ? 'Briefcase' : 'Home'} size={12} className="text-primary shrink-0" />
+                              <span className="text-xs font-bold text-foreground">{a.label}</span>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground truncate mt-0.5">{fullAddr}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                    <button onClick={() => setShowAddAddress(true)}
+                      className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-border/50 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <AppIcon name="Plus" size={14} />
+                      Adicionar novo endereço
+                    </button>
                   </div>
                 )}
-              </>
-            ) : (
-              <>
-                {/* Address cards for selection */}
-                {addresses.map(a => {
-                  const isSelected = selectedAddress?.id === a.id;
-                  const fullAddr = `${a.street}, ${a.number}${a.complement ? ' - ' + a.complement : ''} · ${a.neighborhood}, ${a.city}`;
-                  return (
-                    <div
-                      key={a.id}
-                      onClick={() => setSelectedAddress(a)}
-                      className={`rounded-xl border p-3 cursor-pointer transition-all active:scale-[0.98] ${
-                        isSelected ? 'border-primary bg-primary/5' : 'border-border/30'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                          isSelected ? 'border-primary bg-primary' : 'border-border'
-                        }`}>
-                          {isSelected && <AppIcon name="Check" size={12} className="text-primary-foreground" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <AppIcon name={a.label === 'Trabalho' ? 'Briefcase' : 'Home'} size={12} className="text-primary shrink-0" />
-                            <span className="text-xs font-bold text-foreground">{a.label}</span>
-                            {a.is_primary && (
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">Principal</span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{fullAddr}</p>
-                          {a.reference && (
-                            <p className="text-[10px] text-muted-foreground/60 truncate">Ref: {a.reference}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
 
-                <button
-                  onClick={() => setShowAddAddress(true)}
-                  className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl border border-dashed border-border/50 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                {/* Fee info */}
+                {feeResult && !feeResult.out_of_range && (
+                  <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
+                    <AppIcon name="MapPin" size={12} />
+                    <span>{feeResult.distance_km} km · {feeResult.duration}</span>
+                    <span>· Taxa: {feeResult.fee === 0 ? 'Grátis' : formatPrice(feeResult.fee!)}</span>
+                  </div>
+                )}
+                {feeResult?.out_of_range && (
+                  <div className="mt-3 rounded-xl bg-destructive/10 border border-destructive/20 p-3 flex items-center gap-2">
+                    <AppIcon name="AlertTriangle" size={14} className="text-destructive shrink-0" />
+                    <p className="text-xs text-destructive">Fora da área de entrega ({feeResult.distance_km} km)</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Login CTA */}
+            {!customerUser && (
+              <div className="rounded-2xl border border-border/40 p-5 text-center space-y-3">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
+                  <AppIcon name="Receipt" size={24} className="text-primary" />
+                </div>
+                <p className="text-sm text-muted-foreground">Entre e tenha seus dados salvos para a próxima compra!</p>
+                <button onClick={onLogin}
+                  className="w-full h-12 rounded-xl border border-foreground/20 text-sm font-bold text-foreground active:scale-[0.98] transition-transform"
                 >
-                  <AppIcon name="Plus" size={14} />
-                  Adicionar novo endereço
+                  Entrar ou cadastrar
                 </button>
-              </>
+              </div>
+            )}
+
+            {/* Customer fields */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-bold text-foreground">Nome e sobrenome</label>
+                <span className="text-[11px] font-semibold px-2 py-1 rounded-full bg-muted text-muted-foreground">Obrigatório</span>
+              </div>
+              <input
+                placeholder="Como vamos te chamar"
+                value={customerName}
+                onChange={e => setCustomerName(e.target.value)}
+                className="w-full h-12 rounded-xl border border-border/40 bg-card px-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-bold text-foreground">Número do seu celular</label>
+                <span className="text-[11px] font-semibold px-2 py-1 rounded-full bg-muted text-muted-foreground">Obrigatório</span>
+              </div>
+              <input
+                placeholder="(00) 00000-0000"
+                value={customerPhone}
+                onChange={e => setCustomerPhone(formatPhone(e.target.value))}
+                inputMode="numeric"
+                className="w-full h-12 rounded-xl border border-border/40 bg-card px-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+                O número do celular será utilizado para te atualizar sobre o status do seu pedido.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* QR Code fields */}
+        {isQrCode && (
+          <div className="px-4 space-y-4">
+            <div>
+              <label className="text-sm font-bold text-foreground mb-2 block">Seu nome</label>
+              <input
+                placeholder="Como vamos te chamar"
+                value={customerName}
+                onChange={e => setCustomerName(e.target.value)}
+                className="w-full h-12 rounded-xl border border-border/40 bg-card px-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-bold text-foreground mb-2 block">Número da mesa</label>
+              <input
+                placeholder="Ex: 5"
+                value={tableNumber}
+                onChange={e => setTableNumber(e.target.value.replace(/\D/g, ''))}
+                inputMode="numeric"
+                className="w-full h-12 rounded-xl border border-border/40 bg-card px-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sticky footer */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 bg-background border-t border-border/30 px-4 pb-[env(safe-area-inset-bottom,8px)] pt-3 max-w-4xl mx-auto">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-semibold text-foreground">Total</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-base font-bold text-primary">{formatPrice(isQrCode ? cartTotal : grandTotal)}</span>
+            {isDelivery && deliveryFee > 0 && (
+              <AppIcon name="ChevronUp" size={16} className="text-muted-foreground" />
             )}
           </div>
-        </>
-      )}
-
-      {/* QR Code fields */}
-      {isQrCode && (
-        <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
-          <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-            <AppIcon name="RestaurantMenu" size={16} className="text-primary" />
-            Dados para o pedido
-          </h3>
-          <Input
-            placeholder="Seu nome *"
-            value={customerName}
-            onChange={e => setCustomerName(e.target.value)}
-            className="h-12 rounded-xl"
-          />
-          <Input
-            placeholder="Número da mesa *"
-            value={tableNumber}
-            onChange={e => setTableNumber(e.target.value.replace(/\D/g, ''))}
-            className="h-12 rounded-xl"
-            inputMode="numeric"
-            type="number"
-            min={1}
-          />
         </div>
-      )}
-
-      <Button
-        className="w-full h-14 text-base font-bold rounded-xl"
-        onClick={handleSend}
-        disabled={sending || (isDelivery && !customerUser) || (isDelivery && feeResult?.out_of_range)}
-      >
-        {sending ? (
-          <AppIcon name="Loader2" size={20} className="animate-spin mr-2" />
-        ) : (
-          <AppIcon name="Send" size={20} className="mr-2" />
-        )}
-        {isQrCode ? `Enviar Pedido • ${formatPrice(cartTotal)}` : `Finalizar Pedido • ${formatPrice(grandTotal)}`}
-      </Button>
+        <button
+          onClick={handleSend}
+          disabled={sending || !canSend}
+          className="w-full h-14 rounded-xl bg-foreground text-background font-bold text-sm flex items-center justify-between px-5 disabled:opacity-40 active:scale-[0.98] transition-all"
+        >
+          <span>{sending ? 'Enviando...' : 'Fazer pedido'}</span>
+          {sending ? (
+            <AppIcon name="Loader2" size={20} className="animate-spin" />
+          ) : (
+            <AppIcon name="ArrowRight" size={20} />
+          )}
+        </button>
+      </div>
     </div>
   );
 }
 
-// Extracted cart items list (shared visual)
+// Extracted cart items list (shared visual for tablet)
 export function CartItemsList({ cart, onUpdateQuantity }: { cart: CartItem[]; onUpdateQuantity: (i: number, qty: number) => void }) {
   return (
     <div className="space-y-2">
@@ -501,17 +523,13 @@ export function CartItemsList({ cart, onUpdateQuantity }: { cart: CartItem[]; on
               {item.notes && <p className="text-[11px] text-muted-foreground/70 italic truncate">{item.notes}</p>}
               <div className="flex items-center justify-between mt-2">
                 <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => onUpdateQuantity(i, item.quantity - 1)}
-                    className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center active:scale-90 transition-transform"
-                  >
+                  <button onClick={() => onUpdateQuantity(i, item.quantity - 1)}
+                    className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center active:scale-90 transition-transform">
                     <AppIcon name={item.quantity === 1 ? 'Trash2' : 'Minus'} size={13} className={item.quantity === 1 ? 'text-destructive' : ''} />
                   </button>
                   <span className="w-7 text-center text-sm font-bold text-foreground">{item.quantity}</span>
-                  <button
-                    onClick={() => onUpdateQuantity(i, item.quantity + 1)}
-                    className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center active:scale-90 transition-transform"
-                  >
+                  <button onClick={() => onUpdateQuantity(i, item.quantity + 1)}
+                    className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center active:scale-90 transition-transform">
                     <AppIcon name="Plus" size={13} />
                   </button>
                 </div>

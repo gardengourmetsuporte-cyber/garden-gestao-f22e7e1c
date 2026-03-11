@@ -471,20 +471,19 @@ export default function DigitalMenu() {
 
       {/* Cart tab */}
       {activeTab === 'cart' && unitId && (
-        <div className="pt-4">
-          <MenuCart
-            cart={cart}
-            cartTotal={cartTotal}
-            unitId={unitId}
-            autoConfirm={(unit?.store_info as any)?.auto_confirm?.delivery ?? false}
-            customerUser={customerUser}
-            source={searchParams.get('source') || undefined}
-            onUpdateQuantity={updateCartQuantity}
-            onRemove={removeFromCart}
-            onClear={clearCart}
-            onLogin={() => setShowAuth(true)}
-          />
-        </div>
+        <MenuCart
+          cart={cart}
+          cartTotal={cartTotal}
+          unitId={unitId}
+          autoConfirm={(unit?.store_info as any)?.auto_confirm?.delivery ?? false}
+          customerUser={customerUser}
+          source={searchParams.get('source') || undefined}
+          onUpdateQuantity={updateCartQuantity}
+          onRemove={removeFromCart}
+          onClear={clearCart}
+          onLogin={() => setShowAuth(true)}
+          onBackToMenu={() => setActiveTab('home')}
+        />
       )}
 
       {/* Account tab */}
