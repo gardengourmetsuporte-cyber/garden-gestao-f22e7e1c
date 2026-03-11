@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { useQuotations } from '@/hooks/useQuotations';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { useCountUp } from '@/hooks/useCountUp';
@@ -28,13 +29,18 @@ const variantIcon: Record<string, string> = {
 export function QuickStatsWidget() {
   const navigate = useNavigate();
   const { stats, isLoading } = useDashboardStats();
+  const { quotations } = useQuotations();
+
+  const pendingQuotations = quotations.filter(q => q.status !== 'resolved').length;
 
   if (isLoading) return null;
+
+  const allStats = { ...stats, pendingQuotations };
 
   return (
     <div className="grid grid-cols-2 gap-3">
       {items.map((item) => {
-        const value = stats[item.key as keyof typeof stats] as number;
+        const value = allStats[item.key as keyof typeof allStats] as number;
         const isActive = value > 0;
         const variant = isActive ? item.activeVariant : 'default';
 
