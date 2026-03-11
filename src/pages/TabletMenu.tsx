@@ -122,6 +122,8 @@ export default function TabletMenu() {
         </div>
       </header>
 
+      <div className="px-4 pt-2"><SyncStatusIndicator /></div>
+
       {/* Products by category */}
       <main className="pb-24 px-4 pt-4">
         {loading && products.length === 0 ? (
