@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { SEGMENT_CONFIG, type Customer, type CustomerSegment } from '@/types/customer';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 const TEMPLATES = [
   { label: '🔥 Sentimos sua falta!', text: 'Olá! Sentimos sua falta por aqui. Que tal nos visitar novamente? Temos novidades esperando por você! 😊' },
@@ -25,8 +26,10 @@ interface Props {
 
 export function MessageCampaignSheet({ open, onOpenChange, customers, segment }: Props) {
   const { activeUnit } = useUnit();
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [configError, setConfigError] = useState(false);
 
   const recipients = useMemo(
     () => customers.filter(c => c.phone?.trim()),
@@ -41,6 +44,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
     if (!message.trim() || !activeUnit || recipients.length === 0) return;
 
     setSending(true);
+    setConfigError(false);
     try {
       const phones = recipients.map(c => c.phone!.replace(/\D/g, ''));
       const { data, error } = await supabase.functions.invoke('whatsapp-bulk-send', {
@@ -48,7 +52,14 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
       });
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (data?.error) {
+        if (typeof data.error === 'string' && data.error.includes('CANAL_SEM_CONFIG')) {
+          setConfigError(true);
+          toast.error('Canal WhatsApp não configurado. Complete a configuração primeiro.');
+          return;
+        }
+        throw new Error(data.error);
+      }
 
       toast.success(`${data.sent} mensagens enviadas com sucesso!${data.errors ? ` (${data.errors} erros)` : ''}`);
       setMessage('');
@@ -83,6 +94,31 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
               </p>
             )}
           </div>
+
+          {/* Config error alert */}
+          {configError && (
+            <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 space-y-2">
+              <p className="text-sm font-medium text-destructive flex items-center gap-2">
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>error</span>
+                Canal WhatsApp não configurado
+              </p>
+              <p className="text-xs text-muted-foreground">
+                A URL da API ou chave de API não foram preenchidas. Complete a configuração para enviar mensagens.
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-2"
+                onClick={() => {
+                  onOpenChange(false);
+                  navigate('/whatsapp/settings');
+                }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 16 }}>settings</span>
+                Ir para Configurações
+              </Button>
+            </div>
+          )}
 
           {/* Quick templates */}
           <div>
