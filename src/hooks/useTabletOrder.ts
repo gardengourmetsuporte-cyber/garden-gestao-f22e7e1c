@@ -199,7 +199,7 @@ export function useTabletOrder(unitId: string) {
           setCart([]);
           setOrderStatus('queued_offline');
           toast.success('Pedido salvo offline!', { description: 'Será enviado quando a conexão voltar.' });
-          return { orderId: offlineId, token: offlineId };
+          return { orderId: offlineId };
         } catch {}
       }
       console.error('Error creating order:', err);
