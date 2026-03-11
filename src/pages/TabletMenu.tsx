@@ -59,7 +59,7 @@ export default function TabletMenu() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-card/90 backdrop-blur-xl border-b border-border/20">
-        <div className="flex items-center justify-between px-4 py-3 gap-2">
+        <div className="flex items-center justify-between px-4 py-3">
           <SyncStatusIndicator />
           <div className="flex items-center gap-3">
             <AppIcon name="ChefHat" className="w-7 h-7 text-primary" />
