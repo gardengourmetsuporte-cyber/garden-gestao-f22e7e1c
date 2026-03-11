@@ -250,6 +250,7 @@ export default function PDV() {
             <button onClick={() => setCloseRegisterSheet(true)} className="w-9 h-9 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center shrink-0">
               <AppIcon name="LockKeyhole" size={15} className="text-destructive" />
             </button>
+           <SyncStatusIndicator />
           </div>
 
           {/* Categories */}
