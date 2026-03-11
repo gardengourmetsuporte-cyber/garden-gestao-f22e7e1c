@@ -115,13 +115,16 @@ export function BottomTabBar() {
     return location.pathname.startsWith(path);
   };
 
-  const isTabLocked = (path: string): boolean => {
-    const basePath = path.split('?')[0];
-    const moduleKey = getModuleKeyFromRoute(basePath);
-    if (!moduleKey) return false;
+  const isTabLocked = (tab: TabDef): boolean => {
+    const basePath = tab.path.split('?')[0];
+    const moduleKey = getModuleKeyFromRoute(basePath) || tab.moduleKey;
+    if (!moduleKey || moduleKey === 'dashboard') return false;
+    // Check plan
     const required = MODULE_REQUIRED_PLAN[moduleKey];
-    if (!required) return false;
-    return !planSatisfies(plan, required);
+    if (required && !planSatisfies(plan, required)) return true;
+    // Check module access level
+    if (!hasAccess(moduleKey)) return true;
+    return false;
   };
 
   if (isHidden) return null;
