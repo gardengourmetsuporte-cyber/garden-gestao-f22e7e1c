@@ -100,6 +100,7 @@ const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinan
 const ShareReceiptHandler = lazy(() => lazyRetry(() => import("./pages/ShareReceiptHandler")));
 const Documentation = lazy(() => lazyRetry(() => import("./pages/Documentation")));
 const Compliance = lazy(() => lazyRetry(() => import("./pages/Compliance")));
+const AdminMonitor = lazy(() => lazyRetry(() => import("./pages/AdminMonitor")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
