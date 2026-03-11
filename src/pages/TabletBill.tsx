@@ -65,6 +65,8 @@ export default function TabletBill() {
   const queryClient = useQueryClient();
   const mesa = searchParams.get('mesa') || '1';
   const mesaNum = parseInt(mesa, 10);
+  const comanda = searchParams.get('comanda');
+  const comandaNum = comanda ? parseInt(comanda, 10) : null;
 
   const [selectedPayment, setSelectedPayment] = useState<PaymentOption>(null);
 
