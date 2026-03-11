@@ -73,7 +73,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             Pedido <span className="font-mono font-bold text-foreground">#{orderSent}</span>
           </p>
           <p className="text-muted-foreground text-xs mt-1">
-            Mesa {tableNumber} • {customerName} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            {comandaNumber ? `Comanda #${comandaNumber}` : `Mesa ${tableNumber}`} • {customerName || 'Cliente'} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
         <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
