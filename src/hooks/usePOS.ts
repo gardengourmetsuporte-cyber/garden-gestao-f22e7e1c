@@ -244,7 +244,7 @@ export function usePOS() {
   const subtotal = cart.reduce((sum, i) => sum + (i.quantity * i.unit_price - i.discount), 0);
   const total = Math.max(0, subtotal - discount);
 
-  // Finalize sale
+  // Finalize sale (with offline fallback)
   const finalizeSale = useCallback(async (payments: PaymentLine[], sourceOrderId?: string) => {
     if (!activeUnitId || !user?.id) return null;
     const paymentTotal = payments.reduce((s, p) => s + p.amount, 0);
@@ -253,61 +253,83 @@ export function usePOS() {
       return null;
     }
 
+    const saleData = {
+      unit_id: activeUnitId,
+      user_id: user.id,
+      source: sourceOrderId ? 'pedido' : saleSource,
+      source_order_id: sourceOrderId || null,
+      customer_name: customerName || null,
+      customer_document: customerDocument || null,
+      table_number: tableNumber,
+      subtotal,
+      discount,
+      total,
+      status: 'paid',
+      notes: saleNotes || null,
+      paid_at: new Date().toISOString(),
+    };
+
+    const itemsData = cart.map(i => ({
+      product_id: i.product.id || null,
+      product_name: i.product.name,
+      product_code: i.product.codigo_pdv || null,
+      quantity: i.quantity,
+      unit_price: i.unit_price,
+      discount: i.discount,
+      total_price: i.quantity * i.unit_price - i.discount,
+      notes: i.notes || null,
+    }));
+
+    const paymentsData = payments.map(p => ({
+      method: p.method,
+      amount: p.amount,
+      change_amount: p.change_amount,
+    }));
+
+    // ---- Offline path ----
+    if (!isConnected) {
+      try {
+        const offlineId = crypto.randomUUID();
+        await enqueueOperation({
+          id: offlineId,
+          type: 'pos_sale',
+          payload: { sale: saleData, items: itemsData, payments: paymentsData, sourceOrderId },
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+        });
+        toast.success('Venda salva offline!', { description: 'Será sincronizada quando a conexão voltar.' });
+        clearCart();
+        return offlineId;
+      } catch {
+        toast.error('Erro ao salvar venda offline');
+        return null;
+      }
+    }
+
+    // ---- Online path ----
     setSavingSale(true);
     try {
-      // Create sale
       const { data: sale, error: saleError } = await supabase
         .from('pos_sales')
-        .insert({
-          unit_id: activeUnitId,
-          user_id: user.id,
-          source: sourceOrderId ? 'pedido' : saleSource,
-          source_order_id: sourceOrderId || null,
-          customer_name: customerName || null,
-          customer_document: customerDocument || null,
-          table_number: tableNumber,
-          subtotal,
-          discount,
-          total,
-          status: 'paid',
-          notes: saleNotes || null,
-          paid_at: new Date().toISOString(),
-        })
+        .insert(saleData)
         .select('id')
         .single();
 
       if (saleError) throw saleError;
 
-      // Insert items
       if (cart.length > 0) {
         const { error: itemsError } = await supabase
           .from('pos_sale_items')
-          .insert(cart.map(i => ({
-            sale_id: sale.id,
-            product_id: i.product.id || null,
-            product_name: i.product.name,
-            product_code: i.product.codigo_pdv || null,
-            quantity: i.quantity,
-            unit_price: i.unit_price,
-            discount: i.discount,
-            total_price: i.quantity * i.unit_price - i.discount,
-            notes: i.notes || null,
-          })));
+          .insert(itemsData.map(i => ({ ...i, sale_id: sale.id })));
         if (itemsError) throw itemsError;
       }
 
-      // Insert payments
       const { error: payError } = await supabase
         .from('pos_sale_payments')
-        .insert(payments.map(p => ({
-          sale_id: sale.id,
-          method: p.method,
-          amount: p.amount,
-          change_amount: p.change_amount,
-        })));
+        .insert(paymentsData.map(p => ({ ...p, sale_id: sale.id })));
       if (payError) throw payError;
 
-      // If came from tablet order, mark as delivered
       if (sourceOrderId) {
         await supabase.from('tablet_orders').update({ status: 'delivered' }).eq('id', sourceOrderId);
       }
@@ -317,12 +339,29 @@ export function usePOS() {
       fetchPendingOrders();
       return sale.id;
     } catch (err: any) {
+      // If network error, try to queue offline
+      if (!navigator.onLine || err.message?.includes('fetch')) {
+        try {
+          const offlineId = crypto.randomUUID();
+          await enqueueOperation({
+            id: offlineId,
+            type: 'pos_sale',
+            payload: { sale: saleData, items: itemsData, payments: paymentsData, sourceOrderId },
+            createdAt: new Date().toISOString(),
+            retries: 0,
+            status: 'pending',
+          });
+          toast.success('Venda salva offline!', { description: 'Será sincronizada quando a conexão voltar.' });
+          clearCart();
+          return offlineId;
+        } catch {}
+      }
       toast.error('Erro ao finalizar venda: ' + err.message);
       return null;
     } finally {
       setSavingSale(false);
     }
-  }, [activeUnitId, user, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, clearCart, fetchPendingOrders]);
+  }, [activeUnitId, user, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, clearCart, fetchPendingOrders, isConnected]);
 
   // Send order (mesa/delivery) — creates a tablet_order instead of a sale
   const sendOrder = useCallback(async (paymentInfo?: { method: string; change: number }) => {
