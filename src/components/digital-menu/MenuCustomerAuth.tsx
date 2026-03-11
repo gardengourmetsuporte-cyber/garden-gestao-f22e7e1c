@@ -36,6 +36,16 @@ export function MenuCustomerAuth({ unitName, logoUrl, cuisineType, city, isOpen 
     }
   };
 
+  if (fullPage) {
+    return (
+      <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center px-6 py-10">
+        <div className="w-full max-w-md flex flex-col items-center">
+          {renderContent()}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center animate-in fade-in duration-200">
       {/* Backdrop */}
@@ -43,6 +53,21 @@ export function MenuCustomerAuth({ unitName, logoUrl, cuisineType, city, isOpen 
 
       {/* Sheet */}
       <div className="relative w-full max-w-md bg-background rounded-t-3xl sm:rounded-3xl shadow-2xl border border-border/40 animate-in slide-in-from-bottom-8 duration-300 max-h-[90dvh] overflow-y-auto">
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
+        </div>
+
+        <div className="flex flex-col items-center">
+          {renderContent()}
+        </div>
+      </div>
+    </div>
+  );
+
+  function renderContent() {
+    return (
+      <>
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
