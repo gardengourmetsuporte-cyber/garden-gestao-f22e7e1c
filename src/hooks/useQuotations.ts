@@ -180,7 +180,7 @@ export function useQuotations() {
   });
 
   const resolveQuotation = useMutation({
-    mutationFn: async (quotationId: string) => {
+    mutationFn: async ({ quotationId, manualWinners }: { quotationId: string; manualWinners?: Record<string, string> }) => {
       // Fetch all data
       const { data: qItems } = await supabase
         .from('quotation_items')
@@ -196,31 +196,37 @@ export function useQuotations() {
 
       const prices = await fetchPrices(quotationId);
 
-      // For each item, find best price (latest round per supplier)
+      // For each item, use manual winner if provided, otherwise find best price
       const winners: { item_id: string; quantity: number; supplier_id: string }[] = [];
 
       for (const item of qItems) {
-        const itemPrices = prices.filter(p => p.quotation_item_id === item.id);
-        // Get latest price per supplier
-        const latestBySupplier = new Map<string, QuotationPrice>();
-        for (const p of itemPrices) {
-          const existing = latestBySupplier.get(p.quotation_supplier_id);
-          if (!existing || p.round > existing.round) {
-            latestBySupplier.set(p.quotation_supplier_id, p);
+        let winnerQsId: string | null = null;
+
+        // Check manual override first (manualWinners maps item.id -> quotation_supplier.id)
+        if (manualWinners && manualWinners[item.id]) {
+          winnerQsId = manualWinners[item.id];
+        } else {
+          // Auto: find cheapest
+          const itemPrices = prices.filter(p => p.quotation_item_id === item.id);
+          const latestBySupplier = new Map<string, QuotationPrice>();
+          for (const p of itemPrices) {
+            const existing = latestBySupplier.get(p.quotation_supplier_id);
+            if (!existing || p.round > existing.round) {
+              latestBySupplier.set(p.quotation_supplier_id, p);
+            }
           }
+          let bestPrice: QuotationPrice | null = null;
+          for (const p of latestBySupplier.values()) {
+            if (!bestPrice || p.unit_price < bestPrice.unit_price) {
+              bestPrice = p;
+            }
+          }
+          if (bestPrice) winnerQsId = bestPrice.quotation_supplier_id;
         }
 
-        let bestPrice: QuotationPrice | null = null;
-        for (const p of latestBySupplier.values()) {
-          if (!bestPrice || p.unit_price < bestPrice.unit_price) {
-            bestPrice = p;
-          }
-        }
-
-        if (bestPrice) {
-          const winnerQs = qSuppliers.find(s => s.id === bestPrice!.quotation_supplier_id);
+        if (winnerQsId) {
+          const winnerQs = qSuppliers.find(s => s.id === winnerQsId);
           if (winnerQs) {
-            // Update winner on item
             await supabase
               .from('quotation_items')
               .update({ winner_supplier_id: winnerQs.supplier_id })
