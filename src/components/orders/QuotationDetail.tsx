@@ -18,6 +18,8 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   const [prices, setPrices] = useState<QuotationPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [resolving, setResolving] = useState(false);
+  // Manual winner overrides: itemId -> quotation_supplier_id
+  const [manualWinners, setManualWinners] = useState<Record<string, string>>({});
 
   const loadPrices = async () => {
     try {
@@ -64,6 +66,23 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
     });
   }, [items, suppliers, prices]);
 
+  // Auto-populate winners with cheapest when prices load
+  useEffect(() => {
+    if (prices.length > 0 && Object.keys(manualWinners).length === 0) {
+      const auto: Record<string, string> = {};
+      comparison.forEach(row => {
+        const responded = row.supplierPrices.filter(sp => sp.price);
+        if (responded.length > 0) {
+          const cheapest = responded.reduce((a, b) =>
+            a.price!.unit_price <= b.price!.unit_price ? a : b
+          );
+          auto[row.item.id] = cheapest.supplier.id;
+        }
+      });
+      setManualWinners(auto);
+    }
+  }, [prices, comparison]);
+
   const economy = useMemo(() => {
     let savings = 0;
     comparison.forEach(row => {
@@ -105,10 +124,14 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
     loadPrices();
   };
 
+  const toggleWinner = (itemId: string, qsSupplierId: string) => {
+    setManualWinners(prev => ({ ...prev, [itemId]: qsSupplierId }));
+  };
+
   const handleResolve = async () => {
     setResolving(true);
     try {
-      await resolveQuotation(quotation.id);
+      await resolveQuotation(quotation.id, manualWinners);
       toast.success('Pedidos gerados com sucesso!');
     } catch {
       toast.error('Erro ao gerar pedidos');
@@ -121,6 +144,23 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   const canResolve = allResponded && prices.length > 0 && quotation.status !== 'resolved';
 
   const respondedCount = suppliers.filter(s => s.status === 'responded').length;
+
+  // Count how many items have manual overrides (different from cheapest)
+  const overrideCount = useMemo(() => {
+    let count = 0;
+    comparison.forEach(row => {
+      const responded = row.supplierPrices.filter(sp => sp.price);
+      if (responded.length > 0) {
+        const cheapest = responded.reduce((a, b) =>
+          a.price!.unit_price <= b.price!.unit_price ? a : b
+        );
+        if (manualWinners[row.item.id] && manualWinners[row.item.id] !== cheapest.supplier.id) {
+          count++;
+        }
+      }
+    });
+    return count;
+  }, [comparison, manualWinners]);
 
   return (
     <div className="space-y-5">
@@ -200,9 +240,16 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
       {/* Comparison Table */}
       {prices.length > 0 && (
         <section className="space-y-2">
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
-            Comparação de Preços
-          </p>
+          <div className="flex items-center justify-between px-1">
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+              Comparação de Preços
+            </p>
+            {canResolve && (
+              <p className="text-[10px] text-muted-foreground">
+                Toque para trocar fornecedor
+              </p>
+            )}
+          </div>
 
           {/* Economy highlight */}
           {economy > 0 && (
@@ -214,6 +261,21 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                 <p className="text-xs text-muted-foreground">Economia estimada</p>
                 <p className="text-sm font-bold text-success">
                   R$ {economy.toFixed(2).replace('.', ',')}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Override warning */}
+          {overrideCount > 0 && (
+            <div className="rounded-2xl bg-warning/8 border border-warning/15 p-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-warning/15 flex items-center justify-center shrink-0">
+                <AppIcon name="Pencil" size={16} className="text-warning" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Ajustes manuais</p>
+                <p className="text-sm font-bold text-warning">
+                  {overrideCount} {overrideCount === 1 ? 'item alterado' : 'itens alterados'}
                 </p>
               </div>
             </div>
@@ -236,21 +298,41 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                 {/* Supplier prices row */}
                 <div className="grid divide-x divide-border/20" style={{ gridTemplateColumns: `repeat(${suppliers.length}, 1fr)` }}>
                   {row.supplierPrices.map(sp => {
-                    const isWinner = sp.price && row.minPrice !== null && sp.price.unit_price === row.minPrice;
-                    const isLoser = sp.price && row.minPrice !== null && sp.price.unit_price > row.minPrice;
+                    const isAutoWinner = sp.price && row.minPrice !== null && sp.price.unit_price === row.minPrice;
+                    const isManualWinner = manualWinners[row.item.id] === sp.supplier.id;
+                    const isSelected = isManualWinner;
+                    const isLoser = sp.price && !isSelected && row.minPrice !== null && sp.price.unit_price > row.minPrice;
+                    const canSelect = canResolve && sp.price;
+
                     return (
-                      <div key={sp.supplier.id} className="p-3 text-center">
+                      <button
+                        key={sp.supplier.id}
+                        className={cn(
+                          'p-3 text-center transition-all relative',
+                          isSelected && 'bg-success/8 ring-2 ring-inset ring-success/30',
+                          canSelect && 'cursor-pointer hover:bg-secondary/40 active:scale-95',
+                          !canSelect && 'cursor-default'
+                        )}
+                        onClick={() => canSelect && toggleWinner(row.item.id, sp.supplier.id)}
+                        disabled={!canSelect}
+                        type="button"
+                      >
+                        {isSelected && (
+                          <div className="absolute top-1 right-1">
+                            <AppIcon name="CheckCircle2" size={12} className="text-success" />
+                          </div>
+                        )}
                         <p className="text-[10px] text-muted-foreground mb-1 truncate">{sp.supplier.supplier?.name}</p>
                         {sp.price ? (
                           <div>
                             <div className="flex items-center justify-center gap-1">
                               <span className={cn(
                                 'text-sm font-bold',
-                                isWinner ? 'text-success' : isLoser ? 'text-destructive' : 'text-foreground'
+                                isSelected ? 'text-success' : isLoser ? 'text-destructive' : 'text-foreground'
                               )}>
                                 R$ {sp.price.unit_price.toFixed(2).replace('.', ',')}
                               </span>
-                              {isWinner && <AppIcon name="Trophy" size={14} className="text-warning" />}
+                              {isSelected && <AppIcon name="Trophy" size={14} className="text-warning" />}
                             </div>
                             {sp.price.brand && (
                               <p className="text-[10px] text-muted-foreground mt-0.5">{sp.price.brand}</p>
@@ -259,7 +341,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                         ) : (
                           <span className="text-sm text-muted-foreground/50">—</span>
                         )}
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -300,7 +382,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                 {resolving ? (
                   <><AppIcon name="Loader2" size={16} className="animate-spin" /> Gerando pedidos...</>
                 ) : (
-                  <><AppIcon name="Trophy" size={16} /> Gerar Pedidos Otimizados</>
+                  <><AppIcon name="Trophy" size={16} /> Gerar Pedidos{overrideCount > 0 ? ' (Ajustados)' : ' Otimizados'}</>
                 )}
               </Button>
             )}
