@@ -46,12 +46,18 @@ export default function DigitalMenu() {
   const [showAuth, setShowAuth] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState<MenuTab | null>(null);
+  // Gate: show auth screen on first visit (no session & hasn't skipped)
+  const [authGatePassed, setAuthGatePassed] = useState(() => {
+    return localStorage.getItem(`dm_auth_skipped_${unitId}`) === '1';
+  });
 
   // Check auth state on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setCustomerUser(session?.user ?? null);
+      const user = session?.user ?? null;
+      setCustomerUser(user);
       setAuthChecked(true);
+      if (user) setAuthGatePassed(true);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -291,6 +297,30 @@ export default function DigitalMenu() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  // Auth gate: show login screen on first visit
+  if (authChecked && !customerUser && !authGatePassed) {
+    const handleSkipGate = () => {
+      setAuthGatePassed(true);
+      localStorage.setItem(`dm_auth_skipped_${unitId}`, '1');
+    };
+    return (
+      <MenuCustomerAuth
+        fullPage
+        unitName={unit?.name}
+        logoUrl={unit?.store_info?.logo_url}
+        cuisineType={unit?.store_info?.cuisine_type}
+        city={unit?.store_info?.city}
+        isOpen={true}
+        bonusPoints={signupBonus}
+        onSkip={handleSkipGate}
+        onEmailLogin={() => {
+          handleSkipGate();
+          setShowAuth(true);
+        }}
+      />
     );
   }
 
