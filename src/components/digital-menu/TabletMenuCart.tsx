@@ -168,7 +168,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
               .from('tablet_orders')
               .insert({
                 unit_id: unitId,
-                table_number: parseInt(tableNumber) || 0,
+                table_number: comandaNumber || (parseInt(tableNumber) || 0),
+                comanda_number: comandaNumber || null,
                 status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
                 total: payWithCoins ? 0 : cartTotal,
                 source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
