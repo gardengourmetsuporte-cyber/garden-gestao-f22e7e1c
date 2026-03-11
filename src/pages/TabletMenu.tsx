@@ -87,37 +87,93 @@ export default function TabletMenu() {
                   Seu Pedido
                 </SheetTitle>
               </SheetHeader>
-              <div className="flex-1 overflow-y-auto mt-4 space-y-3">
-                {cart.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-12">Carrinho vazio</p>
-                ) : (
-                  cart.map((item) => (
-                    <CartItemCard
-                      key={item.product.id}
-                      item={item}
-                      onUpdateQuantity={(q) => updateQuantity(item.product.id, q)}
-                      onUpdateNotes={(n) => updateNotes(item.product.id, n)}
-                      onRemove={() => removeFromCart(item.product.id)}
-                      formatPrice={formatPrice}
-                    />
-                  ))
-                )}
-              </div>
-              {cart.length > 0 && (
-                <div className="pt-4 border-t border-border/30 mt-4 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold">Total</span>
-                    <span className="text-2xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+
+              {orderSent ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center gap-5">
+                  <div className="w-20 h-20 rounded-full bg-emerald-500/12 flex items-center justify-center animate-in zoom-in-50 duration-300">
+                    <AppIcon name="CheckCircle2" size={40} className="text-emerald-500" />
                   </div>
-                  <Button
-                    className="w-full h-14 text-lg font-bold rounded-xl"
-                    onClick={handleFinalize}
-                    disabled={submitting}
-                  >
-                    <AppIcon name="Send" className="w-5 h-5 mr-2" />
-                    {submitting ? 'Enviando...' : 'Finalizar Pedido'}
+                  <div>
+                    <h2 className="text-2xl font-bold text-foreground">Pedido enviado!</h2>
+                    <p className="text-muted-foreground text-sm mt-2">
+                      Comanda <span className="font-mono font-bold text-foreground">#{comandaNumber}</span>
+                    </p>
+                  </div>
+                  <Button variant="outline" size="lg" className="rounded-xl mt-2" onClick={() => {
+                    setOrderSent(null);
+                    setComandaNumber(null);
+                    setCartOpen(false);
+                  }}>
+                    <AppIcon name="Plus" size={18} className="mr-2" />
+                    Fazer novo pedido
                   </Button>
                 </div>
+              ) : (
+                <>
+                  <div className="flex-1 overflow-y-auto mt-4 space-y-3">
+                    {cart.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-12">Carrinho vazio</p>
+                    ) : (
+                      cart.map((item) => (
+                        <CartItemCard
+                          key={item.product.id}
+                          item={item}
+                          onUpdateQuantity={(q) => updateQuantity(item.product.id, q)}
+                          onUpdateNotes={(n) => updateNotes(item.product.id, n)}
+                          onRemove={() => removeFromCart(item.product.id)}
+                          formatPrice={formatPrice}
+                        />
+                      ))
+                    )}
+                  </div>
+                  {cart.length > 0 && (
+                    <div className="pt-4 border-t border-border/30 mt-4 space-y-3">
+                      {/* Comanda section */}
+                      <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
+                        <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                          <AppIcon name="QrCode" size={16} className="text-primary" />
+                          Comanda
+                        </h3>
+                        {comandaNumber ? (
+                          <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                              <span className="text-lg font-black text-primary">#{comandaNumber}</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-bold text-foreground">Comanda #{comandaNumber}</p>
+                              <p className="text-[11px] text-muted-foreground">Escaneada com sucesso</p>
+                            </div>
+                            <button onClick={() => setComandaNumber(null)} className="p-2 rounded-lg hover:bg-secondary/50">
+                              <AppIcon name="X" size={16} className="text-muted-foreground" />
+                            </button>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            className="w-full h-14 rounded-xl text-base font-semibold"
+                            onClick={() => setShowScanner(true)}
+                          >
+                            <AppIcon name="Camera" size={20} className="mr-2" />
+                            Escanear Comanda
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-bold">Total</span>
+                        <span className="text-2xl font-bold text-primary">{formatPrice(cartTotal)}</span>
+                      </div>
+                      <Button
+                        className="w-full h-14 text-lg font-bold rounded-xl"
+                        onClick={handleFinalize}
+                        disabled={submitting}
+                      >
+                        <AppIcon name="Send" className="w-5 h-5 mr-2" />
+                        {submitting ? 'Enviando...' : comandaNumber ? 'Enviar Pedido' : 'Escanear Comanda'}
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </SheetContent>
           </Sheet>
