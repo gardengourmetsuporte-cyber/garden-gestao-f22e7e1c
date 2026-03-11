@@ -229,8 +229,7 @@ export function CardapioSettings({ initialTab = null, embedded = false }: Cardap
   const [activeTab, setActiveTab] = useState<SettingsTab | null>(initialTab);
   const [newTableNum, setNewTableNum] = useState('');
 
-  // Use the current origin so the generated links always point to the currently deployed environment
-  const basePublicUrl = window.location.origin;
+  const basePublicUrl = getPublicAppUrl();
 
   // PDV form
   const [hubUrl, setHubUrl] = useState('');
