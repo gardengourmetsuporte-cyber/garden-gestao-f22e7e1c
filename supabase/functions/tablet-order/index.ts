@@ -207,11 +207,8 @@ async function sendToPDV(supabase: any, orderId: string) {
       .single();
 
     if (configError || !config) {
-      await supabase
-        .from("tablet_orders")
-        .update({ status: "error", error_message: "Configuração do PDV não encontrada" })
-        .eq("id", orderId);
-      return { success: false, error: "Configuração do PDV não encontrada" };
+      // No PDV config = standalone mode, skip PDV integration silently
+      return { success: true, skipped: true };
     }
 
     // Build payload - support regular items and combos (CMB- prefix)

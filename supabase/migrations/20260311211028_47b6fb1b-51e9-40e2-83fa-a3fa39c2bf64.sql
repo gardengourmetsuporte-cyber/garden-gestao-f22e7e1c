@@ -1,0 +1,1 @@
+UPDATE tablet_orders SET status = 'confirmed', error_message = NULL WHERE status = 'error' AND error_message = 'Configuração do PDV não encontrada';
