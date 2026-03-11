@@ -32,7 +32,8 @@ export default function Deliveries() {
   const {
     deliveries, allDeliveries, groupedByNeighborhood, isLoading, isProcessing,
     statusFilter, setStatusFilter, stats,
-    processImage, uploadPhoto, createDelivery, updateStatus, updateAddress, deleteDelivery, invalidate,
+    processImage, uploadPhoto, createDelivery, createManualDelivery, isCreatingManual,
+    updateStatus, updateAddress, deleteDelivery, invalidate,
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
