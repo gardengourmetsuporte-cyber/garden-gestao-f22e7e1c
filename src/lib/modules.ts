@@ -94,6 +94,9 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
+    key: 'pdv', label: 'PDV', icon: 'Monitor', route: '/pdv', routes: ['/pdv'], group: 'Operação',
+  },
+  {
     key: 'deliveries', label: 'Entregas', icon: 'Truck', route: '/deliveries', routes: ['/deliveries'], group: 'Operação',
     children: [
       { key: 'deliveries.view', label: 'Ver entregas', icon: 'Eye' },

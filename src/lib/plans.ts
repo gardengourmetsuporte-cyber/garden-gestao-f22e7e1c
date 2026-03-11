@@ -40,6 +40,8 @@ export const PLANS: PlanDef[] = [
     highlight: false,
     features: [
       'Tudo do Pro',
+      'PDV completo',
+      'Entregas e logística',
       'Copilot IA',
       'WhatsApp IA',
       'Marketing',
@@ -66,6 +68,8 @@ export const MODULE_REQUIRED_PLAN: Record<string, PlanTier> = {
   'copilot': 'business',
   'menu-admin': 'business',
   'whatsapp': 'business',
+  'pdv': 'business',
+  'deliveries': 'business',
 };
 
 /** Modules that are still in production (shown with a beta/production badge) */

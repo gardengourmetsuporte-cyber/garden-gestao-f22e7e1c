@@ -104,7 +104,7 @@ describe('Plan Lock Consistency', () => {
 
   // Specific plan assignments
   const PRO_MODULES = ['finance', 'cash-closing', 'recipes', 'employees', 'ranking', 'rewards', 'personal-finance'];
-  const BUSINESS_MODULES = ['marketing', 'copilot', 'menu-admin', 'whatsapp'];
+  const BUSINESS_MODULES = ['marketing', 'copilot', 'menu-admin', 'whatsapp', 'pdv', 'deliveries'];
 
   for (const key of PRO_MODULES) {
     it(`"${key}" requires pro plan`, () => {
@@ -119,7 +119,7 @@ describe('Plan Lock Consistency', () => {
   }
 
   // Free modules should NOT be in the plan map
-  const FREE_MODULES = ['dashboard', 'agenda', 'inventory', 'orders', 'checklists', 'deliveries', 'customers', 'settings'];
+  const FREE_MODULES = ['dashboard', 'agenda', 'inventory', 'orders', 'checklists', 'customers', 'settings'];
   for (const key of FREE_MODULES) {
     it(`"${key}" is free (no plan restriction)`, () => {
       expect(MODULE_REQUIRED_PLAN[key]).toBeUndefined();
