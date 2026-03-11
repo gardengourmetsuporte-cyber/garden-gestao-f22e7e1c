@@ -12,7 +12,7 @@ import { DeliveryLocationPicker } from '@/components/deliveries/DeliveryLocation
 import { DeliveryEditSheet } from '@/components/deliveries/DeliveryEditSheet';
 import { ManualDeliverySheet } from '@/components/deliveries/ManualDeliverySheet';
 import { PageLoader } from '@/components/PageLoader';
-import { useFabAction } from '@/contexts/FabActionContext';
+import { useFabActions } from '@/contexts/FabActionContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
