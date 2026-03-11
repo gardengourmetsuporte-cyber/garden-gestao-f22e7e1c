@@ -19,7 +19,7 @@ export default function TabletMenu() {
   const { unitId } = useParams<{ unitId: string }>();
   const [searchParams] = useSearchParams();
   const tableNumber = parseInt(searchParams.get('mesa') || '1');
-  const navigate = useNavigate();
+  
   const {
     products, cart, cartTotal, loading, orderStatus,
     fetchProducts, addToCart, removeFromCart, updateQuantity, updateNotes, createOrder,
