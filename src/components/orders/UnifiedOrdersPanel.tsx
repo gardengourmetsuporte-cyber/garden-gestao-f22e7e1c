@@ -284,7 +284,7 @@ function TabletOrderList({ orders, emptyIcon, emptyTitle, emptySubtitle, onRetry
               <div className="bg-secondary/30 rounded-xl p-2.5 space-y-1">
                 {order.tablet_order_items.slice(0, 3).map((item: any) => (
                   <div key={item.id} className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">{item.quantity}x {item.tablet_products?.name || '?'}</span>
+                    <span className="text-muted-foreground">{item.quantity}x {item.tablet_products?.name || item.notes || 'Produto removido'}</span>
                   </div>
                 ))}
                 {order.tablet_order_items.length > 3 && (
