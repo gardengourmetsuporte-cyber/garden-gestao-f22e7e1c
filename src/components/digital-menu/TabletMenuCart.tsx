@@ -396,23 +396,54 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         </div>
       </div>
 
-      {/* Mesa + Name fields */}
+      {/* Comanda + Name fields */}
       <div className="rounded-2xl bg-card border border-border/30 p-4 space-y-3">
         <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-          <AppIcon name="TableRestaurant" size={16} className="text-primary" />
-          Identificação
+          <AppIcon name="QrCode" size={16} className="text-primary" />
+          Comanda
         </h3>
-        <div>
-          <label className="text-xs font-semibold text-muted-foreground mb-1 block">Número da mesa</label>
-          <Input
-            placeholder="Ex: 5"
-            value={tableNumber}
-            onChange={e => setTableNumber(e.target.value)}
-            className="text-center h-14 text-xl font-bold rounded-xl"
-            type="number"
-            inputMode="numeric"
-          />
-        </div>
+
+        {comandaNumber ? (
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <span className="text-lg font-black text-primary">#{comandaNumber}</span>
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-foreground">Comanda #{comandaNumber}</p>
+              <p className="text-[11px] text-muted-foreground">Escaneada com sucesso</p>
+            </div>
+            <button
+              onClick={() => setComandaNumber(null)}
+              className="p-2 rounded-lg hover:bg-secondary/50"
+            >
+              <AppIcon name="X" size={16} className="text-muted-foreground" />
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              className="w-full h-14 rounded-xl text-base font-semibold"
+              onClick={() => setShowScanner(true)}
+            >
+              <AppIcon name="Camera" size={20} className="mr-2" />
+              Escanear Comanda
+            </Button>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/30" /></div>
+              <div className="relative flex justify-center"><span className="bg-card px-3 text-[10px] text-muted-foreground uppercase">ou informe a mesa</span></div>
+            </div>
+            <Input
+              placeholder="Nº da mesa"
+              value={tableNumber}
+              onChange={e => setTableNumber(e.target.value)}
+              className="text-center h-12 text-lg font-bold rounded-xl"
+              type="number"
+              inputMode="numeric"
+            />
+          </div>
+        )}
+
         {!customerUser && (
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Seu nome</label>
@@ -425,6 +456,19 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           </div>
         )}
       </div>
+
+      {/* Comanda Scanner Modal */}
+      {showScanner && (
+        <ComandaScanner
+          unitId={unitId}
+          onScan={(num) => {
+            setComandaNumber(num);
+            setShowScanner(false);
+            toast.success(`Comanda #${num} escaneada!`);
+          }}
+          onCancel={() => setShowScanner(false)}
+        />
+      )}
 
       <Button
         className={`w-full h-14 text-base font-bold rounded-xl ${payWithCoins ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
