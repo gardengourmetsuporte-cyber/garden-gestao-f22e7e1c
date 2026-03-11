@@ -101,14 +101,16 @@ export function useTabletOrder(unitId: string) {
     0
   );
 
-  const createOrder = async (tableNumber: number) => {
+  const createOrder = async (tableNumber: number, comandaNumber?: number | null) => {
     setLoading(true);
 
     const orderData = {
       unit_id: unitId,
-      table_number: tableNumber,
+      table_number: comandaNumber || tableNumber,
+      comanda_number: comandaNumber || null,
       status: 'confirmed',
       total: cartTotal,
+      source: 'mesa' as const,
     };
 
     const itemsData = cart.map(c => ({
@@ -134,7 +136,7 @@ export function useTabletOrder(unitId: string) {
         setOrderStatus('queued_offline');
         toast.success('Pedido salvo offline!', { description: 'Será enviado quando a conexão voltar.' });
         setLoading(false);
-        return { orderId: offlineId, token: offlineId };
+        return { orderId: offlineId };
       } catch {
         toast.error('Erro ao salvar pedido offline');
         setLoading(false);
@@ -160,23 +162,27 @@ export function useTabletOrder(unitId: string) {
 
       if (itemsError) throw new Error(itemsError.message);
 
-      // Generate QR token
-      const token = crypto.randomUUID();
-      const expiresAt = new Date(Date.now() + 2 * 60 * 1000).toISOString();
-
-      const { error: qrError } = await supabase
-        .from('tablet_qr_confirmations')
-        .insert({
-          order_id: (order as any).id,
-          token,
-          expires_at: expiresAt,
-        });
-
-      if (qrError) throw new Error(qrError.message);
+      // Try to send to PDV
+      try {
+        await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ order_id: (order as any).id }),
+          }
+        );
+      } catch (e) {
+        console.warn('[useTabletOrder] send-to-pdv failed:', e);
+      }
 
       setCart([]);
       setOrderStatus('confirmed');
-      return { orderId: (order as any).id, token };
+      toast.success('Pedido enviado com sucesso!');
+      return { orderId: (order as any).id };
     } catch (err: any) {
       // If network error, try offline queue
       if (!navigator.onLine || err.message?.includes('fetch')) {
@@ -193,7 +199,7 @@ export function useTabletOrder(unitId: string) {
           setCart([]);
           setOrderStatus('queued_offline');
           toast.success('Pedido salvo offline!', { description: 'Será enviado quando a conexão voltar.' });
-          return { orderId: offlineId, token: offlineId };
+          return { orderId: offlineId };
         } catch {}
       }
       console.error('Error creating order:', err);
