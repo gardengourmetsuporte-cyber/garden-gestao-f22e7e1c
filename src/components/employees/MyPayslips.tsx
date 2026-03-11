@@ -9,12 +9,13 @@ import { Separator } from '@/components/ui/separator';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 export function MyPayslips() {
   const { myEmployee, isLoading: loadingEmployee } = useEmployees();
   const { payments, isLoading: loadingPayments } = useEmployeePayments(myEmployee?.id);
   const [expandedPayments, setExpandedPayments] = useState<Set<string>>(new Set());
-
+  const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
   
 
   const toggleExpand = (paymentId: string) => {
@@ -139,6 +140,15 @@ export function MyPayslips() {
                       )}
                       {payment.fgts_amount > 0 && (<div className="text-sm p-2 bg-emerald-500/10 rounded-lg"><div className="flex justify-between"><span className="text-emerald-600">FGTS depositado</span><span className="text-emerald-600 font-medium">{formatCurrency(payment.fgts_amount)}</span></div></div>)}
                       <div className="p-3 bg-primary/10 rounded-lg"><div className="flex justify-between items-center"><span className="font-semibold">Líquido a Receber</span><span className="font-bold text-lg text-primary">{formatCurrency(payment.net_salary)}</span></div></div>
+                      {payment.receipt_url && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setViewingReceipt(payment.receipt_url); }}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors"
+                        >
+                          <AppIcon name="Image" size={16} />
+                          Ver Comprovante
+                        </button>
+                      )}
                     </div>
                   )}
                 </Card>
@@ -167,10 +177,29 @@ export function MyPayslips() {
                 </div>
                 <span className="font-semibold text-lg" style={{ color: payment.type === 'discount' ? 'hsl(var(--destructive))' : undefined }}>{payment.type === 'discount' ? '-' : ''}{formatCurrency(payment.amount)}</span>
               </div>
+              {payment.receipt_url && (
+                <button
+                  onClick={() => setViewingReceipt(payment.receipt_url)}
+                  className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors"
+                >
+                  <AppIcon name="Image" size={16} />
+                  Ver Comprovante
+                </button>
+              )}
             </Card>
           ))}
         </div>
       )}
+
+      <Dialog open={!!viewingReceipt} onOpenChange={() => setViewingReceipt(null)}>
+        <DialogContent className="max-w-lg p-2">
+          {viewingReceipt && (
+            viewingReceipt.toLowerCase().endsWith('.pdf')
+              ? <iframe src={viewingReceipt} className="w-full h-[70vh] rounded-lg" />
+              : <img src={viewingReceipt} alt="Comprovante" className="w-full rounded-lg object-contain max-h-[70vh]" />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
