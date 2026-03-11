@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { cn } from '@/lib/utils';
 import { PushNotificationPrompt } from '@/components/notifications/PushNotificationPrompt';
+import { OfflineBanner } from '@/components/ui/OfflineBanner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { getRouteTitle } from '@/hooks/useDocumentTitle';
 
