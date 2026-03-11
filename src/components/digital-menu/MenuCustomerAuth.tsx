@@ -11,6 +11,8 @@ interface Props {
   city?: string;
   isOpen?: boolean;
   bonusPoints?: number;
+  /** If true, renders as full-page instead of modal overlay */
+  fullPage?: boolean;
   onSkip?: () => void;
   onEmailLogin?: () => void;
 }
