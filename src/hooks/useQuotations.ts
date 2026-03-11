@@ -298,7 +298,8 @@ export function useQuotations() {
     isLoading,
     createQuotation: createQuotation.mutateAsync,
     contestSupplier: contestSupplier.mutateAsync,
-    resolveQuotation: resolveQuotation.mutateAsync,
+    resolveQuotation: (quotationId: string, manualWinners?: Record<string, string>) =>
+      resolveQuotation.mutateAsync({ quotationId, manualWinners }),
     deleteQuotation: deleteQuotation.mutateAsync,
     fetchPrices,
     invalidate,
