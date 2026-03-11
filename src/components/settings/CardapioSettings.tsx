@@ -19,6 +19,7 @@ import type { GamificationPrize } from '@/hooks/useGamification';
 import { RodizioSettings as RodizioSettingsPanel } from '@/components/settings/RodizioSettings';
 import { DeliveryZonesConfig } from '@/components/settings/DeliveryZonesConfig';
 import { StoreAddressConfig } from '@/components/settings/StoreAddressConfig';
+import { getPublicAppUrl } from '@/lib/publicAppUrl';
 
 type SettingsTab = 'pdv' | 'mesas' | 'roleta' | 'rodizio' | 'config';
 
