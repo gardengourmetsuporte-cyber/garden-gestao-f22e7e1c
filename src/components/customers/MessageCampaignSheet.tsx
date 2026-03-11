@@ -26,8 +26,10 @@ interface Props {
 
 export function MessageCampaignSheet({ open, onOpenChange, customers, segment }: Props) {
   const { activeUnit } = useUnit();
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [configError, setConfigError] = useState(false);
 
   const recipients = useMemo(
     () => customers.filter(c => c.phone?.trim()),
