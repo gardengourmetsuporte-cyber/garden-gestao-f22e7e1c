@@ -234,12 +234,12 @@ export function BottomTabBar() {
                 key={tab.key}
                 tab={tab}
                 active={isActive(tab.path)}
-                locked={isTabLocked(tab.path)}
+                locked={isTabLocked(tab)}
                 moreOpen={moreOpen}
                 slotWidth={slotWidth}
                 onClick={() => {
                   setMoreOpen(false);
-                  if (isTabLocked(tab.path)) { navigate('/plans'); return; }
+                  if (isTabLocked(tab)) { navigate('/plans'); return; }
                   // In cardápio mode: if clicking "Início" and already on cardápio home, go to main dashboard
                   if (isCardapioRoute && tab.key === 'home' && tab.path === '/cardapio' && isActive('/cardapio')) {
                     navigate('/');
