@@ -283,6 +283,28 @@ export default function Deliveries() {
           </Button>
         )}
 
+        {/* Quick add buttons */}
+        {!dispatchMode && (
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant="outline"
+              className="h-10 rounded-xl text-xs font-semibold gap-2"
+              onClick={() => setSheetOpen(true)}
+            >
+              <AppIcon name="Camera" size={16} className="text-primary" />
+              Scanner (Foto)
+            </Button>
+            <Button
+              variant="outline"
+              className="h-10 rounded-xl text-xs font-semibold gap-2"
+              onClick={() => setManualSheetOpen(true)}
+            >
+              <AppIcon name="Edit3" size={16} className="text-primary" />
+              Manual
+            </Button>
+          </div>
+        )}
+
         {/* Main content */}
         <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-5 gap-4">
           {/* Map */}
