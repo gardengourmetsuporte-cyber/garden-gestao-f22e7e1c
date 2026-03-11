@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTabletOrder, CartItem } from '@/hooks/useTabletOrder';
 import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
+import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +26,9 @@ export default function TabletMenu() {
   } = useTabletOrder(unitId || '');
   const [cartOpen, setCartOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [comandaNumber, setComandaNumber] = useState<number | null>(null);
+  const [orderSent, setOrderSent] = useState<string | null>(null);
 
   useEffect(() => {
     if (unitId) fetchProducts();
@@ -35,16 +39,14 @@ export default function TabletMenu() {
 
   const handleFinalize = async () => {
     if (cart.length === 0) return;
+    if (!comandaNumber) {
+      setShowScanner(true);
+      return;
+    }
     setSubmitting(true);
     try {
-      const result = await createOrder(tableNumber);
-      setCartOpen(false);
-      // If queued offline, don't navigate to QR confirm (no real order yet)
-      if (orderStatus === 'queued_offline') {
-        // Stay on page — toast already shown by hook
-      } else {
-        navigate(`/tablet/${unitId}/confirm/${result.orderId}?token=${result.token}`);
-      }
+      const result = await createOrder(tableNumber, comandaNumber);
+      setOrderSent(result.orderId?.toString().slice(0, 8) || 'OK');
     } catch (err: any) {
       alert('Erro: ' + err.message);
     } finally {
