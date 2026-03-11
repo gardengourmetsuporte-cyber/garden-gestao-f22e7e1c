@@ -18,7 +18,6 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   const [prices, setPrices] = useState<QuotationPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [resolving, setResolving] = useState(false);
-  // Manual winner overrides: itemId -> quotation_supplier_id
   const [manualWinners, setManualWinners] = useState<Record<string, string>>({});
 
   const loadPrices = async () => {
@@ -32,7 +31,6 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
 
   useEffect(() => {
     loadPrices();
-
     const channel = supabase
       .channel(`quotation-prices-${quotation.id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'quotation_prices' }, () => {
@@ -43,7 +41,6 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
         invalidate();
       })
       .subscribe();
-
     return () => { supabase.removeChannel(channel); };
   }, [quotation.id]);
 
@@ -66,7 +63,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
     });
   }, [items, suppliers, prices]);
 
-  // Auto-populate winners with cheapest when prices load
+  // Auto-populate winners with cheapest
   useEffect(() => {
     if (prices.length > 0 && Object.keys(manualWinners).length === 0) {
       const auto: Record<string, string> = {};
@@ -132,7 +129,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
     setResolving(true);
     try {
       await resolveQuotation(quotation.id, manualWinners);
-      toast.success('Pedidos gerados com sucesso!');
+      toast.success('Pedidos gerados nos rascunhos!');
     } catch {
       toast.error('Erro ao gerar pedidos');
     } finally {
@@ -143,48 +140,8 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   const allResponded = suppliers.every(s => s.status === 'responded');
   const canResolve = allResponded && prices.length > 0 && quotation.status !== 'resolved';
   const isResolved = quotation.status === 'resolved';
-
   const respondedCount = suppliers.filter(s => s.status === 'responded').length;
 
-  // Build per-supplier order summary for resolved quotations
-  const supplierOrders = useMemo(() => {
-    if (!isResolved) return [];
-    return suppliers.map(qs => {
-      const wonItems = comparison
-        .filter(row => {
-          // Check if this supplier won this item (winner_supplier_id matches)
-          return row.item.winner_supplier_id === qs.supplier_id;
-        })
-        .map(row => {
-          const sp = row.supplierPrices.find(s => s.supplier.id === qs.id);
-          return {
-            name: row.item.item?.name || '',
-            quantity: row.item.quantity,
-            unit: row.item.item?.unit_type || '',
-            price: sp?.price?.unit_price || 0,
-          };
-        });
-      return { supplier: qs, items: wonItems };
-    }).filter(so => so.items.length > 0);
-  }, [isResolved, suppliers, comparison]);
-
-  const sendOrderWhatsApp = (so: typeof supplierOrders[0]) => {
-    const phone = so.supplier.supplier?.phone;
-    if (!phone) { toast.error('Sem telefone cadastrado'); return; }
-    const cleaned = phone.replace(/\D/g, '');
-    const formatted = cleaned.startsWith('55') ? cleaned : `55${cleaned}`;
-
-    const itemLines = so.items.map((item, i) =>
-      `${i + 1}. ${item.name} — ${item.quantity} ${item.unit}${item.price ? ` (R$ ${item.price.toFixed(2).replace('.', ',')})` : ''}`
-    ).join('\n');
-
-    const total = so.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-
-    const msg = `📦 *Pedido de Compra*\n\n${itemLines}\n\n💰 Total: R$ ${total.toFixed(2).replace('.', ',')}\n\nPor favor, confirme o recebimento. Obrigado!`;
-    window.open(`https://wa.me/${formatted}?text=${encodeURIComponent(msg)}`, '_blank');
-  };
-
-  // Count how many items have manual overrides (different from cheapest)
   const overrideCount = useMemo(() => {
     let count = 0;
     comparison.forEach(row => {
@@ -202,7 +159,7 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
   }, [comparison, manualWinners]);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
         <button
@@ -227,7 +184,25 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
             )}
           </div>
         </div>
+        {isResolved && (
+          <span className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide rounded-full bg-success/15 text-success shrink-0">
+            Resolvida
+          </span>
+        )}
       </div>
+
+      {/* Resolved notice */}
+      {isResolved && (
+        <div className="card-glass rounded-xl p-3 flex items-center gap-3 ring-1 ring-inset ring-success/20">
+          <div className="w-9 h-9 rounded-xl bg-success/15 flex items-center justify-center shrink-0">
+            <AppIcon name="CheckCircle2" size={18} className="text-success" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground">Pedidos gerados</p>
+            <p className="text-[11px] text-muted-foreground">Os pedidos foram enviados para a aba de rascunhos na Central de Pedidos.</p>
+          </div>
+        </div>
+      )}
 
       {/* Supplier Cards */}
       <section className="space-y-2">
@@ -236,23 +211,20 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
         </p>
         <div className="space-y-2">
           {suppliers.map(qs => {
-            const statusConfig = qs.status === 'responded'
-              ? { color: 'text-success', bg: 'bg-success/10', icon: 'CheckCircle2', label: 'Respondeu' }
+            const statusCfg = qs.status === 'responded'
+              ? { color: 'text-success', bg: 'bg-success/15', icon: 'CheckCircle2', label: 'Respondeu' }
               : qs.status === 'contested'
-              ? { color: 'text-warning', bg: 'bg-warning/10', icon: 'AlertTriangle', label: 'Contestado' }
-              : { color: 'text-muted-foreground', bg: 'bg-muted/50', icon: 'Clock', label: 'Aguardando' };
+              ? { color: 'text-warning', bg: 'bg-warning/15', icon: 'AlertTriangle', label: 'Contestado' }
+              : { color: 'text-muted-foreground', bg: 'bg-secondary', icon: 'Clock', label: 'Aguardando' };
 
             return (
-              <div
-                key={qs.id}
-                className="rounded-2xl bg-card border border-border/30 p-3 flex items-center gap-3"
-              >
-                <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', statusConfig.bg)}>
-                  <AppIcon name={statusConfig.icon} size={16} className={statusConfig.color} />
+              <div key={qs.id} className="card-glass rounded-xl p-3 flex items-center gap-3">
+                <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', statusCfg.bg)}>
+                  <AppIcon name={statusCfg.icon} size={16} className={statusCfg.color} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-foreground truncate">{qs.supplier?.name}</p>
-                  <p className={cn('text-[11px] font-medium', statusConfig.color)}>{statusConfig.label}</p>
+                  <p className={cn('text-[11px] font-medium', statusCfg.color)}>{statusCfg.label}</p>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
@@ -276,127 +248,130 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
         </div>
       </section>
 
-      {/* Comparison Table */}
+      {/* Comparison */}
       {prices.length > 0 && (
-        <section className="space-y-2">
+        <section className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
               Comparação de Preços
             </p>
             {canResolve && (
               <p className="text-[10px] text-muted-foreground">
-                Toque para trocar fornecedor
+                Toque no preço para trocar
               </p>
             )}
           </div>
 
-          {/* Economy highlight */}
-          {economy > 0 && (
-            <div className="rounded-2xl bg-success/8 border border-success/15 p-3 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-success/15 flex items-center justify-center shrink-0">
-                <AppIcon name="TrendingDown" size={16} className="text-success" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Economia estimada</p>
-                <p className="text-sm font-bold text-success">
+          {/* Economy + Override alerts */}
+          <div className="grid grid-cols-2 gap-2">
+            {economy > 0 && (
+              <div className={cn(
+                "card-glass rounded-xl p-3 ring-1 ring-inset ring-success/20",
+                overrideCount > 0 ? 'col-span-1' : 'col-span-2'
+              )}>
+                <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Economia</p>
+                <p className="text-lg font-extrabold text-success font-display" style={{ letterSpacing: '-0.03em' }}>
                   R$ {economy.toFixed(2).replace('.', ',')}
                 </p>
               </div>
-            </div>
-          )}
-
-          {/* Override warning */}
-          {overrideCount > 0 && (
-            <div className="rounded-2xl bg-warning/8 border border-warning/15 p-3 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-warning/15 flex items-center justify-center shrink-0">
-                <AppIcon name="Pencil" size={16} className="text-warning" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Ajustes manuais</p>
-                <p className="text-sm font-bold text-warning">
-                  {overrideCount} {overrideCount === 1 ? 'item alterado' : 'itens alterados'}
+            )}
+            {overrideCount > 0 && (
+              <div className="card-glass rounded-xl p-3 ring-1 ring-inset ring-warning/20">
+                <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Ajustes</p>
+                <p className="text-lg font-extrabold text-warning font-display" style={{ letterSpacing: '-0.03em' }}>
+                  {overrideCount} {overrideCount === 1 ? 'item' : 'itens'}
                 </p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Card-based comparison */}
-          <div className="space-y-2">
-            {comparison.map((row) => (
-              <div key={row.item.id} className="rounded-2xl bg-card border border-border/30 overflow-hidden">
-                {/* Item header */}
-                <div className="px-3.5 py-2.5 border-b border-border/20 flex items-center gap-2">
-                  <p className="text-sm font-semibold text-foreground flex-1 truncate">
+          {/* Table-style comparison */}
+          <div className="card-glass rounded-xl overflow-hidden">
+            {/* Header row */}
+            <div
+              className="grid border-b border-border/30 bg-secondary/30"
+              style={{ gridTemplateColumns: `1.5fr repeat(${suppliers.length}, 1fr)` }}
+            >
+              <div className="px-3 py-2">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Item</p>
+              </div>
+              {suppliers.map(qs => (
+                <div key={qs.id} className="px-2 py-2 text-center">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider truncate">
+                    {qs.supplier?.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Data rows */}
+            {comparison.map((row, idx) => (
+              <div
+                key={row.item.id}
+                className={cn(
+                  "grid",
+                  idx < comparison.length - 1 && "border-b border-border/15"
+                )}
+                style={{ gridTemplateColumns: `1.5fr repeat(${suppliers.length}, 1fr)` }}
+              >
+                {/* Item name */}
+                <div className="px-3 py-2.5 flex items-center gap-1.5 min-w-0">
+                  <p className="text-[13px] font-medium text-foreground truncate flex-1">
                     {row.item.item?.name}
                   </p>
-                  <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md bg-secondary text-muted-foreground shrink-0">
-                    {row.item.item?.unit_type === 'unidade' ? 'UN' : row.item.item?.unit_type?.toUpperCase()}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground shrink-0">×{row.item.quantity}</span>
+                  <span className="text-[10px] text-muted-foreground shrink-0">×{row.item.quantity}</span>
                 </div>
-                {/* Supplier prices row */}
-                <div className="grid divide-x divide-border/20" style={{ gridTemplateColumns: `repeat(${suppliers.length}, 1fr)` }}>
-                  {row.supplierPrices.map(sp => {
-                    const isAutoWinner = sp.price && row.minPrice !== null && sp.price.unit_price === row.minPrice;
-                    const isManualWinner = manualWinners[row.item.id] === sp.supplier.id;
-                    const isSelected = isManualWinner;
-                    const isLoser = sp.price && !isSelected && row.minPrice !== null && sp.price.unit_price > row.minPrice;
-                    const canSelect = canResolve && sp.price;
 
-                    return (
-                      <button
-                        key={sp.supplier.id}
-                        className={cn(
-                          'p-3 text-center transition-all relative',
-                          isSelected && 'bg-success/8 ring-2 ring-inset ring-success/30',
-                          canSelect && 'cursor-pointer hover:bg-secondary/40 active:scale-95',
-                          !canSelect && 'cursor-default'
-                        )}
-                        onClick={() => canSelect && toggleWinner(row.item.id, sp.supplier.id)}
-                        disabled={!canSelect}
-                        type="button"
-                      >
-                        {isSelected && (
-                          <div className="absolute top-1 right-1">
-                            <AppIcon name="CheckCircle2" size={12} className="text-success" />
-                          </div>
-                        )}
-                        <p className="text-[10px] text-muted-foreground mb-1 truncate">{sp.supplier.supplier?.name}</p>
-                        {sp.price ? (
-                          <div>
-                            <div className="flex items-center justify-center gap-1">
-                              <span className={cn(
-                                'text-sm font-bold',
-                                isSelected ? 'text-success' : isLoser ? 'text-destructive' : 'text-foreground'
-                              )}>
-                                R$ {sp.price.unit_price.toFixed(2).replace('.', ',')}
-                              </span>
-                              {isSelected && <AppIcon name="Trophy" size={14} className="text-warning" />}
-                            </div>
-                            {sp.price.brand && (
-                              <p className="text-[10px] text-muted-foreground mt-0.5">{sp.price.brand}</p>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-sm text-muted-foreground/50">—</span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
+                {/* Price cells */}
+                {row.supplierPrices.map(sp => {
+                  const isManualWinner = manualWinners[row.item.id] === sp.supplier.id;
+                  const isLoser = sp.price && !isManualWinner && row.minPrice !== null && sp.price.unit_price > row.minPrice;
+                  const canSelect = canResolve && sp.price;
+
+                  return (
+                    <button
+                      key={sp.supplier.id}
+                      className={cn(
+                        'px-2 py-2.5 text-center transition-all relative flex items-center justify-center',
+                        isManualWinner && 'bg-success/10',
+                        canSelect && 'cursor-pointer hover:bg-secondary/40 active:scale-95',
+                        !canSelect && 'cursor-default'
+                      )}
+                      onClick={() => canSelect && toggleWinner(row.item.id, sp.supplier.id)}
+                      disabled={!canSelect}
+                      type="button"
+                    >
+                      {sp.price ? (
+                        <div className="flex items-center gap-1">
+                          {isManualWinner && (
+                            <AppIcon name="CheckCircle2" size={12} className="text-success shrink-0" />
+                          )}
+                          <span className={cn(
+                            'text-[13px] font-bold tabular-nums',
+                            isManualWinner ? 'text-success' : isLoser ? 'text-destructive' : 'text-foreground'
+                          )}>
+                            {sp.price.unit_price.toFixed(2).replace('.', ',')}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-[13px] text-muted-foreground/40">—</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             ))}
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col gap-2 pt-1">
+          <div className="flex flex-col gap-2">
             {suppliers.map(qs => {
               const hasLosing = comparison.some(row => {
                 const sp = row.supplierPrices.find(s => s.supplier.id === qs.id);
                 return sp?.price && row.minPrice !== null && sp.price.unit_price > row.minPrice;
               });
 
-              if (!hasLosing || qs.status === 'contested' || quotation.status === 'resolved') return null;
+              if (!hasLosing || qs.status === 'contested' || isResolved) return null;
 
               return (
                 <Button
@@ -421,60 +396,10 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                 {resolving ? (
                   <><AppIcon name="Loader2" size={16} className="animate-spin" /> Gerando pedidos...</>
                 ) : (
-                  <><AppIcon name="Trophy" size={16} /> Gerar Pedidos{overrideCount > 0 ? ' (Ajustados)' : ' Otimizados'}</>
+                  <><AppIcon name="CheckCircle2" size={16} /> Gerar Pedidos nos Rascunhos{overrideCount > 0 ? ` (${overrideCount} ajustados)` : ''}</>
                 )}
               </Button>
             )}
-          </div>
-        </section>
-      )}
-
-      {/* Resolved: Send orders per supplier */}
-      {isResolved && supplierOrders.length > 0 && (
-        <section className="space-y-2">
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
-            Pedidos Gerados — Enviar para Fornecedores
-          </p>
-          <div className="space-y-3">
-            {supplierOrders.map(so => {
-              const total = so.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-              return (
-                <div key={so.supplier.id} className="rounded-2xl bg-card border border-border/30 overflow-hidden">
-                  <div className="px-3.5 py-2.5 border-b border-border/20 flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                      <AppIcon name="Store" size={14} className="text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground truncate">{so.supplier.supplier?.name}</p>
-                      <p className="text-[11px] text-muted-foreground">{so.items.length} itens • R$ {total.toFixed(2).replace('.', ',')}</p>
-                    </div>
-                    {so.supplier.supplier?.phone && (
-                      <Button
-                        size="sm"
-                        className="rounded-xl gap-1.5 h-9 bg-[#25D366] hover:bg-[#1fba59] text-white shadow-sm"
-                        onClick={() => sendOrderWhatsApp(so)}
-                      >
-                        <AppIcon name="MessageCircle" size={14} />
-                        Enviar
-                      </Button>
-                    )}
-                  </div>
-                  <div className="divide-y divide-border/15">
-                    {so.items.map((item, i) => (
-                      <div key={i} className="px-3.5 py-2 flex items-center gap-2">
-                        <p className="text-[13px] text-foreground flex-1 truncate">{item.name}</p>
-                        <span className="text-[11px] text-muted-foreground shrink-0">×{item.quantity}</span>
-                        {item.price > 0 && (
-                          <span className="text-[11px] font-medium text-success shrink-0">
-                            R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </section>
       )}

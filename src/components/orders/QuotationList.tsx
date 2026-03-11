@@ -7,12 +7,12 @@ import { QuotationSheet } from './QuotationSheet';
 import { QuotationDetail } from './QuotationDetail';
 import { AppIcon } from '@/components/ui/app-icon';
 
-const statusConfig: Record<string, { label: string; bg: string; text: string; icon: string }> = {
-  draft: { label: 'Rascunho', bg: 'bg-muted', text: 'text-muted-foreground', icon: 'Clock' },
-  sent: { label: 'Aguardando', bg: 'bg-warning/10', text: 'text-warning', icon: 'Clock' },
-  comparing: { label: 'Comparando', bg: 'bg-primary/10', text: 'text-primary', icon: 'ArrowLeftRight' },
-  contested: { label: 'Contestada', bg: 'bg-orange-500/10', text: 'text-orange-500', icon: 'AlertTriangle' },
-  resolved: { label: 'Resolvida', bg: 'bg-success/10', text: 'text-success', icon: 'CheckCircle2' },
+const statusConfig: Record<string, { label: string; variant: string; icon: string }> = {
+  draft: { label: 'Rascunho', variant: 'muted', icon: 'Clock' },
+  sent: { label: 'Aguardando', variant: 'warning', icon: 'Clock' },
+  comparing: { label: 'Comparando', variant: 'primary', icon: 'ArrowLeftRight' },
+  contested: { label: 'Contestada', variant: 'warning', icon: 'AlertTriangle' },
+  resolved: { label: 'Resolvida', variant: 'success', icon: 'CheckCircle2' },
 };
 
 export function QuotationList() {
@@ -31,7 +31,7 @@ export function QuotationList() {
 
   return (
     <div className="space-y-4">
-      <Button onClick={() => setSheetOpen(true)} className="w-full gap-2 rounded-xl h-12 shadow-lg shadow-emerald-500/20">
+      <Button onClick={() => setSheetOpen(true)} className="w-full gap-2 rounded-xl h-12 shadow-glow-primary">
         <AppIcon name="Plus" className="w-4 h-4" />
         Nova Cotação
       </Button>
@@ -54,25 +54,43 @@ export function QuotationList() {
               <div
                 key={q.id}
                 onClick={() => setSelectedQuotation(q)}
-                className="bg-[#0a1a10] rounded-2xl border border-emerald-500/10 p-4 cursor-pointer transition-all hover:border-emerald-500/25 animate-fade-in"
+                className="card-glass rounded-2xl p-4 cursor-pointer transition-all active:scale-[0.98] animate-fade-in"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                     <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-                       <AppIcon name="Scale" className="w-5 h-5 text-emerald-400" />
+                    <div className={cn(
+                      "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                      status.variant === 'success' ? 'bg-success/15' :
+                      status.variant === 'warning' ? 'bg-warning/15' :
+                      status.variant === 'primary' ? 'bg-primary/15' :
+                      'bg-secondary'
+                    )}>
+                      <AppIcon name="Scale" className={cn(
+                        "w-5 h-5",
+                        status.variant === 'success' ? 'text-success' :
+                        status.variant === 'warning' ? 'text-warning' :
+                        status.variant === 'primary' ? 'text-primary' :
+                        'text-muted-foreground'
+                      )} />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-semibold text-foreground truncate">
+                      <p className="font-semibold text-foreground truncate text-sm">
                         {q.title || `Cotação #${q.id.slice(0, 6)}`}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[11px] text-muted-foreground">
                         {itemCount} ite{itemCount !== 1 ? 'ns' : 'm'} · {responded}/{total} responderam
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={cn('px-2.5 py-1 text-xs font-semibold rounded-full', status.bg, status.text)}>
+                    <span className={cn(
+                      'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide rounded-full',
+                      status.variant === 'success' ? 'bg-success/15 text-success' :
+                      status.variant === 'warning' ? 'bg-warning/15 text-warning' :
+                      status.variant === 'primary' ? 'bg-primary/15 text-primary' :
+                      'bg-secondary text-muted-foreground'
+                    )}>
                       {status.label}
                     </span>
                     <Button
@@ -87,21 +105,23 @@ export function QuotationList() {
                 </div>
 
                 {/* Supplier chips */}
-                <div className="flex flex-wrap gap-1.5 mt-3">
-                  {q.quotation_suppliers?.map(qs => (
-                    <span
-                      key={qs.id}
-                      className={cn(
-                        'text-xs px-2 py-0.5 rounded-full font-medium',
-                        qs.status === 'responded' ? 'bg-success/10 text-success' :
-                        qs.status === 'contested' ? 'bg-orange-500/10 text-orange-500' :
-                        'bg-muted text-muted-foreground'
-                      )}
-                    >
-                      {qs.supplier?.name} {qs.status === 'responded' ? '✅' : qs.status === 'contested' ? '⚠️' : '⏳'}
-                    </span>
-                  ))}
-                </div>
+                {(q.quotation_suppliers?.length || 0) > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {q.quotation_suppliers?.map(qs => (
+                      <span
+                        key={qs.id}
+                        className={cn(
+                          'text-[10px] px-2 py-0.5 rounded-full font-semibold',
+                          qs.status === 'responded' ? 'bg-success/15 text-success' :
+                          qs.status === 'contested' ? 'bg-warning/15 text-warning' :
+                          'bg-secondary text-muted-foreground'
+                        )}
+                      >
+                        {qs.supplier?.name} {qs.status === 'responded' ? '✅' : qs.status === 'contested' ? '⚠️' : '⏳'}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
