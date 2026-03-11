@@ -14,12 +14,15 @@ interface Props {
   onAddToCart: (item: CartItem) => void;
 }
 
+type Step = 'options' | 'quantity';
+
 export function TabletProductDetail({ product, optionGroups, open, onClose, onAddToCart }: Props) {
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
   const [showNotes, setShowNotes] = useState(false);
   const [activeGroupIdx, setActiveGroupIdx] = useState(0);
+  const [step, setStep] = useState<Step>('options');
 
   useEffect(() => {
     if (open) {
@@ -28,10 +31,16 @@ export function TabletProductDetail({ product, optionGroups, open, onClose, onAd
       setSelectedOptions({});
       setShowNotes(false);
       setActiveGroupIdx(0);
+      setStep(optionGroups.length > 0 ? 'options' : 'quantity');
     }
   }, [open, product?.id]);
 
   if (!product || !open) return null;
+
+  const hasOptionGroups = optionGroups.length > 0;
+  const activeGroup = hasOptionGroups ? optionGroups[activeGroupIdx] : null;
+  const totalSteps = optionGroups.length + 1; // options steps + quantity step
+  const currentStepNum = step === 'quantity' ? totalSteps : activeGroupIdx + 1;
 
   const toggleOption = (groupId: string, optionId: string, maxSelections: number) => {
     setSelectedOptions(prev => {
@@ -70,14 +79,13 @@ export function TabletProductDetail({ product, optionGroups, open, onClose, onAd
     return selected >= og.min_selections;
   });
 
-  const hasOptionGroups = optionGroups.length > 0;
-  const activeGroup = hasOptionGroups ? optionGroups[activeGroupIdx] : null;
-
   const canSkipGroup = (og: DMOptionGroup) => og.min_selections === 0;
 
   const handleNextGroup = () => {
     if (activeGroupIdx < optionGroups.length - 1) {
       setActiveGroupIdx(activeGroupIdx + 1);
+    } else {
+      setStep('quantity');
     }
   };
 
@@ -86,6 +94,24 @@ export function TabletProductDetail({ product, optionGroups, open, onClose, onAd
       setActiveGroupIdx(activeGroupIdx - 1);
     }
   };
+
+  const handleBackFromQuantity = () => {
+    if (hasOptionGroups) {
+      setStep('options');
+      setActiveGroupIdx(optionGroups.length - 1);
+    }
+  };
+
+  // Left panel step summary items
+  const stepItems = [
+    ...optionGroups.map((og, idx) => {
+      const count = (selectedOptions[og.id] || []).length;
+      const isDone = count >= og.min_selections && (count > 0 || og.min_selections === 0);
+      const isCurrent = step === 'options' && idx === activeGroupIdx;
+      return { label: og.title, isDone: step === 'quantity' || (isDone && idx < activeGroupIdx), isCurrent, num: idx + 1 };
+    }),
+    { label: 'Quantidade e Opcionais', isDone: false, isCurrent: step === 'quantity', num: totalSteps },
+  ];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -102,90 +128,72 @@ export function TabletProductDetail({ product, optionGroups, open, onClose, onAd
           </button>
 
           {/* Product image */}
-          <div className="flex-1 flex items-center justify-center p-8 pt-16">
+          <div className="shrink-0 flex items-center justify-center px-6 pt-16 pb-4">
             {product.image_url ? (
-              <div className="w-full max-w-[280px] aspect-square rounded-2xl overflow-hidden shadow-xl border border-border/10">
+              <div className="w-full max-w-[200px] aspect-square rounded-2xl overflow-hidden shadow-xl border border-border/10">
                 <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-full max-w-[280px] aspect-square rounded-2xl bg-secondary/60 flex items-center justify-center">
-                <AppIcon name="UtensilsCrossed" size={64} className="text-muted-foreground/20" />
+              <div className="w-full max-w-[200px] aspect-square rounded-2xl bg-secondary/60 flex items-center justify-center">
+                <AppIcon name="UtensilsCrossed" size={56} className="text-muted-foreground/20" />
               </div>
             )}
           </div>
 
           {/* Product info */}
-          <div className="px-6 pb-6 space-y-2">
-            <h2 className="text-xl font-bold text-foreground leading-tight">{product.name}</h2>
+          <div className="px-6 pb-3 space-y-1">
+            <h2 className="text-lg font-bold text-foreground leading-tight">{product.name}</h2>
             {product.description && (
-              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{product.description}</p>
-            )}
-
-            {/* Option groups navigation dots */}
-            {hasOptionGroups && (
-              <div className="flex items-center gap-3 pt-3">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Opcionais</span>
-                <div className="flex items-center gap-1.5">
-                  {optionGroups.map((og, idx) => {
-                    const selectedCount = (selectedOptions[og.id] || []).length;
-                    const isComplete = selectedCount >= og.min_selections && selectedCount > 0;
-                    const isCurrent = idx === activeGroupIdx;
-                    return (
-                      <button
-                        key={og.id}
-                        onClick={() => setActiveGroupIdx(idx)}
-                        className={cn(
-                          'w-2.5 h-2.5 rounded-full transition-all',
-                          isCurrent
-                            ? 'bg-primary scale-125'
-                            : isComplete
-                              ? 'bg-primary/50'
-                              : 'bg-muted-foreground/20'
-                        )}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">{product.description}</p>
             )}
           </div>
 
-          {/* Bottom bar: Quantity + Subtotal */}
-          <div className="px-6 py-4 border-t border-border/15 bg-card/60 backdrop-blur-sm">
-            <div className="flex items-center justify-between mb-3">
+          {/* Step indicators */}
+          {totalSteps > 1 && (
+            <div className="flex-1 overflow-y-auto px-5 py-2">
+              <div className="space-y-1">
+                {stepItems.map((si, idx) => (
+                  <div
+                    key={idx}
+                    className={cn(
+                      'flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all text-left',
+                      si.isCurrent && 'bg-primary/10'
+                    )}
+                  >
+                    <div className={cn(
+                      'w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold transition-colors',
+                      si.isDone
+                        ? 'bg-primary text-primary-foreground'
+                        : si.isCurrent
+                          ? 'bg-primary/20 text-primary border border-primary/40'
+                          : 'bg-muted-foreground/10 text-muted-foreground'
+                    )}>
+                      {si.isDone ? <AppIcon name="Check" size={12} /> : si.num}
+                    </div>
+                    <span className={cn(
+                      'text-xs leading-tight',
+                      si.isCurrent ? 'text-foreground font-semibold' : 'text-muted-foreground'
+                    )}>
+                      {si.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Subtotal */}
+          <div className="px-6 py-4 border-t border-border/15 bg-card/60 backdrop-blur-sm shrink-0">
+            <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground">Subtotal</span>
               <span className="text-xl font-bold text-primary">{formatPrice(itemTotal)}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center bg-secondary rounded-xl">
-                <button
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  className="w-10 h-10 flex items-center justify-center text-foreground active:scale-90 transition-transform"
-                >
-                  <AppIcon name="Minus" size={16} />
-                </button>
-                <span className="w-7 text-center font-bold text-foreground">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(q => q + 1)}
-                  className="w-10 h-10 flex items-center justify-center text-foreground active:scale-90 transition-transform"
-                >
-                  <AppIcon name="Plus" size={16} />
-                </button>
-              </div>
-              <Button
-                className="flex-1 h-11 text-sm font-bold rounded-xl"
-                onClick={handleAdd}
-                disabled={!isValid}
-              >
-                Adicionar ao pedido
-              </Button>
             </div>
           </div>
         </div>
 
-        {/* ─── Right Panel: Options ─── */}
+        {/* ─── Right Panel ─── */}
         <div className="flex-1 flex flex-col">
-          {hasOptionGroups && activeGroup ? (
+          {step === 'options' && activeGroup ? (
             <>
               {/* Group header */}
               <div className="px-8 pt-6 pb-4 border-b border-border/15 shrink-0">
@@ -228,28 +236,19 @@ export function TabletProductDetail({ product, optionGroups, open, onClose, onAd
                             : 'bg-secondary/30 border-2 border-transparent hover:bg-secondary/50'
                         )}
                       >
-                        {/* Checkbox / Radio */}
-                        <div
-                          className={cn(
-                            'w-6 h-6 flex items-center justify-center shrink-0 transition-colors',
-                            isRadio ? 'rounded-full border-2' : 'rounded-lg border-2',
-                            isChecked
-                              ? 'bg-primary border-primary text-primary-foreground'
-                              : 'border-muted-foreground/30'
-                          )}
-                        >
+                        <div className={cn(
+                          'w-6 h-6 flex items-center justify-center shrink-0 transition-colors',
+                          isRadio ? 'rounded-full border-2' : 'rounded-lg border-2',
+                          isChecked
+                            ? 'bg-primary border-primary text-primary-foreground'
+                            : 'border-muted-foreground/30'
+                        )}>
                           {isChecked && <AppIcon name="Check" size={14} />}
                         </div>
-
-                        {/* Option image */}
                         {opt.image_url && (
                           <img src={opt.image_url} alt={opt.name} className="w-12 h-12 rounded-xl object-cover shrink-0" />
                         )}
-
-                        {/* Option name */}
                         <span className="flex-1 text-sm font-semibold text-foreground text-left">{opt.name}</span>
-
-                        {/* Price */}
                         {opt.price > 0 && (
                           <span className="text-sm font-semibold text-muted-foreground shrink-0">
                             + {formatPrice(opt.price)}
@@ -270,73 +269,92 @@ export function TabletProductDetail({ product, optionGroups, open, onClose, onAd
                   </Button>
                 )}
                 <div className="flex-1" />
-                {activeGroupIdx < optionGroups.length - 1 ? (
-                  <Button
-                    onClick={handleNextGroup}
-                    variant={canSkipGroup(activeGroup) ? 'secondary' : 'default'}
-                    className="h-11 rounded-xl px-6"
-                  >
-                    {canSkipGroup(activeGroup) && (selectedOptions[activeGroup.id] || []).length === 0
-                      ? 'Pular'
-                      : 'Próximo'}
-                    <AppIcon name="ChevronRight" size={16} className="ml-1" />
-                  </Button>
-                ) : null}
+                <Button
+                  onClick={handleNextGroup}
+                  variant={canSkipGroup(activeGroup) && (selectedOptions[activeGroup.id] || []).length === 0 ? 'secondary' : 'default'}
+                  className="h-11 rounded-xl px-6"
+                >
+                  {canSkipGroup(activeGroup) && (selectedOptions[activeGroup.id] || []).length === 0
+                    ? 'Pular'
+                    : 'Próximo'}
+                  <AppIcon name="ChevronRight" size={16} className="ml-1" />
+                </Button>
               </div>
             </>
           ) : (
-            /* No option groups: Notes area */
-            <div className="flex-1 flex flex-col items-center justify-center px-8 gap-6">
-              <div className="text-center space-y-2">
-                <AppIcon name="ChefHat" size={48} className="text-muted-foreground/20 mx-auto" />
-                <p className="text-sm text-muted-foreground">
-                  Sem opcionais para este item
-                </p>
+            /* ─── Quantity Step ─── */
+            <div className="flex-1 flex flex-col">
+              <div className="flex-1 flex flex-col items-center justify-center px-8 gap-8">
+                <div className="text-center space-y-1">
+                  <h3 className="text-xl font-bold text-foreground">
+                    Escolha a quantidade de
+                  </h3>
+                  <p className="text-lg text-muted-foreground font-medium">{product.name}</p>
+                </div>
+
+                {/* Large quantity selector */}
+                <div className="flex items-center gap-5">
+                  <button
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    disabled={quantity <= 1}
+                    className={cn(
+                      'w-14 h-14 rounded-full flex items-center justify-center transition-all active:scale-90',
+                      quantity <= 1
+                        ? 'bg-muted-foreground/10 text-muted-foreground/30'
+                        : 'bg-secondary text-foreground hover:bg-secondary/80'
+                    )}
+                  >
+                    <AppIcon name="Minus" size={22} />
+                  </button>
+                  <span className="text-5xl font-bold text-foreground w-20 text-center tabular-nums">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(q => q + 1)}
+                    className="w-14 h-14 rounded-full bg-foreground text-background flex items-center justify-center transition-all active:scale-90 hover:opacity-90 shadow-lg"
+                  >
+                    <AppIcon name="Plus" size={22} />
+                  </button>
+                </div>
+
+                {/* Notes */}
+                <div className="w-full max-w-sm space-y-2">
+                  <button
+                    onClick={() => setShowNotes(!showNotes)}
+                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors mx-auto"
+                  >
+                    <AppIcon name="MessageSquare" size={14} />
+                    {showNotes ? 'Ocultar observações' : 'Alguma observação?'}
+                  </button>
+                  {showNotes && (
+                    <Textarea
+                      placeholder="Ex: sem cebola, bem passado..."
+                      value={notes}
+                      onChange={e => setNotes(e.target.value)}
+                      rows={2}
+                      className="resize-none text-sm"
+                      autoFocus={false}
+                    />
+                  )}
+                </div>
               </div>
 
-              <div className="w-full max-w-sm space-y-3">
-                <button
-                  onClick={() => setShowNotes(!showNotes)}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mx-auto"
-                >
-                  <AppIcon name="MessageSquare" size={16} />
-                  {showNotes ? 'Ocultar observações' : 'Adicionar observação'}
-                  <AppIcon name={showNotes ? 'ChevronUp' : 'ChevronDown'} size={14} />
-                </button>
-                {showNotes && (
-                  <Textarea
-                    placeholder="Ex: sem cebola, bem passado..."
-                    value={notes}
-                    onChange={e => setNotes(e.target.value)}
-                    rows={3}
-                    className="resize-none text-sm"
-                    autoFocus={false}
-                  />
+              {/* Bottom action */}
+              <div className="px-8 py-5 border-t border-border/15 shrink-0 flex items-center gap-3">
+                {hasOptionGroups && (
+                  <Button variant="outline" onClick={handleBackFromQuantity} className="h-12 rounded-xl px-5">
+                    <AppIcon name="ChevronLeft" size={16} className="mr-1" />
+                    Voltar
+                  </Button>
                 )}
+                <Button
+                  className="flex-1 h-12 text-base font-bold rounded-xl gap-2"
+                  onClick={handleAdd}
+                  disabled={!isValid}
+                >
+                  Adicionar ao pedido
+                  <span className="opacity-80">{formatPrice(itemTotal)}</span>
+                  <AppIcon name="ArrowRight" size={18} />
+                </Button>
               </div>
-            </div>
-          )}
-
-          {/* Notes toggle inside option groups - after last group */}
-          {hasOptionGroups && activeGroupIdx === optionGroups.length - 1 && (
-            <div className="px-8 pb-4">
-              <button
-                onClick={() => setShowNotes(!showNotes)}
-                className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <AppIcon name="MessageSquare" size={14} />
-                {showNotes ? 'Ocultar observações' : 'Alguma observação?'}
-              </button>
-              {showNotes && (
-                <Textarea
-                  placeholder="Ex: sem cebola, bem passado..."
-                  value={notes}
-                  onChange={e => setNotes(e.target.value)}
-                  rows={2}
-                  className="resize-none text-sm mt-2"
-                  autoFocus={false}
-                />
-              )}
             </div>
           )}
         </div>
