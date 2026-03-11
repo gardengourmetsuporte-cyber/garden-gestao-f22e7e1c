@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTabletOrder, CartItem } from '@/hooks/useTabletOrder';
+import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +20,7 @@ export default function TabletMenu() {
   const tableNumber = parseInt(searchParams.get('mesa') || '1');
   const navigate = useNavigate();
   const {
-    products, cart, cartTotal, loading,
+    products, cart, cartTotal, loading, orderStatus,
     fetchProducts, addToCart, removeFromCart, updateQuantity, updateNotes, createOrder,
   } = useTabletOrder(unitId || '');
   const [cartOpen, setCartOpen] = useState(false);
@@ -38,7 +39,12 @@ export default function TabletMenu() {
     try {
       const result = await createOrder(tableNumber);
       setCartOpen(false);
-      navigate(`/tablet/${unitId}/confirm/${result.orderId}?token=${result.token}`);
+      // If queued offline, don't navigate to QR confirm (no real order yet)
+      if (orderStatus === 'queued_offline') {
+        // Stay on page — toast already shown by hook
+      } else {
+        navigate(`/tablet/${unitId}/confirm/${result.orderId}?token=${result.token}`);
+      }
     } catch (err: any) {
       alert('Erro: ' + err.message);
     } finally {
@@ -115,6 +121,8 @@ export default function TabletMenu() {
           </Sheet>
         </div>
       </header>
+
+      <div className="px-4 pt-2"><SyncStatusIndicator /></div>
 
       {/* Products by category */}
       <main className="pb-24 px-4 pt-4">
