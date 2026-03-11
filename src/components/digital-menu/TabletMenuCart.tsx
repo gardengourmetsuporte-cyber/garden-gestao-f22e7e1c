@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AppIcon } from '@/components/ui/app-icon';
 import { CartItemsList } from '@/components/digital-menu/MenuCart';
 import { CustomerAuthBanner } from '@/components/digital-menu/CustomerAuthBanner';
+import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
