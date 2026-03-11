@@ -95,6 +95,31 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
             )}
           </div>
 
+          {/* Config error alert */}
+          {configError && (
+            <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 space-y-2">
+              <p className="text-sm font-medium text-destructive flex items-center gap-2">
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>error</span>
+                Canal WhatsApp não configurado
+              </p>
+              <p className="text-xs text-muted-foreground">
+                A URL da API ou chave de API não foram preenchidas. Complete a configuração para enviar mensagens.
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-2"
+                onClick={() => {
+                  onOpenChange(false);
+                  navigate('/whatsapp/settings');
+                }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 16 }}>settings</span>
+                Ir para Configurações
+              </Button>
+            </div>
+          )}
+
           {/* Quick templates */}
           <div>
             <p className="text-xs font-medium text-muted-foreground mb-2">Templates rápidos</p>
