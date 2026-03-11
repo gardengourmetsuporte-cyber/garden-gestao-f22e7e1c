@@ -1,5 +1,8 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { enqueueOperation, setCache, getCache } from '@/lib/offlineDb';
+import { toast } from 'sonner';
 
 export interface TabletProduct {
   id: string;
@@ -23,19 +26,37 @@ export function useTabletOrder(unitId: string) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [orderStatus, setOrderStatus] = useState<string | null>(null);
+  const { isConnected } = useOnlineStatus();
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from('tablet_products')
-      .select('*')
-      .eq('unit_id', unitId)
-      .eq('is_active', true)
-      .order('category')
-      .order('sort_order');
-    setProducts((data as TabletProduct[]) || []);
+
+    if (isConnected) {
+      const { data } = await supabase
+        .from('tablet_products')
+        .select('*')
+        .eq('unit_id', unitId)
+        .eq('is_active', true)
+        .order('category')
+        .order('sort_order');
+      const prods = (data as TabletProduct[]) || [];
+      setProducts(prods);
+      // Cache for offline
+      try {
+        await setCache({ key: `tablet-products-${unitId}`, type: 'products', data: prods, updatedAt: new Date().toISOString() });
+      } catch {}
+    } else {
+      // Load from cache
+      try {
+        const cached = await getCache(`tablet-products-${unitId}`);
+        if (cached?.data) {
+          setProducts(cached.data as TabletProduct[]);
+        }
+      } catch {}
+    }
+
     setLoading(false);
-  }, [unitId]);
+  }, [unitId, isConnected]);
 
   const addToCart = (product: TabletProduct) => {
     setCart(prev => {
@@ -82,29 +103,56 @@ export function useTabletOrder(unitId: string) {
 
   const createOrder = async (tableNumber: number) => {
     setLoading(true);
+
+    const orderData = {
+      unit_id: unitId,
+      table_number: tableNumber,
+      status: 'confirmed',
+      total: cartTotal,
+    };
+
+    const itemsData = cart.map(c => ({
+      product_id: c.product.id,
+      quantity: c.quantity,
+      notes: c.notes || null,
+      unit_price: c.product.price,
+    }));
+
+    // ---- Offline path ----
+    if (!isConnected) {
+      try {
+        const offlineId = crypto.randomUUID();
+        await enqueueOperation({
+          id: offlineId,
+          type: 'tablet_order',
+          payload: { order: orderData, items: itemsData },
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+        });
+        setCart([]);
+        setOrderStatus('queued_offline');
+        toast.success('Pedido salvo offline!', { description: 'Será enviado quando a conexão voltar.' });
+        setLoading(false);
+        return { orderId: offlineId, token: offlineId };
+      } catch {
+        toast.error('Erro ao salvar pedido offline');
+        setLoading(false);
+        throw new Error('Falha ao salvar offline');
+      }
+    }
+
+    // ---- Online path ----
     try {
-      // Create order
       const { data: order, error: orderError } = await supabase
         .from('tablet_orders')
-        .insert({
-          unit_id: unitId,
-          table_number: tableNumber,
-          status: 'confirmed',
-          total: cartTotal,
-        })
+        .insert(orderData)
         .select()
         .single();
 
       if (orderError || !order) throw new Error(orderError?.message || 'Erro ao criar pedido');
 
-      // Create order items
-      const items = cart.map(c => ({
-        order_id: (order as any).id,
-        product_id: c.product.id,
-        quantity: c.quantity,
-        notes: c.notes || null,
-        unit_price: c.product.price,
-      }));
+      const items = itemsData.map(i => ({ ...i, order_id: (order as any).id }));
 
       const { error: itemsError } = await supabase
         .from('tablet_order_items')
@@ -114,7 +162,7 @@ export function useTabletOrder(unitId: string) {
 
       // Generate QR token
       const token = crypto.randomUUID();
-      const expiresAt = new Date(Date.now() + 2 * 60 * 1000).toISOString(); // 2 minutes
+      const expiresAt = new Date(Date.now() + 2 * 60 * 1000).toISOString();
 
       const { error: qrError } = await supabase
         .from('tablet_qr_confirmations')
@@ -130,6 +178,24 @@ export function useTabletOrder(unitId: string) {
       setOrderStatus('confirmed');
       return { orderId: (order as any).id, token };
     } catch (err: any) {
+      // If network error, try offline queue
+      if (!navigator.onLine || err.message?.includes('fetch')) {
+        try {
+          const offlineId = crypto.randomUUID();
+          await enqueueOperation({
+            id: offlineId,
+            type: 'tablet_order',
+            payload: { order: orderData, items: itemsData },
+            createdAt: new Date().toISOString(),
+            retries: 0,
+            status: 'pending',
+          });
+          setCart([]);
+          setOrderStatus('queued_offline');
+          toast.success('Pedido salvo offline!', { description: 'Será enviado quando a conexão voltar.' });
+          return { orderId: offlineId, token: offlineId };
+        } catch {}
+      }
       console.error('Error creating order:', err);
       throw err;
     } finally {
@@ -140,12 +206,6 @@ export function useTabletOrder(unitId: string) {
   const confirmOrder = async (orderId: string, token: string) => {
     setLoading(true);
     try {
-      const response = await supabase.functions.invoke('tablet-order', {
-        body: { order_id: orderId, token },
-        headers: {},
-      });
-
-      // The edge function URL needs action param
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=confirm-qr`,
         {
