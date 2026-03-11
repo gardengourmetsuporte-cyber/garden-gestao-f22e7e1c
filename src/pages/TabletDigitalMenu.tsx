@@ -13,6 +13,7 @@ import { formatCurrency as formatPrice } from '@/lib/format';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import gardenLogo from '@/assets/logo.png';
+import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
 import type { User } from '@supabase/supabase-js';
 
 export default function TabletDigitalMenu() {

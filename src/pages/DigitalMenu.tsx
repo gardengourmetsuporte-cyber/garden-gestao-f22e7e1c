@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { normalizePhone } from '@/lib/normalizePhone';
 import { supabase } from '@/integrations/supabase/client';
 import gardenLogo from '@/assets/logo.png';
+import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
 import type { GamificationPrize } from '@/hooks/useGamification';
 import type { User } from '@supabase/supabase-js';
 
