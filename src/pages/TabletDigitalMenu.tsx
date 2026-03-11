@@ -6,7 +6,7 @@ import { MenuSearch } from '@/components/digital-menu/MenuSearch';
 import { TabletMenuCart } from '@/components/digital-menu/TabletMenuCart';
 import { MenuCustomerAuth } from '@/components/digital-menu/MenuCustomerAuth';
 import { MenuCustomerProfile } from '@/components/digital-menu/MenuCustomerProfile';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+// Sheet removed - cart is now a persistent right panel
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { formatCurrency as formatPrice } from '@/lib/format';
