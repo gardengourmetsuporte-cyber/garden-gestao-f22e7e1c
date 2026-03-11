@@ -16,6 +16,7 @@ async function fetchOrdersData(unitId: string | null): Promise<Order[]> {
         item:inventory_items(*, category:categories(*))
       )
     `)
+    .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
   if (unitId) {
@@ -102,9 +103,10 @@ export function useOrders() {
 
   const deleteOrderMut = useMutation({
     mutationFn: async (orderId: string) => {
-      const { error: itemsError } = await supabase.from('order_items').delete().eq('order_id', orderId);
-      if (itemsError) throw itemsError;
-      const { error } = await supabase.from('orders').delete().eq('id', orderId);
+      const { error } = await supabase
+        .from('orders')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', orderId);
       if (error) throw error;
     },
     onSuccess: invalidate,
