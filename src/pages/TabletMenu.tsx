@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTabletOrder, CartItem } from '@/hooks/useTabletOrder';
 import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
 import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
