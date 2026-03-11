@@ -125,8 +125,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   };
 
   const handleSend = async () => {
-    if (!tableNumber.trim()) {
-      toast.error('Informe o número da mesa');
+    if (!comandaNumber && !tableNumber.trim()) {
+      toast.error('Escaneie uma comanda ou informe o número da mesa');
       return;
     }
     // Use logged-in user name or manual input
