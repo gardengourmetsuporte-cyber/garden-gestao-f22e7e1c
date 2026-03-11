@@ -15,7 +15,7 @@ export function MyPayslips() {
   const { myEmployee, isLoading: loadingEmployee } = useEmployees();
   const { payments, isLoading: loadingPayments } = useEmployeePayments(myEmployee?.id);
   const [expandedPayments, setExpandedPayments] = useState<Set<string>>(new Set());
-
+  const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
   
 
   const toggleExpand = (paymentId: string) => {
