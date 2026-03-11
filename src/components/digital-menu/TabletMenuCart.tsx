@@ -33,6 +33,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [orderType, setOrderType] = useState<'dine-in' | 'takeout'>('dine-in');
   const [payWithCoins, setPayWithCoins] = useState(false);
   const [customerCoins, setCustomerCoins] = useState<number | null>(null);
+  const [showScanner, setShowScanner] = useState(false);
+  const [comandaNumber, setComandaNumber] = useState<number | null>(null);
 
   // Check customer coin balance
   const coinTotal = cart.reduce((sum, item) => {
