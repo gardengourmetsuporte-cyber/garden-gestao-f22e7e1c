@@ -124,14 +124,7 @@ export default function TabletDigitalMenu() {
   };
 
   if (loading) {
-    return (
-      <div className="h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
-        <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3 animate-pulse" style={{ animationDuration: '2s' }}>
-          <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
-        </div>
-        <p className="text-sm font-semibold text-foreground">Carregando cardápio...</p>
-      </div>
-    );
+    return <MenuLoadingScreen />;
   }
 
   if (!hasVisibleProducts) {
