@@ -2,6 +2,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { enqueueOperation, setCache, getCache } from '@/lib/offlineDb';
 import { toast } from 'sonner';
 
 export interface POSProduct {
