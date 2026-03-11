@@ -112,6 +112,8 @@ export function CardapioConfigHub() {
               <AccordionContent className="px-4 pb-4 pt-0">
                 {section.id === 'kds-stations' ? (
                   <KDSStationsManager />
+                ) : section.id === 'comandas' ? (
+                  <ComandaQRGenerator />
                 ) : section.id === 'qrcode' ? (
                   <QRCodeBalcaoSection url={activeUnit ? `${baseUrl}/m/${activeUnit.id}?source=qrcode` : ''} />
                 ) : (

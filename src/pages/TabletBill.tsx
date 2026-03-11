@@ -176,7 +176,9 @@ export default function TabletBill() {
           <AppIcon name="ChevronLeft" size={20} className="text-foreground" />
         </button>
         <div className="flex-1">
-          <h1 className="text-lg font-bold text-foreground">Conta da Mesa {mesa}</h1>
+          <h1 className="text-lg font-bold text-foreground">
+            {comandaNum ? `Comanda #${comandaNum}` : `Conta da Mesa ${mesa}`}
+          </h1>
           <p className="text-xs text-muted-foreground">{hasOrders ? `${orders.length} pedido(s)` : 'Sem pedidos'}</p>
         </div>
       </header>
