@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { useUnit } from '@/contexts/UnitContext';
 import { KDSStationsManager } from '@/components/menu-admin/KDSStationsManager';
+import { ComandaQRGenerator } from '@/components/cardapio/ComandaQRGenerator';
 import { QRCodeSVG } from 'qrcode.react';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { AppIcon } from '@/components/ui/app-icon';
