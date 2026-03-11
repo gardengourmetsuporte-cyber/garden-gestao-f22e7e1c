@@ -328,7 +328,7 @@ export default function TabletDigitalMenu() {
       </div>
 
       {/* Product detail sheet */}
-      <MenuProductDetail
+      <TabletProductDetail
         product={selectedProduct}
         optionGroups={selectedProduct ? getProductOptionGroups(selectedProduct.id) : []}
         open={!!selectedProduct}
