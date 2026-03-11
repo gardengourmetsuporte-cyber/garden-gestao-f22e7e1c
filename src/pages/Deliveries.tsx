@@ -10,6 +10,7 @@ import { DeliveryOcrSheet } from '@/components/deliveries/DeliveryOcrSheet';
 import { DeliveryMap, type DeliveryMapHandle } from '@/components/deliveries/DeliveryMap';
 import { DeliveryLocationPicker } from '@/components/deliveries/DeliveryLocationPicker';
 import { DeliveryEditSheet } from '@/components/deliveries/DeliveryEditSheet';
+import { ManualDeliverySheet } from '@/components/deliveries/ManualDeliverySheet';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { useQuery } from '@tanstack/react-query';
