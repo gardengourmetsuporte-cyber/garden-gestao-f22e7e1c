@@ -66,6 +66,8 @@ export const MODULE_REQUIRED_PLAN: Record<string, PlanTier> = {
   'copilot': 'business',
   'menu-admin': 'business',
   'whatsapp': 'business',
+  'pdv': 'business',
+  'deliveries': 'business',
 };
 
 /** Modules that are still in production (shown with a beta/production badge) */
