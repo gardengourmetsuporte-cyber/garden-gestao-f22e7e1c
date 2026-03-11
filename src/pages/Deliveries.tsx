@@ -37,6 +37,7 @@ export default function Deliveries() {
   } = useDeliveries();
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [manualSheetOpen, setManualSheetOpen] = useState(false);
   const [locationPickerDelivery, setLocationPickerDelivery] = useState<Delivery | null>(null);
   const [editDelivery, setEditDelivery] = useState<Delivery | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
