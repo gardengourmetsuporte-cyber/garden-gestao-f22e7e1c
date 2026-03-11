@@ -29,7 +29,7 @@ const SECTIONS = [
 
 export function CardapioConfigHub() {
   const { activeUnit } = useUnit();
-  const baseUrl = window.location.origin;
+  const baseUrl = import.meta.env.PROD ? window.location.origin : 'https://garden-gestao.lovable.app';
   const [qrOpen, setQrOpen] = useState<string | null>(null);
 
   const copyLink = (url: string, label: string) => {
