@@ -429,6 +429,56 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
         </section>
       )}
 
+      {/* Resolved: Send orders per supplier */}
+      {isResolved && supplierOrders.length > 0 && (
+        <section className="space-y-2">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1">
+            Pedidos Gerados — Enviar para Fornecedores
+          </p>
+          <div className="space-y-3">
+            {supplierOrders.map(so => {
+              const total = so.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+              return (
+                <div key={so.supplier.id} className="rounded-2xl bg-card border border-border/30 overflow-hidden">
+                  <div className="px-3.5 py-2.5 border-b border-border/20 flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <AppIcon name="Store" size={14} className="text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{so.supplier.supplier?.name}</p>
+                      <p className="text-[11px] text-muted-foreground">{so.items.length} itens • R$ {total.toFixed(2).replace('.', ',')}</p>
+                    </div>
+                    {so.supplier.supplier?.phone && (
+                      <Button
+                        size="sm"
+                        className="rounded-xl gap-1.5 h-9 bg-[#25D366] hover:bg-[#1fba59] text-white shadow-sm"
+                        onClick={() => sendOrderWhatsApp(so)}
+                      >
+                        <AppIcon name="MessageCircle" size={14} />
+                        Enviar
+                      </Button>
+                    )}
+                  </div>
+                  <div className="divide-y divide-border/15">
+                    {so.items.map((item, i) => (
+                      <div key={i} className="px-3.5 py-2 flex items-center gap-2">
+                        <p className="text-[13px] text-foreground flex-1 truncate">{item.name}</p>
+                        <span className="text-[11px] text-muted-foreground shrink-0">×{item.quantity}</span>
+                        {item.price > 0 && (
+                          <span className="text-[11px] font-medium text-success shrink-0">
+                            R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {loading && prices.length === 0 && (
         <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
           <AppIcon name="Loader2" size={20} className="animate-spin" />
