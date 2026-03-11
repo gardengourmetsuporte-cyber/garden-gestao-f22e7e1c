@@ -14,6 +14,7 @@ const items = [
   { key: 'pendingOrders', title: 'Pedidos', icon: 'ShoppingCart', route: '/orders', activeVariant: 'primary' },
   { key: 'pendingClosings', title: 'Fechamentos', icon: 'FileText', route: '/cash-closing', activeVariant: 'destructive' },
   { key: 'pendingRedemptions', title: 'Resgates', icon: 'Gift', route: '/rewards', activeVariant: 'success' },
+  { key: 'pendingQuotations', title: 'Cotações', icon: 'Scale', route: '/orders', activeVariant: 'primary' },
 ] as const;
 
 const variantIcon: Record<string, string> = {
