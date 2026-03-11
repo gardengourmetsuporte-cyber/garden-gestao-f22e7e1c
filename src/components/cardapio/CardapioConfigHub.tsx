@@ -76,14 +76,12 @@ export function CardapioConfigHub() {
                     >
                       <AppIcon name="Copy" size={12} className="text-muted-foreground" />
                     </button>
-                    <a
-                      href={path}
-                      target="_blank"
-                      rel="noopener"
+                    <button
+                      onClick={() => window.open(fullUrl, '_blank')}
                       className="w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
                     >
                       <AppIcon name="ExternalLink" size={12} className="text-primary" />
-                    </a>
+                    </button>
                   </div>
                 </div>
               );
