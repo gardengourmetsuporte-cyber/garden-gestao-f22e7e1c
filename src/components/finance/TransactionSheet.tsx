@@ -941,7 +941,6 @@ export function TransactionSheet({
             </div>
           )}
         </SheetContent>
-      </Sheet>
 
       <CategoryPicker
         open={showCategoryPicker}
@@ -1002,10 +1001,12 @@ export function TransactionSheet({
         noneLabel="Nenhum"
         onCreateNew={onAddEmployee ? async (name) => {
           await onAddEmployee(name);
-          return null; // employee doesn't return ID, picker will close
+          return null;
         } : undefined}
         createPlaceholder="Nome do funcionário..."
       />
+
+      </Sheet>
       
       {/* Recurring Edit Mode Dialog */}
       <Dialog open={showRecurringEditDialog} onOpenChange={setShowRecurringEditDialog}>
