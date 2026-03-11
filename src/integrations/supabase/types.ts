@@ -3363,6 +3363,47 @@ export type Database = {
           },
         ]
       }
+      monitored_accounts: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          label: string
+          notify_on_actions: boolean
+          notify_on_login: boolean
+          unit_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          label?: string
+          notify_on_actions?: boolean
+          notify_on_login?: boolean
+          unit_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          label?: string
+          notify_on_actions?: boolean
+          notify_on_login?: boolean
+          unit_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitored_accounts_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           category: string
