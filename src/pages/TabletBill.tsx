@@ -84,15 +84,22 @@ export default function TabletBill() {
 
   // Fetch open orders for this table
   const { data: orders, isLoading, refetch } = useQuery({
-    queryKey: ['tablet-bill-orders', unitId, mesaNum],
+    queryKey: ['tablet-bill-orders', unitId, comandaNum, mesaNum],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('tablet_orders')
-        .select('id, status, total, created_at, customer_name, tablet_order_items(id, quantity, unit_price, notes, tablet_products(name))')
+        .select('id, status, total, created_at, customer_name, comanda_number, tablet_order_items(id, quantity, unit_price, notes, tablet_products(name))')
         .eq('unit_id', unitId!)
-        .eq('table_number', mesaNum)
         .in('status', ['confirmed', 'preparing', 'ready', 'pending'])
         .order('created_at', { ascending: true });
+
+      if (comandaNum) {
+        query = query.eq('comanda_number', comandaNum);
+      } else {
+        query = query.eq('table_number', mesaNum);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return (data ?? []) as Order[];
     },
