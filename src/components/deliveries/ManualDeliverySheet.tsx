@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { AppIcon } from '@/components/ui/app-icon';
-import { cn } from '@/lib/utils';
+import { useUnit } from '@/contexts/UnitContext';
 
 declare global {
   interface Window { L: any; }
@@ -49,9 +49,27 @@ interface GeoResult {
   lat: number;
   lng: number;
   display_name: string;
+  place_name: string;
+  road: string;
+  suburb: string;
+}
+
+/** Extract short place name from Nominatim result */
+function extractPlaceInfo(result: any): { place_name: string; road: string; suburb: string } {
+  const addr = result.address || {};
+  const road = addr.road || addr.pedestrian || addr.street || '';
+  const suburb = addr.suburb || addr.neighbourhood || addr.city_district || '';
+  const houseNumber = addr.house_number || '';
+  
+  let place_name = road;
+  if (houseNumber) place_name = `${road}, ${houseNumber}`;
+  if (!place_name) place_name = result.display_name?.split(',')[0] || 'Local encontrado';
+
+  return { place_name, road, suburb };
 }
 
 export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }: Props) {
+  const { activeUnit } = useUnit();
   const [orderNumber, setOrderNumber] = useState('');
   const [address, setAddress] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
@@ -67,7 +85,10 @@ export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }:
   const markerRef = useRef<any>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Geocode address with debounce
+  // Get city from unit store_info for bounded search
+  const unitCity = activeUnit?.store_info?.city || activeUnit?.name || '';
+
+  // Geocode address with city bias
   const geocode = useCallback(async (query: string) => {
     if (query.trim().length < 5) {
       setGeoResult(null);
@@ -79,11 +100,17 @@ export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }:
     setGeoError(false);
 
     try {
+      // Always append city to keep results in the right area
+      const searchQuery = unitCity
+        ? `${query}, ${unitCity}, Brasil`
+        : `${query}, Brasil`;
+
       const params = new URLSearchParams({
-        q: `${query}, Brasil`,
+        q: searchQuery,
         format: 'json',
         limit: '1',
         countrycodes: 'br',
+        addressdetails: '1',
       });
       const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, {
         headers: { 'User-Agent': 'GardenGestao/1.0' },
@@ -92,11 +119,17 @@ export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }:
 
       if (results?.[0]) {
         const r = results[0];
+        const info = extractPlaceInfo(r);
         setGeoResult({
           lat: parseFloat(r.lat),
           lng: parseFloat(r.lon),
           display_name: r.display_name,
+          ...info,
         });
+        // Auto-fill neighborhood if empty
+        if (!neighborhood && info.suburb) {
+          setNeighborhood(info.suburb);
+        }
       } else {
         setGeoResult(null);
         setGeoError(true);
@@ -107,7 +140,7 @@ export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }:
     } finally {
       setGeocoding(false);
     }
-  }, []);
+  }, [unitCity, neighborhood]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -183,7 +216,6 @@ export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }:
         customer_name: customerName.trim() || 'Cliente',
         notes: notes.trim() || undefined,
       });
-      // Reset
       setOrderNumber('');
       setAddress('');
       setNeighborhood('');
@@ -238,25 +270,36 @@ export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }:
             </div>
           </div>
 
-          {/* Map preview */}
+          {/* Map preview + Place card (Google Maps style) */}
           {(geoResult || geocoding) && (
-            <div className="rounded-xl overflow-hidden border border-border/30 relative" style={{ isolation: 'isolate' }}>
+            <div className="rounded-xl overflow-hidden border border-border/30" style={{ isolation: 'isolate' }}>
               <div
                 ref={mapContainerRef}
                 className="w-full bg-secondary/30"
-                style={{ height: 180, zIndex: 1 }}
+                style={{ height: 160, zIndex: 1 }}
               />
-              {geoResult && (
-                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/90 to-transparent">
-                  <div className="flex items-center gap-1.5">
-                    <AppIcon name="CheckCircle2" size={14} className="text-success shrink-0" />
-                    <p className="text-[11px] text-foreground/80 truncate">{geoResult.display_name}</p>
-                  </div>
+              {geocoding && !geoResult && (
+                <div className="absolute inset-0 flex items-center justify-center bg-secondary/50" style={{ height: 160 }}>
+                  <AppIcon name="Loader2" size={24} className="animate-spin text-muted-foreground" />
                 </div>
               )}
-              {geocoding && !geoResult && (
-                <div className="absolute inset-0 flex items-center justify-center bg-secondary/50">
-                  <AppIcon name="Loader2" size={24} className="animate-spin text-muted-foreground" />
+              {/* Google Maps-style place card */}
+              {geoResult && (
+                <div className="bg-card border-t border-border/30 px-3 py-2.5 flex items-start gap-2.5">
+                  <div className="mt-0.5 shrink-0 w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
+                    <AppIcon name="MapPin" size={16} className="text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">
+                      {geoResult.place_name}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground truncate">
+                      {geoResult.suburb ? `${geoResult.suburb} · ` : ''}{unitCity || geoResult.display_name.split(',').slice(-3, -1).join(',').trim()}
+                    </p>
+                  </div>
+                  <div className="shrink-0 mt-0.5">
+                    <AppIcon name="CheckCircle2" size={16} className="text-primary" />
+                  </div>
                 </div>
               )}
             </div>
@@ -271,7 +314,7 @@ export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }:
             </div>
           )}
 
-          {/* Neighborhood + Customer in a row */}
+          {/* Neighborhood + Customer */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold">Bairro</Label>
