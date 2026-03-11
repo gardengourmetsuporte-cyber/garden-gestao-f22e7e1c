@@ -177,10 +177,29 @@ export function MyPayslips() {
                 </div>
                 <span className="font-semibold text-lg" style={{ color: payment.type === 'discount' ? 'hsl(var(--destructive))' : undefined }}>{payment.type === 'discount' ? '-' : ''}{formatCurrency(payment.amount)}</span>
               </div>
+              {payment.receipt_url && (
+                <button
+                  onClick={() => setViewingReceipt(payment.receipt_url)}
+                  className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors"
+                >
+                  <AppIcon name="Image" size={16} />
+                  Ver Comprovante
+                </button>
+              )}
             </Card>
           ))}
         </div>
       )}
+
+      <Dialog open={!!viewingReceipt} onOpenChange={() => setViewingReceipt(null)}>
+        <DialogContent className="max-w-lg p-2">
+          {viewingReceipt && (
+            viewingReceipt.toLowerCase().endsWith('.pdf')
+              ? <iframe src={viewingReceipt} className="w-full h-[70vh] rounded-lg" />
+              : <img src={viewingReceipt} alt="Comprovante" className="w-full rounded-lg object-contain max-h-[70vh]" />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
