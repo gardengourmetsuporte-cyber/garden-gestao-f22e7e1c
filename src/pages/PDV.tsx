@@ -374,6 +374,12 @@ export default function PDV() {
                         </button>
                         <span className="text-xs font-semibold text-foreground shrink-0">{formatCurrency(item.quantity * item.unit_price)}</span>
                       </div>
+                      {/* Selected options display */}
+                      {item.selectedOptions && item.selectedOptions.length > 0 && (
+                        <div className="ml-[72px] text-[10px] text-muted-foreground">
+                          {item.selectedOptions.map(o => o.name).join(', ')}
+                        </div>
+                      )}
                       {/* Notes display */}
                       {item.notes && (
                         <button
