@@ -92,81 +92,67 @@ export function QuickStatsWidget() {
 
   const allStats = { ...stats, pendingQuotations };
 
+  const allCards = [
+    ...items.map((item) => {
+      const value = allStats[item.key as keyof typeof allStats] as number;
+      const isActive = value > 0;
+      const variant = isActive ? item.activeVariant : 'default';
+      return { ...item, value, isActive, variant, isChecklist: false };
+    }),
+    {
+      key: 'checklist',
+      title: activeType === 'abertura' ? 'Abertura' : 'Fechamento',
+      icon: 'checklist',
+      route: '/checklists',
+      value: checklistProgress.percent,
+      isActive: checklistProgress.percent > 0,
+      variant: checklistProgress.percent === 100 ? 'success' : checklistProgress.percent > 0 ? 'primary' : 'default',
+      isChecklist: true,
+      checklistProgress,
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {items.map((item) => {
-        const value = allStats[item.key as keyof typeof allStats] as number;
-        const isActive = value > 0;
-        const variant = isActive ? item.activeVariant : 'default';
-
-        return (
-          <button
-            key={item.key}
-            onClick={() => navigate(item.route)}
-            className={cn(
-              "card-stat-holo text-left transition-all duration-200 active:scale-[0.97]",
-              isActive && "ring-1 ring-inset",
-              isActive && variant === 'warning' && "ring-warning/20",
-              isActive && variant === 'primary' && "ring-primary/20",
-              isActive && variant === 'destructive' && "ring-destructive/20",
-              isActive && variant === 'success' && "ring-success/20",
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <div className={cn("stat-holo-icon", variantIcon[variant])}>
-                <AppIcon name={item.icon} size={20} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">{item.title}</p>
-                <div className="flex items-baseline gap-2">
-                  <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>
-                    <AnimatedValue value={value} />
-                  </p>
-                  {isActive && (
-                    <span className={cn("text-[9px] font-bold uppercase tracking-wide", variantIcon[variant].split(' ')[1])}>
-                      pendente{value !== 1 ? 's' : ''}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50" />
+    <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:-mx-8 lg:px-8 snap-x snap-mandatory">
+      {allCards.map((card) => (
+        <button
+          key={card.key}
+          onClick={() => navigate(card.route)}
+          className={cn(
+            "card-stat-holo text-left transition-all duration-200 active:scale-[0.97] shrink-0 snap-start",
+            "min-w-[155px] max-w-[180px]",
+            card.isActive && "ring-1 ring-inset",
+            card.isActive && card.variant === 'warning' && "ring-warning/20",
+            card.isActive && card.variant === 'primary' && "ring-primary/20",
+            card.isActive && card.variant === 'destructive' && "ring-destructive/20",
+            card.isActive && card.variant === 'success' && "ring-success/20",
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <div className={cn("stat-holo-icon shrink-0", variantIcon[card.variant])}>
+              <AppIcon name={card.icon} size={20} />
             </div>
-          </button>
-        );
-      })}
-
-      {/* Checklist inline card */}
-      <button
-        onClick={() => navigate('/checklists')}
-        className={cn(
-          "card-stat-holo text-left transition-all duration-200 active:scale-[0.97]",
-          checklistProgress.percent === 100 && "ring-1 ring-inset ring-success/20",
-          checklistProgress.percent > 0 && checklistProgress.percent < 100 && "ring-1 ring-inset ring-primary/20",
-        )}
-      >
-        <div className="flex items-center gap-3">
-          <div className={cn(
-            "stat-holo-icon",
-            checklistProgress.percent === 100 ? "bg-success/15 text-success" : "bg-primary/15 text-primary"
-          )}>
-            <AppIcon name="checklist" size={20} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">
-              {activeType === 'abertura' ? 'Abertura' : 'Fechamento'}
-            </p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>
-                {checklistProgress.percent}%
-              </p>
-              <span className="text-[9px] font-bold text-muted-foreground/60">
-                {checklistProgress.completed}/{checklistProgress.total}
-              </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">{card.title}</p>
+              <div className="flex items-baseline gap-1.5">
+                <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>
+                  {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
+                </p>
+                {card.isChecklist && (card as any).checklistProgress ? (
+                  <span className="text-[9px] font-bold text-muted-foreground/60">
+                    {(card as any).checklistProgress.completed}/{(card as any).checklistProgress.total}
+                  </span>
+                ) : card.isActive && !card.isChecklist ? (
+                  <span className={cn("text-[9px] font-bold uppercase tracking-wide", variantIcon[card.variant].split(' ')[1])}>
+                    pendente{card.value !== 1 ? 's' : ''}
+                  </span>
+                ) : null}
+              </div>
             </div>
+            <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50 shrink-0" />
           </div>
-          <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50" />
-        </div>
-      </button>
+        </button>
+      ))}
     </div>
   );
 }
