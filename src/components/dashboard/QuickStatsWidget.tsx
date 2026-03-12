@@ -113,43 +113,28 @@ export function QuickStatsWidget() {
   ];
 
   return (
-    <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:-mx-8 lg:px-8 snap-x snap-mandatory">
+    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:-mx-8 lg:px-8 snap-x snap-mandatory">
       {allCards.map((card) => (
         <button
           key={card.key}
           onClick={() => navigate(card.route)}
           className={cn(
-            "card-stat-holo text-left transition-all duration-200 active:scale-[0.97] shrink-0 snap-start",
-            "min-w-[145px] max-w-[170px]",
-            card.isActive && "ring-1 ring-inset",
-            card.isActive && card.variant === 'warning' && "ring-warning/20",
-            card.isActive && card.variant === 'primary' && "ring-primary/20",
-            card.isActive && card.variant === 'destructive' && "ring-destructive/20",
-            card.isActive && card.variant === 'success' && "ring-success/20",
+            "flex items-center gap-2.5 shrink-0 snap-start rounded-xl px-3.5 py-2.5 transition-all duration-200 active:scale-[0.97]",
+            "bg-card/70 border border-border/30",
           )}
         >
-          <div className="flex items-center gap-2.5">
-            <div className={cn("stat-holo-icon shrink-0", variantIcon[card.variant])}>
-              <AppIcon name={card.icon} size={20} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">{card.title}</p>
-              <div className="flex items-baseline gap-1.5">
-                <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>
-                  {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
-                </p>
-                {card.isChecklist && (card as any).checklistProgress ? (
-                  <span className="text-[9px] font-bold text-muted-foreground/60">
-                    {(card as any).checklistProgress.completed}/{(card as any).checklistProgress.total}
-                  </span>
-                ) : card.isActive && !card.isChecklist ? (
-                  <span className={cn("text-[9px] font-bold uppercase tracking-wide", variantIcon[card.variant].split(' ')[1])}>
-                    pendente{card.value !== 1 ? 's' : ''}
-                  </span>
-                ) : null}
-              </div>
-            </div>
-            <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50 shrink-0" />
+          <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", variantIcon[card.variant])}>
+            <AppIcon name={card.icon} size={16} />
+          </div>
+          <div className="text-left min-w-0">
+            <p className="text-lg font-extrabold font-display leading-tight" style={{ letterSpacing: '-0.02em' }}>
+              {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
+            </p>
+            <p className="text-[10px] text-muted-foreground truncate leading-tight">
+              {card.isChecklist
+                ? `${(card as any).checklistProgress.completed}/${(card as any).checklistProgress.total} itens`
+                : card.title.toLowerCase()}
+            </p>
           </div>
         </button>
       ))}
