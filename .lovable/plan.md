@@ -10,11 +10,41 @@ Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos
 3. Pedido é vinculado ao `comanda_number` automaticamente
 4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-### Arquivos criados/alterados
-- **Migration**: coluna `comanda_number` (integer, nullable) + índice na `tablet_orders`
-- `src/components/cardapio/ComandaQRGenerator.tsx` — gerador de QR codes para impressão
-- `src/components/digital-menu/ComandaScanner.tsx` — scanner de câmera com fallback manual
-- `src/components/digital-menu/TabletMenuCart.tsx` — botão "Escanear Comanda" no checkout
-- `src/components/orders/UnifiedOrdersPanel.tsx` — exibe "Comanda #N" nos cards
-- `src/components/cardapio/CardapioConfigHub.tsx` — seção "Comandas Físicas" no admin
-- `src/pages/TabletBill.tsx` — suporte a `?comanda=N` para agrupar pedidos por comanda
+---
+
+## Bloco de Relatórios Avançados ✅
+
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+
+## Dashboard Analytics ✅
+
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
+
+## Operacional ✅
+
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+
+## CRM / Clientes ✅
+
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+
+## Funcionários ✅
+
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
