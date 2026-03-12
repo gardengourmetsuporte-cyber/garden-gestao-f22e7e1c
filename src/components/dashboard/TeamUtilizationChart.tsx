@@ -7,15 +7,30 @@ interface Props {
 }
 
 export function TeamUtilizationChart({ members }: Props) {
-  const data = members.slice(0, 8).map(m => ({
-    name: m.full_name.split(' ')[0],
-    pct: m.utilizationPct,
+  const raw = members.slice(0, 8).map(m => {
+    const parts = m.full_name.split(' ');
+    return { firstName: parts[0], lastInitial: parts[1]?.[0] ?? '', pct: m.utilizationPct, fullName: m.full_name };
+  });
+
+  // Deduplicate first names
+  const firstNameCount = raw.reduce<Record<string, number>>((acc, r) => {
+    acc[r.firstName] = (acc[r.firstName] || 0) + 1;
+    return acc;
+  }, {});
+
+  const data = raw.map(r => ({
+    name: firstNameCount[r.firstName] > 1 && r.lastInitial ? `${r.firstName} ${r.lastInitial}.` : r.firstName,
+    pct: r.pct,
+    fullName: r.fullName,
   }));
+
+  const chartHeight = Math.max(120, data.length * 32 + 20);
 
   const getColor = (pct: number) => {
     if (pct >= 80) return 'hsl(var(--primary))';
     if (pct >= 50) return 'hsl(45 93% 47%)';
-    return 'hsl(var(--destructive))';
+    if (pct > 0) return 'hsl(var(--destructive))';
+    return 'hsl(var(--muted-foreground) / 0.3)';
   };
 
   return (
@@ -34,12 +49,13 @@ export function TeamUtilizationChart({ members }: Props) {
           <p className="text-xs text-muted-foreground">Sem dados disponíveis</p>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
           <BarChart data={data} layout="vertical" margin={{ left: 0, right: 12, top: 0, bottom: 0 }}>
             <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={v => `${v}%`} axisLine={false} tickLine={false} />
-            <YAxis type="category" dataKey="name" width={60} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+            <YAxis type="category" dataKey="name" width={70} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
             <Tooltip
-              formatter={(v: number) => `${v}%`}
+              formatter={(v: number) => [`${v}%`, 'Aproveitamento']}
+              labelFormatter={(_label: string, payload: any[]) => payload?.[0]?.payload?.fullName ?? _label}
               contentStyle={{
                 fontSize: 12, borderRadius: 12, border: 'none',
                 background: 'hsl(var(--popover))', color: 'hsl(var(--popover-foreground))',
