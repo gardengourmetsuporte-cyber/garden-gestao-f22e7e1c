@@ -94,7 +94,8 @@ export function AdminDashboard() {
   const renderWidget = (widget: typeof widgets[number], stagger: string) => {
     if (!widget.visible) return null;
 
-    // Filter by current view
+    // Filter by current view — team view renders its own widgets
+    if (view === 'team') return null;
     if (view === 'operational' && FINANCIAL_WIDGETS.has(widget.key)) return null;
     if (view === 'financial' && OPERATIONAL_WIDGETS.has(widget.key)) return null;
 
