@@ -323,7 +323,7 @@ export default function DigitalMenu() {
     .toUpperCase() || '?';
 
   return (
-    <div className="min-h-[100dvh] bg-background w-full mx-auto relative max-w-3xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
+    <div className="min-h-[100dvh] bg-background w-full mx-auto relative">
       {/* Language switcher floating */}
       <div className="fixed top-3 right-3 z-50">
         <LanguageSwitcher onChange={() => forceRerender(n => n + 1)} />
