@@ -1,79 +1,54 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Plano: Adicionar aba "Equipe" ao seletor de visualização do Dashboard
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+### O que muda
 
----
+Adicionar um terceiro modo de visualização **"Equipe"** ao seletor já existente (Operacional / Financeiro / Equipe). Quando selecionado, o dashboard mostra widgets focados na performance e status da equipe.
 
-## Bloco de Relatórios Avançados ✅
+### Widgets da aba Equipe
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+1. **Team KPI Bar** — Barra horizontal compacta com métricas rápidas: total de funcionários ativos, checklists completados hoje, taxa de aproveitamento (% checklists feitos vs total), pendências do dia
+2. **Performance Ranking** — Reusa dados do `EmployeePerformance` / `useTeamAchievements`: ranking com score, barras de progresso, avatar ranked
+3. **Gráfico de Aproveitamento** — Recharts `BarChart` mostrando % de conclusão de checklists por funcionário (completados / total disponível)
+4. **Gráfico de Rendimento** — Recharts `LineChart` ou `AreaChart` com evolução de pontos ganhos nos últimos 7-14 dias por membro
+5. **Pendências** — Lista de itens de checklist não concluídos hoje agrupados por funcionário
+6. **Leaderboard** — Reusa o widget existente `LazyLeaderboard`
 
-## Dashboard Analytics ✅
+### Alterações técnicas
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+**Arquivos modificados:**
+- `src/components/dashboard/AdminDashboard.tsx` — Expandir `DashboardView` para `'operational' | 'financial' | 'team'`, adicionar botão "Equipe" no seletor, criar set `TEAM_WIDGETS`, renderizar widgets da aba equipe
 
-## Operacional ✅
+**Arquivos criados:**
+- `src/components/dashboard/TeamDashboardView.tsx` — Componente que orquestra os widgets da aba equipe
+- `src/hooks/useTeamDashboard.ts` — Hook que busca dados agregados: employees ativos, completions do dia, taxa de aproveitamento, pendências por membro, evolução de pontos (últimos 14 dias)
+- `src/components/dashboard/TeamUtilizationChart.tsx` — Gráfico de barras de aproveitamento por funcionário (Recharts)
+- `src/components/dashboard/TeamTrendChart.tsx` — Gráfico de linha de rendimento ao longo do tempo
+- `src/components/dashboard/TeamPendingItems.tsx` — Lista de pendências de checklist não concluídas
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+### Dados utilizados (tabelas existentes)
+- `employees` — lista de funcionários ativos
+- `checklist_completions` — completions do dia e histórico
+- `checklist_items` — total de itens para calcular taxa de aproveitamento
+- `bonus_points` — pontos bônus
+- Função `get_leaderboard_data` — reusa para ranking
 
-## CRM / Clientes ✅
+### Fluxo no Dashboard
+```text
+[Operacional] [Financeiro] [Equipe]
+                              ↓
+                    ┌─────────────────┐
+                    │  Team KPI Bar   │
+                    ├────────┬────────┤
+                    │Aproveit│Rendim. │
+                    │(BarCht)│(LineCh)│
+                    ├────────┴────────┤
+                    │  Performance    │
+                    │  Ranking        │
+                    ├─────────────────┤
+                    │  Pendências     │
+                    │  do dia         │
+                    └─────────────────┘
+```
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
-
-## Funcionários ✅
-
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
