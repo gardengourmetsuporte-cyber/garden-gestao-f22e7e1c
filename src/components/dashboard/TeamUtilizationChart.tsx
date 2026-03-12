@@ -49,12 +49,13 @@ export function TeamUtilizationChart({ members }: Props) {
           <p className="text-xs text-muted-foreground">Sem dados disponíveis</p>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
           <BarChart data={data} layout="vertical" margin={{ left: 0, right: 12, top: 0, bottom: 0 }}>
             <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={v => `${v}%`} axisLine={false} tickLine={false} />
-            <YAxis type="category" dataKey="name" width={60} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+            <YAxis type="category" dataKey="name" width={70} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
             <Tooltip
-              formatter={(v: number) => `${v}%`}
+              formatter={(v: number) => [`${v}%`, 'Aproveitamento']}
+              labelFormatter={(_label: string, payload: any[]) => payload?.[0]?.payload?.fullName ?? _label}
               contentStyle={{
                 fontSize: 12, borderRadius: 12, border: 'none',
                 background: 'hsl(var(--popover))', color: 'hsl(var(--popover-foreground))',

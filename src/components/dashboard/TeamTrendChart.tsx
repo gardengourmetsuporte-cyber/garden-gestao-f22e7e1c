@@ -57,7 +57,7 @@ export function TeamTrendChart({ trend }: Props) {
                 background: 'hsl(var(--popover))', color: 'hsl(var(--popover-foreground))',
                 boxShadow: '0 8px 24px -4px hsl(0 0% 0% / 0.3)',
               }}
-              formatter={(v: number) => [`${v} pts`, 'Pontos']}
+              formatter={(v: number) => [`${v} pts`, 'Rendimento']}
             />
             <Area type="monotone" dataKey="points" stroke="hsl(var(--primary))" fill="url(#teamTrendGrad)" strokeWidth={2} dot={false} />
           </AreaChart>
