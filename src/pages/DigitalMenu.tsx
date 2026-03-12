@@ -368,13 +368,19 @@ export default function DigitalMenu() {
           {/* Quick search bar */}
           <div className="px-5 md:px-8 mt-5">
             <button
-              onClick={() => { setSearchOpen(true); setActiveTab('menu'); }}
+              onClick={() => setSearchOpen(true)}
               className="w-full flex items-center gap-2.5 px-4 py-3.5 rounded-2xl bg-card border border-border/40 text-muted-foreground text-sm active:scale-[0.98] transition-transform"
             >
               <AppIcon name="Search" size={16} />
               Buscar no cardápio...
             </button>
           </div>
+
+          {searchOpen && (
+            <div className="px-4 md:px-8 mt-3">
+              <MenuSearch products={products} onSelectProduct={(p) => { handleProductSelect(p); setSearchOpen(false); }} />
+            </div>
+          )}
 
           {/* Featured products */}
           {products.filter(p => p.is_highlighted).length > 0 && (
@@ -427,37 +433,8 @@ export default function DigitalMenu() {
         </div>
       )}
 
-      {/* Menu tab */}
-      {activeTab === 'menu' && (
-        <div className="pt-4">
-          {searchOpen ? (
-            <div className="px-4 md:px-8 mb-4">
-              <MenuSearch products={products} onSelectProduct={handleProductSelect} />
-            </div>
-          ) : (
-            <>
-              <div className="px-5 md:px-8 mb-3 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-foreground">Cardápio</h2>
-                <button
-                  onClick={() => setSearchOpen(true)}
-                  className="w-9 h-9 rounded-xl bg-card border border-border/40 flex items-center justify-center"
-                >
-                  <AppIcon name="Search" size={16} className="text-muted-foreground" />
-                </button>
-              </div>
-              <MenuProductList
-                categories={categories}
-                groups={groups}
-                products={products}
-                getGroupProducts={getGroupProducts}
-                selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
-                onSelectProduct={handleProductSelect}
-              />
-            </>
-          )}
-        </div>
-      )}
+      {/* Menu tab - redirect to home */}
+      {activeTab === 'menu' && (() => { setActiveTab('home'); return null; })()}
 
       {/* Cart tab */}
       {activeTab === 'cart' && unitId && (
