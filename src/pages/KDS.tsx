@@ -12,7 +12,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useDroppable } from '@dnd-kit/core';
 import {
   ChefHat, Clock, Maximize, Minimize, Volume2, VolumeX,
-  UtensilsCrossed, Truck, RefreshCw, Hash, User, Undo2,
+  UtensilsCrossed, Truck, RefreshCw, Hash, Undo2, GripVertical,
 } from 'lucide-react';
 import { KDSOrderDetail } from '@/components/kds/KDSOrderDetail';
 
@@ -50,10 +50,10 @@ type KDSOrder = {
 const ACTIVE_STATUSES = ['awaiting_confirmation', 'confirmed', 'preparing', 'ready'];
 
 const COLUMNS = [
-  { key: 'awaiting_confirmation', label: 'Aguardando', gradient: 'from-amber-500/20 to-amber-600/5', accent: 'amber', dotColor: 'bg-amber-400', textColor: 'text-amber-400', bgCard: 'bg-amber-500/8', borderCard: 'border-amber-500/20', btnBg: 'bg-amber-400', btnHover: 'hover:bg-amber-300' },
-  { key: 'confirmed', label: 'Confirmado', gradient: 'from-sky-500/20 to-sky-600/5', accent: 'sky', dotColor: 'bg-sky-400', textColor: 'text-sky-400', bgCard: 'bg-sky-500/8', borderCard: 'border-sky-500/20', btnBg: 'bg-sky-400', btnHover: 'hover:bg-sky-300' },
-  { key: 'preparing', label: 'Preparando', gradient: 'from-violet-500/20 to-violet-600/5', accent: 'violet', dotColor: 'bg-violet-400', textColor: 'text-violet-400', bgCard: 'bg-violet-500/8', borderCard: 'border-violet-500/20', btnBg: 'bg-violet-400', btnHover: 'hover:bg-violet-300' },
-  { key: 'ready', label: 'Pronto', gradient: 'from-emerald-500/20 to-emerald-600/5', accent: 'emerald', dotColor: 'bg-emerald-400', textColor: 'text-emerald-400', bgCard: 'bg-emerald-500/8', borderCard: 'border-emerald-500/20', btnBg: 'bg-emerald-400', btnHover: 'hover:bg-emerald-300' },
+  { key: 'awaiting_confirmation', label: 'Aguardando', emoji: '🟡', bg: 'bg-amber-950/40', border: 'border-amber-700/30', dot: 'bg-amber-400', text: 'text-amber-300', badge: 'bg-amber-400/15 text-amber-300', btn: 'bg-amber-500 hover:bg-amber-400 text-black' },
+  { key: 'confirmed', label: 'Confirmado', emoji: '🔵', bg: 'bg-sky-950/40', border: 'border-sky-700/30', dot: 'bg-sky-400', text: 'text-sky-300', badge: 'bg-sky-400/15 text-sky-300', btn: 'bg-sky-500 hover:bg-sky-400 text-black' },
+  { key: 'preparing', label: 'Preparando', emoji: '🟣', bg: 'bg-violet-950/40', border: 'border-violet-700/30', dot: 'bg-violet-400', text: 'text-violet-300', badge: 'bg-violet-400/15 text-violet-300', btn: 'bg-violet-500 hover:bg-violet-400 text-black' },
+  { key: 'ready', label: 'Pronto', emoji: '🟢', bg: 'bg-emerald-950/40', border: 'border-emerald-700/30', dot: 'bg-emerald-400', text: 'text-emerald-300', badge: 'bg-emerald-400/15 text-emerald-300', btn: 'bg-emerald-500 hover:bg-emerald-400 text-black' },
 ] as const;
 
 const STATUS_NEXT: Record<string, { next: string | null; nextLabel: string; prev: string | null; prevLabel: string }> = {
@@ -76,29 +76,29 @@ function ElapsedBadge({ createdAt }: { createdAt: string }) {
 
   return (
     <span className={cn(
-      'inline-flex items-center gap-1 text-[11px] font-mono font-bold px-2 py-0.5 rounded-lg',
-      isCritical ? 'bg-red-500/20 text-red-400 animate-pulse' :
-      isUrgent ? 'bg-orange-500/15 text-orange-400' :
-      'bg-white/[0.06] text-white/40',
+      'inline-flex items-center gap-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md',
+      isCritical ? 'bg-red-500/25 text-red-300 animate-pulse' :
+      isUrgent ? 'bg-orange-500/20 text-orange-300' :
+      'bg-white/[0.06] text-white/35',
     )}>
-      <Clock className="w-3 h-3" />
+      <Clock className="w-2.5 h-2.5" />
       {mins}m
     </span>
   );
 }
 
-// ─── Source icon ─────────────────────────────────────────────────
+// ─── Source badge ────────────────────────────────────────────────
 function SourceBadge({ source, tableNumber, customerName }: { source: string; tableNumber: number; customerName: string | null }) {
   return (
-    <div className="flex items-center gap-1.5 text-[11px] text-white/50 font-medium">
+    <div className="flex items-center gap-1 text-[10px] text-white/40 font-medium truncate">
       {source === 'delivery' ? (
-        <><Truck className="w-3.5 h-3.5 text-blue-400" /><span>Delivery</span></>
+        <><Truck className="w-3 h-3 text-blue-400 shrink-0" /><span>Delivery</span></>
       ) : source === 'qrcode' ? (
-        <><Hash className="w-3.5 h-3.5 text-purple-400" /><span>Mesa {tableNumber}</span></>
+        <><Hash className="w-3 h-3 text-purple-400 shrink-0" /><span>Mesa {tableNumber}</span></>
       ) : (
-        <><UtensilsCrossed className="w-3.5 h-3.5 text-emerald-400" /><span>Mesa {tableNumber}</span></>
+        <><UtensilsCrossed className="w-3 h-3 text-emerald-400 shrink-0" /><span>Mesa {tableNumber}</span></>
       )}
-      {customerName && <><span className="text-white/20">·</span><span className="truncate max-w-[80px]">{customerName}</span></>}
+      {customerName && <><span className="text-white/15">·</span><span className="truncate">{customerName}</span></>}
     </div>
   );
 }
@@ -120,7 +120,7 @@ function DraggableOrderCard({
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
-    opacity: isDragging ? 0.4 : 1,
+    opacity: isDragging ? 0.3 : 1,
     zIndex: isDragging ? 50 : 'auto' as any,
   };
 
@@ -133,68 +133,68 @@ function DraggableOrderCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'group rounded-2xl border backdrop-blur-sm transition-shadow',
-        col.borderCard, col.bgCard,
-        isDragging && 'shadow-2xl shadow-black/40 scale-[1.02]',
-        'hover:shadow-lg hover:shadow-black/20',
+        'rounded-xl border backdrop-blur-sm transition-all',
+        col.border, col.bg,
+        isDragging && 'shadow-2xl shadow-black/60 ring-2 ring-white/20',
       )}
     >
-      {/* Drag handle + clickable body */}
-      <div
-        {...attributes}
-        {...listeners}
-        className="cursor-grab active:cursor-grabbing touch-manipulation"
+      {/* Card body - tap to view detail */}
+      <button
+        type="button"
+        onClick={() => onSelect(order)}
+        className="w-full text-left px-3 pt-3 pb-2 space-y-2 active:bg-white/[0.03] transition-colors rounded-t-xl"
       >
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); onSelect(order); }}
-          className="w-full text-left px-4 pt-3.5 pb-2.5 space-y-2.5 active:bg-white/[0.03] transition-colors rounded-t-2xl"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2.5">
-              <span className={cn('text-lg font-black tracking-tight', col.textColor)}>#{shortId}</span>
-            </div>
+        {/* Header row */}
+        <div className="flex items-center justify-between gap-1">
+          <span className={cn('text-base font-black tracking-tight', col.text)}>#{shortId}</span>
+          <div className="flex items-center gap-1.5">
             <ElapsedBadge createdAt={order.created_at} />
+            {/* Drag handle */}
+            <div
+              {...attributes}
+              {...listeners}
+              className="p-1 rounded-md bg-white/[0.06] cursor-grab active:cursor-grabbing touch-manipulation"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <GripVertical className="w-3.5 h-3.5 text-white/25" />
+            </div>
           </div>
+        </div>
 
-          {/* Source */}
-          <SourceBadge source={order.source || 'mesa'} tableNumber={order.table_number} customerName={order.customer_name} />
+        <SourceBadge source={order.source || 'mesa'} tableNumber={order.table_number} customerName={order.customer_name} />
 
-          {/* Items */}
-          <div className="space-y-1 pb-0.5">
-            {items.slice(0, 4).map(item => (
-              <div key={item.id} className="flex items-start gap-2">
-                <span className={cn('text-[11px] font-black shrink-0 w-5 h-5 rounded-md flex items-center justify-center', col.bgCard, col.textColor)}>
-                  {item.quantity}
-                </span>
-                <span className="text-xs text-white/70 truncate leading-5">{item.tablet_products?.name || 'Item'}</span>
-              </div>
-            ))}
-            {items.length > 4 && (
-              <span className="text-[10px] text-white/25 font-medium pl-7">+{items.length - 4} itens</span>
-            )}
-          </div>
-        </button>
-      </div>
+        {/* Items */}
+        <div className="space-y-0.5">
+          {items.slice(0, 3).map(item => (
+            <div key={item.id} className="flex items-center gap-1.5">
+              <span className={cn('text-[10px] font-black w-4 h-4 rounded flex items-center justify-center shrink-0', col.badge)}>
+                {item.quantity}
+              </span>
+              <span className="text-[11px] text-white/60 truncate leading-4">{item.tablet_products?.name || 'Item'}</span>
+            </div>
+          ))}
+          {items.length > 3 && (
+            <span className="text-[9px] text-white/20 font-medium pl-5">+{items.length - 3} itens</span>
+          )}
+        </div>
+      </button>
 
       {/* Action buttons */}
-      <div className="flex gap-1.5 px-3 pb-3">
+      <div className="flex gap-1.5 px-2.5 pb-2.5 pt-1">
         {statusCfg?.prev && (
           <button
-            onClick={(e) => { e.stopPropagation(); onBump(order.id, statusCfg.prev!); }}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl text-[11px] font-bold text-white/50 bg-white/[0.05] hover:bg-white/[0.1] active:scale-95 transition-all"
+            onClick={() => onBump(order.id, statusCfg.prev!)}
+            className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-[10px] font-bold text-white/40 bg-white/[0.05] hover:bg-white/[0.1] active:scale-95 transition-all"
           >
             <Undo2 className="w-3 h-3" />
-            {statusCfg.prevLabel}
           </button>
         )}
         {statusCfg?.next && (
           <button
-            onClick={(e) => { e.stopPropagation(); onBump(order.id, statusCfg.next!); }}
+            onClick={() => onBump(order.id, statusCfg.next!)}
             className={cn(
-              'flex-1 py-2.5 rounded-xl text-xs font-black text-black tracking-wide active:scale-95 transition-all',
-              col.btnBg, col.btnHover,
+              'flex-1 py-2 rounded-lg text-[11px] font-black tracking-wide active:scale-95 transition-all',
+              col.btn,
             )}
           >
             {statusCfg.nextLabel}
@@ -213,21 +213,20 @@ function DragOverlayCard({ order }: { order: KDSOrder }) {
 
   return (
     <div className={cn(
-      'rounded-2xl border backdrop-blur-md shadow-2xl shadow-black/50 rotate-2 scale-105',
-      col.borderCard, col.bgCard,
-      'ring-2 ring-white/20',
-    )}>
-      <div className="px-4 pt-3.5 pb-3 space-y-2">
-        <div className="flex items-center gap-2.5">
-          <span className={cn('text-lg font-black tracking-tight', col.textColor)}>#{shortId}</span>
+      'rounded-xl border backdrop-blur-md shadow-2xl shadow-black/60 rotate-1 scale-105',
+      col.border, col.bg,
+      'ring-2 ring-white/25',
+    )} style={{ width: 'min(280px, 70vw)' }}>
+      <div className="px-3 pt-3 pb-2.5 space-y-1.5">
+        <div className="flex items-center gap-2">
+          <span className={cn('text-base font-black', col.text)}>#{shortId}</span>
           <ElapsedBadge createdAt={order.created_at} />
         </div>
-        <SourceBadge source={order.source || 'mesa'} tableNumber={order.table_number} customerName={order.customer_name} />
-        <div className="space-y-1">
-          {items.slice(0, 3).map(item => (
-            <div key={item.id} className="flex items-start gap-2">
-              <span className="text-[11px] font-black text-white/60">{item.quantity}x</span>
-              <span className="text-xs text-white/50 truncate">{item.tablet_products?.name || 'Item'}</span>
+        <div className="space-y-0.5">
+          {items.slice(0, 2).map(item => (
+            <div key={item.id} className="flex items-center gap-1.5">
+              <span className="text-[10px] font-black text-white/50">{item.quantity}x</span>
+              <span className="text-[11px] text-white/40 truncate">{item.tablet_products?.name || 'Item'}</span>
             </div>
           ))}
         </div>
@@ -248,42 +247,43 @@ function KDSColumn({
   const { isOver, setNodeRef } = useDroppable({ id: col.key });
 
   return (
-    <div className="flex flex-col h-full min-w-0">
+    <div className={cn(
+      'flex flex-col h-full min-w-[280px] w-[280px] lg:min-w-0 lg:w-auto shrink-0 lg:shrink',
+      'border-r border-white/[0.04] last:border-r-0',
+    )}>
       {/* Column header */}
       <div className={cn(
-        'flex items-center gap-2.5 px-4 py-3 border-b border-white/[0.06]',
-        isOver && 'bg-white/[0.04]',
+        'flex items-center gap-2 px-3 py-2.5 border-b border-white/[0.06] shrink-0',
+        isOver && 'bg-white/[0.06]',
       )}>
-        <div className={cn('w-2.5 h-2.5 rounded-full shrink-0', col.dotColor, orders.length > 0 && 'animate-pulse')} />
-        <span className={cn('text-xs font-bold uppercase tracking-widest', orders.length > 0 ? col.textColor : 'text-white/20')}>
+        <div className={cn('w-2 h-2 rounded-full shrink-0', col.dot, orders.length > 0 && 'animate-pulse')} />
+        <span className={cn('text-[11px] font-bold uppercase tracking-widest flex-1', orders.length > 0 ? col.text : 'text-white/20')}>
           {col.label}
         </span>
-        {orders.length > 0 && (
-          <span className={cn(
-            'ml-auto text-[11px] font-black w-6 h-6 rounded-lg flex items-center justify-center',
-            col.bgCard, col.textColor,
-          )}>
-            {orders.length}
-          </span>
-        )}
+        <span className={cn(
+          'text-[10px] font-black min-w-[20px] h-5 rounded-md flex items-center justify-center',
+          orders.length > 0 ? col.badge : 'bg-white/[0.04] text-white/15',
+        )}>
+          {orders.length}
+        </span>
       </div>
 
       {/* Scrollable order list */}
       <div
         ref={setNodeRef}
         className={cn(
-          'flex-1 overflow-y-auto p-2.5 space-y-2.5 transition-colors',
-          isOver && 'bg-white/[0.02] ring-1 ring-inset ring-white/[0.06] rounded-b-xl',
+          'flex-1 overflow-y-auto p-2 space-y-2 transition-colors',
+          isOver && 'bg-white/[0.03] ring-1 ring-inset ring-white/[0.08]',
         )}
-        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.08) transparent' }}
+        style={{ scrollbarWidth: 'none' }}
       >
         {orders.map(order => (
           <DraggableOrderCard key={order.id} order={order} col={col} onBump={onBump} onSelect={onSelect} />
         ))}
         {orders.length === 0 && (
-          <div className="flex-1 flex flex-col items-center justify-center min-h-[200px] text-white/[0.08]">
-            <ChefHat className="w-8 h-8 mb-2" />
-            <span className="text-[11px] font-medium">Nenhum pedido</span>
+          <div className="flex flex-col items-center justify-center py-16 text-white/[0.06]">
+            <ChefHat className="w-7 h-7 mb-1.5" />
+            <span className="text-[10px] font-medium">Vazio</span>
           </div>
         )}
       </div>
@@ -303,31 +303,22 @@ export default function KDS() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
   );
 
   const { data: orders = [], isPending, isError, error, refetch } = useQuery({
     queryKey: ['kds-orders', unitId],
     queryFn: async () => {
       if (!unitId) return [];
-      const withTimeout = <T,>(promise: Promise<T>, ms = 12000) =>
-        Promise.race<T>([promise, new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))]);
-      try {
-        const query = supabase
-          .from('tablet_orders')
-          .select('id, unit_id, table_number, order_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv, recipes(recipe_ingredients!recipe_ingredients_recipe_id_fkey(quantity, unit_type, kds_station_id, kds_stations(name, color), inventory_items(name)))))')
-          .eq('unit_id', unitId)
-          .in('status', ACTIVE_STATUSES)
-          .order('created_at', { ascending: true })
-          .limit(50);
-        const { data, error } = await withTimeout(Promise.resolve(query)) as { data: any; error: any };
-        if (error) throw error;
-        return (data as unknown as KDSOrder[]) || [];
-      } catch (err: any) {
-        const msg = String(err?.message || '');
-        if (err?.name === 'AbortError' || msg.toLowerCase().includes('abort')) throw new Error('Conexão instável.');
-        throw err;
-      }
+      const { data, error } = await supabase
+        .from('tablet_orders')
+        .select('id, unit_id, table_number, order_number, status, total, created_at, source, customer_name, tablet_order_items(id, quantity, notes, tablet_products(name, codigo_pdv, recipes(recipe_ingredients!recipe_ingredients_recipe_id_fkey(quantity, unit_type, kds_station_id, kds_stations(name, color), inventory_items(name)))))')
+        .eq('unit_id', unitId)
+        .in('status', ACTIVE_STATUSES)
+        .order('created_at', { ascending: true })
+        .limit(50);
+      if (error) throw error;
+      return (data as unknown as KDSOrder[]) || [];
     },
     enabled: !!unitId,
     staleTime: 5_000,
@@ -404,7 +395,6 @@ export default function KDS() {
     return g;
   }, [orders]);
 
-  // Drag handlers
   const activeOrder = useMemo(() => orders.find(o => o.id === activeId) || null, [orders, activeId]);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -419,60 +409,60 @@ export default function KDS() {
     const orderId = active.id as string;
     const targetStatus = over.id as string;
 
-    // Only allow drop on column droppables (not on other cards)
     if (!ACTIVE_STATUSES.includes(targetStatus)) return;
 
     const order = orders.find(o => o.id === orderId);
     if (!order || order.status === targetStatus) return;
 
-    // Allow drag to any adjacent column (forward or backward)
     const currentIdx = ACTIVE_STATUSES.indexOf(order.status);
     const targetIdx = ACTIVE_STATUSES.indexOf(targetStatus);
-    if (Math.abs(currentIdx - targetIdx) > 1) return; // only 1 step at a time
+    if (Math.abs(currentIdx - targetIdx) > 1) return;
 
     handleBump(orderId, targetStatus);
   }, [orders, handleBump]);
 
   const handleDragCancel = useCallback(() => setActiveId(null), []);
 
+  const totalOrders = orders.length;
+
   return (
-    <div className="h-screen bg-[hsl(225,15%,6%)] text-white flex flex-col select-none overflow-hidden">
+    <div className="h-screen bg-[#0a0c10] text-white flex flex-col select-none overflow-hidden">
       {/* ── Fixed Top Bar ── */}
-      <header className="flex items-center justify-between px-5 h-14 border-b border-white/[0.06] bg-[hsl(225,15%,7%)] shrink-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 flex items-center justify-center ring-1 ring-emerald-500/25">
-            <ChefHat className="w-5 h-5 text-emerald-400" />
+      <header className="flex items-center h-12 px-3 border-b border-white/[0.06] bg-[#0d0f14] shrink-0 z-20">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center shrink-0">
+            <ChefHat className="w-4 h-4 text-emerald-400" />
           </div>
-          <div>
-            <h1 className="text-base font-black tracking-tight leading-none">KDS</h1>
-            <p className="text-[10px] text-white/30 font-medium mt-0.5">
-              Cozinha · {orders.length} {orders.length === 1 ? 'pedido' : 'pedidos'}
+          <div className="min-w-0">
+            <h1 className="text-sm font-black tracking-tight leading-none">KDS</h1>
+            <p className="text-[9px] text-white/25 font-medium">
+              {totalOrders} {totalOrders === 1 ? 'pedido' : 'pedidos'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-mono font-bold text-white/25 mr-2 tabular-nums">
+        <div className="flex items-center gap-0.5">
+          <span className="text-[11px] font-mono font-bold text-white/20 mr-1 tabular-nums">
             {time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </span>
-          <button onClick={() => refetch()} className="p-2.5 rounded-xl hover:bg-white/[0.06] active:scale-95 transition-all" title="Atualizar">
-            <RefreshCw className={cn('w-4 h-4 text-white/30', isPending && 'animate-spin text-emerald-400')} />
+          <button onClick={() => refetch()} className="p-2 rounded-lg hover:bg-white/[0.06] active:scale-95 transition-all" title="Atualizar">
+            <RefreshCw className={cn('w-3.5 h-3.5 text-white/25', isPending && 'animate-spin text-emerald-400')} />
           </button>
-          <button onClick={() => setSoundEnabled(s => !s)} className="p-2.5 rounded-xl hover:bg-white/[0.06] active:scale-95 transition-all" title={soundEnabled ? 'Silenciar' : 'Ativar som'}>
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-white/30" /> : <VolumeX className="w-4 h-4 text-white/15" />}
+          <button onClick={() => setSoundEnabled(s => !s)} className="p-2 rounded-lg hover:bg-white/[0.06] active:scale-95 transition-all">
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-white/25" /> : <VolumeX className="w-3.5 h-3.5 text-white/15" />}
           </button>
-          <button onClick={toggleFullscreen} className="p-2.5 rounded-xl hover:bg-white/[0.06] active:scale-95 transition-all" title="Tela cheia">
-            {isFullscreen ? <Minimize className="w-4 h-4 text-white/30" /> : <Maximize className="w-4 h-4 text-white/30" />}
+          <button onClick={toggleFullscreen} className="p-2 rounded-lg hover:bg-white/[0.06] active:scale-95 transition-all">
+            {isFullscreen ? <Minimize className="w-3.5 h-3.5 text-white/25" /> : <Maximize className="w-3.5 h-3.5 text-white/25" />}
           </button>
         </div>
       </header>
 
       {/* Error bar */}
       {isError && (
-        <div className="mx-3 mt-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 flex items-center justify-between gap-3 shrink-0">
-          <p className="text-xs text-red-400 font-medium truncate">{(error as Error)?.message || 'Falha ao carregar'}</p>
-          <button onClick={() => refetch()} className="h-7 px-3 rounded-lg bg-red-500 text-white text-[11px] font-bold shrink-0 active:scale-95">
-            Tentar novamente
+        <div className="mx-2 mt-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 flex items-center justify-between gap-2 shrink-0">
+          <p className="text-[11px] text-red-400 font-medium truncate">{(error as Error)?.message || 'Falha ao carregar'}</p>
+          <button onClick={() => refetch()} className="h-6 px-2.5 rounded-md bg-red-500 text-white text-[10px] font-bold shrink-0 active:scale-95">
+            Tentar
           </button>
         </div>
       )}
@@ -485,7 +475,7 @@ export default function KDS() {
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <div className="flex-1 grid grid-cols-4 divide-x divide-white/[0.04] overflow-hidden">
+        <div className="flex-1 flex overflow-x-auto overflow-y-hidden lg:grid lg:grid-cols-4">
           {COLUMNS.map(col => (
             <KDSColumn
               key={col.key}
