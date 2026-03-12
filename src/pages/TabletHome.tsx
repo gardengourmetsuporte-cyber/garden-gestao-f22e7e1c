@@ -329,13 +329,20 @@ export default function TabletHome() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
-        {/* Pedido button - top right */}
-        <div className="absolute top-0 right-0 z-10 pr-5 pt-[max(env(safe-area-inset-top,12px),16px)]">
+        {/* Pedido + Minha Conta - top right */}
+        <div className="absolute top-0 right-0 z-10 pr-5 pt-[max(env(safe-area-inset-top,12px),16px)] flex items-center gap-2">
           <button
             onClick={() => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
           >
-            <AppIcon name="ShoppingBag" size={17} className="text-white/80" />
+            <AppIcon name="Receipt" size={16} className="text-white/80" />
+            <span className="text-sm font-bold text-white">Minha Conta</span>
+          </button>
+          <button
+            onClick={() => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
+          >
+            <AppIcon name="ShoppingBag" size={16} className="text-white/80" />
             <span className="text-sm font-bold text-white">Pedido</span>
           </button>
         </div>
