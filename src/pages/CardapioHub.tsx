@@ -295,7 +295,7 @@ export default function CardapioHub() {
                 ))}
               </div>
 
-              {/* Inline action button */}
+              {/* Inline action button — only for produtos view toggle */}
               {cardapioTab === 'produtos' && (
                 <Button
                   size="sm"
@@ -305,16 +305,6 @@ export default function CardapioHub() {
                 >
                   <AppIcon name={viewMode === 'menu' ? 'RecipeBook' : 'Eye'} size={16} />
                   <span className="hidden sm:inline">{viewMode === 'menu' ? 'Ficha Técnica' : 'Cardápio'}</span>
-                </Button>
-              )}
-              {cardapioTab === 'opcionais' && (
-                <Button
-                  size="sm"
-                  className="shrink-0 gap-1.5 rounded-xl h-9"
-                  onClick={openNewOG}
-                >
-                  <AppIcon name="Plus" size={16} />
-                  <span className="hidden sm:inline">Novo</span>
                 </Button>
               )}
             </div>
