@@ -419,25 +419,6 @@ export default function KDS() {
     setActiveId(event.active.id as string);
   }, []);
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    setActiveId(null);
-    const { active, over } = event;
-    if (!over) return;
-
-    const orderId = active.id as string;
-    const targetStatus = over.id as string;
-
-    if (!ACTIVE_STATUSES.includes(targetStatus)) return;
-
-    const order = orders.find(o => o.id === orderId);
-    if (!order || order.status === targetStatus) return;
-
-    const currentIdx = ACTIVE_STATUSES.indexOf(order.status);
-    const targetIdx = ACTIVE_STATUSES.indexOf(targetStatus);
-    if (Math.abs(currentIdx - targetIdx) > 1) return;
-
-    handleBump(orderId, targetStatus);
-  }, [orders, handleBump]);
 
   const handleDragCancel = useCallback(() => setActiveId(null), []);
 
