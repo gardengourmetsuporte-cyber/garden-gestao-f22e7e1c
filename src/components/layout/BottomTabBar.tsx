@@ -157,7 +157,7 @@ export function BottomTabBar() {
                     className={cn("flex flex-col items-center gap-2 animate-scale-in", isMiddle && "mb-6")}
                     style={{ animationDelay: `${i * 50}ms` }}
                   >
-                    <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg relative">
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg relative" style={{ background: action.color || 'hsl(var(--primary) / 0.9)' }}>
                       <AppIcon name={action.icon} size={24} fill={1} style={{ color: 'white' }} />
                       {action.badge && action.badge > 0 && (
                         <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">

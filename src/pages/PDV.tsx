@@ -169,9 +169,9 @@ export default function PDV() {
   useFabActions(
     cashRegister.isOpen
       ? [
-          { icon: 'Camera', label: 'Scanner iFood', onClick: () => ifoodCameraRef.current?.click() },
-          { icon: 'History', label: 'Vendas', onClick: () => setHistoryOpen(true) },
-          { icon: 'LockKeyhole', label: 'Fechar Caixa', onClick: () => setCloseRegisterSheet(true) },
+          { icon: 'Camera', label: 'Scanner iFood', onClick: () => ifoodCameraRef.current?.click(), color: 'hsl(var(--primary))' },
+          { icon: 'History', label: 'Vendas', onClick: () => setHistoryOpen(true), color: 'hsl(210 60% 50%)' },
+          { icon: 'LockKeyhole', label: 'Fechar Caixa', onClick: () => setCloseRegisterSheet(true), color: 'hsl(var(--color-expense, 0 70% 50%))' },
         ]
       : [],
     [cashRegister.isOpen]
