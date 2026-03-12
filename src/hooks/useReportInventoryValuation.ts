@@ -1,0 +1,80 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useUnit } from '@/contexts/UnitContext';
+
+interface ValuationItem {
+  id: string;
+  name: string;
+  category: string;
+  current_stock: number;
+  unit_price: number;
+  unit_type: string;
+  total_value: number;
+  is_below_min: boolean;
+}
+
+interface CategorySummary {
+  category: string;
+  total_value: number;
+  item_count: number;
+}
+
+interface ValuationSummary {
+  totalValue: number;
+  totalItems: number;
+  belowMinCount: number;
+  items: ValuationItem[];
+  categories: CategorySummary[];
+}
+
+export function useReportInventoryValuation() {
+  const { currentUnit } = useUnit();
+  const unitId = currentUnit?.id;
+
+  return useQuery({
+    queryKey: ['report-inventory-valuation', unitId],
+    queryFn: async (): Promise<ValuationSummary> => {
+      if (!unitId) return { totalValue: 0, totalItems: 0, belowMinCount: 0, items: [], categories: [] };
+
+      const { data } = await supabase
+        .from('inventory_items')
+        .select('id, name, category, current_stock, unit_price, unit_type, min_stock')
+        .eq('unit_id', unitId)
+        .is('deleted_at', null)
+        .order('category');
+
+      if (!data?.length) return { totalValue: 0, totalItems: 0, belowMinCount: 0, items: [], categories: [] };
+
+      const items: ValuationItem[] = data.map(i => ({
+        id: i.id,
+        name: i.name,
+        category: i.category || 'Sem categoria',
+        current_stock: Number(i.current_stock || 0),
+        unit_price: Number(i.unit_price || 0),
+        unit_type: i.unit_type || 'unidade',
+        total_value: Number(i.current_stock || 0) * Number(i.unit_price || 0),
+        is_below_min: Number(i.current_stock || 0) < Number(i.min_stock || 0),
+      }));
+
+      const catMap = new Map<string, CategorySummary>();
+      items.forEach(i => {
+        const existing = catMap.get(i.category);
+        if (existing) {
+          existing.total_value += i.total_value;
+          existing.item_count++;
+        } else {
+          catMap.set(i.category, { category: i.category, total_value: i.total_value, item_count: 1 });
+        }
+      });
+
+      return {
+        totalValue: items.reduce((s, i) => s + i.total_value, 0),
+        totalItems: items.length,
+        belowMinCount: items.filter(i => i.is_below_min).length,
+        items: items.sort((a, b) => b.total_value - a.total_value),
+        categories: Array.from(catMap.values()).sort((a, b) => b.total_value - a.total_value),
+      };
+    },
+    enabled: !!unitId,
+  });
+}
