@@ -29,15 +29,23 @@ export function useReservations(date?: string) {
   const query = useQuery({
     queryKey: ['reservations', unitId, date],
     queryFn: async () => {
-      let q = supabase
+      const { data, error } = await supabase
         .from('reservations')
         .select('*')
-        .eq('unit_id', unitId!)
-        .order('reservation_time' as any);
+        .eq('unit_id', unitId!);
+      if (error) throw error;
+      let filtered = (data || []) as unknown as Reservation[];
+      if (date) filtered = filtered.filter(r => r.reservation_date === date);
+      filtered.sort((a, b) => a.reservation_time.localeCompare(b.reservation_time));
+      return filtered;
+    },
+    enabled: !!unitId,
+  });
 
-      if (date) q = q.eq('reservation_date' as any, date);
+  // dummy to satisfy structure
+  const _unused = null; void _unused;
 
-      const { data, error } = await q;
+  const create = useMutation({
       if (error) throw error;
       return (data || []) as unknown as Reservation[];
     },

@@ -42,7 +42,7 @@ export function useReportEmployees(month: number, year: number) {
 
       const employees: EmployeeSummary[] = emps.map(e => ({
         id: e.id,
-        name: e.name,
+        name: e.full_name,
         role: e.role || '-',
         total_payments: payMap.get(e.id) || 0,
         base_salary: Number(e.base_salary || 0),
