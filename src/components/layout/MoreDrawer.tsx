@@ -277,7 +277,19 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                           : "bg-muted/50"
                       )}>
                         {item.customIcon ? (
-                          <img src={item.customIcon} alt="" className={cn("w-6 h-6 transition-all", item.keepIconColor ? "" : active ? "brightness-0 invert opacity-90" : "dark:invert dark:opacity-70 opacity-70")} />
+                          <div
+                            className={cn("w-6 h-6 transition-all", item.keepIconColor ? "" : active ? "bg-primary" : "bg-foreground/70")}
+                            style={{
+                              maskImage: `url(${item.customIcon})`,
+                              maskSize: 'contain',
+                              maskRepeat: 'no-repeat',
+                              maskPosition: 'center',
+                              WebkitMaskImage: `url(${item.customIcon})`,
+                              WebkitMaskSize: 'contain',
+                              WebkitMaskRepeat: 'no-repeat',
+                              WebkitMaskPosition: 'center',
+                            }}
+                          />
                         ) : (
                           <AppIcon name={item.icon} size={22} fill={active ? 1 : 0} className={active ? "text-foreground" : "text-foreground"} />
                         )}
