@@ -178,6 +178,12 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
                     <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                       <AppIcon name="Calendar" size={12} />
                       {format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ptBR })}
+                      {payment.receipt_url && (
+                        <button onClick={() => setReceiptUrl(payment.receipt_url)} className="flex items-center gap-0.5 text-primary hover:underline">
+                          <AppIcon name="Image" size={12} />
+                          <span>Foto</span>
+                        </button>
+                      )}
                       {payment.notes && <span>• {payment.notes}</span>}
                     </div>
                   </div>
