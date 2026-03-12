@@ -249,7 +249,7 @@ function KDSColumn({
 
   return (
     <div className={cn(
-      'flex flex-col h-full min-w-[280px] w-[280px] lg:min-w-0 lg:w-auto shrink-0 lg:shrink',
+      'flex flex-col h-full min-w-0',
       'border-r border-white/[0.04] last:border-r-0',
     )}>
       {/* Column header */}
