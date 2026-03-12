@@ -241,8 +241,8 @@ export function AdminDashboard() {
       {/* Setup Onboarding — full width, operational only */}
       {view === 'operational' && <SetupChecklistWidget />}
 
-      {/* Sales Goal Widget — operational */}
-      {view === 'operational' && (
+      {/* Sales Goal Widget — financial */}
+      {view === 'financial' && (
         <div className="mt-4">
           <SalesGoalWidget />
         </div>
