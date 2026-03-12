@@ -41,17 +41,39 @@ Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos
 - Histórico de pedidos do cliente (POS + tablet)
 - Alertas de aniversário
 - LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
 ## Funcionários ✅
 
 - Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
 - Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
 ## Cardápio Digital ✅
 
 - Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
 
 ## Sistema / UX ✅
 
 - Tour guiado interativo para novos usuários
 - Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
