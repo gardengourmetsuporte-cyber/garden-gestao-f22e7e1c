@@ -272,6 +272,7 @@ export default function CardapioHub() {
                 {([
                   { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
                   { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
+                  { id: 'replicar' as CardapioTab, label: 'Replicar', icon: 'Copy', count: undefined },
                 ]).map(tab => (
                   <button
                     key={tab.id}
