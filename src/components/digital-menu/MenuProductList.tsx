@@ -1,6 +1,6 @@
 import { DMCategory, DMGroup, DMProduct } from '@/hooks/useDigitalMenu';
 import { AppIcon } from '@/components/ui/app-icon';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+
 import { cn } from '@/lib/utils';
 
 interface Props {
