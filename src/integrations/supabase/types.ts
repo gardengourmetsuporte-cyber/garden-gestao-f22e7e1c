@@ -3311,6 +3311,48 @@ export type Database = {
           },
         ]
       }
+      manual_acknowledgments: {
+        Row: {
+          acknowledged_at: string
+          employee_id: string
+          id: string
+          ip_info: string | null
+          unit_id: string
+          version: string
+        }
+        Insert: {
+          acknowledged_at?: string
+          employee_id: string
+          id?: string
+          ip_info?: string | null
+          unit_id: string
+          version?: string
+        }
+        Update: {
+          acknowledged_at?: string
+          employee_id?: string
+          id?: string
+          ip_info?: string | null
+          unit_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manual_acknowledgments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "manual_acknowledgments_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketing_posts: {
         Row: {
           caption: string | null
