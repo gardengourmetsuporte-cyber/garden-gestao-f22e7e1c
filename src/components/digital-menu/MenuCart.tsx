@@ -30,6 +30,11 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
   const [orderSent, setOrderSent] = useState<string | null>(null);
   const isQrCode = source === 'qrcode';
   const isDelivery = !isQrCode;
+  const [paymentOption, setPaymentOption] = useState<'presencial' | 'pix' | 'credit_card' | 'boleto'>('presencial');
+  const [showOnlinePayment, setShowOnlinePayment] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
+  const { asaasActive } = useAsaasConfig(unitId);
 
   // Customer data
   const [customerId, setCustomerId] = useState<string | null>(null);
