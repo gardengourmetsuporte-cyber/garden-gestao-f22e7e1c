@@ -107,6 +107,13 @@ export function AdminDashboard() {
           </DashboardSection>
         ) : null;
 
+      case 'analytics':
+        return hasAccess('cash-closing') ? (
+          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyAnalytics /></LazyWidget>
+          </div>
+        ) : null;
+
       case 'weekly-summary':
         return hasAccess('cash-closing') ? (
           <DashboardSection key={widget.key} onNavigate={() => navigate('/cash-closing')} className={`animate-card-reveal ${stagger}`}>
