@@ -199,7 +199,7 @@ export default function CopilotPage() {
                 className="p-2 rounded-xl hover:bg-secondary transition-colors"
                 title="Nova conversa"
               >
-                <AppIcon name="Plus" size={16} className="text-muted-foreground" />
+                <AppIcon name="Plus" size={16} className="text-foreground" />
               </button>
               <Sheet open={showHistory} onOpenChange={setShowHistory}>
                 <SheetTrigger asChild>
