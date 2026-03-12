@@ -128,7 +128,7 @@ export function QuickStatsWidget() {
             card.isActive && card.variant === 'success' && "ring-success/20",
           )}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <div className={cn("stat-holo-icon shrink-0", variantIcon[card.variant])}>
               <AppIcon name={card.icon} size={20} />
             </div>
