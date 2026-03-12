@@ -170,6 +170,14 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
             )}
           </div>
 
+          {/* Order History */}
+          <CustomerOrderHistory customer={customer} />
+
+          <Separator />
+
+          {/* LGPD */}
+          <CustomerLGPD customer={customer} onDeleted={() => onOpenChange(false)} />
+
           {/* Actions */}
           <div className="flex gap-2 pt-2 pb-4">
             <Button variant="outline" className="flex-1 rounded-xl" onClick={onEdit}>
