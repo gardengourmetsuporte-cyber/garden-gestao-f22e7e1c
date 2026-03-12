@@ -242,7 +242,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
       {/* ─── Sticky Filters ─── */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2 border-b border-border/20">
       {/* ─── Channel Pills ─── */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1">
+      <div className="grid grid-cols-5 gap-1.5 pb-1">
         {CHANNELS.map(ch => {
           const active = channel === ch.id;
           const count = channelCounts[ch.id];
@@ -251,17 +251,17 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
               key={ch.id}
               onClick={() => setChannel(ch.id)}
               className={cn(
-                "flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-200 shrink-0 touch-manipulation",
+                "flex items-center justify-center gap-1 px-2 py-2.5 rounded-2xl text-[11px] font-bold whitespace-nowrap transition-all duration-200 touch-manipulation",
                 active
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-[1.02]"
                   : "bg-card/80 border border-border/30 text-muted-foreground active:scale-95"
               )}
             >
-              <AppIcon name={ch.icon} size={14} />
-              {ch.label}
+              <AppIcon name={ch.icon} size={13} />
+              <span className="truncate">{ch.label}</span>
               {count > 0 && (
                 <span className={cn(
-                  "min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-extrabold rounded-full",
+                  "min-w-[16px] h-[16px] flex items-center justify-center text-[9px] font-extrabold rounded-full",
                   active ? "bg-white/25 text-primary-foreground" : "bg-primary/15 text-primary"
                 )}>
                   {count}
@@ -273,7 +273,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
       </div>
 
       {/* ─── Date Filter Pills ─── */}
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
+      <div className="flex items-center gap-2 flex-wrap">
         {DATE_PILLS.map(pill => {
           if (pill.id === 'custom') {
             return (
