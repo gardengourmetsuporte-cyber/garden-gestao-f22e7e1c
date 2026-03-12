@@ -282,6 +282,9 @@ export function AdminDashboard() {
         </div>
       )}
 
+      {/* Service View */}
+      {view === 'service' && <ServiceDashboardView />}
+
       {/* Team View */}
       {view === 'team' && <TeamDashboardView currentUserId={user?.id} />}
 
