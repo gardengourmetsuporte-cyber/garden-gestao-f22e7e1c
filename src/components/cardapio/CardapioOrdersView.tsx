@@ -238,7 +238,9 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   }, []);
 
   return (
-    <div className="px-4 py-3 lg:px-6 space-y-4">
+    <div className="space-y-0">
+      {/* ─── Sticky Filters ─── */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2 border-b border-border/20">
       {/* ─── Channel Pills ─── */}
       <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1">
         {CHANNELS.map(ch => {
