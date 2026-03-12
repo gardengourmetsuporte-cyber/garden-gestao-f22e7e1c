@@ -417,6 +417,8 @@ export default function InventoryPage() {
             }
           }}
         />
+
+        <StockTransferSheet open={transferOpen} onOpenChange={setTransferOpen} />
       </div>
     </AppLayout>
   );

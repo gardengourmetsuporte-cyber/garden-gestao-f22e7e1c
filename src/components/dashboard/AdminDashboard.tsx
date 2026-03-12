@@ -37,6 +37,7 @@ const LazyMonthComparison = lazy(() => import('./MonthComparisonWidget'));
 const LazyBreakEven = lazy(() => import('./BreakEvenWidget'));
 const LazyMultiUnit = lazy(() => import('./MultiUnitOverview'));
 import { SalesGoalWidget } from './SalesGoalWidget';
+import { GuidedTour } from '@/components/onboarding/GuidedTour';
 function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
   const skeleton = fallback || <GenericWidgetSkeleton />;
