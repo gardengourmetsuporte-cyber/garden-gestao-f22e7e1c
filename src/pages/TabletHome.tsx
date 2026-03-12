@@ -45,25 +45,47 @@ function TableConfigDialog({
   currentMesa,
   onConfirm,
   onCancel,
-  requirePin,
+  unitId,
 }: {
   currentMesa: string;
   onConfirm: (mesa: string, pin: string) => void;
   onCancel?: () => void;
-  requirePin: boolean;
+  unitId?: string;
 }) {
   const [mesa, setMesa] = useState(currentMesa);
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
+  const [checking, setChecking] = useState(false);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!mesa || Number(mesa) < 1) { setError('Informe o número da mesa'); return; }
-    if (requirePin) {
-      const stored = getStoredPin();
-      if (stored && pin !== stored) { setError('Senha incorreta'); return; }
+    if (!pin || pin.length < 4) { setError('Informe a senha de 4 dígitos'); return; }
+    if (!unitId) { setError('Unidade não identificada'); return; }
+
+    setChecking(true);
+    setError('');
+    try {
+      const { data, error: dbError } = await supabase
+        .from('employees')
+        .select('id')
+        .eq('unit_id', unitId)
+        .eq('quick_pin', pin)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (dbError) throw dbError;
+      if (!data) {
+        setError('Senha incorreta. Use o PIN cadastrado em Funcionários.');
+        setChecking(false);
+        return;
+      }
+
+      onConfirm(mesa, pin);
+    } catch {
+      setError('Erro ao validar senha. Tente novamente.');
+    } finally {
+      setChecking(false);
     }
-    if (pin && pin.length >= 4) setStoredPin(pin);
-    onConfirm(mesa, pin);
   };
 
   return (
@@ -85,7 +107,7 @@ function TableConfigDialog({
           </div>
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">
-              {requirePin ? 'Senha de admin' : 'Criar senha (4+ dígitos)'}
+              Senha do funcionário
             </label>
             <input
               type="password"
@@ -93,7 +115,7 @@ function TableConfigDialog({
               maxLength={8}
               value={pin}
               onChange={e => { setPin(e.target.value); setError(''); }}
-              placeholder={requirePin ? '••••' : 'Opcional'}
+              placeholder="••••"
               className="w-full h-12 rounded-xl bg-secondary/50 border border-border/40 px-4 text-lg font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
@@ -114,9 +136,10 @@ function TableConfigDialog({
           )}
           <button
             onClick={handleConfirm}
-            className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors"
+            disabled={checking}
+            className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
           >
-            Confirmar
+            {checking ? 'Verificando...' : 'Confirmar'}
           </button>
         </div>
       </div>
@@ -411,7 +434,7 @@ export default function TabletHome() {
           currentMesa={mesa || '1'}
           onConfirm={handleConfigConfirm}
           onCancel={mesa ? () => setShowConfig(false) : undefined}
-          requirePin={hasPin}
+          unitId={unitId}
         />
       )}
     </div>
