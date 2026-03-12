@@ -37,6 +37,7 @@ const LazyBreakEven = lazy(() => import('./BreakEvenWidget'));
 const LazyMultiUnit = lazy(() => import('./MultiUnitOverview'));
 import { SalesGoalWidget } from './SalesGoalWidget';
 import { TeamDashboardView } from './TeamDashboardView';
+import { ServiceDashboardView } from './ServiceDashboardView';
 import { GuidedTour } from '@/components/onboarding/GuidedTour';
 
 function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
@@ -53,7 +54,7 @@ function LazyWidget({ children, fallback }: { children: React.ReactNode; fallbac
   );
 }
 
-type DashboardView = 'operational' | 'financial' | 'team';
+type DashboardView = 'operational' | 'financial' | 'service' | 'team';
 
 const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'calendar', 'multi-unit']);
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
@@ -96,7 +97,7 @@ export function AdminDashboard() {
     if (!widget.visible) return null;
 
     // Filter by current view — team view renders its own widgets
-    if (view === 'team') return null;
+    if (view === 'team' || view === 'service') return null;
     if (view === 'operational' && (FINANCIAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
     if (view === 'financial' && (OPERATIONAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
 
@@ -214,6 +215,18 @@ export function AdminDashboard() {
           Financeiro
         </button>
         <button
+          onClick={() => handleViewChange('service')}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+            view === 'service'
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <AppIcon name="storefront" size={14} />
+          Serviço
+        </button>
+        <button
           onClick={() => handleViewChange('team')}
           className={cn(
             "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
@@ -269,11 +282,14 @@ export function AdminDashboard() {
         </div>
       )}
 
+      {/* Service View */}
+      {view === 'service' && <ServiceDashboardView />}
+
       {/* Team View */}
       {view === 'team' && <TeamDashboardView currentUserId={user?.id} />}
 
       {/* Widgets Grid — 2 columns on desktop */}
-      {view !== 'team' && (
+      {view !== 'team' && view !== 'service' && (
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
           {widgets.map((widget) => {
             const stagger = nextStagger();
