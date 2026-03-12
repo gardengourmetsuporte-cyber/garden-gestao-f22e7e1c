@@ -6,6 +6,9 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { CartItemsList } from '@/components/digital-menu/MenuCart';
 import { CustomerAuthBanner } from '@/components/digital-menu/CustomerAuthBanner';
 import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
+import { PaymentMethodSelector, paymentOptionToBillingType } from '@/components/digital-menu/PaymentMethodSelector';
+import { OnlinePaymentSheet } from '@/components/digital-menu/OnlinePaymentSheet';
+import { useAsaasConfig } from '@/hooks/useAsaasConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
@@ -35,6 +38,11 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [customerCoins, setCustomerCoins] = useState<number | null>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [comandaNumber, setComandaNumber] = useState<number | null>(null);
+  const [paymentOption, setPaymentOption] = useState<'presencial' | 'pix' | 'credit_card' | 'boleto'>('presencial');
+  const [showOnlinePayment, setShowOnlinePayment] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
+  const { asaasActive } = useAsaasConfig(unitId);
 
   // Check customer coin balance
   const coinTotal = cart.reduce((sum, item) => {
@@ -162,6 +170,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
     try {
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
+          const isOnlinePayment = paymentOptionToBillingType(paymentOption) !== null;
           const orderNotes = payWithCoins ? `[PAGO_COM_MOEDAS:${coinTotal}]` : null;
           const { data: order, error: orderError } = await withTimeout(
             supabase
@@ -170,14 +179,16 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 unit_id: unitId,
                 table_number: comandaNumber || (parseInt(tableNumber) || 0),
                 comanda_number: comandaNumber || null,
-                status: shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation',
+                status: isOnlinePayment ? 'awaiting_payment' : (shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation'),
                 total: payWithCoins ? 0 : cartTotal,
                 source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
                 customer_name: finalName,
                 customer_email: customerUser?.email || null,
                 notes: orderNotes,
+                payment_method: paymentOption,
+                payment_status: isOnlinePayment ? 'pending' : null,
               } as any)
-              .select('id')
+              .select('id, order_number')
               .single(),
             requestTimeoutMs,
             'create_order'
@@ -200,55 +211,64 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
            );
            if (itemsError) throw new Error(itemsError.message);
 
-           if (shouldAutoConfirm) {
-             try {
-               await fetch(
-                 `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
-                 {
-                   method: 'POST',
-                   headers: {
-                     'Content-Type': 'application/json',
-                     apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-                   },
-                   body: JSON.stringify({ order_id: (order as any).id }),
-                 }
-               );
-             } catch (e) {
-               console.warn('[TabletMenuCart] send-to-pdv failed:', e);
-             }
+           // If online payment, show payment sheet
+           if (isOnlinePayment) {
+             const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
+             setPendingOrderId((order as any).id);
+             setPendingOrderNumber(orderNum);
+             setShowOnlinePayment(true);
+             setSending(false);
+             return;
            }
+
+           if (shouldAutoConfirm) {
+              try {
+                await fetch(
+                  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                    },
+                    body: JSON.stringify({ order_id: (order as any).id }),
+                  }
+                );
+              } catch (e) {
+                console.warn('[TabletMenuCart] send-to-pdv failed:', e);
+              }
+            }
 
            // Deduct coins if paying with coins
            if (payWithCoins && customerUser?.email) {
-             try {
-               const { data: cust } = await supabase
-                 .from('customers')
-                 .select('id, loyalty_points')
-                 .eq('unit_id', unitId)
-                 .eq('email', customerUser.email)
-                 .maybeSingle();
-               if (cust) {
-                 await supabase
-                   .from('customers')
-                   .update({ loyalty_points: Math.max(0, (cust.loyalty_points ?? 0) - coinTotal) })
-                   .eq('id', cust.id);
-                 // Log redemption event
-                 await supabase.from('loyalty_events').insert({
-                   customer_id: cust.id,
-                   unit_id: unitId,
-                   type: 'redeemed',
-                   points: -coinTotal,
-                   description: 'Pedido #' + ((order as any).order_number || (order as any).id.slice(0, 8) || (order as any).id.slice(0, 8)) + ' pago com moedas',
-                 });
-                 setCustomerCoins(Math.max(0, (cust.loyalty_points ?? 0) - coinTotal));
-               }
-             } catch (e) {
-               console.warn('[TabletMenuCart] coin deduction failed:', e);
-             }
-           }
+              try {
+                const { data: cust } = await supabase
+                  .from('customers')
+                  .select('id, loyalty_points')
+                  .eq('unit_id', unitId)
+                  .eq('email', customerUser.email)
+                  .maybeSingle();
+                if (cust) {
+                  await supabase
+                    .from('customers')
+                    .update({ loyalty_points: Math.max(0, (cust.loyalty_points ?? 0) - coinTotal) })
+                    .eq('id', cust.id);
+                  await supabase.from('loyalty_events').insert({
+                    customer_id: cust.id,
+                    unit_id: unitId,
+                    type: 'redeemed',
+                    points: -coinTotal,
+                    description: 'Pedido #' + ((order as any).order_number || (order as any).id.slice(0, 8)) + ' pago com moedas',
+                  });
+                  setCustomerCoins(Math.max(0, (cust.loyalty_points ?? 0) - coinTotal));
+                }
+              } catch (e) {
+                console.warn('[TabletMenuCart] coin deduction failed:', e);
+              }
+            }
 
            toast.success(payWithCoins ? 'Pedido enviado! Moedas debitadas ✨' : 'Pedido enviado com sucesso!');
-      setOrderSent((order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8));
+           setOrderSent((order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8));
            return; // Success — exit
         } catch (err: any) {
           lastError = err;
@@ -433,6 +453,17 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             </div>
           </div>
         )}
+
+        {/* Payment method selector */}
+        {!payWithCoins && (
+          <div className="px-4 pb-3">
+            <PaymentMethodSelector
+              selected={paymentOption}
+              onChange={setPaymentOption}
+              asaasActive={asaasActive}
+            />
+          </div>
+        )}
       </div>
 
       {/* ─── Sticky Bottom Actions (Goomer-style) ─── */}
@@ -454,7 +485,11 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           ) : (
             <AppIcon name="Send" size={18} className="mr-2" />
           )}
-          {payWithCoins ? `Pagar com ${coinTotal} moedas` : 'Enviar pedido'}
+          {payWithCoins
+            ? `Pagar com ${coinTotal} moedas`
+            : paymentOptionToBillingType(paymentOption)
+              ? 'Enviar e pagar online'
+              : 'Enviar pedido'}
         </Button>
       </div>
 
@@ -468,6 +503,26 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             toast.success(`Comanda #${num} escaneada!`);
           }}
           onCancel={() => setShowScanner(false)}
+        />
+      )}
+
+      {/* Online Payment Sheet */}
+      {showOnlinePayment && pendingOrderId && pendingOrderNumber && (
+        <OnlinePaymentSheet
+          orderId={pendingOrderId}
+          orderNumber={pendingOrderNumber}
+          total={cartTotal}
+          unitId={unitId}
+          billingType={paymentOptionToBillingType(paymentOption)!}
+          onPaymentConfirmed={() => {
+            setShowOnlinePayment(false);
+            setOrderSent(pendingOrderNumber);
+          }}
+          onCancel={() => {
+            setShowOnlinePayment(false);
+            setPendingOrderId(null);
+            setPendingOrderNumber(null);
+          }}
         />
       )}
     </div>

@@ -1,75 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-# Integração ASAAS para Pagamento Online
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-## Resumo
-Integrar a API do ASAAS para gerar links de pagamento (Pix, Cartão, Boleto) nos 3 canais de pedido: Cardápio Digital (`/m/:unitId`), Tablet (`/tablet/:unitId`) e QR Code. O cliente escolhe a forma de pagamento online no checkout, o sistema gera a cobrança via ASAAS e redireciona/exibe o link de pagamento.
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-## Arquitetura
+---
 
-```text
-┌─────────────────────┐
-│  MenuCart / Tablet   │──► Edge Function ──► ASAAS API v3
-│  / QR Code Checkout  │       │                  │
-└─────────────────────┘       │            ┌─────┴─────┐
-                              │            │ Payment   │
-                              │            │ Link/QR   │
-                              │            └───────────┘
-                              ▼
-                    tablet_orders.payment_status
-                    tablet_orders.payment_link
-                    tablet_orders.asaas_payment_id
-```
+## Bloco de Relatórios Avançados ✅
 
-## Etapas
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-### 1. Configuração do Secret ASAAS
-- Solicitar a API Key do ASAAS ao usuário via `add_secret` (chave: `ASAAS_API_KEY`)
-- Armazenar a URL base (`https://api.asaas.com` para produção ou `https://sandbox.asaas.com/api` para testes)
+## Dashboard Analytics ✅
 
-### 2. Tabela de Configuração ASAAS (migration)
-- Adicionar colunas na tabela `tablet_orders`:
-  - `payment_method` (text) — `pix`, `credit_card`, `boleto`, `presencial`
-  - `payment_status` (text) — `pending`, `confirmed`, `received`, `overdue`
-  - `payment_link` (text) — URL do link de pagamento ASAAS
-  - `asaas_payment_id` (text) — ID da cobrança no ASAAS
-- Criar tabela `asaas_config` por unidade:
-  - `unit_id`, `api_key_encrypted`, `environment` (sandbox/production), `is_active`, `wallet_id`
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-### 3. Edge Function: `asaas-payment`
-Ações:
-- **`create-payment`**: Recebe `order_id`, cria cliente no ASAAS (ou busca existente por CPF/email), cria cobrança com `billingType` escolhido (PIX/CREDIT_CARD/BOLETO), retorna link de pagamento + QR code Pix
-- **`check-status`**: Consulta status da cobrança no ASAAS e atualiza `tablet_orders`
-- **`webhook`**: Recebe webhooks do ASAAS para atualizar status automaticamente (PAYMENT_RECEIVED, PAYMENT_CONFIRMED)
+## Operacional ✅
 
-### 4. Fluxo no Checkout (MenuCart + TabletMenuCart)
-- Adicionar seleção de forma de pagamento: "Pagar na hora" vs "Pagar Online (Pix/Cartão/Boleto)"
-- Se pagamento online:
-  1. Criar pedido com status `awaiting_payment`
-  2. Chamar edge function `asaas-payment?action=create-payment`
-  3. Exibir tela de pagamento: QR Code Pix / link de cartão / boleto
-  4. Polling ou realtime para detectar confirmação
-  5. Ao confirmar, atualizar status do pedido para `confirmed`
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-### 5. Webhook para Confirmação Automática
-- Registrar URL do webhook no ASAAS: `{SUPABASE_URL}/functions/v1/asaas-payment?action=webhook`
-- Validar assinatura do webhook
-- Atualizar `tablet_orders.payment_status` e `status` automaticamente
+## CRM / Clientes ✅
 
-### 6. UI de Pagamento
-- Componente `OnlinePaymentSheet`: exibe QR Pix, link de cartão, ou boleto
-- Timer de expiração (Pix expira em 30 min)
-- Indicador visual de "Aguardando pagamento" com auto-refresh
-- Tela de sucesso ao confirmar
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-## Detalhes Técnicos
-- ASAAS API v3: `POST /v3/payments` para cobranças, `POST /v3/customers` para clientes
-- `billingType`: `UNDEFINED` (cliente escolhe), `PIX`, `CREDIT_CARD`, `BOLETO`
-- Para Pix: resposta inclui `pixQrCodeUrl` e `pixCopiaECola`
-- A API Key do ASAAS pode ser por unidade (multi-tenant) ou global
+## Funcionários ✅
 
-## Segurança
-- API Key armazenada como secret no edge function, nunca exposta ao frontend
-- Webhook validado por token/IP
-- RLS mantido nas tabelas existentes
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)

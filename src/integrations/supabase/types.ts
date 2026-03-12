@@ -55,6 +55,44 @@ export type Database = {
           },
         ]
       }
+      asaas_config: {
+        Row: {
+          created_at: string
+          environment: string
+          id: string
+          is_active: boolean
+          unit_id: string
+          updated_at: string
+          wallet_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          environment?: string
+          id?: string
+          is_active?: boolean
+          unit_id: string
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          environment?: string
+          id?: string
+          is_active?: boolean
+          unit_id?: string
+          updated_at?: string
+          wallet_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asaas_config_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: true
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -6151,6 +6189,7 @@ export type Database = {
       }
       tablet_orders: {
         Row: {
+          asaas_payment_id: string | null
           comanda_number: number | null
           created_at: string
           customer_address: string | null
@@ -6162,7 +6201,9 @@ export type Database = {
           notes: string | null
           order_number: number | null
           payment_change: number | null
+          payment_link: string | null
           payment_method: string | null
+          payment_status: string | null
           pdv_response: Json | null
           retry_count: number | null
           source: string
@@ -6173,6 +6214,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          asaas_payment_id?: string | null
           comanda_number?: number | null
           created_at?: string
           customer_address?: string | null
@@ -6184,7 +6226,9 @@ export type Database = {
           notes?: string | null
           order_number?: number | null
           payment_change?: number | null
+          payment_link?: string | null
           payment_method?: string | null
+          payment_status?: string | null
           pdv_response?: Json | null
           retry_count?: number | null
           source?: string
@@ -6195,6 +6239,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          asaas_payment_id?: string | null
           comanda_number?: number | null
           created_at?: string
           customer_address?: string | null
@@ -6206,7 +6251,9 @@ export type Database = {
           notes?: string | null
           order_number?: number | null
           payment_change?: number | null
+          payment_link?: string | null
           payment_method?: string | null
+          payment_status?: string | null
           pdv_response?: Json | null
           retry_count?: number | null
           source?: string

@@ -6,6 +6,9 @@ import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
 import { useDeliveryFeeCalculator } from '@/hooks/useDeliveryZones';
 import { CustomerAddressManager, useCustomerAddresses, type CustomerAddress } from './CustomerAddressManager';
+import { PaymentMethodSelector, paymentOptionToBillingType } from './PaymentMethodSelector';
+import { OnlinePaymentSheet } from './OnlinePaymentSheet';
+import { useAsaasConfig } from '@/hooks/useAsaasConfig';
 import type { User } from '@supabase/supabase-js';
 
 interface Props {
@@ -27,6 +30,11 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
   const [orderSent, setOrderSent] = useState<string | null>(null);
   const isQrCode = source === 'qrcode';
   const isDelivery = !isQrCode;
+  const [paymentOption, setPaymentOption] = useState<'presencial' | 'pix' | 'credit_card' | 'boleto'>('presencial');
+  const [showOnlinePayment, setShowOnlinePayment] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
+  const { asaasActive } = useAsaasConfig(unitId);
 
   // Customer data
   const [customerId, setCustomerId] = useState<string | null>(null);
@@ -154,24 +162,32 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         ? `${selectedAddress.street}, ${selectedAddress.number}${selectedAddress.complement ? ' - ' + selectedAddress.complement : ''}, ${selectedAddress.neighborhood}, ${selectedAddress.city}${selectedAddress.reference ? ' (Ref: ' + selectedAddress.reference + ')' : ''}`
         : null;
 
+      const isOnlinePayment = paymentOptionToBillingType(paymentOption) !== null;
+
       const orderData = isQrCode
         ? {
             unit_id: unitId, table_number: parseInt(tableNumber),
-            status: 'awaiting_confirmation', total: cartTotal,
+            status: isOnlinePayment ? 'awaiting_payment' : 'awaiting_confirmation',
+            total: cartTotal,
             source: 'qrcode' as string, customer_name: customerName.trim(),
             customer_phone: null as string | null, customer_address: null as string | null,
+            payment_method: paymentOption,
+            payment_status: isOnlinePayment ? 'pending' : null,
           }
         : {
             unit_id: unitId, table_number: 0,
-            status: 'confirmed', total: grandTotal,
+            status: isOnlinePayment ? 'awaiting_payment' : 'confirmed',
+            total: grandTotal,
             source: (orderType === 'pickup' ? 'pickup' : 'delivery') as string,
             customer_name: customerName.trim(),
             customer_phone: customerPhone.replace(/\D/g, ''),
             customer_address: fullAddress,
             customer_email: customerUser?.email || null,
+            payment_method: paymentOption,
+            payment_status: isOnlinePayment ? 'pending' : null,
           };
 
-      const { data: order, error: orderError } = await supabase.from('tablet_orders').insert(orderData).select('id').single();
+      const { data: order, error: orderError } = await supabase.from('tablet_orders').insert(orderData).select('id, order_number').single();
       if (orderError || !order) throw new Error(orderError?.message || 'Erro');
 
       const items = cart.map(c => ({
@@ -183,6 +199,16 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       }));
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
+
+      // If online payment, show payment sheet
+      if (isOnlinePayment) {
+        const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
+        setPendingOrderId((order as any).id);
+        setPendingOrderNumber(orderNum);
+        setShowOnlinePayment(true);
+        setSending(false);
+        return;
+      }
 
       if (!isQrCode) {
         try {
@@ -468,6 +494,15 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
             </div>
           </div>
         )}
+
+        {/* Payment method selector */}
+        <div className="px-4 pb-4">
+          <PaymentMethodSelector
+            selected={paymentOption}
+            onChange={setPaymentOption}
+            asaasActive={asaasActive}
+          />
+        </div>
       </div>
 
       {/* Sticky footer */}
@@ -486,7 +521,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           disabled={sending || !canSend}
           className="w-full h-14 rounded-xl bg-foreground text-background font-bold text-sm flex items-center justify-between px-5 disabled:opacity-40 active:scale-[0.98] transition-all"
         >
-          <span>{sending ? 'Enviando...' : 'Fazer pedido'}</span>
+          <span>{sending ? 'Enviando...' : paymentOptionToBillingType(paymentOption) ? 'Enviar e pagar online' : 'Fazer pedido'}</span>
           {sending ? (
             <AppIcon name="Loader2" size={20} className="animate-spin" />
           ) : (
@@ -494,6 +529,26 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           )}
         </button>
       </div>
+
+      {/* Online Payment Sheet */}
+      {showOnlinePayment && pendingOrderId && pendingOrderNumber && (
+        <OnlinePaymentSheet
+          orderId={pendingOrderId}
+          orderNumber={pendingOrderNumber}
+          total={isQrCode ? cartTotal : grandTotal}
+          unitId={unitId}
+          billingType={paymentOptionToBillingType(paymentOption)!}
+          onPaymentConfirmed={() => {
+            setShowOnlinePayment(false);
+            setOrderSent(pendingOrderNumber);
+          }}
+          onCancel={() => {
+            setShowOnlinePayment(false);
+            setPendingOrderId(null);
+            setPendingOrderNumber(null);
+          }}
+        />
+      )}
     </div>
   );
 }
