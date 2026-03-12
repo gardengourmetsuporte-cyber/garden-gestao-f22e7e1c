@@ -261,6 +261,36 @@ export default function TabletHome() {
   const logoUrl = unit?.store_info?.logo_url;
   const bannerUrl = unit?.store_info?.banner_url;
 
+  // ─── Active Game ───
+  if (activeGame === 'snake') {
+    return <SnakeGame onBack={() => setActiveGame(null)} />;
+  }
+  if (activeGame === 'memory') {
+    return <MemoryGame onBack={() => setActiveGame(null)} />;
+  }
+
+  // ─── Game Selection View ───
+  const GAMES = [
+    {
+      id: 'snake',
+      emoji: '🐍',
+      title: 'Snake Garden',
+      description: 'Coma lanches e fique enorme!',
+      gradient: 'from-emerald-600/25 to-emerald-900/40',
+      border: 'border-emerald-500/30',
+      shadow: 'shadow-emerald-500/10',
+    },
+    {
+      id: 'memory',
+      emoji: '🧠',
+      title: 'Memory Garden',
+      description: 'Encontre os pares de lanches!',
+      gradient: 'from-amber-600/25 to-amber-900/40',
+      border: 'border-amber-500/30',
+      shadow: 'shadow-amber-500/10',
+    },
+  ];
+
   return (
     <div className="fixed inset-0 bg-black overflow-hidden select-none flex">
       {/* ─── Left Sidebar ─── */}
