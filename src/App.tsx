@@ -105,6 +105,7 @@ const ShareReceiptHandler = lazy(() => lazyRetry(() => import("./pages/ShareRece
 const Documentation = lazy(() => lazyRetry(() => import("./pages/Documentation")));
 const Compliance = lazy(() => lazyRetry(() => import("./pages/Compliance")));
 const AdminMonitor = lazy(() => lazyRetry(() => import("./pages/AdminMonitor")));
+const Reports = lazy(() => lazyRetry(() => import("./pages/Reports")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
