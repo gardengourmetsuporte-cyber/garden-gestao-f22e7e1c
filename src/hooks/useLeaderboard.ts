@@ -35,23 +35,17 @@ async function fetchLeaderboardData(unitId: string, month: Date): Promise<Leader
   const monthStart = format(startOfMonth(month), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(month), 'yyyy-MM-dd');
 
-  const { data: userUnitsData } = await supabase
-    .from('user_units')
-    .select('user_id')
-    .eq('unit_id', unitId);
+  const { data: rpcData } = await supabase.rpc('get_leaderboard_data', {
+    p_unit_id: unitId,
+    p_month_start: monthStart,
+    p_month_end: monthEnd,
+  });
 
-  const userIds = (userUnitsData || []).map(u => u.user_id);
+  const userIds = (rpcData || []).map((r: any) => r.user_id);
 
-  const [{ data: rpcData }, { data: profilesData }] = await Promise.all([
-    supabase.rpc('get_leaderboard_data', {
-      p_unit_id: unitId,
-      p_month_start: monthStart,
-      p_month_end: monthEnd,
-    }),
-    userIds.length > 0
-      ? supabase.from('profiles').select('user_id, full_name, avatar_url').in('user_id', userIds)
-      : Promise.resolve({ data: [] as any[] }),
-  ]);
+  const { data: profilesData } = userIds.length > 0
+    ? await supabase.from('profiles').select('user_id, full_name, avatar_url').in('user_id', userIds)
+    : { data: [] as any[] };
 
   return buildEntries(rpcData, profilesData);
 }
