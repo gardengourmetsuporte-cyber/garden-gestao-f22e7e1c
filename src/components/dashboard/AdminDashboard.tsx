@@ -99,6 +99,7 @@ export function AdminDashboard() {
     if (view === 'team') return null;
     if (view === 'operational' && FINANCIAL_WIDGETS.has(widget.key)) return null;
     if (view === 'financial' && OPERATIONAL_WIDGETS.has(widget.key)) return null;
+    if (view !== 'team' && TEAM_ONLY_WIDGETS.has(widget.key)) return null;
 
     switch (widget.key) {
       case 'finance':
