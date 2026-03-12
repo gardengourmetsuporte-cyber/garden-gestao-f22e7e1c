@@ -42,30 +42,20 @@ export function useReservations(date?: string) {
     enabled: !!unitId,
   });
 
-  // dummy to satisfy structure
-  const _unused = null; void _unused;
-
   const create = useMutation({
-      if (error) throw error;
-      return (data || []) as unknown as Reservation[];
-    },
-    enabled: !!unitId,
-  });
-
-  const create = useMutation({
-    mutationFn: async (data: Partial<Reservation>) => {
+    mutationFn: async (input: Partial<Reservation>) => {
       const { error } = await supabase.from('reservations').insert({
         unit_id: unitId!,
         created_by: user?.id,
-        customer_name: data.customer_name!,
-        customer_phone: data.customer_phone,
-        customer_email: data.customer_email,
-        party_size: data.party_size || 2,
-        reservation_date: data.reservation_date!,
-        reservation_time: data.reservation_time!,
-        duration_minutes: data.duration_minutes || 120,
-        table_number: data.table_number,
-        notes: data.notes,
+        customer_name: input.customer_name!,
+        customer_phone: input.customer_phone,
+        customer_email: input.customer_email,
+        party_size: input.party_size || 2,
+        reservation_date: input.reservation_date!,
+        reservation_time: input.reservation_time!,
+        duration_minutes: input.duration_minutes || 120,
+        table_number: input.table_number,
+        notes: input.notes,
         status: 'confirmed',
       } as any);
       if (error) throw error;
@@ -78,8 +68,8 @@ export function useReservations(date?: string) {
   });
 
   const update = useMutation({
-    mutationFn: async ({ id, ...data }: Partial<Reservation> & { id: string }) => {
-      const { error } = await supabase.from('reservations').update({ ...data, updated_at: new Date().toISOString() } as any).eq('id', id);
+    mutationFn: async ({ id, ...rest }: Partial<Reservation> & { id: string }) => {
+      const { error } = await supabase.from('reservations').update({ ...rest, updated_at: new Date().toISOString() } as any).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
