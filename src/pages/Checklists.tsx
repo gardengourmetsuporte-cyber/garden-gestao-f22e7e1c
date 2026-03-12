@@ -167,6 +167,72 @@ export default function ChecklistsPage() {
               );
             })()}
 
+            {/* View Mode Toggle — only in view mode and not bonus */}
+            {!settingsMode && checklistType !== 'bonus' && (() => {
+              const availableSectors = sectors.filter((s: any) =>
+                s.scope !== 'bonus' && s.subcategories?.some((sub: any) =>
+                  sub.items?.some((i: any) => i.is_active && (i as any).checklist_type === checklistType)
+                )
+              );
+              return (
+                <div className="space-y-3">
+                  <div className="flex items-center bg-secondary/50 rounded-xl p-1 gap-1">
+                    <button
+                      onClick={() => setViewMode('full')}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all",
+                        viewMode === 'full'
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <AppIcon name="checklist" size={14} />
+                      Completo
+                    </button>
+                    <button
+                      onClick={() => {
+                        setViewMode('sector');
+                        if (!selectedSectorId && availableSectors.length > 0) {
+                          setSelectedSectorId(availableSectors[0].id);
+                        }
+                      }}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all",
+                        viewMode === 'sector'
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <AppIcon name="label" size={14} />
+                      Meu Setor
+                    </button>
+                  </div>
+
+                  {viewMode === 'sector' && availableSectors.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                      {availableSectors.map((sector: any) => {
+                        const isSelected = selectedSectorId === sector.id;
+                        return (
+                          <button
+                            key={sector.id}
+                            onClick={() => setSelectedSectorId(sector.id)}
+                            className={cn(
+                              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 border",
+                              isSelected
+                                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                : "bg-secondary/50 text-muted-foreground border-border hover:bg-secondary"
+                            )}
+                          >
+                            <span className="text-sm">{sector.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             {/* Content */}
             <div className="pt-3">
               {settingsMode ? (
@@ -192,7 +258,13 @@ export default function ChecklistsPage() {
                 </div>
               ) : (
                 <ChecklistView
-                  sectors={sectors.filter((s: any) => checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus')}
+                  sectors={(() => {
+                    const base = sectors.filter((s: any) => checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus');
+                    if (viewMode === 'sector' && selectedSectorId && checklistType !== 'bonus') {
+                      return base.filter((s: any) => s.id === selectedSectorId);
+                    }
+                    return base;
+                  })()}
                   checklistType={checklistType}
                   date={currentDate}
                   completions={completions}
@@ -213,6 +285,7 @@ export default function ChecklistsPage() {
                   validatePin={validatePin}
                   timeStats={timeStatsMap}
                   timerMinExecutions={timerSettings?.minExecutionsForStats ?? 3}
+                  autoExpandAll={viewMode === 'sector' && checklistType !== 'bonus'}
                 />
               )}
             </div>
