@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
@@ -6,6 +6,8 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+
+const NPSDashboard = lazy(() => import('@/components/reviews/NPSDashboard'));
 
 const CATEGORY_LABELS: Record<string, string> = {
   comida: 'Comida',
@@ -33,6 +35,7 @@ export default function Reviews() {
   const { activeUnit } = useUnit();
   const unitId = activeUnit?.id;
   const [filter, setFilter] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<'reviews' | 'nps'>('reviews');
 
   const { data: reviews, isLoading } = useQuery({
     queryKey: ['reviews', unitId, filter],
@@ -74,6 +77,35 @@ export default function Reviews() {
         <h1 className="text-xl font-bold text-foreground">Avaliações</h1>
         <p className="text-sm text-muted-foreground mt-0.5">Acompanhe as avaliações dos clientes</p>
       </div>
+
+      {/* Tabs: Avaliações | NPS */}
+      <div className="flex gap-2">
+        {[
+          { key: 'reviews' as const, label: 'Avaliações', icon: 'Star' },
+          { key: 'nps' as const, label: 'NPS', icon: 'TrendingUp' },
+        ].map(t => (
+          <button
+            key={t.key}
+            onClick={() => setActiveTab(t.key)}
+            className={cn(
+              'flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all',
+              activeTab === t.key
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-card border border-border/30 text-muted-foreground hover:text-foreground'
+            )}
+          >
+            <AppIcon name={t.icon} size={14} />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'nps' ? (
+        <Suspense fallback={<div className="text-center py-12 text-muted-foreground text-sm">Carregando...</div>}>
+          <NPSDashboard />
+        </Suspense>
+      ) : (
+      <>
 
       {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -180,6 +212,8 @@ export default function Reviews() {
           </div>
         ))}
       </div>
+      </>
+      )}
     </div>
   );
 }
