@@ -110,6 +110,9 @@ export function EmployeeWarnings() {
 
   return (
     <div className="space-y-4">
+      {/* Internal Manual */}
+      <InternalManual />
+
       {/* Filters (admin only) */}
       {isAdmin && (
         <div className="flex gap-2">
