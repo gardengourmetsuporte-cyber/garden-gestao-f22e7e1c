@@ -230,20 +230,29 @@ export default function TabletDigitalMenu() {
 
 
           {/* Category list */}
-          <nav className="flex-1 px-2 pb-4 overflow-hidden">
+          <nav className="flex-1 px-3 pb-4 overflow-y-auto space-y-1.5">
             {categories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all mb-0.5',
+                  'w-full flex items-center gap-3.5 px-4 py-4 rounded-2xl text-left transition-all',
                   activeCategory === cat.id
-                    ? 'bg-primary/15 text-primary font-bold shadow-sm'
-                    : 'text-muted-foreground hover:bg-secondary/40 hover:text-foreground'
+                    ? 'bg-primary/15 text-primary font-bold shadow-md shadow-primary/10 border border-primary/20'
+                    : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground border border-transparent'
                 )}
               >
-                {cat.icon && <AppIcon name={cat.icon} size={17} className="shrink-0" />}
-                <span className="text-[13px] leading-tight truncate">{cat.name}</span>
+                {cat.icon && (
+                  <div className={cn(
+                    'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors',
+                    activeCategory === cat.id
+                      ? 'bg-primary/20'
+                      : 'bg-secondary/60'
+                  )}>
+                    <AppIcon name={cat.icon} size={20} />
+                  </div>
+                )}
+                <span className="text-sm leading-tight truncate">{cat.name}</span>
               </button>
             ))}
           </nav>
