@@ -223,12 +223,11 @@ export default function DigitalMenu() {
 
   // Profile completion handler
   const handleProfileComplete = async (data: { name: string; phone: string; birthday: string | null }) => {
-    if (!unitId || !customerUser) return;
-    const withTimeout = async <T,>(fn: () => PromiseLike<T>, ms = 8000): Promise<T> =>
-      Promise.race([
-        Promise.resolve(fn()),
-        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
-      ]);
+    if (!unitId || !customerUser) {
+      console.error('[DigitalMenu] Missing unitId or customerUser', { unitId, customerUser: !!customerUser });
+      toast.error('Erro ao salvar dados. Tente novamente.');
+      return;
+    }
 
     try {
       const rpcParams = {
@@ -238,17 +237,15 @@ export default function DigitalMenu() {
         p_phone: data.phone || null,
         p_birthday: data.birthday,
       };
-      console.log('[DigitalMenu] Saving profile with params:', JSON.stringify(rpcParams));
-      
-      const { data: result, error } = await withTimeout(() =>
-        supabase.rpc('upsert_menu_customer', rpcParams)
-      );
-      
+      console.log('[DigitalMenu] Saving profile:', JSON.stringify(rpcParams));
+
+      const { data: result, error } = await supabase.rpc('upsert_menu_customer', rpcParams);
+
       if (error) {
-        console.error('[DigitalMenu] RPC error:', JSON.stringify(error));
+        console.error('[DigitalMenu] RPC error:', error.message, error.code, error.details, error.hint);
         throw error;
       }
-      
+
       console.log('[DigitalMenu] Profile saved, customer ID:', result);
       setShowProfile(false);
       if (pendingTabAfterAuth) {
@@ -257,12 +254,8 @@ export default function DigitalMenu() {
       }
       toast.success('Cadastro completo!');
     } catch (err: any) {
-      console.error('[DigitalMenu] Profile save error:', err?.message, err?.code, err?.details, JSON.stringify(err));
-      if (err?.message === 'timeout') {
-        toast.error('Conexão lenta. Tente novamente.');
-      } else {
-        toast.error('Erro ao salvar dados. Tente novamente.');
-      }
+      console.error('[DigitalMenu] Profile save catch:', err?.message, err?.code, err?.details);
+      toast.error('Erro ao salvar dados. Tente novamente.');
     }
   };
 
