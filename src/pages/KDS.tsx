@@ -387,6 +387,23 @@ export default function KDS() {
     }
   }, []);
 
+  // Remove adjacent-only restriction — allow dragging to any column
+  const handleDragEndFn = useCallback((event: DragEndEvent) => {
+    setActiveId(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const orderId = active.id as string;
+    const targetStatus = over.id as string;
+
+    if (!ACTIVE_STATUSES.includes(targetStatus)) return;
+
+    const order = orders.find(o => o.id === orderId);
+    if (!order || order.status === targetStatus) return;
+
+    handleBump(orderId, targetStatus);
+  }, [orders, handleBump]);
+
   const [time, setTime] = useState(new Date());
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 30_000); return () => clearInterval(i); }, []);
 
