@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { InternalManual } from './InternalManual';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -109,6 +110,9 @@ export function EmployeeWarnings() {
 
   return (
     <div className="space-y-4">
+      {/* Internal Manual */}
+      <InternalManual />
+
       {/* Filters (admin only) */}
       {isAdmin && (
         <div className="flex gap-2">
