@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Coins, Plus, Trash2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 export function CashbackSettings() {
   const { activeUnit } = useUnit();
@@ -52,6 +52,7 @@ export function CashbackSettings() {
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['loyalty_rules', unitId] }); },
   });
+
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     rule_type: 'points_per_real' as string,
@@ -89,17 +90,17 @@ export function CashbackSettings() {
             <Coins className="w-4 h-4" />
             Regras de Fidelidade & Cashback
           </CardTitle>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
               <Button size="sm" variant="outline">
                 <Plus className="w-4 h-4 mr-1" /> Nova Regra
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nova Regra de Fidelidade</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl">
+              <SheetHeader>
+                <SheetTitle>Nova Regra de Fidelidade</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 pt-4">
                 <div>
                   <Label>Tipo de Regra</Label>
                   <Select value={form.rule_type} onValueChange={v => setForm(f => ({ ...f, rule_type: v }))}>
@@ -145,8 +146,8 @@ export function CashbackSettings() {
                 </div>
                 <Button onClick={handleCreate} className="w-full">Criar Regra</Button>
               </div>
-            </DialogContent>
-          </Dialog>
+            </SheetContent>
+          </Sheet>
         </div>
       </CardHeader>
       <CardContent>
