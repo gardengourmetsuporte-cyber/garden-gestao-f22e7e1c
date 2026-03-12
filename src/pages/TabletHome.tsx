@@ -219,13 +219,6 @@ export default function TabletHome() {
         onClick: () => {},
       },
       {
-        id: 'conta',
-        icon: 'Receipt',
-        label: 'Minha Conta',
-        subtitle: 'Pedidos e fechamento',
-        onClick: () => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`),
-      },
-      {
         id: 'avalie',
         icon: 'Star',
         label: 'Avalie o Local',
