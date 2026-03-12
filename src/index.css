@@ -1274,10 +1274,10 @@ html {
     filter: brightness(0) saturate(100%) invert(52%) sepia(58%) saturate(522%) hue-rotate(101deg) brightness(96%) contrast(87%);
   }
   .icon-tint-muted {
-    filter: brightness(0) saturate(100%) invert(70%) sepia(5%) saturate(100%) hue-rotate(180deg) brightness(90%);
+    filter: brightness(0) saturate(100%) invert(0%);
   }
   .dark .icon-tint-muted {
-    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) brightness(70%);
+    filter: brightness(0) saturate(100%) invert(100%);
   }
   .animate-slide-up {
     animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
