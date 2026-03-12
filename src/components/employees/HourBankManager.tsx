@@ -91,7 +91,7 @@ export function HourBankManager() {
     rejected: 'bg-red-500/15 text-red-700 dark:text-red-400',
   };
 
-  const empName = (id: string) => employees.find(e => e.id === id)?.name || 'Funcionário';
+  const empName = (id: string) => employees.find(e => e.id === id)?.full_name || 'Funcionário';
 
   return (
     <div className="space-y-4">
