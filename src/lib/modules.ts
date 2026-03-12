@@ -55,6 +55,12 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
+    key: 'reviews', label: 'Avaliações', icon: 'Star', route: '/reviews', routes: ['/reviews'], group: 'Gestão',
+    children: [
+      { key: 'reviews.view', label: 'Ver avaliações', icon: 'Eye' },
+    ],
+  },
+  {
     key: 'inventory', label: 'Estoque', icon: 'Package', route: '/inventory', routes: ['/inventory'], group: 'Operação',
     children: [
       { key: 'inventory.view', label: 'Ver itens', icon: 'Eye' },
