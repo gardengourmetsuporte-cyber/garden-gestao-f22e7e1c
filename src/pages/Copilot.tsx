@@ -204,7 +204,7 @@ export default function CopilotPage() {
               <Sheet open={showHistory} onOpenChange={setShowHistory}>
                 <SheetTrigger asChild>
                   <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
-                    <AppIcon name="Clock" size={16} className="text-muted-foreground" />
+                    <AppIcon name="Clock" size={16} className="text-foreground" />
                   </button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[300px] p-0">
