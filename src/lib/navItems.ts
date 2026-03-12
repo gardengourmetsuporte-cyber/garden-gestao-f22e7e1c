@@ -30,7 +30,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   // ── Início ──
   { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'principal', groupLabel: 'Início' },
-  { icon: 'Sparkles', customIcon: '/icons/copilot-ai.png', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'principal', groupLabel: 'Início', badge: 'Beta' },
+  { icon: 'Sparkles', customIcon: '/icons/copilot-ai.png', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'principal', groupLabel: 'Início' },
 
   // ── Gestão ──
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
@@ -43,8 +43,8 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Truck', customIcon: '/icons/motocicleta.png', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Monitor', label: 'PDV', href: '/pdv', group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'MenuBook', customIcon: '/icons/cardapio.png', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
-  { icon: 'MessageCircle', customIcon: '/icons/whatsapp.png', label: 'WhatsApp IA', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação', badge: 'Beta' },
+  { icon: 'MenuBook', customIcon: '/icons/cardapio.png', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'MessageCircle', customIcon: '/icons/whatsapp.png', label: 'WhatsApp IA', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
 
   // ── Pessoas ──
   { icon: 'Users', customIcon: '/icons/funcionarios.png', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
@@ -52,7 +52,7 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Trophy', customIcon: '/icons/trophy.png', label: 'Ranking', href: '/ranking', group: 'pessoas', groupLabel: 'Pessoas' },
 
   // ── Gestão ──
-  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão', badge: 'Beta' },
+  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ShieldCheck', label: 'Obrigações Legais', href: '/compliance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   
 ];
