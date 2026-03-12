@@ -8,6 +8,13 @@ export interface POSProduct {
   is_active: boolean;
 }
 
+export interface CartItemOption {
+  groupId: string;
+  optionId: string;
+  name: string;
+  price: number;
+}
+
 export interface CartItem {
   id: string;
   product: POSProduct;
@@ -15,6 +22,7 @@ export interface CartItem {
   unit_price: number;
   discount: number;
   notes: string;
+  selectedOptions?: CartItemOption[];
 }
 
 export interface PendingOrder {

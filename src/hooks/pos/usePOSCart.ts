@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { POSProduct, CartItem, PendingOrder } from './types';
+import type { POSProduct, CartItem, CartItemOption, PendingOrder } from './types';
 
 export function usePOSCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
