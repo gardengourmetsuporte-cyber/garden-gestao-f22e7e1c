@@ -95,6 +95,7 @@ const TabletHome = lazy(() => lazyRetry(() => import("./pages/TabletHome")));
 const TabletRodizio = lazy(() => lazyRetry(() => import("./pages/TabletRodizio")));
 const TabletBill = lazy(() => lazyRetry(() => import("./pages/TabletBill")));
 const KDS = lazy(() => lazyRetry(() => import("./pages/KDS")));
+const TabletGames = lazy(() => lazyRetry(() => import("./pages/TabletGames")));
 const Notifications = lazy(() => lazyRetry(() => import("./pages/Notifications")));
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
 const ShareReceiptHandler = lazy(() => lazyRetry(() => import("./pages/ShareReceiptHandler")));
@@ -224,6 +225,7 @@ function PublicRoutes() {
         <Route path="/tablet/:unitId/rodizio" element={<TabletRodizio />} />
         <Route path="/tablet/:unitId/bill" element={<TabletBill />} />
         <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
+        <Route path="/tablet/:unitId/games" element={<TabletGames />} />
         <Route path="/kds/:unitId" element={<KDS />} />
         <Route path="/gamification/:unitId" element={<DigitalMenu />} />
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
