@@ -120,7 +120,7 @@ export function QuickStatsWidget() {
           onClick={() => navigate(card.route)}
           className={cn(
             "card-stat-holo text-left transition-all duration-200 active:scale-[0.97] shrink-0 snap-start",
-            "min-w-[155px] max-w-[180px]",
+            "min-w-[145px] max-w-[170px]",
             card.isActive && "ring-1 ring-inset",
             card.isActive && card.variant === 'warning' && "ring-warning/20",
             card.isActive && card.variant === 'primary' && "ring-primary/20",
