@@ -11,6 +11,7 @@ export interface AuditLog {
   entity_type: string;
   entity_id: string | null;
   details: Record<string, any>;
+  old_values: Record<string, any> | null;
   created_at: string;
   user_name?: string;
 }
@@ -34,10 +35,13 @@ const ACTION_LABELS: Record<string, string> = {
   employee_updated: 'Funcionário editado',
   employee_deleted: 'Funcionário removido',
   customer_deleted: 'Cliente removido',
+  customer_anonymized: 'Cliente anonimizado (LGPD)',
   finance_account_created: 'Conta criada',
   finance_account_updated: 'Conta editada',
   finance_account_deleted: 'Conta removida',
   user_login: 'Login realizado',
+  stock_transfer_created: 'Transferência de estoque',
+  stock_transfer_completed: 'Transferência recebida',
 };
 
 export function getActionLabel(action: string) {
@@ -48,9 +52,11 @@ export function useAuditLogs() {
   const { user } = useAuth();
   const [page, setPage] = useState(0);
   const [actionFilter, setActionFilter] = useState<string>('all');
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
 
   const { data, isLoading } = useQuery({
-    queryKey: ['audit-logs', page, actionFilter],
+    queryKey: ['audit-logs', page, actionFilter, dateFrom, dateTo],
     queryFn: async () => {
       let query = supabase
         .from('audit_logs' as any)
@@ -62,10 +68,16 @@ export function useAuditLogs() {
         query = query.eq('action', actionFilter);
       }
 
+      if (dateFrom) {
+        query = query.gte('created_at', `${dateFrom}T00:00:00`);
+      }
+      if (dateTo) {
+        query = query.lte('created_at', `${dateTo}T23:59:59`);
+      }
+
       const { data: logs } = await query;
       if (!logs || logs.length === 0) return { logs: [] as AuditLog[], userNames: {} as Record<string, string> };
 
-      // Fetch user names for these logs
       const userIds = [...new Set((logs as any[]).map(l => l.user_id))];
       const { data: profiles } = await supabase
         .from('profiles')
@@ -94,6 +106,10 @@ export function useAuditLogs() {
     hasMore,
     actionFilter,
     setActionFilter,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
     actionOptions: Object.entries(ACTION_LABELS).map(([key, label]) => ({ key, label })),
   };
 }
