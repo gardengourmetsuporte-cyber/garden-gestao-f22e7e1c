@@ -509,7 +509,7 @@ export default function DigitalMenu() {
             {unit?.store_info?.logo_url ? (
               <img src={unit.store_info.logo_url} alt={unit.name} className="w-full h-full object-cover" />
             ) : (
-              <img src={gardenLogo} alt="Garden" className="w-[70%] h-[70%] object-contain" />
+              <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain p-2" />
             )}
           </div>
           <div className="text-center">
