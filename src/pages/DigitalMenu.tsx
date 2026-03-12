@@ -231,16 +231,25 @@ export default function DigitalMenu() {
       ]);
 
     try {
-      const { error } = await withTimeout(() =>
-        supabase.rpc('upsert_menu_customer', {
-          p_unit_id: unitId,
-          p_name: data.name,
-          p_email: customerUser.email || null,
-          p_phone: data.phone || null,
-          p_birthday: data.birthday,
-        })
+      const rpcParams = {
+        p_unit_id: unitId,
+        p_name: data.name,
+        p_email: customerUser.email || null,
+        p_phone: data.phone || null,
+        p_birthday: data.birthday,
+      };
+      console.log('[DigitalMenu] Saving profile with params:', JSON.stringify(rpcParams));
+      
+      const { data: result, error } = await withTimeout(() =>
+        supabase.rpc('upsert_menu_customer', rpcParams)
       );
-      if (error) throw error;
+      
+      if (error) {
+        console.error('[DigitalMenu] RPC error:', JSON.stringify(error));
+        throw error;
+      }
+      
+      console.log('[DigitalMenu] Profile saved, customer ID:', result);
       setShowProfile(false);
       if (pendingTabAfterAuth) {
         setActiveTab(pendingTabAfterAuth);
@@ -248,7 +257,7 @@ export default function DigitalMenu() {
       }
       toast.success('Cadastro completo!');
     } catch (err: any) {
-      console.error('[DigitalMenu] Profile save error:', err);
+      console.error('[DigitalMenu] Profile save error:', err?.message, err?.code, err?.details, JSON.stringify(err));
       if (err?.message === 'timeout') {
         toast.error('Conexão lenta. Tente novamente.');
       } else {
