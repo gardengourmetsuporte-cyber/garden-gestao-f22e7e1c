@@ -129,15 +129,11 @@ async function geocodeAddress(
   const cleaned = cleanAddress(address);
   const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 
+  const neighborhoodPart = neighborhood?.trim() ? `${neighborhood.trim()}, ` : '';
   const queries = Array.from(new Set([
-    `${cleaned}, ${neighborhood}, ${normalizedCity}, SP, Brasil`,
-    `${cleaned}, ${normalizedCity}, SP, Brasil`,
-    `${streetOnly}, ${neighborhood}, ${normalizedCity}, SP, Brasil`,
+    `${cleaned}, ${neighborhoodPart}${normalizedCity}, SP, Brasil`,
     `${streetOnly}, ${normalizedCity}, SP, Brasil`,
     `${cleaned}, ${normalizedCity}, Brasil`,
-    `${streetOnly}, ${normalizedCity}, Brasil`,
-    `${neighborhood}, ${normalizedCity}, SP, Brasil`,
-    `${cleaned}, Brasil`,
   ].filter((q) => q.replace(/[,\s]/g, '').length > 0)));
 
   let anchor: { lat: number; lng: number } | null = null;
