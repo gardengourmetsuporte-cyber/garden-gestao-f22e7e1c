@@ -296,7 +296,7 @@ export default function PDV() {
               {filteredProducts.map(product => (
                 <button
                   key={product.id}
-                  onClick={() => pos.addToCart(product)}
+                  onClick={() => setSelectedProduct(product)}
                   className="bg-card border border-border/30 rounded-2xl p-3 text-left hover:border-primary/30 transition-all active:scale-[0.97] flex flex-col gap-0.5"
                 >
                   {product.image_url ? (
