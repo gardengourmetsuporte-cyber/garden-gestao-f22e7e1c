@@ -72,12 +72,7 @@ function TableConfigDialog({
     setError('');
     try {
       const { data, error: dbError } = await supabase
-        .from('employees')
-        .select('id')
-        .eq('unit_id', unitId)
-        .eq('quick_pin', pin)
-        .eq('is_active', true)
-        .maybeSingle();
+        .rpc('validate_tablet_pin', { p_unit_id: unitId, p_pin: pin });
 
       if (dbError) throw dbError;
       if (!data) {
