@@ -71,7 +71,7 @@ export function MenuCustomerProfile({ unitName, logoUrl, defaultName, defaultEma
             </button>
           )}
           <div className="flex-1 flex justify-center pr-9">
-            <div className="w-12 h-12 -mb-3 rounded-xl overflow-hidden border border-border/30 bg-card flex items-center justify-center p-1.5 shadow-sm">
+            <div className="w-12 h-12 -mb-3 rounded-full overflow-hidden border border-border/30 bg-card flex items-center justify-center p-1.5 shadow-sm">
               {logoUrl ? (
                 <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-contain" />
               ) : (

@@ -82,7 +82,7 @@ export function MenuLanding({ unit, unitInitials = '?', customerUser, onProfileC
       {/* Logo + Info */}
       <div className="px-5 md:px-8 -mt-14 relative z-10">
         <div className="flex items-end gap-4">
-          <div className="w-[88px] h-[88px] md:w-24 md:h-24 rounded-2xl bg-card border-[3px] border-background shadow-xl overflow-hidden flex items-center justify-center shrink-0">
+          <div className="w-[88px] h-[88px] md:w-24 md:h-24 rounded-full bg-card border-[3px] border-background shadow-xl overflow-hidden flex items-center justify-center shrink-0">
             {logoUrl ? (
               <img src={logoUrl} alt={unit.name} className="w-full h-full object-cover" />
             ) : (
