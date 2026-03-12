@@ -14,12 +14,15 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
   { key: 'checklist', label: 'Checklists', icon: 'CheckSquare', visible: true },
   { key: 'bills-due', label: 'Contas a vencer', icon: 'AlertTriangle', visible: true },
   { key: 'analytics', label: 'Analytics', icon: 'TrendingUp', visible: true },
+  { key: 'heatmap', label: 'Mapa de calor', icon: 'Flame', visible: true },
+  { key: 'month-comparison', label: 'Mês a mês', icon: 'ArrowLeftRight', visible: true },
+  { key: 'break-even', label: 'Break-even', icon: 'Target', visible: true },
   { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },
   { key: 'calendar', label: 'Calendário', icon: 'CalendarDays', visible: true },
   { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true },
 ];
 
-const STORAGE_KEY = 'dashboard-widgets-config-v4';
+const STORAGE_KEY = 'dashboard-widgets-config-v5';
 
 function loadWidgets(): DashboardWidget[] {
   try {
