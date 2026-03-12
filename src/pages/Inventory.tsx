@@ -238,6 +238,7 @@ export default function InventoryPage() {
             tabs={[
               { key: 'items', label: 'Itens', icon: <AppIcon name="ClipboardList" size={16} /> },
               { key: 'history', label: 'Histórico', icon: <AppIcon name="History" size={16} /> },
+              { key: 'batches', label: 'Lotes/Validade', icon: <AppIcon name="Package" size={16} /> },
             ]}
             activeTab={view}
             onTabChange={(key) => { setView(key as View); if (key === 'history') setStockFilter(null); }}
