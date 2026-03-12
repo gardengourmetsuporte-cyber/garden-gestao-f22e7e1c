@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
 import { formatCurrency } from '@/lib/format';
+import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
 import gardenLogo from '@/assets/logo.png';
 import tabletHero from '@/assets/tablet-hero.jpg';
 
