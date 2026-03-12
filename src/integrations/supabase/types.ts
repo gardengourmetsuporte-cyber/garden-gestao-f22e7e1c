@@ -1753,6 +1753,60 @@ export type Database = {
           },
         ]
       }
+      employee_documents: {
+        Row: {
+          created_at: string
+          employee_id: string
+          expiry_date: string | null
+          file_name: string | null
+          file_url: string
+          id: string
+          title: string
+          type: string
+          unit_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          expiry_date?: string | null
+          file_name?: string | null
+          file_url: string
+          id?: string
+          title: string
+          type?: string
+          unit_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          expiry_date?: string | null
+          file_name?: string | null
+          file_url?: string
+          id?: string
+          title?: string
+          type?: string
+          unit_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_documents_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_documents_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_material_deliveries: {
         Row: {
           category: string
@@ -4844,6 +4898,65 @@ export type Database = {
           },
         ]
       }
+      restaurant_tables: {
+        Row: {
+          capacity: number
+          created_at: string
+          current_order_id: string | null
+          id: string
+          is_active: boolean | null
+          occupied_at: string | null
+          pos_x: number | null
+          pos_y: number | null
+          shape: string | null
+          status: string
+          table_number: string
+          unit_id: string
+          updated_at: string
+          zone: string | null
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          current_order_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          occupied_at?: string | null
+          pos_x?: number | null
+          pos_y?: number | null
+          shape?: string | null
+          status?: string
+          table_number: string
+          unit_id: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          current_order_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          occupied_at?: string | null
+          pos_x?: number | null
+          pos_y?: number | null
+          shape?: string | null
+          status?: string
+          table_number?: string
+          unit_id?: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_tables_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reward_products: {
         Row: {
           created_at: string
@@ -6291,6 +6404,59 @@ export type Database = {
           },
           {
             foreignKeyName: "user_units_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      waitlist: {
+        Row: {
+          called_at: string | null
+          cancelled_at: string | null
+          created_at: string
+          customer_name: string
+          customer_phone: string | null
+          estimated_wait_minutes: number | null
+          id: string
+          notes: string | null
+          party_size: number
+          seated_at: string | null
+          status: string
+          unit_id: string
+        }
+        Insert: {
+          called_at?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          customer_name: string
+          customer_phone?: string | null
+          estimated_wait_minutes?: number | null
+          id?: string
+          notes?: string | null
+          party_size?: number
+          seated_at?: string | null
+          status?: string
+          unit_id: string
+        }
+        Update: {
+          called_at?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string | null
+          estimated_wait_minutes?: number | null
+          id?: string
+          notes?: string | null
+          party_size?: number
+          seated_at?: string | null
+          status?: string
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "units"
