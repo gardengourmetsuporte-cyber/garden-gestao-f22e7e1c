@@ -203,17 +203,10 @@ export default function TabletHome() {
         onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
       },
       {
-        id: 'conta',
-        icon: 'Receipt',
-        label: 'Minha Conta',
-        subtitle: 'Pedidos e fechamento',
-        onClick: () => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`),
-      },
-      {
-        id: 'roleta',
-        icon: 'Dices',
-        label: 'Roleta da Sorte',
-        subtitle: 'Gire e ganhe prêmios!',
+        id: 'jogos',
+        icon: 'SportsEsports',
+        label: 'Jogos',
+        subtitle: 'Diversão na mesa',
         onClick: () => navigate(`/gamification/${unitId}?mesa=${mesa}`),
       },
       {
@@ -296,23 +289,23 @@ export default function TabletHome() {
         {/* Divider */}
         <div className="mx-6 h-px bg-border/30" />
 
-        {/* Menu items - scrollable */}
-        <div className="flex-1 overflow-y-auto px-4 py-4" style={{ scrollbarWidth: 'none' }}>
+        {/* Menu items */}
+        <div className="flex-1 px-4 py-3 overflow-hidden">
           <div className="space-y-1">
             {menuItems.map(item => (
               <button
                 key={item.id}
                 onClick={item.onClick}
-                className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-left hover:bg-card active:bg-card/80 transition-all group"
+                className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left hover:bg-card active:bg-card/80 transition-all group"
               >
-                <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-                  <AppIcon name={item.icon} size={22} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+                  <AppIcon name={item.icon} size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-bold text-foreground">{item.label}</p>
-                  <p className="text-xs text-muted-foreground leading-tight mt-0.5">{item.subtitle}</p>
+                  <p className="text-sm font-bold text-foreground">{item.label}</p>
+                  <p className="text-[11px] text-muted-foreground leading-tight">{item.subtitle}</p>
                 </div>
-                <AppIcon name="ChevronRight" size={18} className="text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors shrink-0" />
+                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors shrink-0" />
               </button>
             ))}
           </div>
@@ -336,13 +329,20 @@ export default function TabletHome() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
-        {/* Pedido button - top right */}
-        <div className="absolute top-0 right-0 z-10 pr-5 pt-[max(env(safe-area-inset-top,12px),16px)]">
+        {/* Pedido + Minha Conta - top right */}
+        <div className="absolute top-0 right-0 z-10 pr-5 pt-[max(env(safe-area-inset-top,12px),16px)] flex items-center gap-2">
           <button
             onClick={() => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
           >
-            <AppIcon name="ShoppingBag" size={17} className="text-white/80" />
+            <AppIcon name="Receipt" size={16} className="text-white/80" />
+            <span className="text-sm font-bold text-white">Minha Conta</span>
+          </button>
+          <button
+            onClick={() => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
+          >
+            <AppIcon name="ShoppingBag" size={16} className="text-white/80" />
             <span className="text-sm font-bold text-white">Pedido</span>
           </button>
         </div>
