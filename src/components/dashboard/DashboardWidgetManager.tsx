@@ -30,12 +30,21 @@ const restrictToVerticalAxis: Modifier = ({ transform }) => ({
   x: 0,
 });
 
+type DashboardView = 'operational' | 'financial' | 'team';
+
+const VIEW_WIDGETS: Record<DashboardView, Set<string>> = {
+  operational: new Set(['checklist', 'quick-stats', 'calendar', 'multi-unit']),
+  financial: new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']),
+  team: new Set(['leaderboard']),
+};
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   widgets: DashboardWidget[];
   onSave: (widgets: DashboardWidget[]) => void;
   onReset: () => void;
+  currentView?: DashboardView;
 }
 
 function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWidget; onToggle: (key: string) => void; isDragActive: boolean }) {
