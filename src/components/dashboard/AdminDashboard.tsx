@@ -289,7 +289,7 @@ export function AdminDashboard() {
       {view === 'team' && <TeamDashboardView currentUserId={user?.id} />}
 
       {/* Widgets Grid — 2 columns on desktop */}
-      {view !== 'team' && (
+      {view !== 'team' && view !== 'service' && (
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
           {widgets.map((widget) => {
             const stagger = nextStagger();
