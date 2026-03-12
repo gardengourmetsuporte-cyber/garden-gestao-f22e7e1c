@@ -381,7 +381,7 @@ export default function InventoryPage() {
           onConfirm={handleMovement}
         />
 
-        <ItemFormSheetNew
+        <ItemFormSheet
           open={itemFormOpen}
           onOpenChange={setItemFormOpen}
           item={editingItem}
