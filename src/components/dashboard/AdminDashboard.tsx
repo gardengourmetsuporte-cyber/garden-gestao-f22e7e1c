@@ -225,6 +225,8 @@ export function AdminDashboard() {
         onSave={setWidgets}
         onReset={resetDefaults}
       />
+
+      <GuidedTour />
     </div>
   );
 }
