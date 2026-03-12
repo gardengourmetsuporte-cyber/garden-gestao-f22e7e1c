@@ -490,10 +490,10 @@ export default function KDS() {
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
+        onDragEnd={handleDragEndFn}
         onDragCancel={handleDragCancel}
       >
-        <div className="flex-1 flex overflow-x-auto overflow-y-hidden lg:grid lg:grid-cols-4">
+        <div className="flex-1 grid grid-cols-4 overflow-hidden">
           {COLUMNS.map(col => (
             <KDSColumn
               key={col.key}
