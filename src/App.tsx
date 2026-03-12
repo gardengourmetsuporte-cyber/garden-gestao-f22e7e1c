@@ -106,6 +106,7 @@ const Documentation = lazy(() => lazyRetry(() => import("./pages/Documentation")
 const Compliance = lazy(() => lazyRetry(() => import("./pages/Compliance")));
 const AdminMonitor = lazy(() => lazyRetry(() => import("./pages/AdminMonitor")));
 const Reports = lazy(() => lazyRetry(() => import("./pages/Reports")));
+const Reservations = lazy(() => lazyRetry(() => import("./pages/Reservations")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
