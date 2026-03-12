@@ -365,6 +365,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
 
       {/* ─── Order Detail Sheet ─── */}
       <OrderDetailSheet order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+      </div>
     </div>
   );
 }
