@@ -34,6 +34,7 @@ export default function Employees() {
     { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
     { key: 'deliveries', label: 'Entregas', icon: 'Package', color: 'text-violet-400', bg: 'bg-violet-500/10' },
     { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10', iconFill: 0 },
+    { key: 'hour-bank', label: 'Banco Horas', icon: 'Timer', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
   ];
 
   const employeeTabs = [
