@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useGameScore } from '@/hooks/useGameScore';
+import { GameRanking } from './GameRanking';
+import { Trophy } from 'lucide-react';
 
 interface Props {
   onBack: () => void;
+  unitId?: string;
 }
 
 const CARD_ITEMS = ['🍔', '🍟', '🍕', '🌭', '🥤', '🧁', '🍗', '🥪'];
