@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { POSProduct, CartItem, PendingOrder } from './types';
+import type { POSProduct, CartItem, CartItemOption, PendingOrder } from './types';
 
 export function usePOSCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -12,19 +12,22 @@ export function usePOSCart() {
   const [deliveryPhone, setDeliveryPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
 
-  const addToCart = useCallback((product: POSProduct, qty = 1) => {
+  const addToCart = useCallback((product: POSProduct, qty = 1, notes = '', selectedOptions?: CartItemOption[]) => {
     setCart(prev => {
-      const existing = prev.find(i => i.product.id === product.id && !i.notes);
+      const optKey = selectedOptions?.length ? JSON.stringify(selectedOptions) : '';
+      const existing = prev.find(i => i.product.id === product.id && !i.notes && !i.selectedOptions?.length && !optKey && !notes);
       if (existing) {
         return prev.map(i => i.id === existing.id ? { ...i, quantity: i.quantity + qty } : i);
       }
+      const optionsTotal = (selectedOptions || []).reduce((s, o) => s + o.price, 0);
       return [...prev, {
         id: crypto.randomUUID(),
         product,
         quantity: qty,
-        unit_price: product.price,
+        unit_price: product.price + optionsTotal,
         discount: 0,
-        notes: '',
+        notes,
+        selectedOptions,
       }];
     });
   }, []);

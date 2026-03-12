@@ -2,6 +2,7 @@ import { useState, useRef, useMemo, useCallback } from 'react';
 import { useFabActions } from '@/contexts/FabActionContext';
 import { useIfoodScanner } from '@/hooks/useIfoodScanner';
 import { IfoodScannerSheet } from '@/components/pdv/IfoodScannerSheet';
+import { PDVProductDetailSheet } from '@/components/pdv/PDVProductDetailSheet';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,7 @@ export default function PDV() {
   const [saleSourceAction, setSaleSourceAction] = useState<'send' | 'charge'>('send');
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingNotes, setEditingNotes] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<POSProduct | null>(null);
   const [invoiceData, setInvoiceData] = useState<{
     saleId: string;
     total: number;
@@ -294,7 +296,7 @@ export default function PDV() {
               {filteredProducts.map(product => (
                 <button
                   key={product.id}
-                  onClick={() => pos.addToCart(product)}
+                  onClick={() => setSelectedProduct(product)}
                   className="bg-card border border-border/30 rounded-2xl p-3 text-left hover:border-primary/30 transition-all active:scale-[0.97] flex flex-col gap-0.5"
                 >
                   {product.image_url ? (
@@ -372,6 +374,12 @@ export default function PDV() {
                         </button>
                         <span className="text-xs font-semibold text-foreground shrink-0">{formatCurrency(item.quantity * item.unit_price)}</span>
                       </div>
+                      {/* Selected options display */}
+                      {item.selectedOptions && item.selectedOptions.length > 0 && (
+                        <div className="ml-[72px] text-[10px] text-muted-foreground">
+                          {item.selectedOptions.map(o => o.name).join(', ')}
+                        </div>
+                      )}
                       {/* Notes display */}
                       {item.notes && (
                         <button
@@ -595,6 +603,16 @@ export default function PDV() {
         }}
         onReset={ifoodScanner.reset}
         onUpdateResult={(data) => ifoodScanner.setResult(data)}
+      />
+
+      {/* Product Detail */}
+      <PDVProductDetailSheet
+        product={selectedProduct}
+        open={!!selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onAdd={(product, qty, notes, options) => {
+          pos.addToCart(product, qty, notes, options);
+        }}
       />
     </AppLayout>
   );
