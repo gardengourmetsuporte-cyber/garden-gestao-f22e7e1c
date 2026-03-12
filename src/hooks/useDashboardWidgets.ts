@@ -11,14 +11,14 @@ export interface DashboardWidget {
 const DEFAULT_WIDGETS: DashboardWidget[] = [
   { key: 'quick-stats', label: 'Visão geral', icon: 'LayoutDashboard', visible: true },
   { key: 'finance', label: 'Saldo financeiro', icon: 'Wallet', visible: true },
+  { key: 'checklist', label: 'Checklists', icon: 'CheckSquare', visible: true },
   { key: 'bills-due', label: 'Contas a vencer', icon: 'AlertTriangle', visible: true },
   { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },
   { key: 'calendar', label: 'Calendário', icon: 'CalendarDays', visible: true },
-  { key: 'checklist', label: 'Checklists', icon: 'CheckSquare', visible: true },
   { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true },
 ];
 
-const STORAGE_KEY = 'dashboard-widgets-config-v2';
+const STORAGE_KEY = 'dashboard-widgets-config-v3';
 
 function loadWidgets(): DashboardWidget[] {
   try {
