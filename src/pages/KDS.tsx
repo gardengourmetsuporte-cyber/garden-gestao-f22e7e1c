@@ -111,14 +111,13 @@ function DraggableOrderCard({
   onBump: (id: string, next: string) => void;
   onSelect: (o: KDSOrder) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef: setDragRef, transform, isDragging } = useDraggable({
     id: order.id,
     data: { order, status: order.status },
   });
 
   const style = {
-    transform: CSS.Translate.toString(transform),
-    transition,
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     opacity: isDragging ? 0.3 : 1,
     zIndex: isDragging ? 50 : 'auto' as any,
   };
