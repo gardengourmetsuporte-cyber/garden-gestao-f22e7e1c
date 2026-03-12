@@ -264,7 +264,7 @@ html {
 
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary-foreground;
-    overscroll-behavior-y: contain;
+    overscroll-behavior-y: auto;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
