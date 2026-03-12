@@ -52,7 +52,7 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Trophy', customIcon: '/icons/trophy.png', label: 'Ranking', href: '/ranking', group: 'pessoas', groupLabel: 'Pessoas' },
 
   // ── Gestão ──
-  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão', badge: 'Beta' },
+  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ShieldCheck', label: 'Obrigações Legais', href: '/compliance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   
 ];
