@@ -44,7 +44,7 @@ function BrandPanel() {
       <div className="relative z-10 flex flex-col items-center gap-8 px-12 max-w-lg">
         {/* Logo */}
         <div
-          className="relative w-36 h-36 rounded-[2rem] overflow-hidden flex items-center justify-center"
+          className="relative w-36 h-36 rounded-full overflow-hidden flex items-center justify-center"
           style={{
             background: 'white',
             boxShadow: '0 0 100px hsl(142 71% 45% / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
