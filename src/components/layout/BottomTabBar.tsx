@@ -277,7 +277,7 @@ export function BottomTabBar() {
             {/* Last tab — Mais (or Config shortcut in cardápio) */}
             {isCardapioRoute ? (
               <TabButton
-                tab={{ key: 'config', icon: 'Settings', label: 'Config', path: '/cardapio?section=config', moduleKey: 'cardapio' }}
+                tab={{ key: 'config', icon: 'Menu', label: 'Mais', path: '/cardapio?section=config', moduleKey: 'cardapio' }}
                 active={isActive('/cardapio?section=config')}
                 locked={false}
                 moreOpen={false}
