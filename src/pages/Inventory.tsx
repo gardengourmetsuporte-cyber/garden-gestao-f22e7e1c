@@ -19,6 +19,7 @@ import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InventoryTemplateSelector } from '@/components/inventory/InventoryTemplateSelector';
+import { StockTransferSheet } from '@/components/inventory/StockTransferSheet';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
