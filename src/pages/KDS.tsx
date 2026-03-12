@@ -128,7 +128,6 @@ function DraggableOrderCard({
 
   return (
     <div
-      ref={setNodeRef}
       style={style}
       className={cn(
         'rounded-xl border backdrop-blur-sm transition-all touch-manipulation',
@@ -146,9 +145,9 @@ function DraggableOrderCard({
           <span className={cn('text-base font-black tracking-tight', col.text)}>#{shortId}</span>
           <div className="flex items-center gap-1.5">
             <ElapsedBadge createdAt={order.created_at} />
-            {/* Drag handle - only this triggers drag */}
-            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 -m-1">
-              <GripVertical className="w-3.5 h-3.5 text-white/25" />
+            {/* Drag handle - only this element triggers drag */}
+            <div ref={setDragRef} {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-2 -m-1 touch-none">
+              <GripVertical className="w-4 h-4 text-white/30" />
             </div>
           </div>
         </div>
