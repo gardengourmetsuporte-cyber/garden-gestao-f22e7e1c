@@ -494,6 +494,15 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
             </div>
           </div>
         )}
+
+        {/* Payment method selector */}
+        <div className="px-4 pb-4">
+          <PaymentMethodSelector
+            selected={paymentOption}
+            onChange={setPaymentOption}
+            asaasActive={asaasActive}
+          />
+        </div>
       </div>
 
       {/* Sticky footer */}
@@ -512,7 +521,7 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           disabled={sending || !canSend}
           className="w-full h-14 rounded-xl bg-foreground text-background font-bold text-sm flex items-center justify-between px-5 disabled:opacity-40 active:scale-[0.98] transition-all"
         >
-          <span>{sending ? 'Enviando...' : 'Fazer pedido'}</span>
+          <span>{sending ? 'Enviando...' : paymentOptionToBillingType(paymentOption) ? 'Enviar e pagar online' : 'Fazer pedido'}</span>
           {sending ? (
             <AppIcon name="Loader2" size={20} className="animate-spin" />
           ) : (
@@ -520,6 +529,26 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
           )}
         </button>
       </div>
+
+      {/* Online Payment Sheet */}
+      {showOnlinePayment && pendingOrderId && pendingOrderNumber && (
+        <OnlinePaymentSheet
+          orderId={pendingOrderId}
+          orderNumber={pendingOrderNumber}
+          total={isQrCode ? cartTotal : grandTotal}
+          unitId={unitId}
+          billingType={paymentOptionToBillingType(paymentOption)!}
+          onPaymentConfirmed={() => {
+            setShowOnlinePayment(false);
+            setOrderSent(pendingOrderNumber);
+          }}
+          onCancel={() => {
+            setShowOnlinePayment(false);
+            setPendingOrderId(null);
+            setPendingOrderNumber(null);
+          }}
+        />
+      )}
     </div>
   );
 }
