@@ -1,16 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AppIcon } from '@/components/ui/app-icon';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/format';
 import type { ActiveDelivery, HubActiveOrder } from '@/hooks/useServiceDashboard';
 
-const PLATFORM_ICONS: Record<string, { label: string; color: string }> = {
-  ifood: { label: 'iFood', color: 'text-red-500' },
-  rappi: { label: 'Rappi', color: 'text-orange-500' },
-  uber_eats: { label: 'Uber Eats', color: 'text-green-600' },
-  aiqfome: { label: 'AiQFome', color: 'text-purple-500' },
-  manual: { label: 'Manual', color: 'text-muted-foreground' },
+const PLATFORM_CONFIG: Record<string, { label: string; variant: string }> = {
+  ifood: { label: 'iFood', variant: 'bg-red-500/15 text-red-400' },
+  rappi: { label: 'Rappi', variant: 'bg-orange-500/15 text-orange-400' },
+  uber_eats: { label: 'Uber Eats', variant: 'bg-emerald-500/15 text-emerald-400' },
+  aiqfome: { label: 'AiQFome', variant: 'bg-violet-500/15 text-violet-400' },
+  manual: { label: 'Manual', variant: 'bg-muted/40 text-muted-foreground' },
 };
 
 const HUB_STATUS: Record<string, string> = {
@@ -26,12 +24,20 @@ export function ServiceDeliveryStatus({ deliveries, hubOrders }: { deliveries: A
 
   if (!hasContent) {
     return (
-      <Card>
-        <CardContent className="py-8 text-center text-muted-foreground text-sm">
-          <AppIcon name="local_shipping" size={32} className="mx-auto mb-2 opacity-40" />
-          Nenhuma entrega ativa
-        </CardContent>
-      </Card>
+      <div className="card-base p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
+            <AppIcon name="local_shipping" size={14} className="text-primary" />
+          </div>
+          <h3 className="text-sm font-semibold text-foreground">Entregas</h3>
+        </div>
+        <div className="flex flex-col items-center py-6 gap-1.5">
+          <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center">
+            <AppIcon name="local_shipping" size={20} className="text-muted-foreground/50" />
+          </div>
+          <p className="text-xs text-muted-foreground">Nenhuma entrega ativa</p>
+        </div>
+      </div>
     );
   }
 
@@ -39,62 +45,70 @@ export function ServiceDeliveryStatus({ deliveries, hubOrders }: { deliveries: A
     <div className="space-y-4">
       {/* Own deliveries */}
       {deliveries.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2 px-4 pt-4">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <AppIcon name="two_wheeler" size={18} className="text-primary" />
-              Entregas em Rota
-              <Badge variant="secondary" className="ml-auto text-[10px]">{deliveries.length}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-1.5">
+        <div className="card-base p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-full bg-amber-500/15 flex items-center justify-center">
+              <AppIcon name="two_wheeler" size={14} className="text-amber-400" />
+            </div>
+            <h3 className="text-sm font-semibold text-foreground flex-1">Entregas em Rota</h3>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 tabular-nums">
+              {deliveries.length}
+            </span>
+          </div>
+          <div className="space-y-1.5">
             {deliveries.map(d => (
-              <div key={d.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-muted/30 text-xs">
-                <span className="font-semibold min-w-[50px]">#{d.order_number || '—'}</span>
+              <div key={d.id} className="flex items-center gap-2 px-2.5 py-2 rounded-xl bg-muted/20 border border-border/10 text-xs">
+                <span className="font-bold min-w-[44px] tabular-nums text-foreground">#{d.order_number || '—'}</span>
                 <span className="truncate flex-1 text-muted-foreground">{d.items_summary || 'Sem itens'}</span>
-                <span className="font-medium">{formatCurrency(d.total)}</span>
-                <Badge variant={d.status === 'out' ? 'default' : 'secondary'} className="text-[10px]">
+                <span className="font-semibold tabular-nums text-foreground">{formatCurrency(d.total)}</span>
+                <span className={cn(
+                  'text-[10px] font-bold px-1.5 py-0.5 rounded-full',
+                  d.status === 'out' ? 'bg-primary/15 text-primary' : 'bg-muted/60 text-muted-foreground'
+                )}>
                   {d.status === 'out' ? 'Em rota' : 'Pendente'}
-                </Badge>
+                </span>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Hub orders */}
       {hubOrders.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2 px-4 pt-4">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <AppIcon name="hub" size={18} className="text-primary" />
-              Delivery Hub
-              <Badge variant="secondary" className="ml-auto text-[10px]">{hubOrders.length}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-4 pb-4 space-y-1.5">
+        <div className="card-base p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-full bg-red-500/15 flex items-center justify-center">
+              <AppIcon name="hub" size={14} className="text-red-400" />
+            </div>
+            <h3 className="text-sm font-semibold text-foreground flex-1">Delivery Hub</h3>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 tabular-nums">
+              {hubOrders.length}
+            </span>
+          </div>
+          <div className="space-y-1.5">
             {hubOrders.map(o => {
-              const platform = PLATFORM_ICONS[o.platform] || PLATFORM_ICONS.manual;
+              const platform = PLATFORM_CONFIG[o.platform] || PLATFORM_CONFIG.manual;
               return (
-                <div key={o.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-muted/30 text-xs">
-                  <span className={cn('font-bold text-[11px]', platform.color)}>{platform.label}</span>
-                  <span className="text-muted-foreground">#{o.platform_display_id || '—'}</span>
-                  <span className="truncate flex-1 text-foreground">{o.customer_name}</span>
-                  <span className="font-medium">{formatCurrency(o.total)}</span>
+                <div key={o.id} className="flex items-center gap-2 px-2.5 py-2 rounded-xl bg-muted/20 border border-border/10 text-xs">
+                  <span className={cn('text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0', platform.variant)}>
+                    {platform.label}
+                  </span>
+                  <span className="truncate flex-1 text-foreground font-medium">{o.customer_name}</span>
+                  <span className="font-semibold tabular-nums text-foreground">{formatCurrency(o.total)}</span>
                   <span className={cn(
-                    'text-[10px] font-bold px-1.5 py-0.5 rounded-full',
-                    o.minutesAgo > 15 ? 'bg-amber-500/10 text-amber-600' : 'bg-muted text-muted-foreground'
+                    'text-[10px] font-bold px-1.5 py-0.5 rounded-full tabular-nums',
+                    o.minutesAgo > 15 ? 'bg-amber-500/15 text-amber-400' : 'bg-muted/60 text-muted-foreground'
                   )}>
                     {o.minutesAgo}min
                   </span>
-                  <Badge variant="outline" className="text-[10px]">
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted/40 text-muted-foreground">
                     {HUB_STATUS[o.status] || o.status}
-                  </Badge>
+                  </span>
                 </div>
               );
             })}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   );

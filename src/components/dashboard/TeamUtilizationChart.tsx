@@ -14,24 +14,38 @@ export function TeamUtilizationChart({ members }: Props) {
 
   const getColor = (pct: number) => {
     if (pct >= 80) return 'hsl(var(--primary))';
-    if (pct >= 50) return 'hsl(var(--warning, 45 93% 47%))';
+    if (pct >= 50) return 'hsl(45 93% 47%)';
     return 'hsl(var(--destructive))';
   };
 
   return (
-    <div className="rounded-2xl border border-border/40 bg-card p-4">
+    <div className="card-base p-4">
       <div className="flex items-center gap-2 mb-4">
-        <AppIcon name="bar_chart" size={16} className="text-primary" />
+        <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
+          <AppIcon name="bar_chart" size={14} className="text-primary" />
+        </div>
         <h3 className="text-sm font-semibold text-foreground">Aproveitamento por membro</h3>
       </div>
       {data.length === 0 ? (
-        <p className="text-xs text-muted-foreground text-center py-6">Sem dados disponíveis</p>
+        <div className="flex flex-col items-center py-6 gap-1.5">
+          <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center">
+            <AppIcon name="bar_chart" size={20} className="text-muted-foreground/50" />
+          </div>
+          <p className="text-xs text-muted-foreground">Sem dados disponíveis</p>
+        </div>
       ) : (
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data} layout="vertical" margin={{ left: 0, right: 12, top: 0, bottom: 0 }}>
-            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} tickFormatter={v => `${v}%`} stroke="hsl(var(--muted-foreground))" />
-            <YAxis type="category" dataKey="name" width={60} tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-            <Tooltip formatter={(v: number) => `${v}%`} contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={v => `${v}%`} axisLine={false} tickLine={false} />
+            <YAxis type="category" dataKey="name" width={60} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+            <Tooltip
+              formatter={(v: number) => `${v}%`}
+              contentStyle={{
+                fontSize: 12, borderRadius: 12, border: 'none',
+                background: 'hsl(var(--popover))', color: 'hsl(var(--popover-foreground))',
+                boxShadow: '0 8px 24px -4px hsl(0 0% 0% / 0.3)',
+              }}
+            />
             <Bar dataKey="pct" radius={[0, 6, 6, 0]} barSize={18}>
               {data.map((entry, i) => (
                 <Cell key={i} fill={getColor(entry.pct)} />

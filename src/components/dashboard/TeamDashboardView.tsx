@@ -6,6 +6,7 @@ import { TeamPendingItems } from './TeamPendingItems';
 import { AppIcon } from '@/components/ui/app-icon';
 import { GenericWidgetSkeleton } from '@/components/ui/widget-skeleton';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
 
@@ -13,18 +14,12 @@ interface Props {
   currentUserId?: string;
 }
 
-function KpiCard({ icon, label, value, sub }: { icon: string; label: string; value: string | number; sub?: string }) {
-  return (
-    <div className="flex flex-col gap-0.5 rounded-xl border border-border/40 bg-card p-3">
-      <div className="flex items-center gap-1.5 text-muted-foreground">
-        <AppIcon name={icon} size={14} />
-        <span className="text-[10px] font-medium uppercase tracking-wide">{label}</span>
-      </div>
-      <span className="text-lg font-bold text-foreground">{value}</span>
-      {sub && <span className="text-[10px] text-muted-foreground">{sub}</span>}
-    </div>
-  );
-}
+const KPI_CONFIG = [
+  { key: 'active', icon: 'groups', label: 'Ativos', variant: 'bg-blue-500/15 text-blue-400' },
+  { key: 'completed', icon: 'task_alt', label: 'Concluídos', variant: 'bg-emerald-500/15 text-emerald-400' },
+  { key: 'utilization', icon: 'speed', label: 'Aproveitamento', variant: 'bg-primary/15 text-primary' },
+  { key: 'pending', icon: 'pending_actions', label: 'Pendências', variant: 'bg-destructive/15 text-destructive' },
+] as const;
 
 export function TeamDashboardView({ currentUserId }: Props) {
   const {
@@ -44,31 +39,60 @@ export function TeamDashboardView({ currentUserId }: Props) {
     );
   }
 
+  const kpiValues: Record<string, { value: string | number; sub?: string }> = {
+    active: { value: activeEmployees },
+    completed: { value: completionsToday, sub: `de ${totalAvailableToday}` },
+    utilization: { value: `${utilizationPct}%` },
+    pending: { value: pendingToday },
+  };
+
   return (
     <div className="mt-4 space-y-5">
-      {/* KPI Bar */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard icon="groups" label="Ativos" value={activeEmployees} />
-        <KpiCard icon="task_alt" label="Concluídos" value={completionsToday} sub={`de ${totalAvailableToday}`} />
-        <div className="flex flex-col gap-1 rounded-xl border border-border/40 bg-card p-3">
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            <AppIcon name="speed" size={14} />
-            <span className="text-[10px] font-medium uppercase tracking-wide">Aproveitamento</span>
+      {/* KPI Strip */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:-mx-8 lg:px-8 snap-x snap-mandatory">
+        {KPI_CONFIG.map(kpi => {
+          const data = kpiValues[kpi.key];
+          return (
+            <div
+              key={kpi.key}
+              className="flex items-center gap-2.5 shrink-0 snap-start rounded-xl px-3.5 py-2.5 bg-card/70 border border-border/30 min-w-[120px]"
+            >
+              <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", kpi.variant)}>
+                <AppIcon name={kpi.icon} size={16} />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-lg font-extrabold font-display leading-tight" style={{ letterSpacing: '-0.02em' }}>
+                  {data.value}
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate leading-tight">
+                  {data.sub ? `${kpi.label} · ${data.sub}` : kpi.label}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Utilization progress bar */}
+      <div className="card-base p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
+            <AppIcon name="speed" size={14} className="text-primary" />
           </div>
-          <span className="text-lg font-bold text-foreground">{utilizationPct}%</span>
-          <Progress value={utilizationPct} className="h-1.5" />
+          <h3 className="text-sm font-semibold text-foreground flex-1">Aproveitamento Geral</h3>
+          <span className="text-sm font-bold text-primary tabular-nums">{utilizationPct}%</span>
         </div>
-        <KpiCard icon="pending_actions" label="Pendências" value={pendingToday} />
+        <Progress value={utilizationPct} className="h-2" />
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <TeamUtilizationChart members={memberStats} />
         <TeamTrendChart trend={trend} />
       </div>
 
       {/* Pending + Leaderboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <TeamPendingItems items={pendingItems} total={pendingToday} />
         <Suspense fallback={<GenericWidgetSkeleton />}>
           <LazyLeaderboard currentUserId={currentUserId} />
