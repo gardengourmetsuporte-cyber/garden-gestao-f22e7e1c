@@ -7,7 +7,7 @@ import { usePOSOrders } from './pos/usePOSOrders';
 import { usePOSCheckout } from './pos/usePOSCheckout';
 
 // Re-export types for backward compatibility
-export type { POSProduct, CartItem, PendingOrder, PaymentLine } from './pos/types';
+export type { POSProduct, CartItem, CartItemOption, PendingOrder, PaymentLine } from './pos/types';
 
 export function usePOS() {
   const { activeUnitId } = useUnit();
