@@ -71,11 +71,11 @@ export function MenuCustomerProfile({ unitName, logoUrl, defaultName, defaultEma
             </button>
           )}
           <div className="flex-1 flex justify-center pr-9">
-            <div className="w-12 h-12 -mb-3 rounded-full overflow-hidden border border-border/30 bg-card flex items-center justify-center p-1.5 shadow-sm">
+            <div className="w-12 h-12 -mb-3 rounded-full overflow-hidden border border-border/30 bg-white flex items-center justify-center shadow-sm">
               {logoUrl ? (
-                <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-contain" />
+                <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-cover" />
               ) : (
-                <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
+                <img src={gardenLogo} alt="Garden" className="w-[70%] h-[70%] object-contain" />
               )}
             </div>
           </div>
