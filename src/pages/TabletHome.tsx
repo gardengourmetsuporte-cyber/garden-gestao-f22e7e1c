@@ -203,17 +203,10 @@ export default function TabletHome() {
         onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
       },
       {
-        id: 'conta',
-        icon: 'Receipt',
-        label: 'Minha Conta',
-        subtitle: 'Pedidos e fechamento',
-        onClick: () => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`),
-      },
-      {
-        id: 'roleta',
-        icon: 'Dices',
-        label: 'Roleta da Sorte',
-        subtitle: 'Gire e ganhe prêmios!',
+        id: 'jogos',
+        icon: 'SportsEsports',
+        label: 'Jogos',
+        subtitle: 'Diversão na mesa',
         onClick: () => navigate(`/gamification/${unitId}?mesa=${mesa}`),
       },
       {
