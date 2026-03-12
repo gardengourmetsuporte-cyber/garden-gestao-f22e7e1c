@@ -92,7 +92,13 @@ describe('usePOSCart', () => {
       id: 'ord-1',
       source: 'delivery',
       customer_name: 'Maria',
+      customer_phone: null,
+      customer_address: null,
       table_number: null,
+      order_number: null,
+      total: 80,
+      status: 'pending',
+      created_at: '2026-03-12T00:00:00Z',
       items: [
         { name: 'Pizza', quantity: 2, unit_price: 40 },
       ],
