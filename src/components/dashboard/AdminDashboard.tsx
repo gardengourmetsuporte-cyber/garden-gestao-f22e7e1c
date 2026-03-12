@@ -19,7 +19,9 @@ import { SmartScannerWidget } from './SmartScannerWidget';
 import { UpgradeBanner } from './UpgradeBanner';
 import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
-import { Skeleton } from '@/components/ui/skeleton';
+import { FinanceSkeleton, QuickStatsSkeleton, LeaderboardSkeleton, CalendarSkeleton, GenericWidgetSkeleton } from '@/components/ui/widget-skeleton';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh';
 
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
 const LazyCalendar = lazy(() => import('./UnifiedCalendarWidget').then(m => ({ default: m.UnifiedCalendarWidget })));
@@ -30,14 +32,15 @@ const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ defaul
 const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
 const LazyQuickStats = lazy(() => import('./QuickStatsWidget').then(m => ({ default: m.QuickStatsWidget })));
 
-function LazyWidget({ children }: { children: React.ReactNode }) {
+function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
+  const skeleton = fallback || <GenericWidgetSkeleton />;
   return (
     <div ref={ref}>
       {visible ? (
-        <Suspense fallback={<Skeleton className="h-32 w-full rounded-2xl" />}>{children}</Suspense>
+        <Suspense fallback={skeleton}>{children}</Suspense>
       ) : (
-        <Skeleton className="h-32 w-full rounded-2xl" />
+        skeleton
       )}
     </div>
   );
