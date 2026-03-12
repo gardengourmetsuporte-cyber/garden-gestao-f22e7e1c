@@ -57,6 +57,7 @@ type DashboardView = 'operational' | 'financial' | 'team';
 
 const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'calendar', 'multi-unit']);
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
+const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
 export function AdminDashboard() {
   const navigate = useNavigate();
