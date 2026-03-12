@@ -139,8 +139,6 @@ export function useServiceDashboard() {
     return () => { supabase.removeChannel(channel); };
   }, [activeUnitId, queryClient]);
 
-  const now = new Date();
-
   const stats: ServiceStats = useMemo(() => ({
     salesToday: sales.reduce((sum, s) => sum + (s.total || 0), 0),
     salesCount: sales.length,
@@ -149,15 +147,14 @@ export function useServiceDashboard() {
     hubActive: hubOrders.length,
   }), [sales, activeOrders, activeDeliveries, hubOrders]);
 
-  const orders: ActiveOrder[] = useMemo(() =>
-    activeOrders.map(o => ({
+  const orders: ActiveOrder[] = useMemo(() => {
+    const n = new Date();
+    return activeOrders.map(o => ({
       ...o,
       source: o.source || 'mesa',
-      minutesAgo: differenceInMinutes(now, new Date(o.created_at)),
-    })) as ActiveOrder[],
-    [activeOrders]
-  );
-
+      minutesAgo: differenceInMinutes(n, new Date(o.created_at)),
+    })) as ActiveOrder[];
+  }, [activeOrders]);
   const hourlySales: HourlySale[] = useMemo(() => {
     const map = new Map<number, { total: number; count: number }>();
     sales.forEach(s => {
