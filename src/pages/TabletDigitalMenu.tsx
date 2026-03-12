@@ -228,16 +228,8 @@ export default function TabletDigitalMenu() {
             </div>
           </div>
 
-          {/* Back */}
-          <button
-            onClick={() => navigate(`/tablet/${unitId}?mesa=${mesa}`)}
-            className="flex items-center gap-2 mx-3 mb-2 px-3 py-2 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors shrink-0"
-          >
-            <AppIcon name="ChevronLeft" size={14} />
-            <span>Voltar</span>
-          </button>
 
-          {/* Category list - no scrollbar, fit content */}
+          {/* Category list */}
           <nav className="flex-1 px-2 pb-4 overflow-hidden">
             {categories.map(cat => (
               <button
