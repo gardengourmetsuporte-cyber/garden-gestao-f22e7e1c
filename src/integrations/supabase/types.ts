@@ -6591,6 +6591,10 @@ export type Database = {
         Args: { _unit_id: string; _user_id: string }
         Returns: boolean
       }
+      validate_tablet_pin: {
+        Args: { p_pin: string; p_unit_id: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "funcionario" | "super_admin"
