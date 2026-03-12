@@ -193,30 +193,9 @@ export default function TabletHome() {
       {
         id: 'cardapio',
         icon: 'Restaurant',
-        label: 'A la Carte',
+        label: 'Cardápio',
         subtitle: 'Menu completo',
         onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
-      },
-      {
-        id: 'roleta',
-        icon: 'Dices',
-        label: 'Roleta da Sorte',
-        subtitle: 'Gire e ganhe prêmios!',
-        onClick: () => navigate(`/gamification/${unitId}`),
-      },
-      {
-        id: 'ranking',
-        icon: 'Trophy',
-        label: 'Ranking',
-        subtitle: 'Veja quem está no topo',
-        onClick: () => navigate(`/gamification/${unitId}?tab=ranking`),
-      },
-      {
-        id: 'mural',
-        icon: 'Newspaper',
-        label: 'Mural da Casa',
-        subtitle: 'Novidades e avisos',
-        onClick: () => {},
       },
       {
         id: 'conta',
@@ -224,6 +203,20 @@ export default function TabletHome() {
         label: 'Minha Conta',
         subtitle: 'Pedidos e fechamento',
         onClick: () => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`),
+      },
+      {
+        id: 'roleta',
+        icon: 'Dices',
+        label: 'Roleta da Sorte',
+        subtitle: 'Gire e ganhe prêmios!',
+        onClick: () => navigate(`/gamification/${unitId}?mesa=${mesa}`),
+      },
+      {
+        id: 'mural',
+        icon: 'Newspaper',
+        label: 'Mural da Casa',
+        subtitle: 'Novidades e avisos',
+        onClick: () => {},
       },
       {
         id: 'avalie',
