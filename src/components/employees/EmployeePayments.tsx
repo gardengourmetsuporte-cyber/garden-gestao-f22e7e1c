@@ -265,6 +265,21 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      {/* Receipt Image Viewer */}
+      <Dialog open={!!receiptUrl} onOpenChange={() => setReceiptUrl(null)}>
+        <DialogContent className="max-w-lg p-2 bg-black/95 border-border/30">
+          <div className="relative w-full max-h-[80vh] overflow-auto rounded-xl">
+            {receiptUrl && (
+              <img
+                src={receiptUrl}
+                alt="Holerite"
+                className="w-full h-auto object-contain rounded-xl"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
