@@ -57,6 +57,7 @@ type DashboardView = 'operational' | 'financial' | 'team';
 
 const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'calendar', 'multi-unit']);
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
+const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -96,8 +97,8 @@ export function AdminDashboard() {
 
     // Filter by current view — team view renders its own widgets
     if (view === 'team') return null;
-    if (view === 'operational' && FINANCIAL_WIDGETS.has(widget.key)) return null;
-    if (view === 'financial' && OPERATIONAL_WIDGETS.has(widget.key)) return null;
+    if (view === 'operational' && (FINANCIAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
+    if (view === 'financial' && (OPERATIONAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
 
     switch (widget.key) {
       case 'finance':
