@@ -1,9 +1,15 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useQuotations } from '@/hooks/useQuotations';
+import { useUnit } from '@/contexts/UnitContext';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { useCountUp } from '@/hooks/useCountUp';
+import { getCurrentChecklistType, getTodayDateStr } from '@/lib/checklistTiming';
+import { useChecklistDeadlines } from '@/hooks/useChecklistDeadlines';
 
 function AnimatedValue({ value }: { value: number }) {
   const animated = useCountUp(value);
@@ -30,8 +36,57 @@ export function QuickStatsWidget() {
   const navigate = useNavigate();
   const { stats, isLoading } = useDashboardStats();
   const { quotations } = useQuotations();
+  const { activeUnitId } = useUnit();
+  const today = getTodayDateStr();
+  const { settings: deadlineSettings } = useChecklistDeadlines();
+  const activeType = getCurrentChecklistType(deadlineSettings);
 
   const pendingQuotations = quotations.filter(q => q.status !== 'resolved').length;
+
+  const { data: sectors = [] } = useQuery({
+    queryKey: ['qs-checklist-sectors', activeUnitId],
+    queryFn: async () => {
+      let query = supabase
+        .from('checklist_sectors')
+        .select('*, subcategories:checklist_subcategories(*, items:checklist_items(*))')
+        .eq('scope', 'standard')
+        .order('sort_order');
+      if (activeUnitId) query = query.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
+      const { data } = await query;
+      return data || [];
+    },
+    enabled: !isLoading,
+    staleTime: 60000,
+  });
+
+  const { data: completions = [] } = useQuery({
+    queryKey: ['qs-checklist-completions', today, activeType, activeUnitId],
+    queryFn: async () => {
+      let query = supabase.from('checklist_completions').select('item_id').eq('date', today).eq('checklist_type', activeType);
+      if (activeUnitId) query = query.or(`unit_id.eq.${activeUnitId},unit_id.is.null`);
+      const { data } = await query;
+      return data || [];
+    },
+    enabled: !isLoading,
+    staleTime: 30000,
+  });
+
+  const checklistProgress = useMemo(() => {
+    const completedIds = new Set(completions.map((c: any) => c.item_id));
+    let total = 0, completed = 0;
+    sectors.forEach((s: any) => {
+      s.subcategories?.forEach((sub: any) => {
+        sub.items?.forEach((item: any) => {
+          if (item.is_active && item.checklist_type === activeType) {
+            total++;
+            if (completedIds.has(item.id)) completed++;
+          }
+        });
+      });
+    });
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { completed, total, percent };
+  }, [sectors, completions, activeType]);
 
   if (isLoading) return null;
 
@@ -79,6 +134,39 @@ export function QuickStatsWidget() {
           </button>
         );
       })}
+
+      {/* Checklist inline card */}
+      <button
+        onClick={() => navigate('/checklists')}
+        className={cn(
+          "card-stat-holo text-left transition-all duration-200 active:scale-[0.97]",
+          checklistProgress.percent === 100 && "ring-1 ring-inset ring-success/20",
+          checklistProgress.percent > 0 && checklistProgress.percent < 100 && "ring-1 ring-inset ring-primary/20",
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "stat-holo-icon",
+            checklistProgress.percent === 100 ? "bg-success/15 text-success" : "bg-primary/15 text-primary"
+          )}>
+            <AppIcon name="checklist" size={20} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">
+              {activeType === 'abertura' ? 'Abertura' : 'Fechamento'}
+            </p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}>
+                {checklistProgress.percent}%
+              </p>
+              <span className="text-[9px] font-bold text-muted-foreground/60">
+                {checklistProgress.completed}/{checklistProgress.total}
+              </span>
+            </div>
+          </div>
+          <AppIcon name="ChevronRight" size={14} className="text-muted-foreground/50" />
+        </div>
+      </button>
     </div>
   );
 }
