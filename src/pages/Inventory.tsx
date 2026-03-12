@@ -28,7 +28,7 @@ import { InventoryItem } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-type View = 'items' | 'history';
+type View = 'items' | 'history' | 'batches';
 
 export default function InventoryPage() {
   const location = useLocation();
