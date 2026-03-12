@@ -25,6 +25,7 @@ import {
 interface MaterialDeliveriesProps {
   employeeId?: string;
   compact?: boolean;
+  onRegisterRef?: (fn: () => void) => void;
 }
 
 export function MaterialDeliveries({ employeeId, compact = false }: MaterialDeliveriesProps) {
