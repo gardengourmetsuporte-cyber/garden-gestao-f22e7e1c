@@ -158,6 +158,11 @@ export function AdminDashboard() {
       {/* Setup Onboarding — full width */}
       <SetupChecklistWidget />
 
+      {/* Sales Goal Widget — full width */}
+      <div className="mt-4">
+        <SalesGoalWidget />
+      </div>
+
       {/* Smart Scanner — full width */}
       <div className="mt-4">
         <SmartScannerWidget />
