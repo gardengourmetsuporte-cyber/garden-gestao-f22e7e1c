@@ -132,7 +132,7 @@ export function MarketingBrandTab() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label className="text-xs flex items-center gap-1">
-                <AppIcon name="Instagram" size={12} /> Instagram
+                <AppIcon name="Camera" size={12} /> Instagram
               </Label>
               <Input
                 value={instagramUrl}
