@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -69,6 +70,7 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
   const [payDialog, setPayDialog] = useState<{ open: boolean; paymentId: string | null }>({ open: false, paymentId: null });
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
   const [isPaying, setIsPaying] = useState(false);
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
 
   const openNewPayslip = () => { setEditingPayslip(null); setPayslipSheetOpen(true); };
   useFabAction({ icon: 'Plus', label: 'Novo Lançamento', onClick: openNewPayslip }, [employee.id]);
@@ -176,6 +178,12 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
                     <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                       <AppIcon name="Calendar" size={12} />
                       {format(new Date(payment.payment_date), "dd/MM/yyyy", { locale: ptBR })}
+                      {payment.receipt_url && (
+                        <button onClick={() => setReceiptUrl(payment.receipt_url)} className="flex items-center gap-0.5 text-primary hover:underline">
+                          <AppIcon name="Image" size={12} />
+                          <span>Foto</span>
+                        </button>
+                      )}
                       {payment.notes && <span>• {payment.notes}</span>}
                     </div>
                   </div>
@@ -193,14 +201,19 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
                         <DropdownMenuItem onClick={() => setPayDialog({ open: true, paymentId: payment.id })}>
                           <AppIcon name="Receipt" size={16} className="mr-2" />Confirmar pagamento
                         </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem onClick={() => handleEdit(payment)}>
-                        <AppIcon name="Pencil" size={16} className="mr-2" />Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setDeleteId(payment.id)} className="text-destructive">
-                        <AppIcon name="Trash2" size={16} className="mr-2" />Excluir
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
+                        )}
+                        {payment.receipt_url && (
+                          <DropdownMenuItem onClick={() => setReceiptUrl(payment.receipt_url)}>
+                            <AppIcon name="Image" size={16} className="mr-2" />Ver Holerite
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={() => handleEdit(payment)}>
+                          <AppIcon name="Pencil" size={16} className="mr-2" />Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setDeleteId(payment.id)} className="text-destructive">
+                          <AppIcon name="Trash2" size={16} className="mr-2" />Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
               </div>
@@ -258,6 +271,21 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      {/* Receipt Image Viewer */}
+      <Dialog open={!!receiptUrl} onOpenChange={() => setReceiptUrl(null)}>
+        <DialogContent className="max-w-lg p-2 bg-black/95 border-border/30">
+          <div className="relative w-full max-h-[80vh] overflow-auto rounded-xl">
+            {receiptUrl && (
+              <img
+                src={receiptUrl}
+                alt="Holerite"
+                className="w-full h-auto object-contain rounded-xl"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
