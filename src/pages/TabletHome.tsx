@@ -330,8 +330,8 @@ export default function TabletHome() {
           </button>
         </div>
 
-        {/* Logo & Brand */}
-        <div className="flex flex-col items-center px-6 pt-2 pb-3">
+        {/* Logo & Brand - centered between mesa badge and cards */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6">
           <div className="w-16 h-16 md:w-18 md:h-18 rounded-full overflow-hidden border-2 border-primary/20 bg-white shadow-lg flex items-center justify-center shrink-0">
             {logoUrl ? (
               <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
