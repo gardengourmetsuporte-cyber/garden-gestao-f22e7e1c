@@ -288,15 +288,15 @@ export default function TabletHome() {
         </div>
 
         {/* Logo & Brand */}
-        <div className="flex flex-col items-center px-6 pt-4 pb-5">
-          <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-[3px] border-primary/20 bg-white shadow-xl flex items-center justify-center shrink-0">
+        <div className="flex flex-col items-center px-6 pt-2 pb-3">
+          <div className="w-16 h-16 md:w-18 md:h-18 rounded-full overflow-hidden border-2 border-primary/20 bg-white shadow-lg flex items-center justify-center shrink-0">
             {logoUrl ? (
               <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
             ) : (
-              <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain p-3" />
+              <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain p-2" />
             )}
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-foreground leading-tight text-center mt-4">{unit?.name || 'Bem-vindo'}</h1>
+          <h1 className="text-base md:text-lg font-bold text-foreground leading-tight text-center mt-2">{unit?.name || 'Bem-vindo'}</h1>
         </div>
 
         {/* Divider */}
