@@ -28,7 +28,7 @@ const HOME_TAB: TabDef = { key: 'home', icon: 'Home', label: 'Início', path: '/
 // Custom tabs when inside CardapioHub
 const CARDAPIO_TABS: TabDef[] = [
   { key: 'home', icon: 'Home', label: 'Início', path: '/cardapio', moduleKey: 'cardapio' },
-  { key: 'cardapio', icon: 'MenuBook', label: 'Cardápio', path: '/cardapio?tab=produtos', moduleKey: 'cardapio' },
+  { key: 'cardapio', icon: 'MenuBook', customIcon: '/icons/cardapio.png', label: 'Cardápio', path: '/cardapio?tab=produtos', moduleKey: 'cardapio' },
   { key: 'pedidos', icon: 'Task', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
 ];
 
@@ -78,6 +78,7 @@ export function BottomTabBar() {
         resolvedTabs.push({
           key: mod.key,
           icon: mod.icon,
+          customIcon: mod.customIcon,
           label: mod.label,
           path: mod.route,
           moduleKey: mod.key,

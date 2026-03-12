@@ -8,6 +8,7 @@ const PINNED_COUNT = 2;
 export interface BottomTabDef {
   key: string;
   icon: string;
+  customIcon?: string;
   label: string;
   path: string;
   moduleKey: string;
@@ -19,6 +20,7 @@ function resolveTab(moduleKey: string): BottomTabDef | null {
   return {
     key: mod.key,
     icon: mod.icon,
+    customIcon: mod.customIcon,
     label: mod.label,
     path: mod.route,
     moduleKey: mod.key,
