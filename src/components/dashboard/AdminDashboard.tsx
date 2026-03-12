@@ -212,6 +212,18 @@ export function AdminDashboard() {
           <AppIcon name="account_balance" size={14} />
           Financeiro
         </button>
+        <button
+          onClick={() => handleViewChange('team')}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+            view === 'team'
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <AppIcon name="groups" size={14} />
+          Equipe
+        </button>
       </div>
 
       {/* Quick Stats — only on operational view */}
