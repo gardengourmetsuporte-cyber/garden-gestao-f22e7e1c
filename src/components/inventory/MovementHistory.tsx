@@ -1,24 +1,57 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
-import { StockMovement, InventoryItem, UnitType } from '@/types/inventory';
+import { StockMovement, InventoryItem } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface MovementHistoryProps {
   movements: StockMovement[];
   items: InventoryItem[];
   showItemName?: boolean;
+  onDeleteMovement?: (movementId: string) => Promise<void>;
 }
 
-function getUnitLabel(unitType: UnitType): string {
+function getUnitLabel(unitType: string): string {
   switch (unitType) {
     case 'unidade': return 'un';
     case 'kg': return 'kg';
     case 'litro': return 'L';
+    default: return unitType;
   }
 }
 
-export function MovementHistory({ movements, items, showItemName = false }: MovementHistoryProps) {
+export function MovementHistory({ movements, items, showItemName = false, onDeleteMovement }: MovementHistoryProps) {
+  const { isAdmin } = useAuth();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (movementId: string) => {
+    if (!onDeleteMovement) return;
+    
+    setDeletingId(movementId);
+    try {
+      await onDeleteMovement(movementId);
+    } catch (error) {
+      toast.error('Erro ao excluir movimentação');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (movements.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -27,42 +60,43 @@ export function MovementHistory({ movements, items, showItemName = false }: Move
     );
   }
 
-  // Group movements by date
-  const groupedMovements = movements.reduce((groups, movement) => {
-    const date = format(new Date(movement.createdAt), 'yyyy-MM-dd');
-    if (!groups[date]) {
-      groups[date] = [];
+  // Group movements by local date (avoid UTC offset shifting to previous day)
+  const groupedByDate: Record<string, StockMovement[]> = {};
+  movements.forEach(movement => {
+    const localDate = new Date(movement.created_at);
+    const dateKey = format(localDate, 'yyyy-MM-dd');
+    if (!groupedByDate[dateKey]) {
+      groupedByDate[dateKey] = [];
     }
-    groups[date].push(movement);
-    return groups;
-  }, {} as Record<string, StockMovement[]>);
+    groupedByDate[dateKey].push(movement);
+  });
 
   return (
     <div className="space-y-6">
-      {Object.entries(groupedMovements).map(([date, dayMovements]) => {
-        const formattedDate = format(new Date(date), "EEEE, d 'de' MMMM", { locale: ptBR });
-        
-        return (
-          <div key={date}>
-            <h3 className="text-sm font-medium text-muted-foreground mb-3 capitalize">
-              {formattedDate}
-            </h3>
-            <div className="space-y-2">
-              {dayMovements.map((movement) => {
-                const item = items.find(i => i.id === movement.itemId);
-                if (!item) return null;
+      {Object.entries(groupedByDate).map(([dateKey, dayMovements]) => (
+        <div key={dateKey}>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3 sticky top-0 bg-background py-2">
+            {format(new Date(dateKey + 'T12:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}
+          </h3>
+          <div className="space-y-2">
+            {dayMovements.map((movement) => {
+              const item = movement.item || items.find(i => i.id === movement.item_id);
+              if (!item) return null;
 
-                return (
-                  <div
-                    key={movement.id}
-                    className="stock-card flex items-center gap-3 animate-slide-up"
-                  >
+              const unitLabel = getUnitLabel(item.unit_type);
+
+              return (
+                <div
+                  key={movement.id}
+                  className="stock-card animate-slide-up"
+                >
+                  <div className="flex items-center gap-3">
                     <div className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
                       movement.type === 'entrada' ? "bg-success/10" : "bg-destructive/10"
                     )}>
                       <AppIcon
-                        name={movement.type === 'entrada' ? 'ArrowCircleUp' : 'ArrowCircleDown'}
+                        name={movement.type === 'entrada' ? 'ArrowDownCircle' : 'ArrowUpCircle'}
                         size={20}
                         className={movement.type === 'entrada' ? 'text-success' : 'text-destructive'}
                       />
@@ -70,28 +104,73 @@ export function MovementHistory({ movements, items, showItemName = false }: Move
 
                     <div className="flex-1 min-w-0">
                       {showItemName && (
-                        <p className="font-medium truncate">{item.name}</p>
+                        <p className="font-semibold text-foreground truncate">{item.name}</p>
                       )}
                       <p className="text-sm text-muted-foreground">
-                        {format(new Date(movement.createdAt), 'HH:mm')}
-                        {movement.notes && ` • ${movement.notes}`}
+                        {movement.type === 'entrada' ? 'Entrada' : 'Saída'} • {format(new Date(movement.created_at), 'HH:mm')}
+                        {(movement as any).user_name && (
+                          <span> • Por: {(movement as any).user_name}</span>
+                        )}
                       </p>
+                      {movement.notes && (
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">{movement.notes}</p>
+                      )}
                     </div>
 
-                    <div className={cn(
-                      "text-right font-bold",
-                      movement.type === 'entrada' ? "text-success" : "text-destructive"
-                    )}>
-                      {movement.type === 'entrada' ? '+' : '-'}
-                      {movement.quantity.toFixed(item.unitType === 'unidade' ? 0 : 2)} {getUnitLabel(item.unitType)}
+                    <div className="flex items-center gap-2">
+                      <div className={cn(
+                        "text-lg font-bold shrink-0",
+                        movement.type === 'entrada' ? "text-success" : "text-destructive"
+                      )}>
+                        {movement.type === 'entrada' ? '+' : '-'}
+                        {movement.quantity.toFixed(item.unit_type === 'unidade' ? 0 : 2)} {unitLabel}
+                      </div>
+
+                      {isAdmin && onDeleteMovement && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              disabled={deletingId === movement.id}
+                            >
+                              {deletingId === movement.id ? (
+                                <AppIcon name="progress_activity" size={16} className="animate-spin" />
+                              ) : (
+                                <AppIcon name="Trash2" size={16} />
+                              )}
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Excluir movimentação?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta ação irá excluir a movimentação e {movement.type === 'entrada' ? 'subtrair' : 'devolver'}{' '}
+                                <strong>{movement.quantity.toFixed(item.unit_type === 'unidade' ? 0 : 2)} {unitLabel}</strong>{' '}
+                                {movement.type === 'entrada' ? 'do' : 'ao'} estoque de <strong>{item.name}</strong>.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(movement.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Excluir
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 }

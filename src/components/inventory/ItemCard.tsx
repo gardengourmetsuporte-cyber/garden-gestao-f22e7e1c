@@ -1,77 +1,95 @@
-import { AppIcon } from '@/components/ui/app-icon';
-import { InventoryItem, UnitType } from '@/types/inventory';
+import { InventoryItem } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { AppIcon } from '@/components/ui/app-icon';
 
 interface ItemCardProps {
   item: InventoryItem;
   onClick: () => void;
+  onEdit?: () => void;
 }
 
-function getUnitLabel(unitType: UnitType): string {
+function getUnitLabel(unitType: string): string {
   switch (unitType) {
     case 'unidade': return 'un';
     case 'kg': return 'kg';
     case 'litro': return 'L';
+    default: return unitType;
   }
 }
 
 function getStockStatus(item: InventoryItem): 'ok' | 'low' | 'out' {
-  if (item.currentStock === 0) return 'out';
-  if (item.currentStock < item.minStock) return 'low';
+  if (item.current_stock === 0) return 'out';
+  if (item.current_stock < item.min_stock) return 'low';
   return 'ok';
 }
 
-export function ItemCard({ item, onClick }: ItemCardProps) {
+export function ItemCard({ item, onClick, onEdit }: ItemCardProps) {
   const status = getStockStatus(item);
-  const unitLabel = getUnitLabel(item.unitType);
+  const unitLabel = getUnitLabel(item.unit_type);
+  const categoryColor = item.category?.color || '#6b7280';
 
   return (
-    <button
+    <div
       onClick={onClick}
-      className="stock-card w-full text-left transition-all hover:shadow-md animate-slide-up"
+      className="card-surface p-3.5 cursor-pointer hover:shadow-[0_0_20px_rgba(16,185,129,0.05)] hover:border-white/10 active:scale-[0.98] transition-all duration-300 relative overflow-hidden group"
     >
-      <div className="flex items-center gap-3">
-        <div className={cn(
-          "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-          status === 'ok' && "bg-success/10",
-          status === 'low' && "bg-warning/10",
-          status === 'out' && "bg-destructive/10"
-        )}>
-          <AppIcon name="Package" size={24} className={cn(
-            status === 'ok' && "text-success",
-            status === 'low' && "text-warning",
-            status === 'out' && "text-destructive"
-          )} />
+      {/* Subtle background glow on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      <div className="flex items-center gap-3 relative z-10">
+        {/* Icon with category color */}
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-white/5 shadow-inner"
+          style={{ backgroundColor: `${categoryColor}15` }}
+        >
+          <AppIcon name="Package" size={18} style={{ color: categoryColor, filter: `drop-shadow(0 0 6px ${categoryColor}80)` }} />
         </div>
 
+        {/* Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-foreground truncate">{item.name}</h3>
-          <p className="text-sm text-muted-foreground">{item.category}</p>
+          <h3 className="font-semibold text-sm text-foreground truncate">{item.name}</h3>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: categoryColor }} />
+            <p className="text-xs text-muted-foreground truncate">
+              {item.category?.name || 'Sem categoria'}
+            </p>
+          </div>
         </div>
 
-        <div className="text-right shrink-0">
-          <p className={cn(
-            "text-lg font-bold",
-            status === 'ok' && "text-foreground",
-            status === 'low' && "text-warning",
-            status === 'out' && "text-destructive"
-          )}>
-            {item.currentStock.toFixed(item.unitType === 'unidade' ? 0 : 2)} {unitLabel}
-          </p>
-          <span className={cn(
-            "status-badge",
-            status === 'ok' && "status-ok",
-            status === 'low' && "status-low",
-            status === 'out' && "status-out"
-          )}>
-            {status === 'ok' && 'OK'}
-            {status === 'low' && 'Baixo'}
-            {status === 'out' && 'Zerado'}
-          </span>
-        </div>
+        {/* Stock value + badge */}
+        <div className="text-right shrink-0 flex items-center gap-2">
+          <div>
+            <p className={cn(
+              "text-base font-bold leading-tight drop-shadow-md",
+              status === 'ok' && "text-foreground",
+              status === 'low' && "text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]",
+              status === 'out' && "text-rose-400 drop-shadow-[0_0_8px_rgba(244,63,94,0.4)]"
+            )}>
+              {item.current_stock.toFixed(item.unit_type === 'unidade' ? 0 : 2)}
+              <span className="text-xs font-normal text-muted-foreground ml-0.5">{unitLabel}</span>
+            </p>
+            <span className={cn(
+              "text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded inline-block mt-0.5 shadow-sm border",
+              status === 'ok' && "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+              status === 'low' && "bg-amber-500/10 border-amber-500/20 text-amber-400",
+              status === 'out' && "bg-rose-500/10 border-rose-500/20 text-rose-400"
+            )}>
+              {status === 'ok' ? 'OK' : status === 'low' ? 'BAIXO' : 'ZERADO'}
+            </span>
+          </div>
 
-        <AppIcon name="ChevronRight" size={20} className="text-muted-foreground shrink-0" />
+          {onEdit && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onEdit(); }}
+              className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors shrink-0"
+            >
+              <AppIcon name="Edit" size={14} />
+            </button>
+          )}
+
+          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground/50 shrink-0" />
+        </div>
       </div>
-    </button>
+    </div>
   );
 }

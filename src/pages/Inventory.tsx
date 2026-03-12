@@ -9,12 +9,12 @@ import { useCategories } from '@/hooks/useCategories';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatsCard } from '@/components/inventory/StatsCard';
-import { ItemCard } from '@/components/inventory/ItemCardNew';
+import { ItemCard } from '@/components/inventory/ItemCard';
 import { SearchBar } from '@/components/inventory/SearchBar';
-import { QuickMovementSheetNew } from '@/components/inventory/QuickMovementSheetNew';
-import { ItemFormSheetNew } from '@/components/inventory/ItemFormSheetNew';
+import { QuickMovementSheet } from '@/components/inventory/QuickMovementSheet';
+import { ItemFormSheet } from '@/components/inventory/ItemFormSheet';
 import { BatchMovementSheet } from '@/components/inventory/BatchMovementSheet';
-import { MovementHistoryNew } from '@/components/inventory/MovementHistoryNew';
+import { MovementHistory } from '@/components/inventory/MovementHistory';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -360,7 +360,7 @@ export default function InventoryPage() {
                 )}
               </div>
             ) : (
-              <MovementHistoryNew
+              <MovementHistory
                 movements={movements.filter(m => {
                   if (!search) return true;
                   const item = items.find(i => i.id === m.item_id);
@@ -374,14 +374,14 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        <QuickMovementSheetNew
+        <QuickMovementSheet
           item={selectedItem}
           open={movementSheetOpen}
           onOpenChange={setMovementSheetOpen}
           onConfirm={handleMovement}
         />
 
-        <ItemFormSheetNew
+        <ItemFormSheet
           open={itemFormOpen}
           onOpenChange={setItemFormOpen}
           item={editingItem}
