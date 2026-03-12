@@ -2699,6 +2699,66 @@ export type Database = {
           },
         ]
       }
+      inventory_batches: {
+        Row: {
+          batch_number: string | null
+          cost_per_unit: number | null
+          created_at: string | null
+          expiry_date: string | null
+          id: string
+          is_consumed: boolean | null
+          item_id: string
+          notes: string | null
+          quantity: number
+          received_at: string
+          unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          batch_number?: string | null
+          cost_per_unit?: number | null
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          is_consumed?: boolean | null
+          item_id: string
+          notes?: string | null
+          quantity?: number
+          received_at?: string
+          unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          batch_number?: string | null
+          cost_per_unit?: number | null
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          is_consumed?: boolean | null
+          item_id?: string
+          notes?: string | null
+          quantity?: number
+          received_at?: string
+          unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_batches_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_batches_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_count_items: {
         Row: {
           adjusted: boolean | null
@@ -3635,6 +3695,54 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "tablet_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_replication_logs: {
+        Row: {
+          categories_count: number | null
+          created_at: string | null
+          groups_count: number | null
+          id: string
+          products_count: number | null
+          replicated_by: string
+          source_unit_id: string
+          target_unit_id: string
+        }
+        Insert: {
+          categories_count?: number | null
+          created_at?: string | null
+          groups_count?: number | null
+          id?: string
+          products_count?: number | null
+          replicated_by: string
+          source_unit_id: string
+          target_unit_id: string
+        }
+        Update: {
+          categories_count?: number | null
+          created_at?: string | null
+          groups_count?: number | null
+          id?: string
+          products_count?: number | null
+          replicated_by?: string
+          source_unit_id?: string
+          target_unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_replication_logs_source_unit_id_fkey"
+            columns: ["source_unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_replication_logs_target_unit_id_fkey"
+            columns: ["target_unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]

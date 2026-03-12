@@ -22,6 +22,7 @@ import { normalizePhone } from '@/lib/normalizePhone';
 import { supabase } from '@/integrations/supabase/client';
 import gardenLogo from '@/assets/logo.png';
 import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
+import { LanguageSwitcher } from '@/components/digital-menu/LanguageSwitcher';
 import type { GamificationPrize } from '@/hooks/useGamification';
 import type { User } from '@supabase/supabase-js';
 
@@ -40,6 +41,7 @@ export default function DigitalMenu() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<DMProduct | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [, forceRerender] = useState(0);
 
   // Auth state for customer login
   const [customerUser, setCustomerUser] = useState<User | null>(null);
@@ -322,6 +324,10 @@ export default function DigitalMenu() {
 
   return (
     <div className="min-h-[100dvh] bg-background w-full mx-auto relative max-w-3xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
+      {/* Language switcher floating */}
+      <div className="fixed top-3 right-3 z-50">
+        <LanguageSwitcher onChange={() => forceRerender(n => n + 1)} />
+      </div>
       {/* Auth modal (sheet overlay) */}
       {showAuth && (
         <MenuCustomerAuth

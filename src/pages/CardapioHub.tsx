@@ -17,6 +17,7 @@ import { ProductSheet } from '@/components/menu/ProductSheet';
 import { OptionGroupList } from '@/components/menu/OptionGroupList';
 import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
+import { MenuReplication } from '@/components/menu-admin/MenuReplication';
 import { RecipeSyncPanel } from '@/components/menu/RecipeSyncPanel';
 import { FichaTecnicaHeader } from '@/components/menu/FichaTecnicaHeader';
 // UnifiedOrdersPanel removed — orders managed via PDV/KDS/Deliveries
@@ -39,7 +40,7 @@ const CardapioDashboardLazy = lazy(() => import('@/components/cardapio/CardapioD
 const CardapioConfigHubLazy = lazy(() => import('@/components/cardapio/CardapioConfigHub').then(m => ({ default: m.CardapioConfigHub })));
 const CardapioOrdersViewLazy = lazy(() => import('@/components/cardapio/CardapioOrdersView').then(m => ({ default: m.CardapioOrdersView })));
 
-type CardapioTab = 'produtos' | 'opcionais';
+type CardapioTab = 'produtos' | 'opcionais' | 'replicar';
 
 export default function CardapioHub() {
   const { activeUnit } = useUnit();
@@ -271,6 +272,7 @@ export default function CardapioHub() {
                 {([
                   { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
                   { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
+                  { id: 'replicar' as CardapioTab, label: 'Replicar', icon: 'Copy', count: undefined },
                 ]).map(tab => (
                   <button
                     key={tab.id}
@@ -377,6 +379,11 @@ export default function CardapioHub() {
               onDelete={deleteOptionGroup}
               onLinkProducts={openLinkProducts}
             />
+          )}
+
+          {/* ==================== REPLICAR ==================== */}
+          {cardapioTab === 'replicar' && (
+            <MenuReplication />
           )}
         </div>
       </div>

@@ -20,6 +20,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InventoryTemplateSelector } from '@/components/inventory/InventoryTemplateSelector';
 import { StockTransferSheet } from '@/components/inventory/StockTransferSheet';
+import { BatchExpiryManager } from '@/components/inventory/BatchExpiryManager';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
@@ -27,7 +28,7 @@ import { InventoryItem } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-type View = 'items' | 'history';
+type View = 'items' | 'history' | 'batches';
 
 export default function InventoryPage() {
   const location = useLocation();
@@ -237,6 +238,7 @@ export default function InventoryPage() {
             tabs={[
               { key: 'items', label: 'Itens', icon: <AppIcon name="ClipboardList" size={16} /> },
               { key: 'history', label: 'Histórico', icon: <AppIcon name="History" size={16} /> },
+              { key: 'batches', label: 'Lotes/Validade', icon: <AppIcon name="Package" size={16} /> },
             ]}
             activeTab={view}
             onTabChange={(key) => { setView(key as View); if (key === 'history') setStockFilter(null); }}
@@ -305,13 +307,10 @@ export default function InventoryPage() {
                         className="bg-card border border-border/40 rounded-2xl overflow-hidden relative animate-fade-in"
                         style={{ animationDelay: `${catIndex * 40}ms` }}
                       >
-                        {/* Colored accent bar */}
                         <div
                           className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
                           style={{ background: categoryColor }}
                         />
-
-                        {/* Category Header */}
                         <button
                           onClick={() => toggleCategory(categoryName)}
                           className="w-full flex items-center gap-3 pl-5 pr-4 py-3.5 text-left hover:bg-secondary/30 transition-colors"
@@ -339,8 +338,6 @@ export default function InventoryPage() {
                             )}
                           />
                         </button>
-
-                        {/* Category Items */}
                         <div
                           className={cn(
                             "overflow-hidden transition-all duration-300 ease-out",
@@ -369,7 +366,7 @@ export default function InventoryPage() {
                   })
                 )}
               </div>
-            ) : (
+            ) : view === 'history' ? (
               <MovementHistory
                 movements={movements.filter(m => {
                   if (!search) return true;
@@ -380,6 +377,8 @@ export default function InventoryPage() {
                 showItemName
                 onDeleteMovement={deleteMovement}
               />
+            ) : (
+              <BatchExpiryManager />
             )}
           </div>
         </div>
