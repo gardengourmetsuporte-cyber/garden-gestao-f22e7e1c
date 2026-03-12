@@ -1,79 +1,19 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+# Efeito de overscroll elástico (bounce orgânico)
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+## Problema
+O `overscroll-behavior: none` no `html, body` (linha 2672 do `index.css`) bloqueia completamente o efeito de bounce nativo do iOS/Android. Isso foi adicionado para evitar que o body scrolle quando drawers/dialogs estão abertos, mas acaba removendo o efeito elástico das páginas normais também.
 
----
+## Solução
+Mover o `overscroll-behavior: none` para ser aplicado **apenas** quando um drawer ou dialog está aberto, não globalmente. Assim as páginas normais terão o bounce nativo orgânico.
 
-## Bloco de Relatórios Avançados ✅
+### Arquivo: `src/index.css`
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+1. **Remover** `overscroll-behavior: none` do seletor global `html, body` (linhas 2670-2673)
+2. **Adicionar** `overscroll-behavior: none` apenas nos seletores condicionais que já existem (linhas 2676-2680), garantindo que drawers/dialogs continuem sem scroll do body
 
-## Dashboard Analytics ✅
+Também remover o `overscroll-behavior-y: contain` da linha 267 do body base, que tem o mesmo efeito restritivo.
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+Resultado: páginas com scroll normal terão o bounce elástico nativo do iOS (e Chrome Android), enquanto sheets/drawers continuam protegidos contra scroll indesejado.
 
-## Operacional ✅
-
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
-
-## CRM / Clientes ✅
-
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
-
-## Funcionários ✅
-
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
