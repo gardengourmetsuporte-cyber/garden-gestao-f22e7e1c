@@ -22,6 +22,7 @@ interface RodizioSettings {
 
 const TABLET_MESA_KEY = 'tablet_mesa_config';
 const TABLET_PIN_KEY = 'tablet_admin_pin';
+const TABLET_UNIT_KEY = 'tablet_unit_id';
 
 function getStoredMesa(): string | null {
   try { return localStorage.getItem(TABLET_MESA_KEY); } catch { return null; }
