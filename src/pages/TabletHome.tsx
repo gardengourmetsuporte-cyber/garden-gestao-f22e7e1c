@@ -434,7 +434,7 @@ export default function TabletHome() {
           currentMesa={mesa || '1'}
           onConfirm={handleConfigConfirm}
           onCancel={mesa ? () => setShowConfig(false) : undefined}
-          requirePin={hasPin}
+          unitId={unitId}
         />
       )}
     </div>
