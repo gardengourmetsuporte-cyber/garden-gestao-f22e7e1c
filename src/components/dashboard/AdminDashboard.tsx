@@ -36,6 +36,7 @@ const LazyMonthComparison = lazy(() => import('./MonthComparisonWidget'));
 const LazyBreakEven = lazy(() => import('./BreakEvenWidget'));
 const LazyMultiUnit = lazy(() => import('./MultiUnitOverview'));
 import { SalesGoalWidget } from './SalesGoalWidget';
+import { TeamDashboardView } from './TeamDashboardView';
 import { GuidedTour } from '@/components/onboarding/GuidedTour';
 
 function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
@@ -52,7 +53,7 @@ function LazyWidget({ children, fallback }: { children: React.ReactNode; fallbac
   );
 }
 
-type DashboardView = 'operational' | 'financial';
+type DashboardView = 'operational' | 'financial' | 'team';
 
 const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'leaderboard', 'calendar', 'multi-unit']);
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
@@ -93,7 +94,8 @@ export function AdminDashboard() {
   const renderWidget = (widget: typeof widgets[number], stagger: string) => {
     if (!widget.visible) return null;
 
-    // Filter by current view
+    // Filter by current view — team view renders its own widgets
+    if (view === 'team') return null;
     if (view === 'operational' && FINANCIAL_WIDGETS.has(widget.key)) return null;
     if (view === 'financial' && OPERATIONAL_WIDGETS.has(widget.key)) return null;
 
@@ -210,6 +212,18 @@ export function AdminDashboard() {
           <AppIcon name="account_balance" size={14} />
           Financeiro
         </button>
+        <button
+          onClick={() => handleViewChange('team')}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+            view === 'team'
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <AppIcon name="groups" size={14} />
+          Equipe
+        </button>
       </div>
 
       {/* Quick Stats — only on operational view */}
@@ -254,13 +268,18 @@ export function AdminDashboard() {
         </div>
       )}
 
+      {/* Team View */}
+      {view === 'team' && <TeamDashboardView currentUserId={user?.id} />}
+
       {/* Widgets Grid — 2 columns on desktop */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
-        {widgets.map((widget) => {
-          const stagger = nextStagger();
-          return renderWidget(widget, stagger);
-        })}
-      </div>
+      {view !== 'team' && (
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+          {widgets.map((widget) => {
+            const stagger = nextStagger();
+            return renderWidget(widget, stagger);
+          })}
+        </div>
+      )}
 
       {/* Manage button */}
       <button
