@@ -22,6 +22,7 @@ import { normalizePhone } from '@/lib/normalizePhone';
 import { supabase } from '@/integrations/supabase/client';
 import gardenLogo from '@/assets/logo.png';
 import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
+import { LanguageSwitcher } from '@/components/digital-menu/LanguageSwitcher';
 import type { GamificationPrize } from '@/hooks/useGamification';
 import type { User } from '@supabase/supabase-js';
 
