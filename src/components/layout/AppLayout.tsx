@@ -93,8 +93,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     className={cn(
                       "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
                       !isScrolled
-                        ? "h-9 bg-card border border-border/50 shadow-sm pl-2 pr-3.5 gap-2.5"
-                        : "h-8 w-8 bg-transparent p-0 justify-center"
+                        ? "h-8 bg-card border border-border/50 shadow-sm pl-1.5 pr-3 gap-2"
+                        : "h-7 w-7 bg-transparent p-0 justify-center"
+                    )}
                     )}
                   >
                     <div className={cn(
