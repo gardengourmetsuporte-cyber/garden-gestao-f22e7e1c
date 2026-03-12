@@ -290,14 +290,14 @@ export default function TabletHome() {
         {/* Spacer for centering */}
         <div className="w-[120px]" />
 
-        {/* Mesa badge - centered */}
+        {/* Mesa badge - centered, always opens config */}
         <button
-          onClick={() => { if (hasPin) setShowConfig(true); }}
+          onClick={() => setShowConfig(true)}
           className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
         >
           <AppIcon name="TableBar" size={16} className="text-white/70" />
           <span className="text-sm font-bold text-white">Mesa {mesa || '?'}</span>
-          {hasPin && <AppIcon name="Lock" size={12} className="text-white/40" />}
+          <AppIcon name="Settings" size={12} className="text-white/40" />
         </button>
 
         {/* Right actions */}
