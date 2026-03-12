@@ -25,12 +25,17 @@ import {
 interface MaterialDeliveriesProps {
   employeeId?: string;
   compact?: boolean;
+  onRegisterRef?: (fn: () => void) => void;
 }
 
-export function MaterialDeliveries({ employeeId, compact = false }: MaterialDeliveriesProps) {
+export function MaterialDeliveries({ employeeId, compact = false, onRegisterRef }: MaterialDeliveriesProps) {
   const { deliveries, isLoading, addDelivery, deleteDelivery } = useMaterialDeliveries(employeeId);
   const { employees } = useEmployees();
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Expose open function to parent
+  const openSheet = () => setSheetOpen(true);
+  if (onRegisterRef) onRegisterRef(openSheet);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
 

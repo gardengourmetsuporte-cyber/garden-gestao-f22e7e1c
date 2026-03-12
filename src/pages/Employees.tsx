@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useScrollToTopOnChange } from '@/components/ScrollToTop';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Employee } from '@/types/employee';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -18,7 +19,13 @@ export default function Employees() {
   const { isAdmin } = useAuth();
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [activeTab, setActiveTab] = useState('employees');
+  const openMaterialRef = useRef<(() => void) | null>(null);
   useScrollToTopOnChange(activeTab);
+
+  useFabAction(
+    activeTab === 'deliveries' ? { icon: 'Plus', label: 'Registrar', onClick: () => openMaterialRef.current?.() } : null,
+    [activeTab]
+  );
 
   const adminTabs = [
     { key: 'employees', label: 'Funcionários', icon: 'Users', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
@@ -74,7 +81,7 @@ export default function Employees() {
                 {activeTab === 'time-tracking' && <TimeTracking />}
                 {activeTab === 'schedules' && (isAdmin ? <ScheduleManagement /> : <EmployeeScheduleRequest />)}
                 {activeTab === 'payslips' && !isAdmin && <MyPayslips />}
-                {activeTab === 'deliveries' && isAdmin && <MaterialDeliveries />}
+                {activeTab === 'deliveries' && isAdmin && <MaterialDeliveries onRegisterRef={(fn) => { openMaterialRef.current = fn; }} />}
                 {activeTab === 'warnings' && <EmployeeWarnings />}
               </div>
             </>
