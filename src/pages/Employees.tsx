@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useScrollToTopOnChange } from '@/components/ScrollToTop';
+import { useFabAction } from '@/contexts/FabActionContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Employee } from '@/types/employee';
 import { AppLayout } from '@/components/layout/AppLayout';
