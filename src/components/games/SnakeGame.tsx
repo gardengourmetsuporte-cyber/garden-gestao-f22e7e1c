@@ -9,22 +9,14 @@ const SPEED_INCREMENT = 3;
 const MIN_SPEED = 60;
 
 const FOOD_ITEMS = [
-  { emoji: '🍔', points: 10, name: 'Hambúrguer' },
-  { emoji: '🍟', points: 8, name: 'Batata Frita' },
-  { emoji: '🌭', points: 7, name: 'Hot Dog' },
-  { emoji: '🥤', points: 5, name: 'Refrigerante' },
-  { emoji: '🍕', points: 12, name: 'Pizza' },
-  { emoji: '🧁', points: 15, name: 'Cupcake' },
-  { emoji: '🥪', points: 9, name: 'Sanduíche' },
-  { emoji: '🍗', points: 11, name: 'Frango' },
-];
-
-const SNAKE_HEAD = '🟢';
-const SNAKE_BODY_COLORS = [
-  'hsl(142, 70%, 45%)',
-  'hsl(142, 65%, 40%)',
-  'hsl(142, 60%, 35%)',
-  'hsl(142, 55%, 30%)',
+  { color: '#FF6B35', points: 10, name: 'Hambúrguer', shape: 'burger' },
+  { color: '#FFD700', points: 8, name: 'Batata Frita', shape: 'fries' },
+  { color: '#FF4444', points: 7, name: 'Hot Dog', shape: 'hotdog' },
+  { color: '#00BFFF', points: 5, name: 'Refrigerante', shape: 'drink' },
+  { color: '#FF6347', points: 12, name: 'Pizza', shape: 'pizza' },
+  { color: '#FF69B4', points: 15, name: 'Cupcake', shape: 'cupcake' },
+  { color: '#F4A460', points: 9, name: 'Sanduíche', shape: 'sandwich' },
+  { color: '#CD853F', points: 11, name: 'Frango', shape: 'chicken' },
 ];
 
 type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
@@ -35,6 +27,52 @@ function randomFood(snake: Point[]): { pos: Point; item: typeof FOOD_ITEMS[0] } 
     pos = { x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID) };
   } while (snake.some(s => s.x === pos.x && s.y === pos.y));
   return { pos, item: FOOD_ITEMS[Math.floor(Math.random() * FOOD_ITEMS.length)] };
+}
+
+function drawFoodShape(ctx: CanvasRenderingContext2D, x: number, y: number, cell: number, item: typeof FOOD_ITEMS[0]) {
+  const cx = x + cell / 2;
+  const cy = y + cell / 2;
+  const r = cell * 0.32;
+
+  // Glow
+  const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, cell * 0.7);
+  glow.addColorStop(0, item.color + '40');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(cx, cy, cell * 0.7, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Main circle
+  const grad = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, 0, cx, cy, r);
+  grad.addColorStop(0, item.color);
+  grad.addColorStop(1, shadeColor(item.color, -30));
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath();
+  ctx.arc(cx - r * 0.2, cy - r * 0.2, r * 0.35, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Points text
+  ctx.fillStyle = 'white';
+  ctx.font = `bold ${cell * 0.22}px system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(`+${item.points}`, cx, cy + r + cell * 0.14);
+}
+
+function shadeColor(color: string, percent: number): string {
+  const num = parseInt(color.replace('#', ''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.max(0, Math.min(255, (num >> 16) + amt));
+  const G = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amt));
+  const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
+  return `rgb(${R},${G},${B})`;
 }
 
 interface Props {
@@ -58,7 +96,6 @@ export function SnakeGame({ onBack }: Props) {
   const scoreRef = useRef(0);
   const gameLoopRef = useRef<number | null>(null);
   const lastTimeRef = useRef(0);
-
   const cellSize = useRef(0);
 
   const drawGame = useCallback(() => {
@@ -71,66 +108,67 @@ export function SnakeGame({ onBack }: Props) {
     const cell = size / GRID;
     cellSize.current = cell;
 
-    // Background - dark grid
-    ctx.fillStyle = 'hsl(140, 15%, 8%)';
+    // Background
+    ctx.fillStyle = 'hsl(150, 12%, 7%)';
     ctx.fillRect(0, 0, size, size);
 
-    // Grid lines (subtle)
-    ctx.strokeStyle = 'hsl(140, 10%, 12%)';
-    ctx.lineWidth = 0.5;
-    for (let i = 0; i <= GRID; i++) {
-      ctx.beginPath();
-      ctx.moveTo(i * cell, 0);
-      ctx.lineTo(i * cell, size);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(0, i * cell);
-      ctx.lineTo(size, i * cell);
-      ctx.stroke();
+    // Grid dots (subtle)
+    ctx.fillStyle = 'hsla(150, 10%, 20%, 0.3)';
+    for (let i = 0; i < GRID; i++) {
+      for (let j = 0; j < GRID; j++) {
+        ctx.beginPath();
+        ctx.arc(i * cell + cell / 2, j * cell + cell / 2, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     // Food
     const food = foodRef.current;
-    ctx.font = `${cell * 0.75}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    // Food glow
-    const gradient = ctx.createRadialGradient(
-      food.pos.x * cell + cell / 2, food.pos.y * cell + cell / 2, 0,
-      food.pos.x * cell + cell / 2, food.pos.y * cell + cell / 2, cell
-    );
-    gradient.addColorStop(0, 'hsla(45, 100%, 60%, 0.15)');
-    gradient.addColorStop(1, 'transparent');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(food.pos.x * cell - cell / 2, food.pos.y * cell - cell / 2, cell * 2, cell * 2);
-
-    ctx.fillText(food.item.emoji, food.pos.x * cell + cell / 2, food.pos.y * cell + cell / 2);
+    drawFoodShape(ctx, food.pos.x * cell, food.pos.y * cell, cell, food.item);
 
     // Snake
     const snake = snakeRef.current;
     snake.forEach((seg, i) => {
-      const colorIdx = Math.min(i, SNAKE_BODY_COLORS.length - 1);
+      const progress = i / Math.max(snake.length - 1, 1);
+      const hue = 142;
+      const lightness = 50 - progress * 18;
+      const saturation = 75 - progress * 15;
 
       if (i === 0) {
-        // Head - larger with glow
-        const headGrad = ctx.createRadialGradient(
-          seg.x * cell + cell / 2, seg.y * cell + cell / 2, 0,
-          seg.x * cell + cell / 2, seg.y * cell + cell / 2, cell * 0.8
+        // Head glow
+        const headGlow = ctx.createRadialGradient(
+          seg.x * cell + cell / 2, seg.y * cell + cell / 2, cell * 0.2,
+          seg.x * cell + cell / 2, seg.y * cell + cell / 2, cell * 0.9
         );
-        headGrad.addColorStop(0, 'hsl(142, 80%, 55%)');
-        headGrad.addColorStop(1, 'hsl(142, 70%, 35%)');
-        ctx.fillStyle = headGrad;
+        headGlow.addColorStop(0, `hsla(${hue}, 80%, 50%, 0.2)`);
+        headGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = headGlow;
+        ctx.fillRect(seg.x * cell - cell * 0.3, seg.y * cell - cell * 0.3, cell * 1.6, cell * 1.6);
 
-        const r = cell * 0.45;
+        // Head body
+        const headGrad = ctx.createLinearGradient(
+          seg.x * cell, seg.y * cell,
+          seg.x * cell + cell, seg.y * cell + cell
+        );
+        headGrad.addColorStop(0, `hsl(${hue}, 80%, 52%)`);
+        headGrad.addColorStop(1, `hsl(${hue}, 75%, 38%)`);
+        ctx.fillStyle = headGrad;
         ctx.beginPath();
-        ctx.roundRect(seg.x * cell + cell * 0.05, seg.y * cell + cell * 0.05, cell * 0.9, cell * 0.9, r);
+        ctx.roundRect(seg.x * cell + 1, seg.y * cell + 1, cell - 2, cell - 2, cell * 0.35);
+        ctx.fill();
+
+        // Head shine
+        ctx.fillStyle = 'hsla(142, 80%, 70%, 0.15)';
+        ctx.beginPath();
+        ctx.roundRect(seg.x * cell + 3, seg.y * cell + 3, cell * 0.45, cell * 0.35, cell * 0.2);
         ctx.fill();
 
         // Eyes
-        const eyeSize = cell * 0.12;
-        ctx.fillStyle = 'white';
+        const eyeSize = cell * 0.11;
         const eyeOffsets = getEyeOffsets(dirRef.current, cell);
+        
+        // Eye whites
+        ctx.fillStyle = 'white';
         ctx.beginPath();
         ctx.arc(seg.x * cell + cell / 2 + eyeOffsets[0].x, seg.y * cell + cell / 2 + eyeOffsets[0].y, eyeSize, 0, Math.PI * 2);
         ctx.fill();
@@ -140,8 +178,7 @@ export function SnakeGame({ onBack }: Props) {
 
         // Pupils
         ctx.fillStyle = '#111';
-        const pupilOff = cell * 0.04;
-        const pd = getPupilDirection(dirRef.current, pupilOff);
+        const pd = getPupilDirection(dirRef.current, cell * 0.04);
         ctx.beginPath();
         ctx.arc(seg.x * cell + cell / 2 + eyeOffsets[0].x + pd.x, seg.y * cell + cell / 2 + eyeOffsets[0].y + pd.y, eyeSize * 0.55, 0, Math.PI * 2);
         ctx.fill();
@@ -149,26 +186,36 @@ export function SnakeGame({ onBack }: Props) {
         ctx.arc(seg.x * cell + cell / 2 + eyeOffsets[1].x + pd.x, seg.y * cell + cell / 2 + eyeOffsets[1].y + pd.y, eyeSize * 0.55, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // Body
-        ctx.fillStyle = SNAKE_BODY_COLORS[colorIdx];
-        const gap = cell * 0.08;
-        const r = cell * 0.35;
+        // Body segment
+        const bodyGrad = ctx.createRadialGradient(
+          seg.x * cell + cell / 2, seg.y * cell + cell / 2, 0,
+          seg.x * cell + cell / 2, seg.y * cell + cell / 2, cell * 0.5
+        );
+        bodyGrad.addColorStop(0, `hsl(${hue}, ${saturation}%, ${lightness + 5}%)`);
+        bodyGrad.addColorStop(1, `hsl(${hue}, ${saturation}%, ${lightness - 5}%)`);
+        ctx.fillStyle = bodyGrad;
+        
+        const gap = 1.5;
         ctx.beginPath();
-        ctx.roundRect(seg.x * cell + gap, seg.y * cell + gap, cell - gap * 2, cell - gap * 2, r);
+        ctx.roundRect(seg.x * cell + gap, seg.y * cell + gap, cell - gap * 2, cell - gap * 2, cell * 0.3);
         ctx.fill();
 
-        // Subtle pattern on body
-        ctx.fillStyle = 'hsla(142, 50%, 60%, 0.1)';
-        ctx.beginPath();
-        ctx.roundRect(seg.x * cell + gap + 2, seg.y * cell + gap + 2, (cell - gap * 2) / 2, (cell - gap * 2) / 2, r / 2);
-        ctx.fill();
+        // Scale pattern
+        if (i % 2 === 0) {
+          ctx.fillStyle = `hsla(${hue}, 50%, ${lightness + 12}%, 0.12)`;
+          ctx.beginPath();
+          ctx.arc(seg.x * cell + cell * 0.35, seg.y * cell + cell * 0.35, cell * 0.12, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
     });
 
-    // Border glow
-    ctx.strokeStyle = 'hsl(142, 60%, 25%)';
+    // Border
+    ctx.strokeStyle = 'hsla(142, 50%, 30%, 0.6)';
     ctx.lineWidth = 2;
-    ctx.strokeRect(0, 0, size, size);
+    ctx.beginPath();
+    ctx.roundRect(1, 1, size - 2, size - 2, 12);
+    ctx.stroke();
   }, []);
 
   const gameLoop = useCallback((timestamp: number) => {
@@ -179,7 +226,6 @@ export function SnakeGame({ onBack }: Props) {
       return;
     }
     lastTimeRef.current = timestamp;
-
     dirRef.current = nextDirRef.current;
 
     const snake = [...snakeRef.current];
@@ -192,27 +238,17 @@ export function SnakeGame({ onBack }: Props) {
       case 'RIGHT': head.x++; break;
     }
 
-    // Wall collision
-    if (head.x < 0 || head.x >= GRID || head.y < 0 || head.y >= GRID) {
-      endGame();
-      return;
-    }
-
-    // Self collision
-    if (snake.some(s => s.x === head.x && s.y === head.y)) {
-      endGame();
-      return;
-    }
+    if (head.x < 0 || head.x >= GRID || head.y < 0 || head.y >= GRID) { endGame(); return; }
+    if (snake.some(s => s.x === head.x && s.y === head.y)) { endGame(); return; }
 
     snake.unshift(head);
 
-    // Food collision
     const food = foodRef.current;
     if (head.x === food.pos.x && head.y === food.pos.y) {
       scoreRef.current += food.item.points;
       setScore(scoreRef.current);
-      setLastFood(food.item.emoji + ' +' + food.item.points);
-      setTimeout(() => setLastFood(''), 1000);
+      setLastFood(`${food.item.name} +${food.item.points}`);
+      setTimeout(() => setLastFood(''), 1200);
       foodRef.current = randomFood(snake);
       speedRef.current = Math.max(MIN_SPEED, speedRef.current - SPEED_INCREMENT);
     } else {
@@ -248,14 +284,11 @@ export function SnakeGame({ onBack }: Props) {
     if (gameState === 'playing') {
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     }
-    return () => {
-      if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
-    };
+    return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
   }, [gameState, gameLoop]);
 
   useEffect(() => {
     if (gameState !== 'playing') return;
-
     const handleKey = (e: KeyboardEvent) => {
       const dir = dirRef.current;
       switch (e.key) {
@@ -265,24 +298,20 @@ export function SnakeGame({ onBack }: Props) {
         case 'ArrowRight': case 'd': if (dir !== 'LEFT') nextDirRef.current = 'RIGHT'; break;
       }
     };
-
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, [gameState]);
 
-  // Touch controls
+  // Touch
   const touchStart = useRef<{ x: number; y: number } | null>(null);
-
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
   };
-
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!touchStart.current) return;
     const dx = e.changedTouches[0].clientX - touchStart.current.x;
     const dy = e.changedTouches[0].clientY - touchStart.current.y;
     const dir = dirRef.current;
-
     if (Math.abs(dx) > Math.abs(dy)) {
       if (dx > 20 && dir !== 'LEFT') nextDirRef.current = 'RIGHT';
       else if (dx < -20 && dir !== 'RIGHT') nextDirRef.current = 'LEFT';
@@ -324,7 +353,7 @@ export function SnakeGame({ onBack }: Props) {
   }, [canvasSize, gameState, drawGame]);
 
   return (
-    <div className="h-[100dvh] bg-[hsl(140,15%,5%)] flex flex-col overflow-hidden">
+    <div className="h-[100dvh] bg-[hsl(150,12%,5%)] flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top,8px),12px)] pb-2 shrink-0">
         <button onClick={onBack} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
@@ -339,15 +368,15 @@ export function SnakeGame({ onBack }: Props) {
       </div>
 
       {/* Score bar */}
-      <div className="flex items-center justify-center gap-6 px-4 py-2 shrink-0">
+      <div className="flex items-center justify-center gap-4 px-4 py-2 shrink-0">
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-          <span className="text-xs text-emerald-400 font-bold">🍔 {score}</span>
+          <span className="text-xs text-emerald-400 font-bold">⭐ {score}</span>
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
           <span className="text-xs text-amber-400 font-bold">🏆 {highScore}</span>
         </div>
         {lastFood && (
-          <span className="text-sm font-bold text-emerald-300 animate-bounce">{lastFood}</span>
+          <span className="text-xs font-bold text-emerald-300 animate-bounce">{lastFood}</span>
         )}
       </div>
 
@@ -358,24 +387,18 @@ export function SnakeGame({ onBack }: Props) {
             ref={canvasRef}
             width={canvasSize}
             height={canvasSize}
-            className="rounded-2xl shadow-2xl shadow-emerald-900/30"
+            className="rounded-2xl"
+            style={{ boxShadow: '0 0 40px hsla(142, 50%, 30%, 0.15), inset 0 0 20px hsla(142, 50%, 20%, 0.05)' }}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           />
 
           {/* Menu overlay */}
           {gameState === 'menu' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm rounded-2xl gap-6">
-              <div className="text-center">
-                <span className="text-6xl block mb-3">🐍</span>
-                <h2 className="text-2xl font-black text-white">Snake Garden</h2>
-                <p className="text-sm text-emerald-300/80 mt-1">Coma lanches e fique enorme!</p>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2 px-8">
-                {FOOD_ITEMS.slice(0, 6).map(f => (
-                  <span key={f.emoji} className="text-2xl animate-pulse" style={{ animationDelay: `${Math.random() * 2}s` }}>{f.emoji}</span>
-                ))}
-              </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm rounded-2xl gap-5">
+              <span className="text-6xl">🐍</span>
+              <h2 className="text-2xl font-black text-white">Snake Garden</h2>
+              <p className="text-sm text-emerald-300/80">Coma os lanches e fique enorme!</p>
               <button
                 onClick={startGame}
                 className="px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base shadow-lg shadow-emerald-500/30 active:scale-95 transition-all"
@@ -386,29 +409,21 @@ export function SnakeGame({ onBack }: Props) {
             </div>
           )}
 
-          {/* Game over overlay */}
+          {/* Game over */}
           {gameState === 'gameover' && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm rounded-2xl gap-4">
               <span className="text-5xl">😵</span>
               <h2 className="text-xl font-black text-white">Game Over!</h2>
-              <div className="text-center">
-                <p className="text-3xl font-black text-emerald-400">{score}</p>
-                <p className="text-xs text-white/50 mt-1">pontos</p>
-              </div>
+              <p className="text-3xl font-black text-emerald-400">{score}</p>
+              <p className="text-xs text-white/50">pontos</p>
               {score >= highScore && score > 0 && (
                 <p className="text-sm font-bold text-amber-400 animate-pulse">🏆 Novo recorde!</p>
               )}
               <div className="flex gap-3 mt-2">
-                <button
-                  onClick={onBack}
-                  className="px-5 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white font-semibold text-sm"
-                >
+                <button onClick={onBack} className="px-5 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white font-semibold text-sm">
                   Sair
                 </button>
-                <button
-                  onClick={startGame}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm shadow-lg shadow-emerald-500/30 active:scale-95 transition-all"
-                >
+                <button onClick={startGame} className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm shadow-lg shadow-emerald-500/30 active:scale-95 transition-all">
                   Jogar de novo 🔄
                 </button>
               </div>
@@ -417,42 +432,34 @@ export function SnakeGame({ onBack }: Props) {
         </div>
       </div>
 
-      {/* D-Pad controls */}
+      {/* D-Pad */}
       {gameState === 'playing' && (
         <div className="shrink-0 flex justify-center pb-[max(env(safe-area-inset-bottom,8px),12px)] pt-2">
-          <div className="relative w-[160px] h-[160px]">
-            {/* Up */}
-            <button
-              onTouchStart={() => changeDir('UP')}
-              onMouseDown={() => changeDir('UP')}
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-14 h-14 rounded-2xl bg-white/8 border border-white/10 flex items-center justify-center active:bg-emerald-500/20 transition-colors"
-            >
-              <AppIcon name="KeyboardArrowUp" size={28} className="text-white/60" />
-            </button>
-            {/* Down */}
-            <button
-              onTouchStart={() => changeDir('DOWN')}
-              onMouseDown={() => changeDir('DOWN')}
-              className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-14 rounded-2xl bg-white/8 border border-white/10 flex items-center justify-center active:bg-emerald-500/20 transition-colors"
-            >
-              <AppIcon name="KeyboardArrowDown" size={28} className="text-white/60" />
-            </button>
-            {/* Left */}
-            <button
-              onTouchStart={() => changeDir('LEFT')}
-              onMouseDown={() => changeDir('LEFT')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-2xl bg-white/8 border border-white/10 flex items-center justify-center active:bg-emerald-500/20 transition-colors"
-            >
-              <AppIcon name="KeyboardArrowLeft" size={28} className="text-white/60" />
-            </button>
-            {/* Right */}
-            <button
-              onTouchStart={() => changeDir('RIGHT')}
-              onMouseDown={() => changeDir('RIGHT')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 w-14 h-14 rounded-2xl bg-white/8 border border-white/10 flex items-center justify-center active:bg-emerald-500/20 transition-colors"
-            >
-              <AppIcon name="KeyboardArrowRight" size={28} className="text-white/60" />
-            </button>
+          <div className="relative w-[150px] h-[150px]">
+            {(['UP', 'DOWN', 'LEFT', 'RIGHT'] as Direction[]).map(d => {
+              const pos = {
+                UP: 'top-0 left-1/2 -translate-x-1/2',
+                DOWN: 'bottom-0 left-1/2 -translate-x-1/2',
+                LEFT: 'left-0 top-1/2 -translate-y-1/2',
+                RIGHT: 'right-0 top-1/2 -translate-y-1/2',
+              }[d];
+              const icon = {
+                UP: 'KeyboardArrowUp',
+                DOWN: 'KeyboardArrowDown',
+                LEFT: 'KeyboardArrowLeft',
+                RIGHT: 'KeyboardArrowRight',
+              }[d];
+              return (
+                <button
+                  key={d}
+                  onTouchStart={() => changeDir(d)}
+                  onMouseDown={() => changeDir(d)}
+                  className={`absolute ${pos} w-12 h-12 rounded-xl bg-white/6 border border-white/10 flex items-center justify-center active:bg-emerald-500/20 transition-colors`}
+                >
+                  <AppIcon name={icon} size={24} className="text-white/50" />
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

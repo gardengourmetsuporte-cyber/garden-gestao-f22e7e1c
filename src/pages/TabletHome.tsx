@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
 import { formatCurrency } from '@/lib/format';
 import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
+import { SnakeGame } from '@/components/games/SnakeGame';
+import { MemoryGame } from '@/components/games/MemoryGame';
 import gardenLogo from '@/assets/logo.png';
 import tabletHero from '@/assets/tablet-hero.jpg';
 
