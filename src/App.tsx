@@ -202,6 +202,18 @@ function PublicWithAuth({ children }: { children: React.ReactNode }) {
   );
 }
 
+function TabletRedirect() {
+  try {
+    const unitId = localStorage.getItem('tablet_unit_id');
+    const mesa = localStorage.getItem('tablet_mesa_config');
+    if (unitId) {
+      const url = `/tablet/${unitId}${mesa ? `?mesa=${mesa}` : ''}`;
+      return <Navigate to={url} replace />;
+    }
+  } catch {}
+  return <AuthenticatedApp />;
+}
+
 function PublicRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
@@ -220,7 +232,7 @@ function PublicRoutes() {
         <Route path="/invite" element={<PublicWithAuth><RouteErrorBoundary><Invite /></RouteErrorBoundary></PublicWithAuth>} />
         <Route path="/share-receipt" element={<ShareReceiptHandler />} />
         <Route path="/docs" element={<Documentation />} />
-        <Route path="*" element={<AuthenticatedApp />} />
+        <Route path="*" element={<TabletRedirect />} />
       </Routes>
     </Suspense>
   );
