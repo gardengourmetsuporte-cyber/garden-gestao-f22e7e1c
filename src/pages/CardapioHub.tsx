@@ -380,6 +380,11 @@ export default function CardapioHub() {
               onLinkProducts={openLinkProducts}
             />
           )}
+
+          {/* ==================== REPLICAR ==================== */}
+          {cardapioTab === 'replicar' && (
+            <MenuReplication />
+          )}
         </div>
       </div>
 
