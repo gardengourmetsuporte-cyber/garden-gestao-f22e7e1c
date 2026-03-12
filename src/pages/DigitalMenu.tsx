@@ -321,7 +321,7 @@ export default function DigitalMenu() {
     .toUpperCase() || '?';
 
   return (
-    <div className="min-h-[100dvh] bg-background max-w-4xl mx-auto relative lg:max-w-5xl">
+    <div className="min-h-[100dvh] bg-background w-full mx-auto relative max-w-3xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
       {/* Auth modal (sheet overlay) */}
       {showAuth && (
         <MenuCustomerAuth
