@@ -143,33 +143,40 @@ export function BottomTabBar() {
             className="fixed inset-0 bottom-[calc(64px+env(safe-area-inset-bottom,0px))] z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
             onClick={() => setSpeedDialOpen(false)}
           />
-          <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 flex justify-center pb-4">
-            <div className="flex items-end gap-6">
-              {fabActions.map((action, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    navigator.vibrate?.(10);
-                    setSpeedDialOpen(false);
-                    action.onClick();
-                  }}
-                  className="flex flex-col items-center gap-2 animate-scale-in"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  <div
-                    className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg relative"
-                    style={{ background: action.color || 'hsl(var(--primary) / 0.9)' }}
+          <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 flex justify-center pb-6">
+            <div className="flex items-end gap-5">
+              {fabActions.map((action, i) => {
+                // Arc: middle items float higher
+                const count = fabActions.length;
+                const mid = (count - 1) / 2;
+                const dist = Math.abs(i - mid);
+                const lift = Math.round((1 - dist / Math.max(mid, 1)) * 28);
+                return (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      navigator.vibrate?.(10);
+                      setSpeedDialOpen(false);
+                      action.onClick();
+                    }}
+                    className="flex flex-col items-center gap-2 animate-scale-in"
+                    style={{ animationDelay: `${i * 50}ms`, marginBottom: `${lift}px` }}
                   >
-                    <AppIcon name={action.icon} size={24} fill={1} style={{ color: 'white' }} />
-                    {action.badge && action.badge > 0 && (
-                      <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
-                        {action.badge}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[11px] font-bold text-white">{action.label}</span>
-                </button>
-              ))}
+                    <div
+                      className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg relative"
+                      style={{ background: action.color || 'hsl(var(--primary) / 0.9)' }}
+                    >
+                      <AppIcon name={action.icon} size={24} fill={1} style={{ color: 'white' }} />
+                      {action.badge && action.badge > 0 && (
+                        <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
+                          {action.badge}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] font-bold text-white">{action.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </>
