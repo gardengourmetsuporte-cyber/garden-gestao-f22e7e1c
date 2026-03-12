@@ -34,11 +34,13 @@ Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos
 - Fila de espera digital
 - Mapa visual de mesas (salão com status)
 - Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
 ## CRM / Clientes ✅
 
 - Histórico de pedidos do cliente (POS + tablet)
 - Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
 
 ## Funcionários ✅
 
@@ -48,3 +50,8 @@ Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos
 ## Cardápio Digital ✅
 
 - Order tracker em tempo real (status do pedido via realtime)
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV

@@ -5459,6 +5459,109 @@ export type Database = {
           },
         ]
       }
+      stock_transfer_items: {
+        Row: {
+          from_item_id: string | null
+          id: string
+          item_name: string
+          quantity: number
+          to_item_id: string | null
+          transfer_id: string
+          unit_type: string
+        }
+        Insert: {
+          from_item_id?: string | null
+          id?: string
+          item_name: string
+          quantity?: number
+          to_item_id?: string | null
+          transfer_id: string
+          unit_type?: string
+        }
+        Update: {
+          from_item_id?: string | null
+          id?: string
+          item_name?: string
+          quantity?: number
+          to_item_id?: string | null
+          transfer_id?: string
+          unit_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_transfer_items_from_item_id_fkey"
+            columns: ["from_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_transfer_items_to_item_id_fkey"
+            columns: ["to_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_transfer_items_transfer_id_fkey"
+            columns: ["transfer_id"]
+            isOneToOne: false
+            referencedRelation: "stock_transfers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_transfers: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string
+          from_unit_id: string
+          id: string
+          notes: string | null
+          status: string
+          to_unit_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by: string
+          from_unit_id: string
+          id?: string
+          notes?: string | null
+          status?: string
+          to_unit_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string
+          from_unit_id?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          to_unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_transfers_from_unit_id_fkey"
+            columns: ["from_unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_transfers_to_unit_id_fkey"
+            columns: ["to_unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supplier_invoices: {
         Row: {
           amount: number

@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import type { Customer, LoyaltyEvent } from '@/types/customer';
 import { SEGMENT_CONFIG } from '@/types/customer';
+import { CustomerLGPD } from './CustomerLGPD';
+import { CustomerOrderHistory } from './CustomerOrderHistory';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -167,6 +169,14 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
               </div>
             )}
           </div>
+
+          {/* Order History */}
+          <CustomerOrderHistory customerId={customer.id} customerName={customer.name} customerPhone={customer.phone} />
+
+          <Separator />
+
+          {/* LGPD */}
+          <CustomerLGPD customer={customer} onDeleted={() => onOpenChange(false)} />
 
           {/* Actions */}
           <div className="flex gap-2 pt-2 pb-4">
