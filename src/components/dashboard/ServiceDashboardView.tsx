@@ -2,33 +2,47 @@ import { useServiceDashboard } from '@/hooks/useServiceDashboard';
 import { ServiceActiveOrders } from './ServiceActiveOrders';
 import { ServiceHourlySales } from './ServiceHourlySales';
 import { ServiceDeliveryStatus } from './ServiceDeliveryStatus';
-import { Card, CardContent } from '@/components/ui/card';
 import { AppIcon } from '@/components/ui/app-icon';
 import { formatCurrency } from '@/lib/format';
+import { cn } from '@/lib/utils';
 
-function KpiCard({ icon, label, value, accent }: { icon: string; label: string; value: string; accent?: string }) {
-  return (
-    <Card className="flex-1 min-w-0">
-      <CardContent className="p-3 flex flex-col items-center gap-1">
-        <AppIcon name={icon} size={20} className={accent || 'text-primary'} />
-        <span className="text-base font-bold text-foreground leading-tight">{value}</span>
-        <span className="text-[10px] text-muted-foreground font-medium">{label}</span>
-      </CardContent>
-    </Card>
-  );
-}
+const KPI_ITEMS = [
+  { key: 'sales', icon: 'payments', label: 'Vendas Hoje', variant: 'bg-emerald-500/15 text-emerald-400' },
+  { key: 'orders', icon: 'receipt_long', label: 'Pedidos Ativos', variant: 'bg-blue-500/15 text-blue-400' },
+  { key: 'deliveries', icon: 'two_wheeler', label: 'Entregas', variant: 'bg-amber-500/15 text-amber-400' },
+  { key: 'hub', icon: 'hub', label: 'Delivery Hub', variant: 'bg-red-500/15 text-red-400' },
+] as const;
 
 export function ServiceDashboardView() {
   const { stats, orders, hourlySales, deliveries, hubActive } = useServiceDashboard();
 
+  const values: Record<string, string> = {
+    sales: formatCurrency(stats.salesToday),
+    orders: String(stats.activeOrders),
+    deliveries: String(stats.activeDeliveries),
+    hub: String(stats.hubActive),
+  };
+
   return (
     <div className="mt-4 space-y-4">
-      {/* KPI Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <KpiCard icon="payments" label="Vendas Hoje" value={formatCurrency(stats.salesToday)} accent="text-green-500" />
-        <KpiCard icon="receipt_long" label="Pedidos Ativos" value={String(stats.activeOrders)} accent="text-blue-500" />
-        <KpiCard icon="two_wheeler" label="Entregas" value={String(stats.activeDeliveries)} accent="text-amber-500" />
-        <KpiCard icon="hub" label="Delivery Hub" value={String(stats.hubActive)} accent="text-red-500" />
+      {/* KPI Strip — horizontal scroll like QuickStats */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:-mx-8 lg:px-8 snap-x snap-mandatory">
+        {KPI_ITEMS.map(kpi => (
+          <div
+            key={kpi.key}
+            className="flex items-center gap-2.5 shrink-0 snap-start rounded-xl px-3.5 py-2.5 bg-card/70 border border-border/30 min-w-[140px]"
+          >
+            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", kpi.variant)}>
+              <AppIcon name={kpi.icon} size={16} />
+            </div>
+            <div className="text-left min-w-0">
+              <p className="text-lg font-extrabold font-display leading-tight" style={{ letterSpacing: '-0.02em' }}>
+                {values[kpi.key]}
+              </p>
+              <p className="text-[10px] text-muted-foreground truncate leading-tight">{kpi.label}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Active Orders */}
