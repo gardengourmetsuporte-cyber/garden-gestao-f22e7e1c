@@ -273,9 +273,12 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
       </Sheet>
 
       {/* Receipt Image Viewer */}
-      <Dialog open={!!receiptUrl} onOpenChange={() => setReceiptUrl(null)}>
-        <DialogContent className="max-w-lg p-2 bg-black/95 border-border/30">
-          <div className="relative w-full max-h-[80vh] overflow-auto rounded-xl">
+      <Sheet open={!!receiptUrl} onOpenChange={() => setReceiptUrl(null)}>
+        <SheetContent side="bottom" className="rounded-t-2xl p-3 max-h-[90vh]">
+          <SheetHeader>
+            <SheetTitle>Holerite</SheetTitle>
+          </SheetHeader>
+          <div className="relative w-full max-h-[75vh] overflow-auto rounded-xl mt-3">
             {receiptUrl && (
               <img
                 src={receiptUrl}
@@ -284,8 +287,8 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
               />
             )}
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
