@@ -80,6 +80,7 @@ function shadeColor(color: string, percent: number): string {
 
 interface Props {
   onBack: () => void;
+  unitId?: string;
 }
 
 export function SnakeGame({ onBack }: Props) {
