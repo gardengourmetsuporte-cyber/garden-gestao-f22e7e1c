@@ -39,7 +39,7 @@ export function CustomerLGPD({ customer, onDeleted }: CustomerLGPDProps) {
           email: customer.email,
           telefone: customer.phone,
           aniversario: customer.birthday,
-          endereco: customer.address,
+          endereco: customer.notes,
           segmento: customer.segment,
           notas: customer.notes,
           tags: customer.tags,
