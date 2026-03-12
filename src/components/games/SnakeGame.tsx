@@ -268,10 +268,13 @@ export function SnakeGame({ onBack, unitId }: Props) {
 
   const endGame = () => {
     setGameState('gameover');
-    if (scoreRef.current > highScore) {
-      setHighScore(scoreRef.current);
-      try { localStorage.setItem('garden_snake_high', String(scoreRef.current)); } catch {}
+    const finalScore = scoreRef.current;
+    if (finalScore > highScore) {
+      setHighScore(finalScore);
+      try { localStorage.setItem('garden_snake_high', String(finalScore)); } catch {}
     }
+    // Save score to ranking (async, fire-and-forget)
+    saveScore('snake', finalScore);
   };
 
   const startGame = () => {
