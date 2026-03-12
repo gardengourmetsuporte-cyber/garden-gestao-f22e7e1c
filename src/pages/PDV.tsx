@@ -253,33 +253,29 @@ export default function PDV() {
            <SyncStatusIndicator />
           </div>
 
-          {/* Categories */}
-          <div className="grid grid-cols-3 gap-2">
+          {/* Categories - Dropdown */}
+          <div className="relative">
             <button
-              onClick={() => setSelectedCategory(null)}
-              className={cn(
-                'flex items-center justify-center px-3 py-2.5 rounded-2xl text-[13px] font-semibold transition-all duration-200',
-                !selectedCategory
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
-                  : 'bg-muted/50 text-muted-foreground active:scale-95'
-              )}
+              onClick={() => {
+                const el = document.getElementById('pdv-cat-select');
+                if (el) (el as HTMLSelectElement).showPicker?.();
+              }}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-card/80 border border-border/30 text-sm font-semibold text-foreground transition-all active:scale-[0.99]"
             >
-              Todos
+              <span className="truncate">{selectedCategory || 'Todas as categorias'}</span>
+              <AppIcon name="ChevronDown" size={16} className="text-muted-foreground shrink-0" />
             </button>
-            {pos.categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
-                className={cn(
-                  'px-3 py-2.5 rounded-2xl text-[13px] font-semibold transition-all duration-200 truncate',
-                  cat === selectedCategory
-                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
-                    : 'bg-muted/50 text-muted-foreground active:scale-95'
-                )}
-              >
-                {cat}
-              </button>
-            ))}
+            <select
+              id="pdv-cat-select"
+              value={selectedCategory || ''}
+              onChange={(e) => setSelectedCategory(e.target.value || null)}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            >
+              <option value="">Todas as categorias</option>
+              {pos.categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
         </div>
 
