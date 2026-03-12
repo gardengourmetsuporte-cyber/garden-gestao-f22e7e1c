@@ -84,11 +84,8 @@ export function AdminDashboard() {
         ) : null;
 
       case 'checklist':
-        return hasAccess('checklists') ? (
-          <DashboardSection key={widget.key} onNavigate={() => navigate('/checklists')} className={`animate-card-reveal ${stagger}`}>
-            <LazyWidget><LazyChecklist /></LazyWidget>
-          </DashboardSection>
-        ) : null;
+        // Now embedded inside QuickStatsWidget
+        return null;
 
       case 'bills-due':
         return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
