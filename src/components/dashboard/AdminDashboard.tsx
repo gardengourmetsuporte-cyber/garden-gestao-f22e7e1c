@@ -103,7 +103,7 @@ export function AdminDashboard() {
       case 'calendar':
         return hasAccess('agenda') ? (
           <DashboardSection key={widget.key} onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
-            <LazyWidget><LazyCalendar /></LazyWidget>
+            <LazyWidget fallback={<CalendarSkeleton />}><LazyCalendar /></LazyWidget>
           </DashboardSection>
         ) : null;
 
