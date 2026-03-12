@@ -272,97 +272,87 @@ export default function TabletHome() {
   const bannerUrl = unit?.store_info?.banner_url;
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden select-none">
-      {/* ─── Full-screen Hero Background ─── */}
-      <img
-        src={bannerUrl || tabletHero}
-        alt="Hero"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
-
-      {/* ─── Top bar: Mesa (center) + Pedido (right) ─── */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-5 pt-[env(safe-area-inset-top,12px)] pb-2"
-        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)' }}
-      >
-        {/* Spacer for centering */}
-        <div className="w-[120px]" />
-
-        {/* Mesa badge - centered, always opens config */}
-        <button
-          onClick={() => setShowConfig(true)}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
-        >
-          <AppIcon name="TableBar" size={16} className="text-white/70" />
-          <span className="text-sm font-bold text-white">Mesa {mesa || '?'}</span>
-          <AppIcon name="Settings" size={12} className="text-white/40" />
-        </button>
-
-        {/* Right actions */}
-        <div className="w-[120px] flex justify-end gap-2">
+    <div className="fixed inset-0 bg-black overflow-hidden select-none flex">
+      {/* ─── Left Sidebar ─── */}
+      <aside className="relative z-20 w-[340px] md:w-[400px] lg:w-[420px] h-full flex flex-col bg-background/95 backdrop-blur-xl border-r border-border/20">
+        {/* Mesa badge - top */}
+        <div className="px-6 pt-[max(env(safe-area-inset-top,12px),16px)] pb-3 flex justify-center">
           <button
-            onClick={() => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`)}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
+            onClick={() => setShowConfig(true)}
+            className="flex items-center gap-2 px-5 py-2 rounded-full border border-border/40 bg-card/60 backdrop-blur-sm hover:bg-card transition-colors"
           >
-            <AppIcon name="ShoppingBag" size={16} className="text-white/70" />
-            <span className="text-xs font-bold text-white">Pedido</span>
+            <AppIcon name="TableBar" size={15} className="text-primary" />
+            <span className="text-sm font-bold text-foreground">Mesa {mesa || '?'}</span>
+            <AppIcon name="ChevronDown" size={13} className="text-muted-foreground" />
           </button>
         </div>
-      </div>
 
-      {/* ─── Centered Floating Menu Card ─── */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
-        style={{ paddingTop: '60px' }}
-      >
-        <div className="pointer-events-auto w-[360px] max-h-[calc(100%-80px)]">
-          <div className="bg-white/[0.08] backdrop-blur-2xl rounded-3xl border border-white/[0.12] overflow-hidden shadow-2xl shadow-black/40 flex flex-col max-h-full">
-            {/* Logo & Brand - centered */}
-            <div className="flex flex-col items-center px-6 pt-6 pb-4">
-              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/20 bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-lg mb-3">
-                {logoUrl ? (
-                  <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
-                ) : (
-                  <img src={gardenLogo} alt="Garden" className="w-14 h-14 object-contain" />
-                )}
+        {/* Logo & Brand */}
+        <div className="flex flex-col items-center px-6 pt-4 pb-5">
+          <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-[3px] border-primary/20 bg-white shadow-xl flex items-center justify-center shrink-0">
+            {logoUrl ? (
+              <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-white flex items-center justify-center p-3">
+                <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-lg font-bold text-white leading-tight text-center">{unit?.name || 'Bem-vindo'}</h1>
-              <p className="text-[11px] text-white/40 mt-1">Mesa {mesa || '?'}</p>
-            </div>
-
-            {/* Divider */}
-            <div className="mx-5 h-px bg-white/[0.08]" />
-
-            {/* Menu items */}
-            <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: 'none' }}>
-              <div className="space-y-1">
-                {menuItems.map(item => (
-                  <button
-                    key={item.id}
-                    onClick={item.onClick}
-                    className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-left hover:bg-white/[0.08] active:bg-white/[0.12] transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-white/[0.08] flex items-center justify-center shrink-0 group-hover:bg-white/[0.14] transition-colors">
-                      <AppIcon name={item.icon} size={20} className="text-white/80" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-white/90">{item.label}</p>
-                      <p className="text-[11px] text-white/40 leading-tight mt-0.5">{item.subtitle}</p>
-                    </div>
-                    <AppIcon name="ChevronRight" size={16} className="text-white/20 group-hover:text-white/40 transition-colors shrink-0" />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="px-4 py-2.5 border-t border-white/[0.06]">
-              <p className="text-[9px] text-white/25 text-center font-medium">
-                uma experiência <span className="font-bold text-white/40">Garden</span>
-              </p>
-            </div>
+            )}
           </div>
+          <h1 className="text-xl md:text-2xl font-bold text-foreground leading-tight text-center mt-4">{unit?.name || 'Bem-vindo'}</h1>
+        </div>
+
+        {/* Divider */}
+        <div className="mx-6 h-px bg-border/30" />
+
+        {/* Menu items - scrollable */}
+        <div className="flex-1 overflow-y-auto px-4 py-4" style={{ scrollbarWidth: 'none' }}>
+          <div className="space-y-1">
+            {menuItems.map(item => (
+              <button
+                key={item.id}
+                onClick={item.onClick}
+                className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-left hover:bg-card active:bg-card/80 transition-all group"
+              >
+                <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+                  <AppIcon name={item.icon} size={22} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] font-bold text-foreground">{item.label}</p>
+                  <p className="text-xs text-muted-foreground leading-tight mt-0.5">{item.subtitle}</p>
+                </div>
+                <AppIcon name="ChevronRight" size={18} className="text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors shrink-0" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-3 border-t border-border/20">
+          <p className="text-[10px] text-muted-foreground/50 text-center font-medium tracking-wide">
+            uma experiência <span className="font-bold text-muted-foreground/70">Garden</span>
+          </p>
+        </div>
+      </aside>
+
+      {/* ─── Right Hero Area ─── */}
+      <div className="flex-1 relative">
+        <img
+          src={bannerUrl || tabletHero}
+          alt="Hero"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+        {/* Pedido button - top right */}
+        <div className="absolute top-0 right-0 z-10 pr-5 pt-[max(env(safe-area-inset-top,12px),16px)]">
+          <button
+            onClick={() => navigate(`/tablet/${unitId}/bill?mesa=${mesa}`)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-xl hover:bg-white/10 transition-colors"
+          >
+            <AppIcon name="ShoppingBag" size={17} className="text-white/80" />
+            <span className="text-sm font-bold text-white">Pedido</span>
+          </button>
         </div>
       </div>
 
