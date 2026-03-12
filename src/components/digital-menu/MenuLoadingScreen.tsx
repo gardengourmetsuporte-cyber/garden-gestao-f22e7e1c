@@ -8,7 +8,7 @@ export function MenuLoadingScreen({ message = 'Carregando cardápio...' }: Props
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
        <div className="w-20 h-20 rounded-full overflow-hidden bg-white shadow-lg flex items-center justify-center animate-pulse" style={{ animationDuration: '2s' }}>
-         <img src={gardenLogo} alt="Garden" className="w-[70%] h-[70%] object-contain" />
+         <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain p-2" />
        </div>
       <div className="flex flex-col items-center gap-1.5">
         <p className="text-sm font-semibold text-foreground">{message}</p>

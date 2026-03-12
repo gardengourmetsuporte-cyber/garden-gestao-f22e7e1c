@@ -86,7 +86,7 @@ export function MenuLanding({ unit, unitInitials = '?', customerUser, onProfileC
             {logoUrl ? (
               <img src={logoUrl} alt={unit.name} className="w-full h-full object-cover" />
             ) : (
-              <img src={gardenLogo} alt="Garden" className="w-[70%] h-[70%] object-contain" />
+              <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain p-2" />
             )}
           </div>
           <div className="pb-1.5 min-w-0">

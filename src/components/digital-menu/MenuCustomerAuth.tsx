@@ -42,7 +42,7 @@ export function MenuCustomerAuth({ unitName, logoUrl, cuisineType, city, isOpen 
         {logoUrl ? (
           <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-cover" />
         ) : (
-          <img src={gardenLogo} alt="Garden" className="w-[70%] h-[70%] object-contain" />
+          <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain p-3" />
         )}
       </div>
 
