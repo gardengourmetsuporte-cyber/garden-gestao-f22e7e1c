@@ -200,7 +200,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                 className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 transition-all"
               >
                 <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
-                  <AppIcon name="WorkspacePremium" size={20} style={{ color: 'hsl(45 90% 55%)' }} />
+                  <AppIcon name="Diamond" size={20} style={{ color: 'hsl(45 90% 55%)' }} />
                 </div>
                 <span className="text-sm font-semibold text-foreground">Upgrade de Plano</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>FREE</span>
