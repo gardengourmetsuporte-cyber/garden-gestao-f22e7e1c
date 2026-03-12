@@ -78,6 +78,7 @@ export function BottomTabBar() {
         resolvedTabs.push({
           key: mod.key,
           icon: mod.icon,
+          customIcon: mod.customIcon,
           label: mod.label,
           path: mod.route,
           moduleKey: mod.key,
