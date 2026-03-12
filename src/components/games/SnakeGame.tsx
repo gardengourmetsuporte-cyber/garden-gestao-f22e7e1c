@@ -474,6 +474,9 @@ export function SnakeGame({ onBack, unitId }: Props) {
           </div>
         </div>
       )}
+      {showRanking && unitId && (
+        <GameRanking unitId={unitId} gameType="snake" accentColor="emerald" onClose={() => setShowRanking(false)} />
+      )}
     </div>
   );
 }
