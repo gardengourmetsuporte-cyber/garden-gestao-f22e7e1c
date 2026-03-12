@@ -38,7 +38,7 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Handshake', customIcon: '/icons/fornecedores.png', label: 'Fornecedores', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
 
   // ── Operação ──
-  { icon: 'ClipboardCheck', customIcon: '/icons/checklists.png', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'CheckCircle', customIcon: '/icons/checklists.png', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento de Caixa', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Truck', customIcon: '/icons/motocicleta.png', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },

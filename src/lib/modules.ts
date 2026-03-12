@@ -83,7 +83,7 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'checklists', label: 'Checklists', icon: 'ClipboardCheck', customIcon: '/icons/checklists.png', route: '/checklists', routes: ['/checklists'], group: 'Operação',
+    key: 'checklists', label: 'Checklists', icon: 'CheckCircle', customIcon: '/icons/checklists.png', route: '/checklists', routes: ['/checklists'], group: 'Operação',
     children: [
       { key: 'checklists.complete', label: 'Completar itens', icon: 'CheckSquare' },
       { key: 'checklists.manage', label: 'Gerenciar itens (admin)', icon: 'Settings' },
