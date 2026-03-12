@@ -70,7 +70,7 @@ export function AdminDashboard() {
       return (localStorage.getItem('dashboard-view') as DashboardView) || 'operational';
     } catch { return 'operational'; }
   });
-  const { pullDistance, refreshing, threshold } = usePullToRefresh([['dashboard-stats']]);
+  
 
   const isReady = !statsLoading && !modulesLoading && !!profile;
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
