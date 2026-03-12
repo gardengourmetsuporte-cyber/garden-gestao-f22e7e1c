@@ -436,7 +436,7 @@ const TabButton = forwardRef<
             weight={active ? 600 : 400}
             className={cn(
               "relative z-10 transition-colors duration-300",
-              active ? 'text-primary' : ''
+              active ? 'text-primary' : 'text-muted-foreground'
             )}
           />
         )}
