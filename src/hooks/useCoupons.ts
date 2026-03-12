@@ -19,8 +19,8 @@ export interface Coupon {
 }
 
 export function useCoupons() {
-  const { currentUnit } = useUnit();
-  const unitId = currentUnit?.id;
+  const { activeUnit } = useUnit();
+  const unitId = activeUnit?.id;
   const qc = useQueryClient();
 
   const query = useQuery({
@@ -32,7 +32,7 @@ export function useCoupons() {
         .eq('unit_id', unitId!)
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data as Coupon[];
+      return (data || []) as unknown as Coupon[];
     },
     enabled: !!unitId,
   });
@@ -40,10 +40,15 @@ export function useCoupons() {
   const create = useMutation({
     mutationFn: async (data: Partial<Coupon>) => {
       const { error } = await supabase.from('discount_coupons').insert({
-        ...data,
         unit_id: unitId!,
-        code: data.code?.toUpperCase(),
-      });
+        code: (data.code || '').toUpperCase(),
+        discount_type: data.discount_type || 'percentage',
+        discount_value: data.discount_value || 0,
+        min_order_value: data.min_order_value || 0,
+        max_uses: data.max_uses,
+        valid_until: data.valid_until,
+        is_active: true,
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -55,7 +60,7 @@ export function useCoupons() {
 
   const update = useMutation({
     mutationFn: async ({ id, ...data }: Partial<Coupon> & { id: string }) => {
-      const { error } = await supabase.from('discount_coupons').update(data).eq('id', id);
+      const { error } = await supabase.from('discount_coupons').update(data as any).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -86,7 +91,7 @@ export function useCoupons() {
 
     if (error || !data) return { valid: false, discount: 0, message: 'Cupom inválido' };
 
-    const coupon = data as Coupon;
+    const coupon = data as unknown as Coupon;
     const now = new Date();
     if (coupon.valid_until && new Date(coupon.valid_until) < now) return { valid: false, discount: 0, message: 'Cupom expirado' };
     if (coupon.max_uses && coupon.current_uses >= coupon.max_uses) return { valid: false, discount: 0, message: 'Cupom esgotado' };

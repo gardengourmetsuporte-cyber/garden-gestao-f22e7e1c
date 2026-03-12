@@ -21,9 +21,9 @@ export interface Reservation {
 }
 
 export function useReservations(date?: string) {
-  const { currentUnit } = useUnit();
+  const { activeUnit } = useUnit();
   const { user } = useAuth();
-  const unitId = currentUnit?.id;
+  const unitId = activeUnit?.id;
   const qc = useQueryClient();
 
   const query = useQuery({
@@ -33,13 +33,13 @@ export function useReservations(date?: string) {
         .from('reservations')
         .select('*')
         .eq('unit_id', unitId!)
-        .order('reservation_time');
+        .order('reservation_time' as any);
 
-      if (date) q = q.eq('reservation_date', date);
+      if (date) q = q.eq('reservation_date' as any, date);
 
       const { data, error } = await q;
       if (error) throw error;
-      return data as Reservation[];
+      return (data || []) as unknown as Reservation[];
     },
     enabled: !!unitId,
   });
@@ -47,10 +47,19 @@ export function useReservations(date?: string) {
   const create = useMutation({
     mutationFn: async (data: Partial<Reservation>) => {
       const { error } = await supabase.from('reservations').insert({
-        ...data,
         unit_id: unitId!,
         created_by: user?.id,
-      });
+        customer_name: data.customer_name!,
+        customer_phone: data.customer_phone,
+        customer_email: data.customer_email,
+        party_size: data.party_size || 2,
+        reservation_date: data.reservation_date!,
+        reservation_time: data.reservation_time!,
+        duration_minutes: data.duration_minutes || 120,
+        table_number: data.table_number,
+        notes: data.notes,
+        status: 'confirmed',
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -62,7 +71,7 @@ export function useReservations(date?: string) {
 
   const update = useMutation({
     mutationFn: async ({ id, ...data }: Partial<Reservation> & { id: string }) => {
-      const { error } = await supabase.from('reservations').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
+      const { error } = await supabase.from('reservations').update({ ...data, updated_at: new Date().toISOString() } as any).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {

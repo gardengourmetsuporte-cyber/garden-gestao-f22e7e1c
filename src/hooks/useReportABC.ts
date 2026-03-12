@@ -20,8 +20,8 @@ interface ABCSummary {
 }
 
 export function useReportABC(startDate: string, endDate: string) {
-  const { currentUnit } = useUnit();
-  const unitId = currentUnit?.id;
+  const { activeUnit } = useUnit();
+  const unitId = activeUnit?.id;
 
   return useQuery({
     queryKey: ['report-abc', unitId, startDate, endDate],

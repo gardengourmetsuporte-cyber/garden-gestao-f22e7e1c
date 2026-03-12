@@ -5,9 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export function useInventoryCounts() {
-  const { currentUnit } = useUnit();
+  const { activeUnit } = useUnit();
   const { user } = useAuth();
-  const unitId = currentUnit?.id;
+  const unitId = activeUnit?.id;
   const qc = useQueryClient();
 
   const countsQuery = useQuery({
@@ -27,29 +27,26 @@ export function useInventoryCounts() {
 
   const startCount = useMutation({
     mutationFn: async () => {
-      // Get all inventory items
       const { data: items } = await supabase
         .from('inventory_items')
         .select('id, current_stock')
         .eq('unit_id', unitId!)
         .is('deleted_at', null);
 
-      // Create count
       const { data: count, error } = await supabase
         .from('inventory_counts')
-        .insert({ unit_id: unitId!, created_by: user?.id, status: 'in_progress' })
+        .insert({ unit_id: unitId!, created_by: user?.id, status: 'in_progress' } as any)
         .select()
         .single();
       if (error) throw error;
 
-      // Create count items
       if (items?.length) {
         const countItems = items.map(item => ({
           count_id: count.id,
           item_id: item.id,
           system_stock: Number(item.current_stock || 0),
         }));
-        await supabase.from('inventory_count_items').insert(countItems);
+        await supabase.from('inventory_count_items').insert(countItems as any);
       }
 
       return count;
@@ -65,7 +62,7 @@ export function useInventoryCounts() {
     mutationFn: async ({ itemId, countedStock }: { itemId: string; countedStock: number }) => {
       const { error } = await supabase
         .from('inventory_count_items')
-        .update({ counted_stock: countedStock, counted_by: user?.id, counted_at: new Date().toISOString() })
+        .update({ counted_stock: countedStock, counted_by: user?.id, counted_at: new Date().toISOString() } as any)
         .eq('id', itemId);
       if (error) throw error;
     },
@@ -74,15 +71,13 @@ export function useInventoryCounts() {
 
   const completeCount = useMutation({
     mutationFn: async (countId: string) => {
-      // Get items with differences
       const { data: items } = await supabase
         .from('inventory_count_items')
         .select('item_id, counted_stock')
         .eq('count_id', countId)
         .not('counted_stock', 'is', null);
 
-      // Adjust stock for each
-      for (const item of items || []) {
+      for (const item of (items as any[]) || []) {
         await supabase
           .from('inventory_items')
           .update({ current_stock: item.counted_stock, updated_at: new Date().toISOString() })
@@ -90,14 +85,14 @@ export function useInventoryCounts() {
 
         await supabase
           .from('inventory_count_items')
-          .update({ adjusted: true })
+          .update({ adjusted: true } as any)
           .eq('count_id', countId)
           .eq('item_id', item.item_id);
       }
 
       await supabase
         .from('inventory_counts')
-        .update({ status: 'completed', completed_at: new Date().toISOString() })
+        .update({ status: 'completed', completed_at: new Date().toISOString() } as any)
         .eq('id', countId);
     },
     onSuccess: () => {
@@ -117,10 +112,23 @@ export function useCountItems(countId: string | null) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('inventory_count_items')
-        .select('*, inventory_items(name, category, unit_type)')
+        .select('*')
         .eq('count_id', countId!);
       if (error) throw error;
-      return data;
+      // Get item names separately
+      const itemIds = data?.map(d => (d as any).item_id) || [];
+      if (!itemIds.length) return [];
+      const { data: invItems } = await supabase
+        .from('inventory_items')
+        .select('id, name, category_id, unit_type')
+        .in('id', itemIds);
+      const nameMap = new Map(invItems?.map(i => [i.id, i]) || []);
+      return data?.map(d => ({
+        ...(d as any),
+        item_name: nameMap.get((d as any).item_id)?.name || '',
+        item_category: nameMap.get((d as any).item_id)?.category_id || '',
+        item_unit_type: String(nameMap.get((d as any).item_id)?.unit_type || 'unidade'),
+      })) || [];
     },
     enabled: !!countId,
   });

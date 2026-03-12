@@ -7,13 +7,12 @@ interface EmployeeSummary {
   name: string;
   role: string;
   total_payments: number;
-  hours_worked: number;
-  days_present: number;
+  base_salary: number;
 }
 
 export function useReportEmployees(month: number, year: number) {
-  const { currentUnit } = useUnit();
-  const unitId = currentUnit?.id;
+  const { activeUnit } = useUnit();
+  const unitId = activeUnit?.id;
 
   return useQuery({
     queryKey: ['report-employees', unitId, month, year],
@@ -22,7 +21,7 @@ export function useReportEmployees(month: number, year: number) {
 
       const { data: emps } = await supabase
         .from('employees')
-        .select('id, name, role')
+        .select('id, name, role, base_salary')
         .eq('unit_id', unitId)
         .eq('is_active', true)
         .is('deleted_at', null);
@@ -36,24 +35,9 @@ export function useReportEmployees(month: number, year: number) {
         .eq('reference_month', month)
         .eq('reference_year', year);
 
-      const { data: timeEntries } = await supabase
-        .from('time_entries')
-        .select('employee_id, hours_worked, date')
-        .eq('unit_id', unitId)
-        .gte('date', `${year}-${String(month).padStart(2, '0')}-01`)
-        .lte('date', `${year}-${String(month).padStart(2, '0')}-31`);
-
       const payMap = new Map<string, number>();
       payments?.forEach(p => {
         payMap.set(p.employee_id, (payMap.get(p.employee_id) || 0) + Number(p.amount || 0));
-      });
-
-      const hoursMap = new Map<string, { hours: number; days: Set<string> }>();
-      timeEntries?.forEach(t => {
-        const e = hoursMap.get(t.employee_id) || { hours: 0, days: new Set<string>() };
-        e.hours += Number(t.hours_worked || 0);
-        e.days.add(t.date);
-        hoursMap.set(t.employee_id, e);
       });
 
       const employees: EmployeeSummary[] = emps.map(e => ({
@@ -61,8 +45,7 @@ export function useReportEmployees(month: number, year: number) {
         name: e.name,
         role: e.role || '-',
         total_payments: payMap.get(e.id) || 0,
-        hours_worked: hoursMap.get(e.id)?.hours || 0,
-        days_present: hoursMap.get(e.id)?.days.size || 0,
+        base_salary: Number(e.base_salary || 0),
       }));
 
       return {

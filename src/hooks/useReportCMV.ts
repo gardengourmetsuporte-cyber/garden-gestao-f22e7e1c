@@ -27,8 +27,8 @@ interface CMVSummary {
 }
 
 export function useReportCMV(filters: CMVFilters) {
-  const { currentUnit } = useUnit();
-  const unitId = currentUnit?.id;
+  const { activeUnit } = useUnit();
+  const unitId = activeUnit?.id;
 
   return useQuery({
     queryKey: ['report-cmv', unitId, filters.startDate, filters.endDate],
@@ -49,7 +49,7 @@ export function useReportCMV(filters: CMVFilters) {
       const saleIds = sales.map(s => s.id);
       const totalRevenue = sales.reduce((s, v) => s + Number(v.total || 0), 0);
 
-      // Get sale items with product info
+      // Get sale items
       const { data: items } = await supabase
         .from('pos_sale_items')
         .select('product_id, product_name, quantity, total_price')
@@ -58,27 +58,41 @@ export function useReportCMV(filters: CMVFilters) {
 
       if (!items?.length) return { totalRevenue, totalCost: 0, grossMargin: totalRevenue, cmvPercent: 0, products: [] };
 
-      // Get recipes for these products
-      const productIds = [...new Set(items.map(i => i.product_id).filter(Boolean))];
-      const { data: recipes } = await supabase
-        .from('recipes')
-        .select('id, product_id, cost_per_portion')
-        .in('product_id', productIds);
+      // Get tablet products with recipe link
+      const productIds = [...new Set(items.map(i => i.product_id).filter(Boolean))] as string[];
+      const { data: tabletProducts } = await supabase
+        .from('tablet_products')
+        .select('id, recipe_id')
+        .in('id', productIds)
+        .not('recipe_id', 'is', null);
 
-      const costMap = new Map<string, number>();
-      recipes?.forEach(r => {
-        if (r.product_id) costMap.set(r.product_id, Number(r.cost_per_portion || 0));
+      const recipeIds = tabletProducts?.map(tp => tp.recipe_id).filter(Boolean) as string[] || [];
+      const productRecipeMap = new Map<string, string>();
+      tabletProducts?.forEach(tp => {
+        if (tp.recipe_id) productRecipeMap.set(tp.id, tp.recipe_id);
       });
+
+      // Get recipe costs
+      const costMap = new Map<string, number>();
+      if (recipeIds.length) {
+        const { data: recipes } = await supabase
+          .from('recipes')
+          .select('id, cost_per_portion')
+          .in('id', recipeIds);
+
+        recipes?.forEach(r => costMap.set(r.id, Number(r.cost_per_portion || 0)));
+      }
 
       // Aggregate by product
       const productMap = new Map<string, ProductCMV>();
       items.forEach(item => {
         const pid = item.product_id!;
-        const existing = productMap.get(pid);
+        const recipeId = productRecipeMap.get(pid);
+        const unitCost = recipeId ? (costMap.get(recipeId) || 0) : 0;
         const qty = Number(item.quantity || 1);
         const rev = Number(item.total_price || 0);
-        const unitCost = costMap.get(pid) || 0;
         const cost = unitCost * qty;
+        const existing = productMap.get(pid);
 
         if (existing) {
           existing.qty_sold += qty;
