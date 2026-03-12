@@ -32,6 +32,9 @@ const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ defaul
 const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
 const LazyQuickStats = lazy(() => import('./QuickStatsWidget').then(m => ({ default: m.QuickStatsWidget })));
 const LazyAnalytics = lazy(() => import('./AnalyticsWidget'));
+const LazyHeatmap = lazy(() => import('./SalesHeatmapWidget'));
+const LazyMonthComparison = lazy(() => import('./MonthComparisonWidget'));
+const LazyBreakEven = lazy(() => import('./BreakEvenWidget'));
 import { SalesGoalWidget } from './SalesGoalWidget';
 function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
