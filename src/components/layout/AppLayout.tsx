@@ -100,7 +100,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   >
                     <div className={cn(
                       "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-300",
-                      !isScrolled ? "w-6 h-6" : "w-8 h-8"
+                      !isScrolled ? "w-5 h-5" : "w-7 h-7"
                     )}>
                       <img alt="Garden Gestão" className="w-full h-full object-contain" src={customLogo || gardenLogo} fetchPriority="high" decoding="async" />
                     </div>
