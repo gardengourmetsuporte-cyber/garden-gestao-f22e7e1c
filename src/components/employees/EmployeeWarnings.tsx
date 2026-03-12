@@ -138,15 +138,96 @@ export function EmployeeWarnings() {
         </div>
       )}
 
+      {/* Reference: Infractions guide */}
+      <div className="space-y-2">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
+          Infrações previstas — CLT & Acordo Coletivo
+        </p>
+        {[
+          {
+            icon: 'schedule',
+            title: 'Atrasos e Faltas Injustificadas',
+            desc: 'Chegar atrasado sem justificativa ou faltar sem avisar/comprovar.',
+            warning: 'Verbal → Escrita → Suspensão',
+            cesta: 'Perde cesta com 3+ faltas injustificadas no mês',
+            color: 'text-amber-400',
+            bg: 'bg-amber-500/10',
+          },
+          {
+            icon: 'mood_bad',
+            title: 'Insubordinação / Indisciplina',
+            desc: 'Recusar ordens diretas do superior ou descumprir regras internas.',
+            warning: 'Escrita → Suspensão → Justa Causa (Art. 482, h)',
+            cesta: 'Perde cesta a partir da 1ª suspensão',
+            color: 'text-red-400',
+            bg: 'bg-red-500/10',
+          },
+          {
+            icon: 'no_food',
+            title: 'Desídia / Negligência',
+            desc: 'Desleixo no trabalho, tarefas malfeitas, checklist não executado.',
+            warning: 'Verbal → Escrita (Art. 482, e)',
+            cesta: 'Perde cesta após 2 advertências escritas no mês',
+            color: 'text-orange-400',
+            bg: 'bg-orange-500/10',
+          },
+          {
+            icon: 'clean_hands',
+            title: 'Higiene e Segurança Alimentar',
+            desc: 'Não usar EPI, falta de higiene pessoal, contaminação cruzada.',
+            warning: 'Escrita imediata → Suspensão',
+            cesta: 'Perde cesta na 1ª ocorrência grave (Vigilância Sanitária)',
+            color: 'text-cyan-400',
+            bg: 'bg-cyan-500/10',
+          },
+          {
+            icon: 'phone_android',
+            title: 'Uso de Celular em Serviço',
+            desc: 'Uso de celular durante o expediente sem autorização.',
+            warning: 'Verbal → Escrita',
+            cesta: 'Perde cesta após 3 advertências verbais',
+            color: 'text-violet-400',
+            bg: 'bg-violet-500/10',
+          },
+          {
+            icon: 'local_bar',
+            title: 'Embriaguez / Substâncias em Serviço',
+            desc: 'Estar sob efeito de álcool ou drogas durante o trabalho.',
+            warning: 'Suspensão imediata → Justa Causa (Art. 482, f)',
+            cesta: 'Perde cesta imediatamente',
+            color: 'text-rose-400',
+            bg: 'bg-rose-500/10',
+          },
+        ].map((item, i) => (
+          <div key={i} className="bg-card/60 border border-border/30 rounded-xl p-3 space-y-1.5">
+            <div className="flex items-center gap-2">
+              <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', item.bg)}>
+                <AppIcon name={item.icon} size={18} className={item.color} />
+              </div>
+              <p className="text-sm font-semibold leading-tight">{item.title}</p>
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
+            <div className="flex flex-col gap-0.5">
+              <p className="text-[10px] text-amber-400/90">
+                <span className="font-semibold">⚠️ Progressão:</span> {item.warning}
+              </p>
+              <p className="text-[10px] text-red-400/90">
+                <span className="font-semibold">🧺 Cesta básica:</span> {item.cesta}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Warnings list */}
       {visibleWarnings.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border border-dashed border-border/30 bg-card/20">
-          <div className="w-16 h-16 rounded-2xl bg-muted/20 flex items-center justify-center mb-4">
-            <AppIcon name="verified_user" size={32} className="text-muted-foreground/20" />
+        <div className="flex flex-col items-center justify-center py-12 text-center rounded-2xl border border-dashed border-border/30 bg-card/20">
+          <div className="w-12 h-12 rounded-2xl bg-muted/20 flex items-center justify-center mb-3">
+            <AppIcon name="verified_user" size={28} className="text-muted-foreground/20" />
           </div>
-          <p className="text-sm font-semibold text-muted-foreground">Nenhuma advertência</p>
-          <p className="text-xs text-muted-foreground/50 mt-1.5 max-w-[220px] leading-relaxed">
-            Registros de advertências aparecerão aqui
+          <p className="text-sm font-semibold text-muted-foreground">Nenhuma advertência registrada</p>
+          <p className="text-xs text-muted-foreground/50 mt-1 max-w-[220px] leading-relaxed">
+            Registros aparecerão aqui
           </p>
         </div>
       ) : (
