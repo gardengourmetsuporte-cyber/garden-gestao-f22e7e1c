@@ -47,9 +47,9 @@ export default function DigitalMenu() {
   const [showAuth, setShowAuth] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState<MenuTab | null>(null);
-  // Gate: show auth screen on first visit (no session & hasn't skipped)
+  // Gate: show auth screen on first visit (use sessionStorage so it shows each new session)
   const [authGatePassed, setAuthGatePassed] = useState(() => {
-    return localStorage.getItem(`dm_auth_skipped_${unitId}`) === '1';
+    return sessionStorage.getItem(`dm_auth_skipped_${unitId}`) === '1';
   });
 
   // Check auth state on mount
@@ -291,7 +291,7 @@ export default function DigitalMenu() {
   if (authChecked && !customerUser && !authGatePassed) {
     const handleSkipGate = () => {
       setAuthGatePassed(true);
-      localStorage.setItem(`dm_auth_skipped_${unitId}`, '1');
+      sessionStorage.setItem(`dm_auth_skipped_${unitId}`, '1');
     };
     return (
       <MenuCustomerAuth
@@ -319,7 +319,7 @@ export default function DigitalMenu() {
     .toUpperCase() || '?';
 
   return (
-    <div className="min-h-[100dvh] bg-background max-w-4xl mx-auto relative">
+    <div className="min-h-[100dvh] bg-background max-w-4xl mx-auto relative lg:max-w-5xl">
       {/* Auth modal (sheet overlay) */}
       {showAuth && (
         <MenuCustomerAuth
@@ -409,17 +409,15 @@ export default function DigitalMenu() {
             </div>
           )}
 
-          {/* Full menu listing */}
-          <div className="mt-5">
-            <MenuProductList
-              categories={categories}
-              groups={groups}
-              products={products}
-              getGroupProducts={getGroupProducts}
-              selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
-              onSelectProduct={handleProductSelect}
-            />
+          {/* CTA to open full menu */}
+          <div className="mt-6 px-5 md:px-8 pb-4">
+            <button
+              onClick={() => setActiveTab('menu')}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-primary/10 text-primary text-sm font-semibold active:scale-[0.98] transition-transform border border-primary/20"
+            >
+              <AppIcon name="RestaurantMenu" size={18} />
+              Ver cardápio completo
+            </button>
           </div>
         </div>
       )}
