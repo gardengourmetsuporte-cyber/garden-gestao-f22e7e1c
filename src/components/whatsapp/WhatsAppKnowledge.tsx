@@ -55,11 +55,11 @@ export function WhatsAppKnowledge() {
   };
 
   return (
-    <div className="px-4 py-4 space-y-4 max-w-3xl mx-auto">
+    <div className="px-4 py-4 space-y-4 max-w-3xl mx-auto pb-24">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
             <AppIcon name="BookOpen" className="w-4 h-4 text-primary" />
           </div>
           <div>
@@ -68,13 +68,13 @@ export function WhatsAppKnowledge() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" className="rounded-xl gap-1.5" onClick={() => setShowSuggestions(!showSuggestions)}>
+          <Button size="sm" variant="outline" className="rounded-xl gap-1.5 flex-1" onClick={() => setShowSuggestions(!showSuggestions)}>
             <AppIcon name="Lightbulb" className="w-3.5 h-3.5" />
             Sugestões
           </Button>
-          <Button size="sm" className="rounded-xl gap-1.5" onClick={openNew}>
+          <Button size="sm" className="rounded-xl gap-1.5 flex-1" onClick={openNew}>
             <AppIcon name="Plus" className="w-3.5 h-3.5" />
-            Novo
+            Novo Artigo
           </Button>
         </div>
       </div>
