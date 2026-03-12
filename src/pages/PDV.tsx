@@ -253,29 +253,33 @@ export default function PDV() {
            <SyncStatusIndicator />
           </div>
 
-          {/* Categories - Dropdown */}
-          <div className="relative">
+          {/* Categories - Compact horizontal pills */}
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-3 px-3 pb-1">
             <button
-              onClick={() => {
-                const el = document.getElementById('pdv-cat-select');
-                if (el) (el as HTMLSelectElement).showPicker?.();
-              }}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-card/80 border border-border/30 text-sm font-semibold text-foreground transition-all active:scale-[0.99]"
+              onClick={() => setSelectedCategory(null)}
+              className={cn(
+                'shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 touch-manipulation',
+                !selectedCategory
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'bg-muted/40 text-muted-foreground active:scale-95'
+              )}
             >
-              <span className="truncate">{selectedCategory || 'Todas as categorias'}</span>
-              <AppIcon name="ChevronDown" size={16} className="text-muted-foreground shrink-0" />
+              Todos
             </button>
-            <select
-              id="pdv-cat-select"
-              value={selectedCategory || ''}
-              onChange={(e) => setSelectedCategory(e.target.value || null)}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            >
-              <option value="">Todas as categorias</option>
-              {pos.categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+            {pos.categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
+                className={cn(
+                  'shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all duration-200 whitespace-nowrap touch-manipulation',
+                  cat === selectedCategory
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-muted/40 text-muted-foreground active:scale-95'
+                )}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
 
