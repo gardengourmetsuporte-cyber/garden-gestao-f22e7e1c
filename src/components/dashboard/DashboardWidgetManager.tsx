@@ -30,12 +30,21 @@ const restrictToVerticalAxis: Modifier = ({ transform }) => ({
   x: 0,
 });
 
+type DashboardView = 'operational' | 'financial' | 'team';
+
+const VIEW_WIDGETS: Record<DashboardView, Set<string>> = {
+  operational: new Set(['checklist', 'quick-stats', 'calendar', 'multi-unit']),
+  financial: new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']),
+  team: new Set(['leaderboard']),
+};
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   widgets: DashboardWidget[];
   onSave: (widgets: DashboardWidget[]) => void;
   onReset: () => void;
+  currentView?: DashboardView;
 }
 
 function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWidget; onToggle: (key: string) => void; isDragActive: boolean }) {
@@ -86,7 +95,7 @@ function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWid
   );
 }
 
-export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, onReset }: Props) {
+export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, onReset, currentView = 'operational' }: Props) {
   const [draft, setDraft] = useState<DashboardWidget[]>(widgets);
   const [isDragActive, setIsDragActive] = useState(false);
 
@@ -162,7 +171,7 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
           autoScroll={true}
           modifiers={[restrictToVerticalAxis]}
         >
-          <SortableContext items={draft.map(w => w.key)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={draft.filter(w => VIEW_WIDGETS[currentView]?.has(w.key)).map(w => w.key)} strategy={verticalListSortingStrategy}>
             <div
               data-vaul-no-drag
               style={{ touchAction: isDragActive ? 'none' : 'pan-y' }}
@@ -170,7 +179,7 @@ export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, on
                 "space-y-2 max-h-[50vh] overflow-y-auto overscroll-contain pr-1"
               )}
             >
-              {draft.map(widget => (
+              {draft.filter(w => VIEW_WIDGETS[currentView]?.has(w.key)).map(widget => (
                 <SortableItem key={widget.key} widget={widget} onToggle={handleToggle} isDragActive={isDragActive} />
               ))}
             </div>

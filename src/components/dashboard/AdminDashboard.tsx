@@ -296,6 +296,7 @@ export function AdminDashboard() {
         widgets={widgets}
         onSave={setWidgets}
         onReset={resetDefaults}
+        currentView={view}
       />
 
       <GuidedTour />
