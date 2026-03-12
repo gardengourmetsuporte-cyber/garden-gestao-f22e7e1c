@@ -96,6 +96,9 @@ const TabletRodizio = lazy(() => lazyRetry(() => import("./pages/TabletRodizio")
 const TabletBill = lazy(() => lazyRetry(() => import("./pages/TabletBill")));
 const KDS = lazy(() => lazyRetry(() => import("./pages/KDS")));
 const TabletGames = lazy(() => lazyRetry(() => import("./pages/TabletGames")));
+const TabletReview = lazy(() => lazyRetry(() => import("./pages/TabletReview")));
+const TabletMural = lazy(() => lazyRetry(() => import("./pages/TabletMural")));
+const Reviews = lazy(() => lazyRetry(() => import("./pages/Reviews")));
 const Notifications = lazy(() => lazyRetry(() => import("./pages/Notifications")));
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
 const ShareReceiptHandler = lazy(() => lazyRetry(() => import("./pages/ShareReceiptHandler")));
