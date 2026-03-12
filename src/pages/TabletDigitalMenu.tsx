@@ -216,41 +216,41 @@ export default function TabletDigitalMenu() {
       {/* ─── Main: Sidebar + Products + Cart Panel ─── */}
       <div className="flex flex-1 overflow-hidden">
         {/* Fixed sidebar */}
-        <aside className="w-44 lg:w-48 flex flex-col border-r border-border/20 bg-card/40 shrink-0">
-          {/* Logo at top of sidebar */}
-          <div className="px-4 pt-4 pb-3 border-b border-border/15 shrink-0">
-            <div className="w-14 h-14 rounded-full overflow-hidden border border-border/20 bg-white flex items-center justify-center mx-auto shadow-sm">
+        <aside className="w-52 lg:w-56 flex flex-col border-r border-border/20 bg-card/30 shrink-0 h-full overflow-hidden">
+          {/* Logo */}
+          <div className="px-5 pt-5 pb-4 shrink-0 flex justify-center">
+            <div className="w-12 h-12 rounded-full overflow-hidden border border-border/20 bg-white flex items-center justify-center shadow-sm">
               {logoUrl ? (
                 <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
               ) : (
-                <img src={gardenLogo} alt="Garden" className="w-10 h-10 object-contain" />
+                <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain p-1.5" />
               )}
             </div>
           </div>
 
-          {/* Back to home */}
+          {/* Back */}
           <button
             onClick={() => navigate(`/tablet/${unitId}?mesa=${mesa}`)}
-            className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-colors shrink-0 border-b border-border/10"
+            className="flex items-center gap-2 mx-3 mb-2 px-3 py-2 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors shrink-0"
           >
             <AppIcon name="ChevronLeft" size={14} />
             <span>Voltar</span>
           </button>
 
-          {/* Category list */}
-          <nav className="flex-1 overflow-y-auto py-1">
+          {/* Category list - no scrollbar, fit content */}
+          <nav className="flex-1 px-2 pb-4 overflow-hidden">
             {categories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 className={cn(
-                  'w-full flex items-center gap-2.5 px-4 py-3 text-left transition-all',
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all mb-0.5',
                   activeCategory === cat.id
-                    ? 'bg-primary/10 text-primary border-r-[3px] border-primary font-bold'
+                    ? 'bg-primary/15 text-primary font-bold shadow-sm'
                     : 'text-muted-foreground hover:bg-secondary/40 hover:text-foreground'
                 )}
               >
-                {cat.icon && <AppIcon name={cat.icon} size={16} className="shrink-0" />}
+                {cat.icon && <AppIcon name={cat.icon} size={17} className="shrink-0" />}
                 <span className="text-[13px] leading-tight truncate">{cat.name}</span>
               </button>
             ))}
