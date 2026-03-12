@@ -225,6 +225,7 @@ function PublicRoutes() {
         <Route path="/tablet/:unitId/rodizio" element={<TabletRodizio />} />
         <Route path="/tablet/:unitId/bill" element={<TabletBill />} />
         <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
+        <Route path="/tablet/:unitId/games" element={<TabletGames />} />
         <Route path="/kds/:unitId" element={<KDS />} />
         <Route path="/gamification/:unitId" element={<DigitalMenu />} />
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
