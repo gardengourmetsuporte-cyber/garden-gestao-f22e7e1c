@@ -137,6 +137,7 @@ export default function TabletHome() {
   const initialMesa = mesaParam || storedMesa || null;
   const [mesa, setMesa] = useState<string | null>(initialMesa);
   const [showConfig, setShowConfig] = useState(!initialMesa);
+  const [activeGame, setActiveGame] = useState<string | null>(null);
 
   // Persist mesa and unitId on first load
   useEffect(() => {
