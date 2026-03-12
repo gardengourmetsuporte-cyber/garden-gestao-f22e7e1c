@@ -50,6 +50,7 @@ export default function PDV() {
   const [saleSourceAction, setSaleSourceAction] = useState<'send' | 'charge'>('send');
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingNotes, setEditingNotes] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<POSProduct | null>(null);
   const [invoiceData, setInvoiceData] = useState<{
     saleId: string;
     total: number;
