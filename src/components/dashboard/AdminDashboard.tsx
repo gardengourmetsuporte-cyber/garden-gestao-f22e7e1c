@@ -54,6 +54,7 @@ export function AdminDashboard() {
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { widgets, setWidgets, resetDefaults } = useDashboardWidgets();
   const [managerOpen, setManagerOpen] = useState(false);
+  const { pullDistance, refreshing, threshold } = usePullToRefresh([['dashboard-stats']]);
 
   const isReady = !statsLoading && !modulesLoading && !!profile;
 
