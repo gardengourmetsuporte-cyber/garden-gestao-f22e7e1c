@@ -17,7 +17,7 @@ const CardapioSettings = lazy(() =>
 const LINKS_DATA = [
   { key: 'public', icon: 'Globe', label: 'Cardápio Digital', buildPath: (unitId: string) => `/m/${unitId}` },
   { key: 'qrcode', icon: 'QrCode', label: 'QR Code Balcão', buildPath: (unitId: string) => `/m/${unitId}?source=qrcode` },
-  { key: 'tablet', icon: 'Tablet', label: 'Cardápio Tablet', buildPath: (unitId: string) => `/tablet/${unitId}/menu?mesa=1` },
+  { key: 'tablet', icon: 'Tablet', label: 'Cardápio Tablet', buildPath: (unitId: string) => `/tablet/${unitId}` },
   { key: 'kds', icon: 'ChefHat', label: 'KDS - Cozinha', buildPath: (unitId: string) => `/kds/${unitId}` },
 ] as const;
 
