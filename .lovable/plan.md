@@ -1,79 +1,65 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Auditoria: Bugs e Problemas Encontrados
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+Revisei todos os arquivos das telas de Servico, Equipe, Financeiro e o Dashboard principal. Aqui estao os problemas identificados:
+
+### 1. Bug: `now` nao esta no array de dependencias do `useMemo` (useServiceDashboard.ts)
+
+Nas linhas 142, 152-158 e 175-181, `now` e criado fora do `useMemo` mas usado dentro dele sem estar nas dependencias. Isso faz com que `minutesAgo` fique congelado e nao atualize. Correcao: mover `new Date()` para dentro dos useMemo ou usar `refetchInterval` para forcar recalculo.
+
+### 2. Bug: `awarded_points !== false` esta errado (useTeamDashboard.ts, linha 110)
+
+A condicao `c.awarded_points !== false` compara um campo numerico/null com `false`, o que e sempre `true`. Deveria ser `c.awarded_points !== 0` ou `c.points_awarded > 0`.
+
+### 3. Icone "Target" com nome Lucide em vez de Material Symbols (SalesGoalWidget.tsx, linha 48)
+
+`AppIcon name="Target"` usa nome Lucide. O AppIcon funciona com Material Symbols Rounded. O correto seria `flag_circle` ou `target` (minusculo, se mapeado no ICON_MAP). Precisa verificar se "Target" esta no ICON_MAP, senao mostra texto "Target" em vez de icone.
+
+### 4. Icone "Settings" com nome Lucide (AdminDashboard.tsx, linha 278)
+
+`AppIcon name="Settings"` — precisa verificar se esta no ICON_MAP. O Material Symbols usa `settings` (minusculo).
+
+### 5. Icone "GripVertical" com nome Lucide (DashboardWidgetManager.tsx, linha 83)
+
+`AppIcon name="GripVertical"` — nome Lucide. Deveria ser `drag_indicator` ou verificar o ICON_MAP.
+
+### 6. Widget Manager mostra lista vazia na aba "Servico"
+
+`VIEW_WIDGETS.service` e `new Set([])` — vazio. Quando o usuario abre "Gerenciar tela inicial" na aba Servico, ve uma lista vazia sem nenhuma opcao.
+
+### 7. Imports nao utilizados (AdminDashboard.tsx)
+
+- `DashboardKPIGrid` (linha 12) — importado mas nunca usado
+- `AIInsightsWidget` (linha 16) — lazy importado mas nunca renderizado
+- `PendingOrdersWidget` (linha 17) — lazy importado mas nunca renderizado
+- `LazyChecklist` (linha 27) — lazy importado mas nunca renderizado
+- `LazyAutoOrder` (linha 30) — lazy importado mas nunca renderizado
+- `LazyCashFlow` (linha 31) — lazy importado mas nunca renderizado
+
+### 8. Linha em branco extra (AdminDashboard.tsx, linhas 75-76 e 186-187)
+
+Duas linhas em branco consecutivas apos o state e dentro do return, nao e um bug funcional mas e inconsistencia de formatacao.
 
 ---
 
-## Bloco de Relatórios Avançados ✅
+### Plano de Correcoes
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+**Arquivo: `src/hooks/useServiceDashboard.ts`**
+- Mover `new Date()` para dentro dos callbacks `useMemo` de `orders` e `hubActive`
 
-## Dashboard Analytics ✅
+**Arquivo: `src/hooks/useTeamDashboard.ts`**
+- Corrigir `c.awarded_points !== false` para `c.points_awarded > 0`
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+**Arquivo: `src/components/dashboard/SalesGoalWidget.tsx`**
+- Trocar `AppIcon name="Target"` para `name="flag_circle"` (ou verificar ICON_MAP)
 
-## Operacional ✅
+**Arquivo: `src/components/dashboard/AdminDashboard.tsx`**
+- Trocar `AppIcon name="Settings"` para `name="settings"` (Material Symbols)
+- Remover imports nao utilizados (`DashboardKPIGrid`, `AIInsightsWidget`, `PendingOrdersWidget`, `LazyChecklist`, `LazyAutoOrder`, `LazyCashFlow`)
+- Limpar linhas em branco extras
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+**Arquivo: `src/components/dashboard/DashboardWidgetManager.tsx`**
+- Trocar `AppIcon name="GripVertical"` para `name="drag_indicator"`
+- Esconder o botao "Gerenciar tela inicial" ou mostrar mensagem quando a view nao tem widgets configuraveis (service)
 
-## CRM / Clientes ✅
-
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
-
-## Funcionários ✅
-
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
