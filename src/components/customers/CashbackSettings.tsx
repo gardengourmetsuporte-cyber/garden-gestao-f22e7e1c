@@ -13,7 +13,45 @@ import { Coins, Plus, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 export function CashbackSettings() {
-  const { loyaltyRules, createRule, updateRule, deleteRule } = useCustomerCRM();
+  const { activeUnit } = useUnit();
+  const unitId = activeUnit?.id;
+  const qc = useQueryClient();
+
+  const { data: loyaltyRules = [] } = useQuery({
+    queryKey: ['loyalty_rules', unitId],
+    queryFn: async () => {
+      if (!unitId) return [];
+      const { data, error } = await supabase.from('loyalty_rules').select('*').eq('unit_id', unitId).order('created_at');
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!unitId,
+  });
+
+  const createRule = useMutation({
+    mutationFn: async (input: any) => {
+      if (!unitId) throw new Error('Sem unidade');
+      const { error } = await supabase.from('loyalty_rules').insert({ unit_id: unitId, ...input });
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['loyalty_rules', unitId] }); },
+  });
+
+  const updateRule = useMutation({
+    mutationFn: async ({ id, ...input }: any) => {
+      const { error } = await supabase.from('loyalty_rules').update(input).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['loyalty_rules', unitId] }); },
+  });
+
+  const deleteRule = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('loyalty_rules').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['loyalty_rules', unitId] }); },
+  });
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     rule_type: 'points_per_real' as string,
