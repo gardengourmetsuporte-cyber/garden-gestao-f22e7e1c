@@ -532,8 +532,8 @@ export default function TabletHome() {
   const bannerUrl = unit?.store_info?.banner_url;
 
   // ─── Fullscreen Game ───
-  if (activeGame === 'snake') return <SnakeGame onBack={() => setActiveGame(null)} />;
-  if (activeGame === 'memory') return <MemoryGame onBack={() => setActiveGame(null)} />;
+  if (activeGame === 'snake') return <SnakeGame onBack={() => setActiveGame(null)} unitId={unitId} />;
+  if (activeGame === 'memory') return <MemoryGame onBack={() => setActiveGame(null)} unitId={unitId} />;
 
   // Check if a right panel is active
   const hasRightPanel = activePanel !== null;

@@ -2601,6 +2601,51 @@ export type Database = {
           },
         ]
       }
+      game_scores: {
+        Row: {
+          created_at: string
+          customer_id: string
+          game_type: string
+          id: string
+          metadata: Json | null
+          score: number
+          unit_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          game_type: string
+          id?: string
+          metadata?: Json | null
+          score?: number
+          unit_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          game_type?: string
+          id?: string
+          metadata?: Json | null
+          score?: number
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_scores_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_scores_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gamification_plays: {
         Row: {
           customer_name: string | null

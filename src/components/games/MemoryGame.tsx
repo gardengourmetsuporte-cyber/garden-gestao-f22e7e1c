@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useGameScore } from '@/hooks/useGameScore';
+import { GameRanking } from './GameRanking';
+import { Trophy } from 'lucide-react';
 
 interface Props {
   onBack: () => void;
+  unitId?: string;
 }
 
 const CARD_ITEMS = ['🍔', '🍟', '🍕', '🌭', '🥤', '🧁', '🍗', '🥪'];
@@ -34,7 +38,9 @@ function createBoard(pairs: number): Card[] {
   }));
 }
 
-export function MemoryGame({ onBack }: Props) {
+export function MemoryGame({ onBack, unitId }: Props) {
+  const { saveScore } = useGameScore(unitId);
+  const [showRanking, setShowRanking] = useState(false);
   const [cards, setCards] = useState<Card[]>(() => createBoard(8));
   const [selected, setSelected] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
@@ -96,12 +102,15 @@ export function MemoryGame({ onBack }: Props) {
           lockRef.current = false;
 
           if (newMatches === totalPairs) {
+            const finalMoves = moves + 1; // current move
             setGameState('won');
             if (timerRef.current) clearInterval(timerRef.current);
             if (!bestTime || timer < bestTime) {
               setBestTime(timer);
               try { localStorage.setItem('garden_memory_best', String(timer)); } catch {}
             }
+            // Save to ranking (fewer moves = better)
+            saveScore('memory', finalMoves, { time: timer });
           }
         }, 400);
       } else {
@@ -130,7 +139,9 @@ export function MemoryGame({ onBack }: Props) {
             🧠 Memory <span className="text-amber-400">Garden</span>
           </h1>
         </div>
-        <div className="w-9" />
+        <button onClick={() => setShowRanking(true)} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+          <Trophy size={18} className="text-amber-400" />
+        </button>
       </div>
 
       {/* Score bar */}
@@ -214,6 +225,9 @@ export function MemoryGame({ onBack }: Props) {
           )}
         </div>
       </div>
+      {showRanking && unitId && (
+        <GameRanking unitId={unitId} gameType="memory" accentColor="amber" onClose={() => setShowRanking(false)} />
+      )}
     </div>
   );
 }
