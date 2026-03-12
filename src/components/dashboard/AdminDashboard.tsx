@@ -20,8 +20,6 @@ import { UpgradeBanner } from './UpgradeBanner';
 import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { FinanceSkeleton, QuickStatsSkeleton, LeaderboardSkeleton, CalendarSkeleton, GenericWidgetSkeleton } from '@/components/ui/widget-skeleton';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh';
 import { cn } from '@/lib/utils';
 
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
@@ -71,7 +69,7 @@ export function AdminDashboard() {
       return (localStorage.getItem('dashboard-view') as DashboardView) || 'operational';
     } catch { return 'operational'; }
   });
-  const { pullDistance, refreshing, threshold } = usePullToRefresh([['dashboard-stats']]);
+  
 
   const isReady = !statsLoading && !modulesLoading && !!profile;
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
@@ -190,8 +188,6 @@ export function AdminDashboard() {
   return (
     <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto">
 
-      {/* Pull to Refresh indicator */}
-      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} threshold={threshold} />
 
       {/* Greeting */}
       <DashboardContextBar firstName={firstName} stats={stats} />
