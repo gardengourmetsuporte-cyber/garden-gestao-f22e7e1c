@@ -124,7 +124,7 @@ export function AdminDashboard() {
       case 'quick-stats':
         return (
           <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
-            <LazyWidget><LazyQuickStats /></LazyWidget>
+            <LazyWidget fallback={<QuickStatsSkeleton />}><LazyQuickStats /></LazyWidget>
           </div>
         );
 
