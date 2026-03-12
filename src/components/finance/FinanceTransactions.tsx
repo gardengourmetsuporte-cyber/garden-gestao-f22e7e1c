@@ -11,6 +11,7 @@ import { TransactionFilters, TransactionFiltersState } from './TransactionFilter
 import { FinanceCategory, FinanceAccount } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import { exportTransactionsCsv } from '@/lib/exportPdf';
+import { exportTransactionsExcel } from '@/lib/exportExcel';
 import {
   DndContext,
   DragEndEvent,
