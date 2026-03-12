@@ -9,6 +9,7 @@ export interface ModuleDef {
   key: string;
   label: string;
   icon: string;
+  customIcon?: string;
   route: string;
   /** Routes that belong to this module (for route protection) */
   routes: string[];
