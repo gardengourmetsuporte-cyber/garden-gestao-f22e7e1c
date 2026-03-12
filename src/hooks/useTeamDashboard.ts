@@ -107,7 +107,7 @@ export function useTeamDashboard(): TeamDashboardData {
         pointsByDate.set(format(subDays(new Date(), i), 'yyyy-MM-dd'), 0);
       }
       (trendCompletions || []).forEach(c => {
-        if (c.awarded_points !== false) {
+        if (c.awarded_points === true) {
           const current = pointsByDate.get(c.date) || 0;
           pointsByDate.set(c.date, current + (c.points_awarded || 0));
         }

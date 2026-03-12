@@ -35,7 +35,7 @@ type DashboardView = 'operational' | 'financial' | 'service' | 'team';
 const VIEW_WIDGETS: Record<DashboardView, Set<string>> = {
   operational: new Set(['checklist', 'quick-stats', 'calendar', 'multi-unit']),
   financial: new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']),
-  service: new Set([]),
+  service: new Set(['service-placeholder']),
   team: new Set(['leaderboard']),
 };
 
