@@ -21,7 +21,7 @@ export function useReportEmployees(month: number, year: number) {
 
       const { data: emps } = await supabase
         .from('employees')
-        .select('id, name, role, base_salary')
+        .select('id, full_name, role, base_salary')
         .eq('unit_id', unitId)
         .eq('is_active', true)
         .is('deleted_at', null);
