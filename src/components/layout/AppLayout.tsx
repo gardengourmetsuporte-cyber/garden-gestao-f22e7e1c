@@ -96,7 +96,6 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                         ? "h-8 bg-card border border-border/50 shadow-sm pl-1.5 pr-3 gap-2"
                         : "h-7 w-7 bg-transparent p-0 justify-center"
                     )}
-                    )}
                   >
                     <div className={cn(
                       "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-300",
