@@ -152,17 +152,13 @@ function ProductCard({ product, onSelect }: { product: DMProduct; onSelect: (p: 
         </div>
       </div>
 
-      {product.image_url ? (
+      {product.image_url && (
         <img
           src={product.image_url}
           alt={product.name}
           className="w-[88px] h-[88px] rounded-xl object-cover shrink-0 group-hover:scale-105 transition-transform"
           loading="lazy"
         />
-      ) : (
-        <div className="w-[88px] h-[88px] rounded-xl bg-secondary/60 flex items-center justify-center shrink-0">
-          <AppIcon name="Image" size={24} className="text-muted-foreground/30" />
-        </div>
       )}
     </button>
   );
