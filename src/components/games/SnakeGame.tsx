@@ -83,7 +83,9 @@ interface Props {
   unitId?: string;
 }
 
-export function SnakeGame({ onBack }: Props) {
+export function SnakeGame({ onBack, unitId }: Props) {
+  const { saveScore } = useGameScore(unitId);
+  const [showRanking, setShowRanking] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'gameover'>('menu');
   const [score, setScore] = useState(0);
