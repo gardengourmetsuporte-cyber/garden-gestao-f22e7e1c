@@ -453,6 +453,17 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             </div>
           </div>
         )}
+
+        {/* Payment method selector */}
+        {!payWithCoins && (
+          <div className="px-4 pb-3">
+            <PaymentMethodSelector
+              selected={paymentOption}
+              onChange={setPaymentOption}
+              asaasActive={asaasActive}
+            />
+          </div>
+        )}
       </div>
 
       {/* ─── Sticky Bottom Actions (Goomer-style) ─── */}
@@ -474,7 +485,11 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           ) : (
             <AppIcon name="Send" size={18} className="mr-2" />
           )}
-          {payWithCoins ? `Pagar com ${coinTotal} moedas` : 'Enviar pedido'}
+          {payWithCoins
+            ? `Pagar com ${coinTotal} moedas`
+            : paymentOptionToBillingType(paymentOption)
+              ? 'Enviar e pagar online'
+              : 'Enviar pedido'}
         </Button>
       </div>
 
@@ -488,6 +503,26 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             toast.success(`Comanda #${num} escaneada!`);
           }}
           onCancel={() => setShowScanner(false)}
+        />
+      )}
+
+      {/* Online Payment Sheet */}
+      {showOnlinePayment && pendingOrderId && pendingOrderNumber && (
+        <OnlinePaymentSheet
+          orderId={pendingOrderId}
+          orderNumber={pendingOrderNumber}
+          total={cartTotal}
+          unitId={unitId}
+          billingType={paymentOptionToBillingType(paymentOption)!}
+          onPaymentConfirmed={() => {
+            setShowOnlinePayment(false);
+            setOrderSent(pendingOrderNumber);
+          }}
+          onCancel={() => {
+            setShowOnlinePayment(false);
+            setPendingOrderId(null);
+            setPendingOrderNumber(null);
+          }}
         />
       )}
     </div>
