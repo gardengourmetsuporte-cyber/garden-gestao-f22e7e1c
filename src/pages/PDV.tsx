@@ -2,6 +2,7 @@ import { useState, useRef, useMemo, useCallback } from 'react';
 import { useFabActions } from '@/contexts/FabActionContext';
 import { useIfoodScanner } from '@/hooks/useIfoodScanner';
 import { IfoodScannerSheet } from '@/components/pdv/IfoodScannerSheet';
+import { PDVProductDetailSheet } from '@/components/pdv/PDVProductDetailSheet';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
