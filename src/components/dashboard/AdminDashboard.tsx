@@ -177,8 +177,15 @@ export function AdminDashboard() {
       {/* Pull to Refresh indicator */}
       <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} threshold={threshold} />
 
-      {/* Greeting + Context Pills */}
+      {/* Greeting */}
       <DashboardContextBar firstName={firstName} stats={stats} />
+
+      {/* Quick Stats — horizontal scroll strip */}
+      <div className="mt-3">
+        <Suspense fallback={<QuickStatsSkeleton />}>
+          <LazyQuickStats />
+        </Suspense>
+      </div>
 
       {/* Upgrade Banner for free users */}
       <div className="mt-4">
