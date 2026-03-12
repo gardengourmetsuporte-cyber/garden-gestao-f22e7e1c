@@ -21,7 +21,7 @@ export function LanguageSwitcher({ onChange }: Props) {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-medium hover:bg-white/30 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/90 backdrop-blur-sm text-foreground text-xs font-medium border border-border/50 shadow-sm hover:bg-card transition-colors"
       >
         <Globe className="w-3.5 h-3.5" />
         {LOCALE_LABELS[locale]}
