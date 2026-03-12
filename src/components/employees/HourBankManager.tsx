@@ -194,7 +194,7 @@ export function HourBankManager() {
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
                   {employees.filter(e => e.is_active).map(e => (
-                    <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
+                    <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
