@@ -15,7 +15,7 @@ interface QuickMovementSheetProps {
 
 const quickValues = [1, 5, 10, 25];
 
-export function QuickMovementSheetNew({ item, open, onOpenChange, onConfirm }: QuickMovementSheetProps) {
+export function QuickMovementSheet({ item, open, onOpenChange, onConfirm }: QuickMovementSheetProps) {
   const [type, setType] = useState<'entrada' | 'saida'>('entrada');
   const [quantity, setQuantity] = useState<number>(0);
   const [notes, setNotes] = useState('');

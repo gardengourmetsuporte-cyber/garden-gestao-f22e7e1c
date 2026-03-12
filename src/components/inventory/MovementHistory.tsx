@@ -35,7 +35,7 @@ function getUnitLabel(unitType: string): string {
   }
 }
 
-export function MovementHistoryNew({ movements, items, showItemName = false, onDeleteMovement }: MovementHistoryProps) {
+export function MovementHistory({ movements, items, showItemName = false, onDeleteMovement }: MovementHistoryProps) {
   const { isAdmin } = useAuth();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 

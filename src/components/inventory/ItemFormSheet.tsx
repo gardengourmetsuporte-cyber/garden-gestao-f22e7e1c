@@ -33,7 +33,7 @@ interface ItemFormSheetProps {
   isAdmin?: boolean;
 }
 
-export function ItemFormSheetNew({ 
+export function ItemFormSheet({ 
   item, 
   categories, 
   suppliers = [],
