@@ -5,10 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import {
   DndContext, DragOverlay, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors,
+  useDraggable, useDroppable,
   type DragStartEvent, type DragEndEvent,
 } from '@dnd-kit/core';
-import { useDraggable } from '@dnd-kit/core';
-import { useDroppable } from '@dnd-kit/core';
 import {
   ChefHat, Clock, Maximize, Minimize, Volume2, VolumeX,
   UtensilsCrossed, Truck, RefreshCw, Hash, Undo2, GripVertical,
