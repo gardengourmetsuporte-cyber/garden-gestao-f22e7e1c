@@ -31,7 +31,7 @@ const LazyWeeklySummary = lazy(() => import('./LazyWeeklySummaryWidget'));
 const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ default: m.AutoOrderWidget })));
 const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
 const LazyQuickStats = lazy(() => import('./QuickStatsWidget').then(m => ({ default: m.QuickStatsWidget })));
-
+const LazyAnalytics = lazy(() => import('./AnalyticsWidget'));
 function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
   const skeleton = fallback || <GenericWidgetSkeleton />;
@@ -105,6 +105,13 @@ export function AdminDashboard() {
           <DashboardSection key={widget.key} onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
             <LazyWidget fallback={<CalendarSkeleton />}><LazyCalendar /></LazyWidget>
           </DashboardSection>
+        ) : null;
+
+      case 'analytics':
+        return hasAccess('cash-closing') ? (
+          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyAnalytics /></LazyWidget>
+          </div>
         ) : null;
 
       case 'weekly-summary':
