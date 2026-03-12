@@ -168,21 +168,13 @@ export function AppSidebar() {
                           onMouseEnter={() => void preloadRoute(targetHref)}
                         >
                           {item.customIcon ? (
-                            <div
+                            <img
+                              src={item.customIcon}
+                              alt=""
                               className={cn(
-                                "w-5 h-5 shrink-0",
-                                item.keepIconColor ? "opacity-90" : isActive ? "bg-primary" : "bg-foreground/70"
+                                "w-5 h-5 object-contain shrink-0",
+                                item.keepIconColor ? "opacity-90" : isActive ? "icon-tint-primary" : "icon-tint-muted"
                               )}
-                              style={{
-                                maskImage: `url(${item.customIcon})`,
-                                maskSize: 'contain',
-                                maskRepeat: 'no-repeat',
-                                maskPosition: 'center',
-                                WebkitMaskImage: `url(${item.customIcon})`,
-                                WebkitMaskSize: 'contain',
-                                WebkitMaskRepeat: 'no-repeat',
-                                WebkitMaskPosition: 'center',
-                              }}
                             />
                           ) : (
                             <AppIcon name={item.icon} size={20} fill={isActive ? 1 : 0} />
