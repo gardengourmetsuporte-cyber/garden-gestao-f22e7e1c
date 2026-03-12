@@ -25,7 +25,7 @@ export function UnitRankingWidget() {
             .select('total_amount')
             .eq('unit_id', unit.id)
             .gte('date', startOfMonth.toISOString().slice(0, 10))
-            .in('status', ['approved', 'validated']);
+            .eq('status', 'approved');
 
           const revenue = (closings || []).reduce((sum, c) => sum + (c.total_amount || 0), 0);
 
