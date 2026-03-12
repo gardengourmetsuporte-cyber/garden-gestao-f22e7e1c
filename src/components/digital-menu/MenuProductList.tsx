@@ -31,39 +31,53 @@ export function MenuProductList({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Category pills */}
-      <ScrollArea className="w-full">
-        <div className="flex gap-2 px-4 py-1">
-          <button
-            onClick={() => onSelectCategory(null)}
-            className={cn(
-              'shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-semibold transition-all',
-              !selectedCategory
-                ? 'bg-primary text-primary-foreground shadow-md shadow-primary/25'
-                : 'bg-card text-muted-foreground border border-border/50 active:scale-95'
-            )}
-          >
-            <AppIcon name="LayoutGrid" size={14} />
-            Todos
-          </button>
-          {categories.map(cat => (
+      {/* Category chips — iOS style with icons */}
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b border-border/10">
+        <ScrollArea className="w-full">
+          <div className="flex gap-2 px-4 py-3">
             <button
-              key={cat.id}
-              onClick={() => onSelectCategory(cat.id)}
+              onClick={() => onSelectCategory(null)}
               className={cn(
-                'shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-semibold transition-all',
-                selectedCategory === cat.id
-                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/25'
-                  : 'bg-card text-muted-foreground border border-border/50 active:scale-95'
+                'shrink-0 flex items-center gap-2 pl-2.5 pr-4 py-2 rounded-2xl text-[13px] font-semibold transition-all duration-200',
+                !selectedCategory
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-[1.02]'
+                  : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 active:scale-95'
               )}
             >
-              {cat.icon && <AppIcon name={cat.icon} size={14} />}
-              {cat.name}
+              <span className={cn(
+                'w-7 h-7 rounded-xl flex items-center justify-center transition-colors',
+                !selectedCategory ? 'bg-white/20' : 'bg-primary/10'
+              )}>
+                <AppIcon name="LayoutGrid" size={15} className={!selectedCategory ? '' : 'text-primary'} />
+              </span>
+              Todos
             </button>
-          ))}
-        </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => onSelectCategory(cat.id)}
+                className={cn(
+                  'shrink-0 flex items-center gap-2 pl-2.5 pr-4 py-2 rounded-2xl text-[13px] font-semibold transition-all duration-200',
+                  selectedCategory === cat.id
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-[1.02]'
+                    : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 active:scale-95'
+                )}
+              >
+                {cat.icon && (
+                  <span className={cn(
+                    'w-7 h-7 rounded-xl flex items-center justify-center transition-colors',
+                    selectedCategory === cat.id ? 'bg-white/20' : 'bg-primary/10'
+                  )}>
+                    <AppIcon name={cat.icon} size={15} className={selectedCategory === cat.id ? '' : 'text-primary'} />
+                  </span>
+                )}
+                {cat.name}
+              </button>
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
 
       {/* Grouped products */}
       <div className="px-4 md:px-8 space-y-6 pb-28">
