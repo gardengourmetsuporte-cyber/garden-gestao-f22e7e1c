@@ -114,7 +114,7 @@ export default function Plans() {
                     className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
                     style={{ background: 'hsl(var(--neon-green) / 0.12)' }}
                   >
-                    <AppIcon name="Crown" size={24} style={{ color: 'hsl(var(--neon-green))' }} />
+                    <AppIcon name="Diamond" size={24} style={{ color: 'hsl(var(--neon-green))' }} />
                   </div>
                   <div className="flex flex-col gap-1">
                     <h2 className="text-lg font-bold text-foreground leading-tight">
