@@ -161,6 +161,13 @@ export function AdminDashboard() {
           </div>
         );
 
+      case 'multi-unit':
+        return (
+          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyMultiUnit /></LazyWidget>
+          </div>
+        );
+
       default:
         return null;
     }
