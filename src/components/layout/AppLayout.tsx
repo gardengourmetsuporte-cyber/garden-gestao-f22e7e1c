@@ -85,7 +85,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             }}
           >
             <div className="relative overflow-hidden">
-              <div className="flex items-center justify-between h-14 px-3 relative z-10">
+              <div className="flex items-center justify-between h-11 px-3 relative z-10">
                 {/* Left: Logo pill */}
                 <div className="flex items-center gap-1 relative" style={{ minWidth: '2.5rem' }}>
                   <button
