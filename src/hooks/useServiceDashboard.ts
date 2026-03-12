@@ -169,14 +169,14 @@ export function useServiceDashboard() {
 
   const deliveries: ActiveDelivery[] = activeDeliveries as ActiveDelivery[];
 
-  const hubActive: HubActiveOrder[] = useMemo(() =>
-    hubOrders.map(o => ({
+  const hubActive: HubActiveOrder[] = useMemo(() => {
+    const n = new Date();
+    return hubOrders.map(o => ({
       ...o,
       platform: o.platform || 'manual',
-      minutesAgo: differenceInMinutes(now, new Date(o.received_at)),
-    })) as HubActiveOrder[],
-    [hubOrders]
-  );
+      minutesAgo: differenceInMinutes(n, new Date(o.received_at)),
+    })) as HubActiveOrder[];
+  }, [hubOrders]);
 
   return { stats, orders, hourlySales, deliveries, hubActive };
 }
