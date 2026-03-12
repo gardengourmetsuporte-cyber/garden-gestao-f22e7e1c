@@ -99,15 +99,7 @@ export function AdminDashboard() {
 
     switch (widget.key) {
       case 'finance':
-        return hasAccess('finance') ? (
-          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
-            <DashboardHeroFinance
-              balance={stats.monthBalance}
-              pendingExpenses={stats.pendingExpenses}
-              isLoading={statsLoading}
-            />
-          </div>
-        ) : null;
+        return null; // Rendered outside grid
 
       case 'checklist':
         return null;
