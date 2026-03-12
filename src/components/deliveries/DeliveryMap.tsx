@@ -101,17 +101,19 @@ function pickValidResult(
   const lng = Number.parseFloat(result?.lon);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
-  if (anchor && distanceKm(anchor, { lat, lng }) > 25) return null;
+  // If we have an anchor, reject results too far away
+  if (anchor && distanceKm(anchor, { lat, lng }) > 50) return null;
 
+  // Soft city check: only reject if display_name has zero city-word matches
   const cityToken = normalizeText(city);
-  const displayName = normalizeText(String(result?.display_name || ''));
-  if (cityToken && displayName) {
+  if (cityToken) {
+    const displayName = normalizeText(String(result?.display_name || ''));
+    const addressCity = normalizeText(String(result?.address?.city || result?.address?.town || result?.address?.municipality || result?.address?.state || ''));
+    const combined = `${displayName} ${addressCity}`;
     const cityWords = cityToken.split(/\s+/).filter(w => w.length > 2 && !['de','da','do','das','dos'].includes(w));
-    const allMatch = cityWords.every(w => displayName.includes(w));
-    if (!allMatch) return null;
-    // Check address components to reject neighborhood-only matches
-    const addressCity = normalizeText(String(result?.address?.city || result?.address?.town || result?.address?.municipality || ''));
-    if (addressCity && !cityWords.every(w => addressCity.includes(w))) return null;
+    const matchCount = cityWords.filter(w => combined.includes(w)).length;
+    // Reject only if no significant words match at all
+    if (cityWords.length > 0 && matchCount === 0) return null;
   }
 
   return { lat, lng };
