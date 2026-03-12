@@ -167,7 +167,12 @@ export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }:
           scrollWheelZoom: false,
         }).setView([geoResult.lat, geoResult.lng], 16);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        const isDark = document.documentElement.classList.contains('dark');
+        const tileUrl = isDark
+          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+          : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+        L.tileLayer(tileUrl, {
+          subdomains: 'abcd',
           maxZoom: 19,
         }).addTo(mapRef.current);
       } else {
