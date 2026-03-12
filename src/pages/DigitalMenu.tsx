@@ -41,6 +41,7 @@ export default function DigitalMenu() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<DMProduct | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [, forceRerender] = useState(0);
 
   // Auth state for customer login
   const [customerUser, setCustomerUser] = useState<User | null>(null);
