@@ -1203,6 +1203,47 @@ export type Database = {
           },
         ]
       }
+      customer_reviews: {
+        Row: {
+          category: string | null
+          comment: string | null
+          created_at: string
+          customer_name: string
+          id: string
+          mesa: string | null
+          rating: number
+          unit_id: string
+        }
+        Insert: {
+          category?: string | null
+          comment?: string | null
+          created_at?: string
+          customer_name?: string
+          id?: string
+          mesa?: string | null
+          rating: number
+          unit_id: string
+        }
+        Update: {
+          category?: string | null
+          comment?: string | null
+          created_at?: string
+          customer_name?: string
+          id?: string
+          mesa?: string | null
+          rating?: number
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_reviews_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
@@ -3397,6 +3438,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "monitored_accounts_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mural_posts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          sort_order: number
+          title: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          sort_order?: number
+          title: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          sort_order?: number
+          title?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mural_posts_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "units"

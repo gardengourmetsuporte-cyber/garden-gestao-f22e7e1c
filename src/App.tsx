@@ -96,6 +96,9 @@ const TabletRodizio = lazy(() => lazyRetry(() => import("./pages/TabletRodizio")
 const TabletBill = lazy(() => lazyRetry(() => import("./pages/TabletBill")));
 const KDS = lazy(() => lazyRetry(() => import("./pages/KDS")));
 const TabletGames = lazy(() => lazyRetry(() => import("./pages/TabletGames")));
+const TabletReview = lazy(() => lazyRetry(() => import("./pages/TabletReview")));
+const TabletMural = lazy(() => lazyRetry(() => import("./pages/TabletMural")));
+const Reviews = lazy(() => lazyRetry(() => import("./pages/Reviews")));
 const Notifications = lazy(() => lazyRetry(() => import("./pages/Notifications")));
 const PersonalFinance = lazy(() => lazyRetry(() => import("./pages/PersonalFinance")));
 const ShareReceiptHandler = lazy(() => lazyRetry(() => import("./pages/ShareReceiptHandler")));
@@ -226,6 +229,8 @@ function PublicRoutes() {
         <Route path="/tablet/:unitId/bill" element={<TabletBill />} />
         <Route path="/tablet/:unitId/confirm/:orderId" element={<TabletConfirm />} />
         <Route path="/tablet/:unitId/games" element={<TabletGames />} />
+        <Route path="/tablet/:unitId/review" element={<TabletReview />} />
+        <Route path="/tablet/:unitId/mural" element={<TabletMural />} />
         <Route path="/kds/:unitId" element={<KDS />} />
         <Route path="/gamification/:unitId" element={<TabletGames />} />
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
@@ -297,6 +302,7 @@ function AuthenticatedRoutes() {
           <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
           <Route path="/calendar" element={<ProtectedRoute><CalendarFull /></ProtectedRoute>} />
           <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+          <Route path="/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
           <Route path="/personal-finance" element={<ProtectedRoute><PersonalFinance /></ProtectedRoute>} />
           <Route path="/compliance" element={<ProtectedRoute><Compliance /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />

@@ -240,14 +240,14 @@ export default function TabletHome() {
         icon: 'Newspaper',
         label: 'Mural da Casa',
         subtitle: 'Novidades e avisos',
-        onClick: () => {},
+        onClick: () => navigate(`/tablet/${unitId}/mural?mesa=${mesa}`),
       },
       {
         id: 'avalie',
         icon: 'Star',
         label: 'Avalie o Local',
         subtitle: 'Deixe sua opinião',
-        onClick: () => {},
+        onClick: () => navigate(`/tablet/${unitId}/review?mesa=${mesa}`),
       },
     ];
   }, [mesa, navigate, rodizio, unitId]);
