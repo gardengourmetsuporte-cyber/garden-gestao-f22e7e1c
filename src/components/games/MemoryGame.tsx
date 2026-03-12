@@ -139,7 +139,9 @@ export function MemoryGame({ onBack, unitId }: Props) {
             🧠 Memory <span className="text-amber-400">Garden</span>
           </h1>
         </div>
-        <div className="w-9" />
+        <button onClick={() => setShowRanking(true)} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+          <Trophy size={18} className="text-amber-400" />
+        </button>
       </div>
 
       {/* Score bar */}
