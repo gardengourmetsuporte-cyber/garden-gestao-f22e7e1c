@@ -30,7 +30,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   // ── Início ──
   { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'principal', groupLabel: 'Início' },
-  { icon: 'Sparkles', customIcon: '/icons/copilot-ai.png', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'principal', groupLabel: 'Início', badge: 'Beta' },
+  { icon: 'Sparkles', customIcon: '/icons/copilot-ai.png', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'principal', groupLabel: 'Início' },
 
   // ── Gestão ──
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
