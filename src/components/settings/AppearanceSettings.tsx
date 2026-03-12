@@ -84,7 +84,7 @@ export function AppearanceSettings() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-border bg-card flex items-center justify-center shrink-0">
+        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-border bg-card flex items-center justify-center shrink-0">
           <img
             src={currentLogo || gardenLogo}
             alt="Logo"

@@ -80,7 +80,7 @@ export function AppSidebar() {
         >
           <button
             onClick={() => navigate('/')}
-            className="w-8 h-8 rounded-lg overflow-hidden bg-white flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-sm"
+            className="w-8 h-8 rounded-full overflow-hidden bg-white flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-sm"
           >
             <img alt="Garden" className="w-6 h-6 object-contain" src={activeUnit?.store_info?.logo_url || gardenLogo} loading="lazy" decoding="async" />
           </button>
