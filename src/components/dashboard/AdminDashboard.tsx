@@ -135,11 +135,8 @@ export function AdminDashboard() {
         ) : null;
 
       case 'quick-stats':
-        return (
-          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
-            <LazyWidget fallback={<QuickStatsSkeleton />}><LazyQuickStats /></LazyWidget>
-          </div>
-        );
+        // Rendered directly in layout, not in grid
+        return null;
 
       case 'heatmap':
         return (
