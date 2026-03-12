@@ -104,11 +104,24 @@ export function ChecklistView({
   validatePin,
   timeStats,
   timerMinExecutions = 3,
+  autoExpandAll = false,
 }: ChecklistViewProps) {
   const { triggerCoin } = useCoinAnimation();
   const { activeUnitId } = useUnit();
   const [expandedSectors, setExpandedSectors] = useState<Set<string>>(new Set());
   const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
+
+  // Auto-expand all sectors and subcategories when autoExpandAll is true
+  useEffect(() => {
+    if (autoExpandAll && sectors.length > 0) {
+      const allSectorIds = new Set(sectors.map(s => s.id));
+      const allSubIds = new Set(
+        sectors.flatMap(s => (s.subcategories || []).map(sub => sub.id))
+      );
+      setExpandedSectors(allSectorIds);
+      setExpandedSubcategories(allSubIds);
+    }
+  }, [autoExpandAll, sectors]);
   const [openPopover, setOpenPopover] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<Pick<Profile, 'user_id' | 'full_name'>[]>([]);
   const [optimisticToggles, setOptimisticToggles] = useState<Set<string>>(new Set());
