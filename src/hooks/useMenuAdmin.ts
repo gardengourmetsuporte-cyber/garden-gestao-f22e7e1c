@@ -128,6 +128,7 @@ export function useMenuAdmin() {
       .from('tablet_products')
       .select('*')
       .eq('unit_id', activeUnitId)
+      .eq('is_active', true)
       .order('sort_order');
     setProducts((data as MenuProduct[]) || []);
   }, [activeUnitId]);
