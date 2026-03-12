@@ -360,7 +360,7 @@ export default function InventoryPage() {
                 )}
               </div>
             ) : (
-              <MovementHistoryNew
+              <MovementHistory
                 movements={movements.filter(m => {
                   if (!search) return true;
                   const item = items.find(i => i.id === m.item_id);
