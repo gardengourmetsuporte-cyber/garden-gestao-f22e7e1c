@@ -240,7 +240,7 @@ export default function TabletHome() {
   if (isLoading) {
     return (
       <div className="h-[100dvh] bg-background flex flex-col items-center justify-center gap-5">
-        <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3 animate-pulse" style={{ animationDuration: '2s' }}>
+        <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center p-3 animate-pulse" style={{ animationDuration: '2s' }}>
           <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
         </div>
         <p className="text-sm font-semibold text-foreground">Carregando...</p>
@@ -320,7 +320,7 @@ export default function TabletHome() {
         <div className="flex-1 flex flex-col bg-black/60 backdrop-blur-2xl border-r border-white/[0.08] overflow-hidden">
           {/* Logo & Brand - centered */}
           <div className="flex flex-col items-center px-6 pt-8 pb-5">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/15 bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-lg mb-4">
+            <div className="w-20 h-20 rounded-full overflow-hidden border border-white/15 bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-lg mb-4">
               {logoUrl ? (
                 <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
               ) : (

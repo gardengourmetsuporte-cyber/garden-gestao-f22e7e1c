@@ -219,7 +219,7 @@ export default function TabletDigitalMenu() {
         <aside className="w-44 lg:w-48 flex flex-col border-r border-border/20 bg-card/40 shrink-0">
           {/* Logo at top of sidebar */}
           <div className="px-4 pt-4 pb-3 border-b border-border/15 shrink-0">
-            <div className="w-14 h-14 rounded-xl overflow-hidden border border-border/20 bg-white flex items-center justify-center mx-auto shadow-sm">
+            <div className="w-14 h-14 rounded-full overflow-hidden border border-border/20 bg-white flex items-center justify-center mx-auto shadow-sm">
               {logoUrl ? (
                 <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
               ) : (
