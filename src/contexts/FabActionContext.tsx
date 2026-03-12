@@ -5,6 +5,7 @@ export interface FabAction {
   label: string;
   onClick: () => void;
   badge?: number;
+  color?: string; // CSS color for circular FAB button background
 }
 
 interface FabActionContextType {
