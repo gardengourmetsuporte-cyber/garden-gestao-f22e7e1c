@@ -6,6 +6,9 @@ import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
 import { useDeliveryFeeCalculator } from '@/hooks/useDeliveryZones';
 import { CustomerAddressManager, useCustomerAddresses, type CustomerAddress } from './CustomerAddressManager';
+import { PaymentMethodSelector, paymentOptionToBillingType } from './PaymentMethodSelector';
+import { OnlinePaymentSheet } from './OnlinePaymentSheet';
+import { useAsaasConfig } from '@/hooks/useAsaasConfig';
 import type { User } from '@supabase/supabase-js';
 
 interface Props {
