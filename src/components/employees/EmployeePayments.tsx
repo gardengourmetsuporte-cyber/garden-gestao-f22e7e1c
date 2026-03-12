@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
