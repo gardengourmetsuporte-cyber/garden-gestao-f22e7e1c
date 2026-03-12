@@ -331,8 +331,8 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
           <p className="text-2xl font-black tabular-nums text-emerald-400">{stats.done}</p>
           <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/70 mt-0.5">Entregues</p>
         </div>
-        <div className="rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 p-3 text-center">
-          <p className="text-lg font-black tabular-nums text-primary">{formatPrice(stats.revenue)}</p>
+        <div className="rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 p-3 text-center min-w-0">
+          <p className="text-base sm:text-lg font-black tabular-nums text-primary truncate">{formatPrice(stats.revenue)}</p>
           <p className="text-[9px] font-bold uppercase tracking-widest text-primary/70 mt-0.5">Faturamento</p>
         </div>
       </div>
