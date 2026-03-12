@@ -132,10 +132,8 @@ function DraggableOrderCard({
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
       className={cn(
-        'rounded-xl border backdrop-blur-sm transition-all cursor-grab active:cursor-grabbing touch-manipulation',
+        'rounded-xl border backdrop-blur-sm transition-all touch-manipulation',
         col.border, col.bg,
         isDragging && 'shadow-2xl shadow-black/60 ring-2 ring-white/20',
       )}
@@ -143,20 +141,17 @@ function DraggableOrderCard({
       {/* Card body - tap to view detail */}
       <div
         className="w-full text-left px-3 pt-3 pb-2 space-y-2"
-        onPointerUp={(e) => {
-          // Only trigger select on quick taps (not drags)
-          if (!isDragging) {
-            e.stopPropagation();
-            onSelect(order);
-          }
-        }}
+        onClick={() => { if (!isDragging) onSelect(order); }}
       >
         {/* Header row */}
         <div className="flex items-center justify-between gap-1">
           <span className={cn('text-base font-black tracking-tight', col.text)}>#{shortId}</span>
           <div className="flex items-center gap-1.5">
             <ElapsedBadge createdAt={order.created_at} />
-            <GripVertical className="w-3.5 h-3.5 text-white/25" />
+            {/* Drag handle - only this triggers drag */}
+            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 -m-1">
+              <GripVertical className="w-3.5 h-3.5 text-white/25" />
+            </div>
           </div>
         </div>
 
