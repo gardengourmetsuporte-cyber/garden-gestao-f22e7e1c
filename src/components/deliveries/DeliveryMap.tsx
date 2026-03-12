@@ -173,7 +173,7 @@ async function geocodeAddress(
     } catch (error) {
       console.warn('Falha ao geocodificar endereço', error);
     }
-    await new Promise((resolve) => setTimeout(resolve, 1100));
+    await new Promise((resolve) => setTimeout(resolve, 600));
   }
 
   if (anchor) {
