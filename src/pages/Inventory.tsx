@@ -259,6 +259,14 @@ export default function InventoryPage() {
               <AppIcon name="ListChecks" size={18} />
               <span className="text-sm font-medium hidden sm:inline">Lote</span>
             </button>
+            <button
+              onClick={() => setTransferOpen(true)}
+              className="shrink-0 h-10 px-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary flex items-center gap-1.5 transition-colors"
+              title="Transferir estoque"
+            >
+              <AppIcon name="ArrowLeftRight" size={18} />
+              <span className="text-sm font-medium hidden sm:inline">Transferir</span>
+            </button>
           </div>
 
           {/* Content with fade transition */}
