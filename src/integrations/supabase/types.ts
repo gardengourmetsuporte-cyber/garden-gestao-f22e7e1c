@@ -3407,6 +3407,45 @@ export type Database = {
           },
         ]
       }
+      menu_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          unit_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          unit_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          unit_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "tablet_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_favorites_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_groups: {
         Row: {
           availability: Json
@@ -3749,6 +3788,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "notifications_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nps_responses: {
+        Row: {
+          comment: string | null
+          created_at: string
+          customer_name: string | null
+          customer_phone: string | null
+          id: string
+          order_id: string | null
+          score: number
+          source: string | null
+          unit_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          order_id?: string | null
+          score: number
+          source?: string | null
+          unit_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          id?: string
+          order_id?: string | null
+          score?: number
+          source?: string | null
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nps_responses_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "units"
