@@ -110,46 +110,62 @@ export function exportCashClosingPdf(closing: CashClosingData) {
     closing.pix_amount + closing.delivery_amount + closing.meal_voucher_amount
   );
 
-  const rows = [
-    ['Dinheiro', closing.cash_amount],
-    ['Débito', closing.debit_amount],
-    ['Crédito', closing.credit_amount],
-    ['Pix', closing.pix_amount],
-    ['Delivery', closing.delivery_amount],
-    ['Vale Alimentação', closing.meal_voucher_amount],
-  ]
-    .map(([label, value]) => `
-      <tr>
-        <td>${label}</td>
-        <td class="text-right">${formatCurrency(value as number)}</td>
-      </tr>
-    `)
+  const methods = [
+    { label: 'Dinheiro', value: closing.cash_amount, icon: '💵' },
+    { label: 'Débito', value: closing.debit_amount, icon: '💳' },
+    { label: 'Crédito', value: closing.credit_amount, icon: '💳' },
+    { label: 'Pix', value: closing.pix_amount, icon: '📱' },
+    { label: 'Delivery', value: closing.delivery_amount, icon: '🛵' },
+    { label: 'Vale Alimentação', value: closing.meal_voucher_amount, icon: '🎫' },
+  ];
+
+  const maxVal = Math.max(...methods.map(m => m.value), 1);
+
+  const rows = methods
+    .map(m => {
+      const pct = total > 0 ? ((m.value / total) * 100).toFixed(1) : '0.0';
+      const barW = Math.max((m.value / maxVal) * 100, 2);
+      return `
+        <tr>
+          <td style="white-space:nowrap;">${m.icon} ${m.label}</td>
+          <td class="text-right" style="white-space:nowrap;">${formatCurrency(m.value)}</td>
+          <td class="text-right" style="color:#888;font-size:11px;">${pct}%</td>
+          <td style="width:40%;padding-left:12px;">
+            <div style="background:#e5e7eb;border-radius:4px;height:12px;overflow:hidden;">
+              <div style="background:linear-gradient(90deg,#3b82f6,#60a5fa);height:100%;width:${barW}%;border-radius:4px;"></div>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
     .join('');
 
   const body = `
     <h1>Fechamento de Caixa</h1>
-    <h2>${closing.unit_name} — ${new Date(closing.date + 'T12:00:00').toLocaleDateString('pt-BR')}</h2>
+    <h2>${closing.unit_name} — ${new Date(closing.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}</h2>
     <div class="metrics">
       <div class="metric">
         <div class="metric-label">Total Vendas</div>
         <div class="metric-value">${formatCurrency(total)}</div>
       </div>
       <div class="metric">
-        <div class="metric-label">Diferença</div>
+        <div class="metric-label">Diferença de Caixa</div>
         <div class="metric-value ${(closing.cash_difference ?? 0) >= 0 ? 'positive' : 'negative'}">${formatCurrency(closing.cash_difference ?? 0)}</div>
       </div>
     </div>
     <table>
-      <thead><tr><th>Meio de Pagamento</th><th class="text-right">Valor</th></tr></thead>
+      <thead><tr><th>Meio de Pagamento</th><th class="text-right">Valor</th><th class="text-right">%</th><th>Participação</th></tr></thead>
       <tbody>
         ${rows}
         <tr class="total-row">
           <td class="bold">Total</td>
           <td class="text-right bold">${formatCurrency(total)}</td>
+          <td class="text-right bold">100%</td>
+          <td></td>
         </tr>
       </tbody>
     </table>
-    ${closing.notes ? `<p style="margin-top:16px;color:#666;"><strong>Observações:</strong> ${closing.notes}</p>` : ''}
+    ${closing.notes ? `<p style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px;color:#666;"><strong>📝 Observações:</strong> ${closing.notes}</p>` : ''}
   `;
 
   openPrintWindow(`Fechamento - ${closing.date}`, body);
