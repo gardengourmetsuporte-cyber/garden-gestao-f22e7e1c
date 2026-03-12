@@ -307,13 +307,10 @@ export default function InventoryPage() {
                         className="bg-card border border-border/40 rounded-2xl overflow-hidden relative animate-fade-in"
                         style={{ animationDelay: `${catIndex * 40}ms` }}
                       >
-                        {/* Colored accent bar */}
                         <div
                           className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
                           style={{ background: categoryColor }}
                         />
-
-                        {/* Category Header */}
                         <button
                           onClick={() => toggleCategory(categoryName)}
                           className="w-full flex items-center gap-3 pl-5 pr-4 py-3.5 text-left hover:bg-secondary/30 transition-colors"
@@ -341,8 +338,6 @@ export default function InventoryPage() {
                             )}
                           />
                         </button>
-
-                        {/* Category Items */}
                         <div
                           className={cn(
                             "overflow-hidden transition-all duration-300 ease-out",
@@ -371,7 +366,7 @@ export default function InventoryPage() {
                   })
                 )}
               </div>
-            ) : (
+            ) : view === 'history' ? (
               <MovementHistory
                 movements={movements.filter(m => {
                   if (!search) return true;
@@ -382,6 +377,8 @@ export default function InventoryPage() {
                 showItemName
                 onDeleteMovement={deleteMovement}
               />
+            ) : (
+              <BatchExpiryManager />
             )}
           </div>
         </div>
