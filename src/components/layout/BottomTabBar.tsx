@@ -140,10 +140,10 @@ export function BottomTabBar() {
       {speedDialOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
+            className="fixed inset-0 bottom-[calc(64px+env(safe-area-inset-bottom,0px))] z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
             onClick={() => setSpeedDialOpen(false)}
           />
-          <div className="fixed bottom-28 left-0 right-0 z-40 flex justify-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 flex justify-center pb-4">
             <div className="flex items-end gap-8">
               {fabActions.map((action, i) => {
                 const isMiddle = fabActions.length === 3 && i === 1;
