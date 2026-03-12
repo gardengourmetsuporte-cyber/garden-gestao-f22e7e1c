@@ -139,38 +139,36 @@ export function BottomTabBar() {
       {speedDialOpen && (
         <>
           <div
-            className="fixed inset-0 bottom-[72px] z-[60] bg-black/60 animate-fade-in"
+            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm animate-fade-in"
             onClick={() => setSpeedDialOpen(false)}
           />
-           <div className="fixed bottom-20 left-0 right-0 z-[61] flex justify-center px-6 animate-fade-in"
-            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-          >
-            <div className="w-full max-w-[240px] bg-card/95 backdrop-blur-xl border border-border/60 rounded-2xl overflow-hidden shadow-2xl">
-              {fabActions.map((action, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    navigator.vibrate?.(10);
-                    setSpeedDialOpen(false);
-                    action.onClick();
-                  }}
-                  className={cn(
-                    "flex items-center gap-3 w-full px-4 py-3 text-left active:bg-primary/10 transition-colors animate-scale-in",
-                    i < fabActions.length - 1 && "border-b border-border/30"
-                  )}
-                  style={{ animationDelay: `${i * 40}ms` }}
-                >
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary/15 relative shrink-0">
-                    <AppIcon name={action.icon} size={15} fill={1} className="text-primary" />
-                    {action.badge && action.badge > 0 && (
-                      <span className="absolute -top-1 -right-1 h-4 min-w-4 px-0.5 text-[9px] font-bold rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
-                        {action.badge}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[13px] font-medium text-foreground">{action.label}</span>
-                </button>
-              ))}
+          <div className="fixed bottom-28 left-0 right-0 z-[61] flex justify-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+            <div className="flex items-end gap-8">
+              {fabActions.map((action, i) => {
+                const isMiddle = fabActions.length === 3 && i === 1;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      navigator.vibrate?.(10);
+                      setSpeedDialOpen(false);
+                      action.onClick();
+                    }}
+                    className={cn("flex flex-col items-center gap-2 animate-scale-in", isMiddle && "mb-6")}
+                    style={{ animationDelay: `${i * 50}ms` }}
+                  >
+                    <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg relative">
+                      <AppIcon name={action.icon} size={24} fill={1} style={{ color: 'white' }} />
+                      {action.badge && action.badge > 0 && (
+                        <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
+                          {action.badge}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] font-bold text-white">{action.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </>
