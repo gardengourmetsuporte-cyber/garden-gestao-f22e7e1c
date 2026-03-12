@@ -135,8 +135,11 @@ export default function TabletHome() {
   const [mesa, setMesa] = useState<string | null>(initialMesa);
   const [showConfig, setShowConfig] = useState(!initialMesa);
 
-  // Persist mesa on first load from URL param
+  // Persist mesa and unitId on first load
   useEffect(() => {
+    if (unitId) {
+      try { localStorage.setItem(TABLET_UNIT_KEY, unitId); } catch {}
+    }
     if (mesaParam && !storedMesa) {
       setStoredMesa(mesaParam);
       setMesa(mesaParam);
