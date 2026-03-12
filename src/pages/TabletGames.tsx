@@ -11,7 +11,7 @@ export default function TabletGames() {
   const [activeGame, setActiveGame] = useState<string | null>(null);
 
   if (activeGame === 'snake') {
-    return <SnakeGame onBack={() => setActiveGame(null)} />;
+    return <SnakeGame onBack={() => setActiveGame(null)} unitId={unitId} />;
   }
 
   const games = [
