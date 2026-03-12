@@ -171,7 +171,7 @@ export function CustomerDetail({ open, onOpenChange, customer, events, eventsLoa
           </div>
 
           {/* Order History */}
-          <CustomerOrderHistory customer={customer} />
+          <CustomerOrderHistory customerId={customer.id} customerName={customer.name} customerPhone={customer.phone} />
 
           <Separator />
 
