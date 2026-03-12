@@ -312,59 +312,56 @@ export default function TabletHome() {
         </div>
       </div>
 
-      {/* ─── Full-height Sidebar Menu (left) ─── */}
-      <div
-        className="absolute left-0 top-0 bottom-0 z-10 w-[300px] flex flex-col"
-        style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 0px)',
-          paddingLeft: 'max(env(safe-area-inset-left, 0px), 0px)',
-        }}
+      {/* ─── Centered Floating Menu Card ─── */}
+      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+        style={{ paddingTop: '60px' }}
       >
-        <div className="flex-1 flex flex-col bg-black/60 backdrop-blur-2xl border-r border-white/[0.08] overflow-hidden">
-          {/* Logo & Brand - centered */}
-          <div className="flex flex-col items-center px-6 pt-8 pb-5">
-            <div className="w-20 h-20 rounded-full overflow-hidden border border-white/15 bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-lg mb-4">
-              {logoUrl ? (
-                <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
-              ) : (
-                <img src={gardenLogo} alt="Garden" className="w-14 h-14 object-contain" />
-              )}
+        <div className="pointer-events-auto w-[360px] max-h-[calc(100%-80px)]">
+          <div className="bg-white/[0.08] backdrop-blur-2xl rounded-3xl border border-white/[0.12] overflow-hidden shadow-2xl shadow-black/40 flex flex-col max-h-full">
+            {/* Logo & Brand - centered */}
+            <div className="flex flex-col items-center px-6 pt-6 pb-4">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/20 bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-lg mb-3">
+                {logoUrl ? (
+                  <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
+                ) : (
+                  <img src={gardenLogo} alt="Garden" className="w-14 h-14 object-contain" />
+                )}
+              </div>
+              <h1 className="text-lg font-bold text-white leading-tight text-center">{unit?.name || 'Bem-vindo'}</h1>
+              <p className="text-[11px] text-white/40 mt-1">Mesa {mesa || '?'}</p>
             </div>
-            <h1 className="text-lg font-bold text-white leading-tight text-center">{unit?.name || 'Bem-vindo'}</h1>
-            <p className="text-[11px] text-white/40 mt-1">Mesa {mesa || '?'}</p>
-          </div>
 
-          {/* Divider */}
-          <div className="mx-5 h-px bg-white/[0.08]" />
+            {/* Divider */}
+            <div className="mx-5 h-px bg-white/[0.08]" />
 
-          {/* Menu items */}
-          <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: 'none' }}>
-            <div className="space-y-1">
-              {menuItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={item.onClick}
-                  className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-left hover:bg-white/[0.08] active:bg-white/[0.12] transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.08] flex items-center justify-center shrink-0 group-hover:bg-white/[0.14] transition-colors">
-                    <AppIcon name={item.icon} size={20} className="text-white/80" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white/90">{item.label}</p>
-                    <p className="text-[11px] text-white/40 leading-tight mt-0.5">{item.subtitle}</p>
-                  </div>
-                  <AppIcon name="ChevronRight" size={16} className="text-white/20 group-hover:text-white/40 transition-colors shrink-0" />
-                </button>
-              ))}
+            {/* Menu items */}
+            <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: 'none' }}>
+              <div className="space-y-1">
+                {menuItems.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={item.onClick}
+                    className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-left hover:bg-white/[0.08] active:bg-white/[0.12] transition-colors group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.08] flex items-center justify-center shrink-0 group-hover:bg-white/[0.14] transition-colors">
+                      <AppIcon name={item.icon} size={20} className="text-white/80" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-white/90">{item.label}</p>
+                      <p className="text-[11px] text-white/40 leading-tight mt-0.5">{item.subtitle}</p>
+                    </div>
+                    <AppIcon name="ChevronRight" size={16} className="text-white/20 group-hover:text-white/40 transition-colors shrink-0" />
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Footer */}
-          <div className="px-4 py-3 border-t border-white/[0.06]">
-            <p className="text-[9px] text-white/25 text-center font-medium">
-              uma experiência <span className="font-bold text-white/40">Garden</span>
-            </p>
+            {/* Footer */}
+            <div className="px-4 py-2.5 border-t border-white/[0.06]">
+              <p className="text-[9px] text-white/25 text-center font-medium">
+                uma experiência <span className="font-bold text-white/40">Garden</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
