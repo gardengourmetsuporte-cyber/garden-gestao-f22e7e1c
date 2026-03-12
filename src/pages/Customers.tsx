@@ -16,6 +16,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import type { Customer, CustomerSegment } from '@/types/customer';
 import { SEGMENT_CONFIG } from '@/types/customer';
 import { BirthdayAlerts } from '@/components/customers/BirthdayAlerts';
+import { CashbackSettings } from '@/components/customers/CashbackSettings';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { cn } from '@/lib/utils';
 import {
@@ -138,6 +139,9 @@ export default function Customers() {
 
         {/* Birthday alerts */}
         <BirthdayAlerts customers={customers} />
+
+        {/* Cashback & Loyalty Settings */}
+        <CashbackSettings />
 
         {/* Select mode bar */}
         {selectMode && (
