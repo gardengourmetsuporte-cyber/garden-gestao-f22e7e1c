@@ -35,6 +35,7 @@ const LazyAnalytics = lazy(() => import('./AnalyticsWidget'));
 const LazyHeatmap = lazy(() => import('./SalesHeatmapWidget'));
 const LazyMonthComparison = lazy(() => import('./MonthComparisonWidget'));
 const LazyBreakEven = lazy(() => import('./BreakEvenWidget'));
+const LazyMultiUnit = lazy(() => import('./MultiUnitOverview'));
 import { SalesGoalWidget } from './SalesGoalWidget';
 function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
