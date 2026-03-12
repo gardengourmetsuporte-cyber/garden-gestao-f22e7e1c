@@ -7,7 +7,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { FinanceTab, TransactionType } from '@/types/finance';
 
-function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab; icon: string; label: string }; active: boolean; onTabChange: (tab: FinanceTab) => void }) {
+function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab; icon: string; customIcon?: string; label: string }; active: boolean; onTabChange: (tab: FinanceTab) => void }) {
   const [bouncing, setBouncing] = useState(false);
   const handledByPointer = useRef(false);
 
