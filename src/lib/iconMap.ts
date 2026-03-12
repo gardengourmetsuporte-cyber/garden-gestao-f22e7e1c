@@ -114,6 +114,7 @@ export const ICON_MAP: Record<string, string> = {
   LayoutGrid: 'grid_view',
   MenuBook: 'menu_book',
   RestaurantMenu: 'restaurant_menu',
+  Task: 'task',
 
   // Actions
   Plus: 'add',
