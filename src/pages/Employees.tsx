@@ -85,6 +85,7 @@ export default function Employees() {
                 {activeTab === 'payslips' && !isAdmin && <MyPayslips />}
                 {activeTab === 'deliveries' && isAdmin && <MaterialDeliveries onRegisterRef={(fn) => { openMaterialRef.current = fn; }} />}
                 {activeTab === 'warnings' && <EmployeeWarnings />}
+                {activeTab === 'hour-bank' && isAdmin && <HourBankManager />}
               </div>
             </>
           )}
