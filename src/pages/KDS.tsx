@@ -5,11 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import {
   DndContext, DragOverlay, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors,
+  useDraggable, useDroppable,
   type DragStartEvent, type DragEndEvent,
 } from '@dnd-kit/core';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useDroppable } from '@dnd-kit/core';
 import {
   ChefHat, Clock, Maximize, Minimize, Volume2, VolumeX,
   UtensilsCrossed, Truck, RefreshCw, Hash, Undo2, GripVertical,
@@ -112,14 +110,13 @@ function DraggableOrderCard({
   onBump: (id: string, next: string) => void;
   onSelect: (o: KDSOrder) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef: setDragRef, transform, isDragging } = useDraggable({
     id: order.id,
     data: { order, status: order.status },
   });
 
   const style = {
-    transform: CSS.Translate.toString(transform),
-    transition,
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     opacity: isDragging ? 0.3 : 1,
     zIndex: isDragging ? 50 : 'auto' as any,
   };
@@ -130,7 +127,6 @@ function DraggableOrderCard({
 
   return (
     <div
-      ref={setNodeRef}
       style={style}
       className={cn(
         'rounded-xl border backdrop-blur-sm transition-all touch-manipulation',
@@ -148,9 +144,9 @@ function DraggableOrderCard({
           <span className={cn('text-base font-black tracking-tight', col.text)}>#{shortId}</span>
           <div className="flex items-center gap-1.5">
             <ElapsedBadge createdAt={order.created_at} />
-            {/* Drag handle - only this triggers drag */}
-            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 -m-1">
-              <GripVertical className="w-3.5 h-3.5 text-white/25" />
+            {/* Drag handle - only this element triggers drag */}
+            <div ref={setDragRef} {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-2 -m-1 touch-none">
+              <GripVertical className="w-4 h-4 text-white/30" />
             </div>
           </div>
         </div>
