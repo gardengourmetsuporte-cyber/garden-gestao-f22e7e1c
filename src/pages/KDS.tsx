@@ -389,8 +389,9 @@ export default function KDS() {
 
   // Remove adjacent-only restriction — allow dragging to any column
   const handleDragEndFn = useCallback((event: DragEndEvent) => {
-    setActiveId(null);
     const { active, over } = event;
+    setActiveId(null);
+    
     if (!over) return;
 
     const orderId = active.id as string;
