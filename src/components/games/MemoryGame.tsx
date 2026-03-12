@@ -38,7 +38,9 @@ function createBoard(pairs: number): Card[] {
   }));
 }
 
-export function MemoryGame({ onBack }: Props) {
+export function MemoryGame({ onBack, unitId }: Props) {
+  const { saveScore } = useGameScore(unitId);
+  const [showRanking, setShowRanking] = useState(false);
   const [cards, setCards] = useState<Card[]>(() => createBoard(8));
   const [selected, setSelected] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
