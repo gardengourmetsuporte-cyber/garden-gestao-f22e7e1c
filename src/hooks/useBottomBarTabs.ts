@@ -8,6 +8,7 @@ const PINNED_COUNT = 2;
 export interface BottomTabDef {
   key: string;
   icon: string;
+  customIcon?: string;
   label: string;
   path: string;
   moduleKey: string;
