@@ -11,6 +11,7 @@ import { TransactionFilters, TransactionFiltersState } from './TransactionFilter
 import { FinanceCategory, FinanceAccount } from '@/types/finance';
 import { cn } from '@/lib/utils';
 import { exportTransactionsCsv } from '@/lib/exportPdf';
+import { exportTransactionsExcel } from '@/lib/exportExcel';
 import {
   DndContext,
   DragEndEvent,
@@ -347,11 +348,12 @@ export function FinanceTransactions({
                   }))
                 );
                 const label = format(selectedMonth, "MMMM yyyy", { locale: ptBR });
-                exportTransactionsCsv(allTxns, label);
+                exportTransactionsExcel(allTxns, label);
               }}
               className="gap-1"
+              title="Exportar Excel"
             >
-              <AppIcon name="Download" size={16} />
+              <AppIcon name="FileSpreadsheet" size={16} />
             </Button>
             <Button
               variant={hasActiveFilters ? "default" : "outline"}
