@@ -85,31 +85,29 @@ ${assets.length > 0 ? assets.map((a: any) => `- [${a.type}] ${a.title} (tags: ${
 REGRAS CRÍTICAS — LEIA COM ATENÇÃO:
 ═══════════════════════════════════════════
 
-1. **PROIBIÇÃO ABSOLUTA DE INVENÇÃO**: NUNCA invente produtos, pratos, preços, promoções ou combos que NÃO estejam listados acima. Se um item não aparece na lista de produtos, ele NÃO EXISTE.
+1. **DISTRIBUIÇÃO OBRIGATÓRIA**: Das 3 sugestões, PELO MENOS 2 DEVEM ser sobre PRODUTOS REAIS do cardápio com nome e preço exatos. No máximo 1 pode ser engajamento/bastidores. NUNCA gere 3 posts genéricos sem produto.
 
-2. **PRODUTOS REAIS APENAS**: Use EXCLUSIVAMENTE os nomes e preços listados em "PRODUTOS REAIS DO CARDÁPIO". Copie os nomes exatamente como estão escritos. NÃO altere nomes, NÃO crie variações.
+2. **PROIBIÇÃO ABSOLUTA DE INVENÇÃO**: NUNCA invente produtos, pratos, preços, promoções ou combos que NÃO estejam listados acima. Se um item não aparece na lista de produtos, ele NÃO EXISTE.
 
-3. **PROMOÇÕES REALISTAS**: Se sugerir promoção/desconto, calcule a partir do preço real listado. Exemplo: "De R$35,90 por R$29,90" — ambos os valores devem fazer sentido com os preços reais. NÃO invente valores.
+3. **PRODUTOS REAIS APENAS**: Use EXCLUSIVAMENTE os nomes e preços listados em "PRODUTOS REAIS DO CARDÁPIO". Copie os nomes exatamente como estão escritos. NÃO altere nomes, NÃO crie variações.
 
-4. **SEM PRODUTOS = SEM MENÇÃO**: Se não houver produtos cadastrados, gere APENAS posts de:
-   - Engajamento (enquetes, bastidores, equipe)
-   - Institucional (história do negócio, valores)
-   - Bastidores (dia a dia, preparo, ambiente)
-   NÃO mencione nenhum prato ou preço específico neste caso.
+4. **FOCO EM VENDA**: Os posts devem ter o objetivo de VENDER. Destaque o produto, mostre o preço, crie desejo. Evite posts vagos sobre "momentos especiais" ou "experiências". Seja direto: "Nosso X por apenas R$Y".
 
-5. **DESTAQUES PRIORITÁRIOS**: Dê preferência aos itens marcados com ⭐DESTAQUE.
+5. **PROMOÇÕES REALISTAS**: Se sugerir promoção/desconto, calcule a partir do preço real listado. NÃO invente valores.
 
-6. Use o nome "${unitName}" nos posts quando apropriado.
+6. **SEM PRODUTOS = SEM MENÇÃO**: Se não houver produtos cadastrados, gere APENAS posts de engajamento e bastidores. NÃO mencione nenhum prato ou preço.
 
-7. Cada sugestão deve ser específica para o dia de hoje. Se for feriado/data comemorativa, aproveite.
+7. **DESTAQUES PRIORITÁRIOS**: Dê preferência aos itens marcados com ⭐DESTAQUE.
 
-8. Inclua legendas prontas para copiar e colar com hashtags relevantes.
+8. **DATAS SÃO SECUNDÁRIAS**: Datas comemorativas podem ser usadas como CONTEXTO para vender um produto real, mas NUNCA como tema principal sem produto. Exemplo correto: "Neste São João, experimente nosso X por R$Y". Exemplo ERRADO: "Venha celebrar o São João conosco" sem produto.
 
-9. Sugira o melhor horário para postar.
+9. Use o nome "${unitName}" nos posts quando apropriado.
 
-10. Gere um prompt de imagem descritivo (em inglês) para cada sugestão — o prompt deve descrever o produto REAL mencionado no post.
+10. Inclua legendas prontas para copiar e colar com hashtags relevantes.
 
-11. Considere dias da semana (ex: segunda = "Começar a semana", sexta = "Happy hour").`;
+11. Sugira o melhor horário para postar.
+
+12. Gere um prompt de imagem descritivo (em inglês) para cada sugestão — o prompt deve descrever o produto REAL mencionado no post.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
