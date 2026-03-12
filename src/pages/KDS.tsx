@@ -132,32 +132,31 @@ function DraggableOrderCard({
     <div
       ref={setNodeRef}
       style={style}
+      {...attributes}
+      {...listeners}
       className={cn(
-        'rounded-xl border backdrop-blur-sm transition-all',
+        'rounded-xl border backdrop-blur-sm transition-all cursor-grab active:cursor-grabbing touch-manipulation',
         col.border, col.bg,
         isDragging && 'shadow-2xl shadow-black/60 ring-2 ring-white/20',
       )}
     >
       {/* Card body - tap to view detail */}
-      <button
-        type="button"
-        onClick={() => onSelect(order)}
-        className="w-full text-left px-3 pt-3 pb-2 space-y-2 active:bg-white/[0.03] transition-colors rounded-t-xl"
+      <div
+        className="w-full text-left px-3 pt-3 pb-2 space-y-2"
+        onPointerUp={(e) => {
+          // Only trigger select on quick taps (not drags)
+          if (!isDragging) {
+            e.stopPropagation();
+            onSelect(order);
+          }
+        }}
       >
         {/* Header row */}
         <div className="flex items-center justify-between gap-1">
           <span className={cn('text-base font-black tracking-tight', col.text)}>#{shortId}</span>
           <div className="flex items-center gap-1.5">
             <ElapsedBadge createdAt={order.created_at} />
-            {/* Drag handle */}
-            <div
-              {...attributes}
-              {...listeners}
-              className="p-1 rounded-md bg-white/[0.06] cursor-grab active:cursor-grabbing touch-manipulation"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <GripVertical className="w-3.5 h-3.5 text-white/25" />
-            </div>
+            <GripVertical className="w-3.5 h-3.5 text-white/25" />
           </div>
         </div>
 
@@ -177,12 +176,13 @@ function DraggableOrderCard({
             <span className="text-[9px] text-white/20 font-medium pl-5">+{items.length - 3} itens</span>
           )}
         </div>
-      </button>
+      </div>
 
       {/* Action buttons */}
       <div className="flex gap-1.5 px-2.5 pb-2.5 pt-1">
         {statusCfg?.prev && (
           <button
+            onPointerDown={e => e.stopPropagation()}
             onClick={() => onBump(order.id, statusCfg.prev!)}
             className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-[10px] font-bold text-white/40 bg-white/[0.05] hover:bg-white/[0.1] active:scale-95 transition-all"
           >
@@ -191,6 +191,7 @@ function DraggableOrderCard({
         )}
         {statusCfg?.next && (
           <button
+            onPointerDown={e => e.stopPropagation()}
             onClick={() => onBump(order.id, statusCfg.next!)}
             className={cn(
               'flex-1 py-2 rounded-lg text-[11px] font-black tracking-wide active:scale-95 transition-all',
@@ -248,7 +249,7 @@ function KDSColumn({
 
   return (
     <div className={cn(
-      'flex flex-col h-full min-w-[280px] w-[280px] lg:min-w-0 lg:w-auto shrink-0 lg:shrink',
+      'flex flex-col h-full min-w-0',
       'border-r border-white/[0.04] last:border-r-0',
     )}>
       {/* Column header */}
@@ -386,6 +387,23 @@ export default function KDS() {
     }
   }, []);
 
+  // Remove adjacent-only restriction — allow dragging to any column
+  const handleDragEndFn = useCallback((event: DragEndEvent) => {
+    setActiveId(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const orderId = active.id as string;
+    const targetStatus = over.id as string;
+
+    if (!ACTIVE_STATUSES.includes(targetStatus)) return;
+
+    const order = orders.find(o => o.id === orderId);
+    if (!order || order.status === targetStatus) return;
+
+    handleBump(orderId, targetStatus);
+  }, [orders, handleBump]);
+
   const [time, setTime] = useState(new Date());
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 30_000); return () => clearInterval(i); }, []);
 
@@ -401,25 +419,6 @@ export default function KDS() {
     setActiveId(event.active.id as string);
   }, []);
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    setActiveId(null);
-    const { active, over } = event;
-    if (!over) return;
-
-    const orderId = active.id as string;
-    const targetStatus = over.id as string;
-
-    if (!ACTIVE_STATUSES.includes(targetStatus)) return;
-
-    const order = orders.find(o => o.id === orderId);
-    if (!order || order.status === targetStatus) return;
-
-    const currentIdx = ACTIVE_STATUSES.indexOf(order.status);
-    const targetIdx = ACTIVE_STATUSES.indexOf(targetStatus);
-    if (Math.abs(currentIdx - targetIdx) > 1) return;
-
-    handleBump(orderId, targetStatus);
-  }, [orders, handleBump]);
 
   const handleDragCancel = useCallback(() => setActiveId(null), []);
 
@@ -472,10 +471,10 @@ export default function KDS() {
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
+        onDragEnd={handleDragEndFn}
         onDragCancel={handleDragCancel}
       >
-        <div className="flex-1 flex overflow-x-auto overflow-y-hidden lg:grid lg:grid-cols-4">
+        <div className="flex-1 grid grid-cols-4 overflow-hidden">
           {COLUMNS.map(col => (
             <KDSColumn
               key={col.key}
