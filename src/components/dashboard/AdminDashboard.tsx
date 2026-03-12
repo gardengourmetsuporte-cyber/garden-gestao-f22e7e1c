@@ -97,7 +97,7 @@ export function AdminDashboard() {
     if (!widget.visible) return null;
 
     // Filter by current view — team view renders its own widgets
-    if (view === 'team') return null;
+    if (view === 'team' || view === 'service') return null;
     if (view === 'operational' && (FINANCIAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
     if (view === 'financial' && (OPERATIONAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
 
