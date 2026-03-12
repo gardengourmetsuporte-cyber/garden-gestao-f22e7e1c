@@ -7,8 +7,7 @@ import {
   DndContext, DragOverlay, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors,
   type DragStartEvent, type DragEndEvent,
 } from '@dnd-kit/core';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { useDraggable } from '@dnd-kit/core';
 import { useDroppable } from '@dnd-kit/core';
 import {
   ChefHat, Clock, Maximize, Minimize, Volume2, VolumeX,
