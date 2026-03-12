@@ -189,55 +189,27 @@ export function AdminDashboard() {
       <DashboardContextBar firstName={firstName} stats={stats} />
 
       {/* View Selector */}
-      <div className="mt-3 flex gap-1.5 p-1 rounded-xl bg-card/70 border border-border/30 w-fit">
-        <button
-          onClick={() => handleViewChange('operational')}
-          className={cn(
-            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
-            view === 'operational'
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          )}
-        >
-          <AppIcon name="dashboard" size={14} />
-          Operacional
-        </button>
-        <button
-          onClick={() => handleViewChange('financial')}
-          className={cn(
-            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
-            view === 'financial'
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          )}
-        >
-          <AppIcon name="account_balance" size={14} />
-          Financeiro
-        </button>
-        <button
-          onClick={() => handleViewChange('service')}
-          className={cn(
-            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
-            view === 'service'
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          )}
-        >
-          <AppIcon name="storefront" size={14} />
-          Serviço
-        </button>
-        <button
-          onClick={() => handleViewChange('team')}
-          className={cn(
-            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
-            view === 'team'
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          )}
-        >
-          <AppIcon name="groups" size={14} />
-          Equipe
-        </button>
+      <div className="mt-3 grid grid-cols-4 gap-1 p-1 rounded-xl bg-card/70 border border-border/30">
+        {([
+          { key: 'operational' as const, icon: 'dashboard', label: 'Operacional' },
+          { key: 'financial' as const, icon: 'account_balance', label: 'Financeiro' },
+          { key: 'service' as const, icon: 'storefront', label: 'Serviço' },
+          { key: 'team' as const, icon: 'groups', label: 'Equipe' },
+        ] as const).map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => handleViewChange(tab.key)}
+            className={cn(
+              "flex items-center justify-center gap-1 px-1 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-200 min-w-0",
+              view === tab.key
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            )}
+          >
+            <AppIcon name={tab.icon} size={14} className="shrink-0" />
+            <span className="truncate">{tab.label}</span>
+          </button>
+        ))}
       </div>
 
       {/* Quick Stats — only on operational view */}
