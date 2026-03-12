@@ -498,34 +498,46 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
                         <AppIcon name={cfg.icon} size={14} className="text-muted-foreground" />
                         <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{cfg.label}</span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         {sourceOrders.map(order => {
-                          const orderNumber = order.order_number || order.id.slice(0, 4).toUpperCase();
+                          const statusColor = STATUS_COLORS[order.status] || 'bg-secondary text-muted-foreground';
+                          const isUrgent = order.status === 'pending' || order.status === 'awaiting_confirmation';
                           return (
                             <button
                               key={order.id}
                               onClick={() => setSelectedOrder(order)}
-                              className="bg-card border border-border/50 rounded-xl p-3 text-left active:bg-secondary/30 transition-colors flex flex-col gap-2"
+                              className={cn(
+                                "relative bg-card/80 backdrop-blur-sm border rounded-2xl p-3.5 text-left active:scale-[0.97] transition-all flex flex-col gap-2.5 overflow-hidden",
+                                isUrgent ? "border-warning/30 shadow-[0_0_12px_-4px_hsl(var(--warning)/0.2)]" : "border-border/40"
+                              )}
                             >
+                              {/* Top row: number + status */}
                               <div className="flex items-center justify-between">
-                                <span className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-[11px] font-bold text-primary">
+                                <span className={cn(
+                                  "w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black",
+                                  isUrgent ? "bg-warning/15 text-warning" : "bg-primary/15 text-primary"
+                                )}>
                                   {order.sequentialNumber}
                                 </span>
-                                <Badge variant="outline" className={cn('text-[8px] border px-1.5', STATUS_COLORS[order.status] || 'bg-secondary text-muted-foreground')}>
+                                <Badge variant="outline" className={cn('text-[9px] font-semibold border-0 rounded-full px-2.5 py-0.5', statusColor)}>
                                   {STATUS_LABELS[order.status] || order.status}
                                 </Badge>
                               </div>
-                              <div>
-                                <p className="text-xs font-semibold truncate">
+
+                              {/* Info */}
+                              <div className="space-y-0.5">
+                                <p className="text-sm font-bold text-foreground truncate">
                                   {sourceKey === 'mesa' && order.table_number ? `Mesa ${order.table_number}` : cfg.label}
                                 </p>
                                 {order.customer_name && (
-                                  <p className="text-[10px] text-muted-foreground truncate">{order.customer_name}</p>
+                                  <p className="text-[11px] text-muted-foreground truncate">{order.customer_name}</p>
                                 )}
                               </div>
-                              <div className="flex items-center justify-between mt-auto">
-                                <span className="text-[10px] text-muted-foreground">{format(new Date(order.created_at), 'HH:mm')}</span>
-                                <span className="text-xs font-bold text-primary">{formatCurrency(order.total)}</span>
+
+                              {/* Footer: time + price */}
+                              <div className="flex items-center justify-between mt-auto pt-1 border-t border-border/20">
+                                <span className="text-[10px] text-muted-foreground font-medium">{format(new Date(order.created_at), 'HH:mm')}</span>
+                                <span className="text-sm font-black text-primary">{formatCurrency(order.total)}</span>
                               </div>
                             </button>
                           );
