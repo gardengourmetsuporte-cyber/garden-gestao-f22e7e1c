@@ -4,11 +4,16 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import {
+  DndContext, DragOverlay, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors,
+  type DragStartEvent, type DragEndEvent,
+} from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { useDroppable } from '@dnd-kit/core';
+import {
   ChefHat, Clock, Maximize, Minimize, Volume2, VolumeX,
-  UtensilsCrossed, Truck, RefreshCw, X, Hash, User, ShoppingBag,
+  UtensilsCrossed, Truck, RefreshCw, Hash, User, Undo2,
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { KDSOrderDetail } from '@/components/kds/KDSOrderDetail';
 
 // ─── Types ────────────────────────────────────────────────────────
@@ -21,6 +26,7 @@ type KDSOrder = {
   created_at: string;
   source: string;
   customer_name: string | null;
+  order_number?: number;
   tablet_order_items?: {
     id: string;
     quantity: number;
@@ -43,23 +49,18 @@ type KDSOrder = {
 
 const ACTIVE_STATUSES = ['awaiting_confirmation', 'confirmed', 'preparing', 'ready'];
 
-const STATUS_CFG: Record<string, {
-  label: string;
-  accent: string;       // tailwind color stem e.g. "amber"
-  next: string | null;
-  nextLabel: string;
-}> = {
-  awaiting_confirmation: { label: 'Aguardando', accent: 'amber', next: 'confirmed', nextLabel: 'ACEITAR' },
-  confirmed:             { label: 'Confirmado', accent: 'yellow', next: 'preparing', nextLabel: 'PREPARAR' },
-  preparing:             { label: 'Preparando', accent: 'orange', next: 'ready', nextLabel: 'PRONTO ✓' },
-  ready:                 { label: 'Pronto',     accent: 'emerald', next: 'delivered', nextLabel: 'ENTREGUE' },
-};
+const COLUMNS = [
+  { key: 'awaiting_confirmation', label: 'Aguardando', gradient: 'from-amber-500/20 to-amber-600/5', accent: 'amber', dotColor: 'bg-amber-400', textColor: 'text-amber-400', bgCard: 'bg-amber-500/8', borderCard: 'border-amber-500/20', btnBg: 'bg-amber-400', btnHover: 'hover:bg-amber-300' },
+  { key: 'confirmed', label: 'Confirmado', gradient: 'from-sky-500/20 to-sky-600/5', accent: 'sky', dotColor: 'bg-sky-400', textColor: 'text-sky-400', bgCard: 'bg-sky-500/8', borderCard: 'border-sky-500/20', btnBg: 'bg-sky-400', btnHover: 'hover:bg-sky-300' },
+  { key: 'preparing', label: 'Preparando', gradient: 'from-violet-500/20 to-violet-600/5', accent: 'violet', dotColor: 'bg-violet-400', textColor: 'text-violet-400', bgCard: 'bg-violet-500/8', borderCard: 'border-violet-500/20', btnBg: 'bg-violet-400', btnHover: 'hover:bg-violet-300' },
+  { key: 'ready', label: 'Pronto', gradient: 'from-emerald-500/20 to-emerald-600/5', accent: 'emerald', dotColor: 'bg-emerald-400', textColor: 'text-emerald-400', bgCard: 'bg-emerald-500/8', borderCard: 'border-emerald-500/20', btnBg: 'bg-emerald-400', btnHover: 'hover:bg-emerald-300' },
+] as const;
 
-const ACCENT_MAP: Record<string, { text: string; bg: string; border: string; btn: string; ring: string }> = {
-  amber:   { text: 'text-amber-400',   bg: 'bg-amber-500/10',   border: 'border-amber-500/30',   btn: 'bg-amber-500 hover:bg-amber-400',     ring: 'ring-amber-500/40' },
-  yellow:  { text: 'text-yellow-400',  bg: 'bg-yellow-500/10',  border: 'border-yellow-500/30',  btn: 'bg-yellow-500 hover:bg-yellow-400',    ring: 'ring-yellow-500/40' },
-  orange:  { text: 'text-orange-400',  bg: 'bg-orange-500/10',  border: 'border-orange-500/30',  btn: 'bg-orange-500 hover:bg-orange-400',    ring: 'ring-orange-500/40' },
-  emerald: { text: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', btn: 'bg-emerald-500 hover:bg-emerald-400',  ring: 'ring-emerald-500/40' },
+const STATUS_NEXT: Record<string, { next: string | null; nextLabel: string; prev: string | null; prevLabel: string }> = {
+  awaiting_confirmation: { next: 'confirmed', nextLabel: 'Aceitar', prev: null, prevLabel: '' },
+  confirmed: { next: 'preparing', nextLabel: 'Preparar', prev: 'awaiting_confirmation', prevLabel: 'Voltar' },
+  preparing: { next: 'ready', nextLabel: 'Pronto', prev: 'confirmed', prevLabel: 'Voltar' },
+  ready: { next: 'delivered', nextLabel: 'Entregue', prev: 'preparing', prevLabel: 'Voltar' },
 };
 
 // ─── Elapsed timer ────────────────────────────────────────────────
@@ -75,10 +76,10 @@ function ElapsedBadge({ createdAt }: { createdAt: string }) {
 
   return (
     <span className={cn(
-      'inline-flex items-center gap-1 text-xs font-mono font-bold px-2 py-0.5 rounded-md',
+      'inline-flex items-center gap-1 text-[11px] font-mono font-bold px-2 py-0.5 rounded-lg',
       isCritical ? 'bg-red-500/20 text-red-400 animate-pulse' :
       isUrgent ? 'bg-orange-500/15 text-orange-400' :
-      'bg-white/5 text-white/50',
+      'bg-white/[0.06] text-white/40',
     )}>
       <Clock className="w-3 h-3" />
       {mins}m
@@ -86,93 +87,209 @@ function ElapsedBadge({ createdAt }: { createdAt: string }) {
   );
 }
 
-// ─── Order Card (compact, clickable) ──────────────────────────────
-function OrderCard({
-  order, onBump, onSelect,
-}: {
-  order: KDSOrder;
-  onBump: (id: string, next: string) => void;
-  onSelect: (o: KDSOrder) => void;
-}) {
-  const cfg = STATUS_CFG[order.status] || STATUS_CFG.confirmed;
-  const a = ACCENT_MAP[cfg.accent];
-  const source = order.source || 'mesa';
-  const items = order.tablet_order_items || [];
-  const shortId = (order as any).order_number ? `${(order as any).order_number}` : order.id.slice(0, 4).toUpperCase();
-
+// ─── Source icon ─────────────────────────────────────────────────
+function SourceBadge({ source, tableNumber, customerName }: { source: string; tableNumber: number; customerName: string | null }) {
   return (
-    <div className={cn(
-      'flex flex-col rounded-2xl border overflow-hidden backdrop-blur-sm transition-all',
-      a.border, a.bg,
-    )}>
-      {/* Clickable body */}
-      <button
-        type="button"
-        onClick={() => onSelect(order)}
-        className="flex-1 text-left px-3.5 pt-3 pb-2 space-y-2 active:bg-white/5 transition-colors"
-      >
-        {/* Top row */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-base font-black text-white tracking-tight">#{shortId}</span>
-            <span className={cn('text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md', a.bg, a.text)}>
-              {cfg.label}
-            </span>
-          </div>
-          <ElapsedBadge createdAt={order.created_at} />
-        </div>
-
-        {/* Source */}
-        <div className="flex items-center gap-1.5">
-          {source === 'delivery' ? (
-            <Truck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-          ) : source === 'qrcode' ? (
-            <Hash className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-          ) : (
-            <UtensilsCrossed className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          )}
-          <span className="text-xs font-semibold text-white/70 truncate">
-            {source === 'delivery' ? 'Delivery' : source === 'qrcode' ? `QR · Mesa ${order.table_number}` : `Mesa ${order.table_number}`}
-          </span>
-          {order.customer_name && (
-            <span className="text-[10px] text-white/40 truncate ml-auto">{order.customer_name}</span>
-          )}
-        </div>
-
-        {/* Items preview (max 3) */}
-        <div className="space-y-1">
-          {items.slice(0, 3).map(item => (
-            <div key={item.id} className="flex items-start gap-1.5">
-              <span className="text-xs font-bold text-white/80 shrink-0">{item.quantity}x</span>
-              <span className="text-xs text-white/60 truncate">{item.tablet_products?.name || 'Item'}</span>
-            </div>
-          ))}
-          {items.length > 3 && (
-            <span className="text-[10px] text-white/30 font-medium">+{items.length - 3} itens</span>
-          )}
-          {items.length === 0 && (
-            <span className="text-[10px] text-white/20">Sem itens</span>
-          )}
-        </div>
-      </button>
-
-      {/* Bump button */}
-      {cfg.next && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onBump(order.id, cfg.next!); }}
-          className={cn(
-            'w-full py-3 text-sm font-black tracking-wide text-black transition-all active:scale-[0.97]',
-            a.btn,
-          )}
-        >
-          {cfg.nextLabel}
-        </button>
+    <div className="flex items-center gap-1.5 text-[11px] text-white/50 font-medium">
+      {source === 'delivery' ? (
+        <><Truck className="w-3.5 h-3.5 text-blue-400" /><span>Delivery</span></>
+      ) : source === 'qrcode' ? (
+        <><Hash className="w-3.5 h-3.5 text-purple-400" /><span>Mesa {tableNumber}</span></>
+      ) : (
+        <><UtensilsCrossed className="w-3.5 h-3.5 text-emerald-400" /><span>Mesa {tableNumber}</span></>
       )}
+      {customerName && <><span className="text-white/20">·</span><span className="truncate max-w-[80px]">{customerName}</span></>}
     </div>
   );
 }
 
-// OrderDetail moved to src/components/kds/KDSOrderDetail.tsx
+// ─── Draggable Order Card ────────────────────────────────────────
+function DraggableOrderCard({
+  order, col, onBump, onSelect,
+}: {
+  order: KDSOrder;
+  col: typeof COLUMNS[number];
+  onBump: (id: string, next: string) => void;
+  onSelect: (o: KDSOrder) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: order.id,
+    data: { order, status: order.status },
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    zIndex: isDragging ? 50 : 'auto' as any,
+  };
+
+  const items = order.tablet_order_items || [];
+  const shortId = order.order_number ? `${order.order_number}` : order.id.slice(0, 4).toUpperCase();
+  const statusCfg = STATUS_NEXT[order.status];
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'group rounded-2xl border backdrop-blur-sm transition-shadow',
+        col.borderCard, col.bgCard,
+        isDragging && 'shadow-2xl shadow-black/40 scale-[1.02]',
+        'hover:shadow-lg hover:shadow-black/20',
+      )}
+    >
+      {/* Drag handle + clickable body */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing touch-manipulation"
+      >
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onSelect(order); }}
+          className="w-full text-left px-4 pt-3.5 pb-2.5 space-y-2.5 active:bg-white/[0.03] transition-colors rounded-t-2xl"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5">
+              <span className={cn('text-lg font-black tracking-tight', col.textColor)}>#{shortId}</span>
+            </div>
+            <ElapsedBadge createdAt={order.created_at} />
+          </div>
+
+          {/* Source */}
+          <SourceBadge source={order.source || 'mesa'} tableNumber={order.table_number} customerName={order.customer_name} />
+
+          {/* Items */}
+          <div className="space-y-1 pb-0.5">
+            {items.slice(0, 4).map(item => (
+              <div key={item.id} className="flex items-start gap-2">
+                <span className={cn('text-[11px] font-black shrink-0 w-5 h-5 rounded-md flex items-center justify-center', col.bgCard, col.textColor)}>
+                  {item.quantity}
+                </span>
+                <span className="text-xs text-white/70 truncate leading-5">{item.tablet_products?.name || 'Item'}</span>
+              </div>
+            ))}
+            {items.length > 4 && (
+              <span className="text-[10px] text-white/25 font-medium pl-7">+{items.length - 4} itens</span>
+            )}
+          </div>
+        </button>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-1.5 px-3 pb-3">
+        {statusCfg?.prev && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onBump(order.id, statusCfg.prev!); }}
+            className="flex items-center gap-1 px-3 py-2 rounded-xl text-[11px] font-bold text-white/50 bg-white/[0.05] hover:bg-white/[0.1] active:scale-95 transition-all"
+          >
+            <Undo2 className="w-3 h-3" />
+            {statusCfg.prevLabel}
+          </button>
+        )}
+        {statusCfg?.next && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onBump(order.id, statusCfg.next!); }}
+            className={cn(
+              'flex-1 py-2.5 rounded-xl text-xs font-black text-black tracking-wide active:scale-95 transition-all',
+              col.btnBg, col.btnHover,
+            )}
+          >
+            {statusCfg.nextLabel}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Overlay card (dragging ghost) ───────────────────────────────
+function DragOverlayCard({ order }: { order: KDSOrder }) {
+  const col = COLUMNS.find(c => c.key === order.status) || COLUMNS[1];
+  const items = order.tablet_order_items || [];
+  const shortId = order.order_number ? `${order.order_number}` : order.id.slice(0, 4).toUpperCase();
+
+  return (
+    <div className={cn(
+      'rounded-2xl border backdrop-blur-md shadow-2xl shadow-black/50 rotate-2 scale-105',
+      col.borderCard, col.bgCard,
+      'ring-2 ring-white/20',
+    )}>
+      <div className="px-4 pt-3.5 pb-3 space-y-2">
+        <div className="flex items-center gap-2.5">
+          <span className={cn('text-lg font-black tracking-tight', col.textColor)}>#{shortId}</span>
+          <ElapsedBadge createdAt={order.created_at} />
+        </div>
+        <SourceBadge source={order.source || 'mesa'} tableNumber={order.table_number} customerName={order.customer_name} />
+        <div className="space-y-1">
+          {items.slice(0, 3).map(item => (
+            <div key={item.id} className="flex items-start gap-2">
+              <span className="text-[11px] font-black text-white/60">{item.quantity}x</span>
+              <span className="text-xs text-white/50 truncate">{item.tablet_products?.name || 'Item'}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Droppable Column ────────────────────────────────────────────
+function KDSColumn({
+  col, orders, onBump, onSelect,
+}: {
+  col: typeof COLUMNS[number];
+  orders: KDSOrder[];
+  onBump: (id: string, next: string) => void;
+  onSelect: (o: KDSOrder) => void;
+}) {
+  const { isOver, setNodeRef } = useDroppable({ id: col.key });
+
+  return (
+    <div className="flex flex-col h-full min-w-0">
+      {/* Column header */}
+      <div className={cn(
+        'flex items-center gap-2.5 px-4 py-3 border-b border-white/[0.06]',
+        isOver && 'bg-white/[0.04]',
+      )}>
+        <div className={cn('w-2.5 h-2.5 rounded-full shrink-0', col.dotColor, orders.length > 0 && 'animate-pulse')} />
+        <span className={cn('text-xs font-bold uppercase tracking-widest', orders.length > 0 ? col.textColor : 'text-white/20')}>
+          {col.label}
+        </span>
+        {orders.length > 0 && (
+          <span className={cn(
+            'ml-auto text-[11px] font-black w-6 h-6 rounded-lg flex items-center justify-center',
+            col.bgCard, col.textColor,
+          )}>
+            {orders.length}
+          </span>
+        )}
+      </div>
+
+      {/* Scrollable order list */}
+      <div
+        ref={setNodeRef}
+        className={cn(
+          'flex-1 overflow-y-auto p-2.5 space-y-2.5 transition-colors',
+          isOver && 'bg-white/[0.02] ring-1 ring-inset ring-white/[0.06] rounded-b-xl',
+        )}
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.08) transparent' }}
+      >
+        {orders.map(order => (
+          <DraggableOrderCard key={order.id} order={order} col={col} onBump={onBump} onSelect={onSelect} />
+        ))}
+        {orders.length === 0 && (
+          <div className="flex-1 flex flex-col items-center justify-center min-h-[200px] text-white/[0.08]">
+            <ChefHat className="w-8 h-8 mb-2" />
+            <span className="text-[11px] font-medium">Nenhum pedido</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ─── Main KDS Page ────────────────────────────────────────────────
 export default function KDS() {
@@ -181,19 +298,20 @@ export default function KDS() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<KDSOrder | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 8 } }),
+  );
 
   const { data: orders = [], isPending, isError, error, refetch } = useQuery({
     queryKey: ['kds-orders', unitId],
     queryFn: async () => {
       if (!unitId) return [];
-
       const withTimeout = <T,>(promise: Promise<T>, ms = 12000) =>
-        Promise.race<T>([
-          promise,
-          new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout ao carregar pedidos do KDS')), ms)),
-        ]);
-
+        Promise.race<T>([promise, new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))]);
       try {
         const query = supabase
           .from('tablet_orders')
@@ -202,22 +320,12 @@ export default function KDS() {
           .in('status', ACTIVE_STATUSES)
           .order('created_at', { ascending: true })
           .limit(50);
-
-        const { data, error } = await withTimeout(
-          Promise.resolve(query)
-        ) as { data: any; error: any };
-
-        console.log('[KDS] Query result:', { count: data?.length, error });
-        if (error) {
-          console.error('[KDS] Supabase error:', error);
-          throw error;
-        }
+        const { data, error } = await withTimeout(Promise.resolve(query)) as { data: any; error: any };
+        if (error) throw error;
         return (data as unknown as KDSOrder[]) || [];
       } catch (err: any) {
-        console.error('[KDS] Fetch error:', err?.name, err?.message, err);
         const msg = String(err?.message || '');
-        const isAbort = err?.name === 'AbortError' || msg.toLowerCase().includes('abort');
-        if (isAbort) throw new Error('Conexão instável. Tente novamente.');
+        if (err?.name === 'AbortError' || msg.toLowerCase().includes('abort')) throw new Error('Conexão instável.');
         throw err;
       }
     },
@@ -263,28 +371,20 @@ export default function KDS() {
   }, []);
 
   const handleBump = useCallback(async (orderId: string, nextStatus: string) => {
-    // Optimistic: remove from local cache immediately if moving to delivered
     if (nextStatus === 'delivered' || nextStatus === 'completed') {
       queryClient.setQueryData(['kds-orders', unitId], (old: KDSOrder[] | undefined) =>
         (old || []).filter(o => o.id !== orderId)
       );
     } else {
-      // Optimistic: update status locally
       queryClient.setQueryData(['kds-orders', unitId], (old: KDSOrder[] | undefined) =>
         (old || []).map(o => o.id === orderId ? { ...o, status: nextStatus } : o)
       );
     }
-
     const { error } = await supabase
       .from('tablet_orders')
       .update({ status: nextStatus, updated_at: new Date().toISOString() })
       .eq('id', orderId);
-
-    if (error) {
-      console.error('[KDS] Bump failed:', error);
-      // Revert optimistic update
-      queryClient.invalidateQueries({ queryKey: ['kds-orders', unitId] });
-    }
+    if (error) queryClient.invalidateQueries({ queryKey: ['kds-orders', unitId] });
   }, [unitId, queryClient]);
 
   const toggleFullscreen = useCallback(() => {
@@ -296,108 +396,120 @@ export default function KDS() {
   }, []);
 
   const [time, setTime] = useState(new Date());
-  useEffect(() => {
-    const i = setInterval(() => setTime(new Date()), 30_000);
-    return () => clearInterval(i);
-  }, []);
+  useEffect(() => { const i = setInterval(() => setTime(new Date()), 30_000); return () => clearInterval(i); }, []);
 
   const ordersByStatus = useMemo(() => {
-    const g = { awaiting_confirmation: [] as KDSOrder[], confirmed: [] as KDSOrder[], preparing: [] as KDSOrder[], ready: [] as KDSOrder[] };
-    orders.forEach(o => { if (g[o.status as keyof typeof g]) g[o.status as keyof typeof g].push(o); });
+    const g: Record<string, KDSOrder[]> = { awaiting_confirmation: [], confirmed: [], preparing: [], ready: [] };
+    orders.forEach(o => { if (g[o.status]) g[o.status].push(o); });
     return g;
   }, [orders]);
 
-  const COLUMNS = [
-    { key: 'awaiting_confirmation' as const, label: 'Aguardando', accent: 'amber' },
-    { key: 'confirmed' as const, label: 'Confirmado', accent: 'yellow' },
-    { key: 'preparing' as const, label: 'Preparando', accent: 'orange' },
-    { key: 'ready' as const, label: 'Pronto', accent: 'emerald' },
-  ];
+  // Drag handlers
+  const activeOrder = useMemo(() => orders.find(o => o.id === activeId) || null, [orders, activeId]);
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  }, []);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    setActiveId(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const orderId = active.id as string;
+    const targetStatus = over.id as string;
+
+    // Only allow drop on column droppables (not on other cards)
+    if (!ACTIVE_STATUSES.includes(targetStatus)) return;
+
+    const order = orders.find(o => o.id === orderId);
+    if (!order || order.status === targetStatus) return;
+
+    // Allow drag to any adjacent column (forward or backward)
+    const currentIdx = ACTIVE_STATUSES.indexOf(order.status);
+    const targetIdx = ACTIVE_STATUSES.indexOf(targetStatus);
+    if (Math.abs(currentIdx - targetIdx) > 1) return; // only 1 step at a time
+
+    handleBump(orderId, targetStatus);
+  }, [orders, handleBump]);
+
+  const handleDragCancel = useCallback(() => setActiveId(null), []);
 
   return (
-    <div className="min-h-screen bg-[hsl(240,10%,4%)] text-white flex flex-col select-none">
-      {/* ── Top bar ── */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] bg-[hsl(240,10%,5%)] shrink-0">
+    <div className="h-screen bg-[hsl(225,15%,6%)] text-white flex flex-col select-none overflow-hidden">
+      {/* ── Fixed Top Bar ── */}
+      <header className="flex items-center justify-between px-5 h-14 border-b border-white/[0.06] bg-[hsl(225,15%,7%)] shrink-0 z-20">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center ring-1 ring-emerald-500/30">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 flex items-center justify-center ring-1 ring-emerald-500/25">
             <ChefHat className="w-5 h-5 text-emerald-400" />
           </div>
           <div>
-            <h1 className="text-lg font-black tracking-tight leading-tight">KDS</h1>
-            <p className="text-[10px] text-white/40 font-medium -mt-0.5">Cozinha • {orders.length} pedidos</p>
+            <h1 className="text-base font-black tracking-tight leading-none">KDS</h1>
+            <p className="text-[10px] text-white/30 font-medium mt-0.5">
+              Cozinha · {orders.length} {orders.length === 1 ? 'pedido' : 'pedidos'}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-base font-mono font-bold text-white/40 mr-1">
+
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-mono font-bold text-white/25 mr-2 tabular-nums">
             {time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </span>
-          <button onClick={() => setSoundEnabled(s => !s)} className="p-2 rounded-xl hover:bg-white/5 transition-colors" title={soundEnabled ? 'Mudo' : 'Som'}>
-            {soundEnabled ? <Volume2 className="w-5 h-5 text-white/50" /> : <VolumeX className="w-5 h-5 text-white/25" />}
+          <button onClick={() => refetch()} className="p-2.5 rounded-xl hover:bg-white/[0.06] active:scale-95 transition-all" title="Atualizar">
+            <RefreshCw className={cn('w-4 h-4 text-white/30', isPending && 'animate-spin text-emerald-400')} />
           </button>
-          <button onClick={toggleFullscreen} className="p-2 rounded-xl hover:bg-white/5 transition-colors" title="Tela cheia">
-            {isFullscreen ? <Minimize className="w-5 h-5 text-white/50" /> : <Maximize className="w-5 h-5 text-white/50" />}
+          <button onClick={() => setSoundEnabled(s => !s)} className="p-2.5 rounded-xl hover:bg-white/[0.06] active:scale-95 transition-all" title={soundEnabled ? 'Silenciar' : 'Ativar som'}>
+            {soundEnabled ? <Volume2 className="w-4 h-4 text-white/30" /> : <VolumeX className="w-4 h-4 text-white/15" />}
+          </button>
+          <button onClick={toggleFullscreen} className="p-2.5 rounded-xl hover:bg-white/[0.06] active:scale-95 transition-all" title="Tela cheia">
+            {isFullscreen ? <Minimize className="w-4 h-4 text-white/30" /> : <Maximize className="w-4 h-4 text-white/30" />}
           </button>
         </div>
       </header>
 
-      {/* ── Column headers ── */}
+      {/* Error bar */}
       {isError && (
-        <div className="mx-2.5 mt-2.5 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 flex items-center justify-between gap-3">
-          <p className="text-xs text-destructive font-medium truncate">
-            {(error as Error)?.message || 'Falha ao carregar pedidos'}
-          </p>
-          <button
-            onClick={() => refetch()}
-            className="h-7 px-2.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold shrink-0"
-          >
+        <div className="mx-3 mt-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 flex items-center justify-between gap-3 shrink-0">
+          <p className="text-xs text-red-400 font-medium truncate">{(error as Error)?.message || 'Falha ao carregar'}</p>
+          <button onClick={() => refetch()} className="h-7 px-3 rounded-lg bg-red-500 text-white text-[11px] font-bold shrink-0 active:scale-95">
             Tentar novamente
           </button>
         </div>
       )}
 
-      <div className="grid grid-cols-4 shrink-0">
-        {COLUMNS.map(col => {
-          const a = ACCENT_MAP[col.accent];
-          const count = ordersByStatus[col.key].length;
-          return (
-            <div key={col.key} className={cn('flex items-center justify-center gap-2 py-2.5 border-b-2', count > 0 ? a.border : 'border-white/[0.04]')}>
-              <span className={cn('text-[11px] font-bold uppercase tracking-widest', count > 0 ? a.text : 'text-white/20')}>
-                {col.label}
-              </span>
-              {count > 0 && (
-                <span className={cn('text-[10px] font-black px-1.5 py-0.5 rounded-md', a.bg, a.text)}>
-                  {count}
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {/* ── Columns with DnD ── */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <div className="flex-1 grid grid-cols-4 divide-x divide-white/[0.04] overflow-hidden">
+          {COLUMNS.map(col => (
+            <KDSColumn
+              key={col.key}
+              col={col}
+              orders={ordersByStatus[col.key] || []}
+              onBump={handleBump}
+              onSelect={setSelectedOrder}
+            />
+          ))}
+        </div>
 
-      {/* ── Orders grid ── */}
-      <div className="flex-1 grid grid-cols-4 gap-2.5 p-2.5 overflow-auto">
-        {COLUMNS.map(col => (
-          <div key={col.key} className="flex flex-col gap-2.5">
-            {ordersByStatus[col.key].map(order => (
-              <OrderCard key={order.id} order={order} onBump={handleBump} onSelect={setSelectedOrder} />
-            ))}
-            {ordersByStatus[col.key].length === 0 && (
-              <div className="flex-1 flex items-center justify-center min-h-[180px]">
-                <span className="text-white/10 text-xs font-medium">Nenhum pedido</span>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+        <DragOverlay dropAnimation={null}>
+          {activeOrder ? <DragOverlayCard order={activeOrder} /> : null}
+        </DragOverlay>
+      </DndContext>
 
       {/* ── Detail overlay ── */}
       {selectedOrder && (
         <KDSOrderDetail order={selectedOrder} onClose={() => setSelectedOrder(null)} onBump={handleBump} />
       )}
 
-      {/* Loading */}
-      {(isPending && !isError) && (
-        <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50">
+      {/* Loading overlay */}
+      {(isPending && !isError && orders.length === 0) && (
+        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-50">
           <RefreshCw className="w-8 h-8 animate-spin text-emerald-400" />
         </div>
       )}
