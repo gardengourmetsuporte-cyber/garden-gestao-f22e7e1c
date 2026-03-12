@@ -291,7 +291,7 @@ export default function DigitalMenu() {
   if (authChecked && !customerUser && !authGatePassed) {
     const handleSkipGate = () => {
       setAuthGatePassed(true);
-      localStorage.setItem(`dm_auth_skipped_${unitId}`, '1');
+      sessionStorage.setItem(`dm_auth_skipped_${unitId}`, '1');
     };
     return (
       <MenuCustomerAuth
