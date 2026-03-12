@@ -273,7 +273,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
       </div>
 
       {/* ─── Date Filter Pills ─── */}
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-none -mx-4 px-4">
+      <div className="flex items-center gap-2 flex-wrap">
         {DATE_PILLS.map(pill => {
           if (pill.id === 'custom') {
             return (
