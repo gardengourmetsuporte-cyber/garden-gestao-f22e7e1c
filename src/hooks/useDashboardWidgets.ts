@@ -13,6 +13,7 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
   { key: 'finance', label: 'Saldo financeiro', icon: 'Wallet', visible: true },
   { key: 'checklist', label: 'Checklists', icon: 'CheckSquare', visible: true },
   { key: 'bills-due', label: 'Contas a vencer', icon: 'AlertTriangle', visible: true },
+  { key: 'analytics', label: 'Analytics', icon: 'TrendingUp', visible: true },
   { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },
   { key: 'calendar', label: 'Calendário', icon: 'CalendarDays', visible: true },
   { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true },
