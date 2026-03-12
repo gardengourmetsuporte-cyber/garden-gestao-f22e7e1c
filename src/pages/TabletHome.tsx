@@ -198,6 +198,20 @@ export default function TabletHome() {
         onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`),
       },
       {
+        id: 'roleta',
+        icon: 'Dices',
+        label: 'Roleta da Sorte',
+        subtitle: 'Gire e ganhe prêmios!',
+        onClick: () => navigate(`/gamification/${unitId}`),
+      },
+      {
+        id: 'ranking',
+        icon: 'Trophy',
+        label: 'Ranking',
+        subtitle: 'Veja quem está no topo',
+        onClick: () => navigate(`/gamification/${unitId}?tab=ranking`),
+      },
+      {
         id: 'mural',
         icon: 'Newspaper',
         label: 'Mural da Casa',
