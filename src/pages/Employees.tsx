@@ -58,7 +58,7 @@ export default function Employees() {
           ) : (
             <>
               {/* Navigation Cards */}
-              <div className={cn("grid gap-2", tabs.length <= 3 ? "grid-cols-3" : tabs.length <= 4 ? "grid-cols-4" : "grid-cols-5")}>
+              <div className="grid grid-cols-3 gap-2">
                 {tabs.map((tab) => (
                   <button
                     key={tab.key}
