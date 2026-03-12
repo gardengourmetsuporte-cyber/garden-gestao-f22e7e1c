@@ -19,7 +19,7 @@ const tabs: { key: MenuTab; icon: string; iconFilled: string; label: string }[] 
 export function MenuBottomNav({ active, onTabChange, cartCount }: Props) {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-50 safe-area-pb">
-      <div className="max-w-4xl mx-auto px-3 pb-2">
+      <div className="max-w-4xl lg:max-w-5xl mx-auto px-3 pb-2">
         <div className="bg-card/90 backdrop-blur-2xl border border-border/40 rounded-2xl shadow-xl">
           <div className="flex items-center justify-around h-16">
             {tabs.map(tab => {
