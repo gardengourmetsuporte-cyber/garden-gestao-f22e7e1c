@@ -51,62 +51,14 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
     return 'Boa noite';
   })();
 
-  const pills = [
-    {
-      icon: 'Receipt',
-      label: 'contas',
-      value: stats.billsDueSoon?.length ?? 0,
-      color: 'hsl(var(--warning, 38 92% 50%))',
-      path: '/finance',
-    },
-    {
-      icon: 'Checklist',
-      label: 'checklists',
-      value: stats.pendingClosings,
-      color: 'hsl(var(--primary))',
-      path: '/checklists',
-    },
-    {
-      icon: 'ShoppingBag',
-      label: 'pedidos',
-      value: stats.pendingOrders,
-      color: 'hsl(210 80% 55%)',
-      path: '/orders',
-    },
-    {
-      icon: 'Inventory2',
-      label: 'estoque crítico',
-      value: stats.criticalItems,
-      color: 'hsl(0 72% 51%)',
-      path: '/inventory',
-    },
-  ];
-
-  const hasAnyPill = pills.some(p => p.value > 0);
-
   return (
-    <div className="flex flex-col gap-2">
+    <div>
       <h2
         className="text-base font-extrabold text-foreground font-display"
         style={{ letterSpacing: '-0.03em' }}
       >
         {greeting}, {firstName} <span className="animate-wave-hand">👋</span>
       </h2>
-
-      {hasAnyPill && (
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
-          {pills.map((pill) => (
-            <ContextPill
-              key={pill.icon}
-              icon={pill.icon}
-              label={pill.label}
-              value={pill.value}
-              color={pill.color}
-              onClick={() => navigate(pill.path)}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
