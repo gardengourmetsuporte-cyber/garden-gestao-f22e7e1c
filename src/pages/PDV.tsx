@@ -254,12 +254,14 @@ export default function PDV() {
           </div>
 
           {/* Categories */}
-          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-3 px-3">
+          <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => setSelectedCategory(null)}
               className={cn(
-                'shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
-                !selectedCategory ? 'bg-primary text-primary-foreground' : 'bg-secondary/60 text-muted-foreground'
+                'flex items-center justify-center px-3 py-2.5 rounded-2xl text-[13px] font-semibold transition-all duration-200',
+                !selectedCategory
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
+                  : 'bg-muted/50 text-muted-foreground active:scale-95'
               )}
             >
               Todos
@@ -269,8 +271,10 @@ export default function PDV() {
                 key={cat}
                 onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
                 className={cn(
-                  'shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap',
-                  cat === selectedCategory ? 'bg-primary text-primary-foreground' : 'bg-secondary/60 text-muted-foreground'
+                  'px-3 py-2.5 rounded-2xl text-[13px] font-semibold transition-all duration-200 truncate',
+                  cat === selectedCategory
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
+                    : 'bg-muted/50 text-muted-foreground active:scale-95'
                 )}
               >
                 {cat}
