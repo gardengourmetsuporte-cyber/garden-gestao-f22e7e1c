@@ -265,8 +265,8 @@ export default function DigitalMenu() {
   if (!hasVisibleProducts) {
     return (
       <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5 px-8">
-        <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3">
-          <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
+        <div className="w-20 h-20 rounded-full overflow-hidden bg-white shadow-lg flex items-center justify-center">
+          <img src={gardenLogo} alt="Garden" className="w-[70%] h-[70%] object-contain" />
         </div>
         <div className="flex flex-col items-center gap-3 text-center">
           <AppIcon name="UtensilsCrossed" size={44} className="text-muted-foreground/30" />
