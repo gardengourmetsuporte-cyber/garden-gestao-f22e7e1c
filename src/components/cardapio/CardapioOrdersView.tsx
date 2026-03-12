@@ -242,7 +242,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
       {/* ─── Sticky Filters ─── */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2.5 lg:px-6 space-y-2.5 border-b border-border/20">
         {/* ─── Channel Pills ─── */}
-        <div className="flex items-center justify-center gap-1.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-1">
           {CHANNELS.map(ch => {
             const active = channel === ch.id;
             const count = channelCounts[ch.id];
