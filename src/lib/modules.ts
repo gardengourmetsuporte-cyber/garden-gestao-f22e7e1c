@@ -151,6 +151,12 @@ export const ALL_MODULES: ModuleDef[] = [
     children: [],
   },
   {
+    key: 'reports', label: 'Relatórios', icon: 'BarChart3', route: '/reports', routes: ['/reports'], group: 'Gestão',
+    children: [
+      { key: 'reports.sales', label: 'Vendas', icon: 'ShoppingCart' },
+    ],
+  },
+  {
     key: 'menu-admin', label: 'Cardápio', icon: 'MenuBook', customIcon: '/icons/cardapio.png', route: '/cardapio', routes: ['/cardapio', '/menu-admin', '/tablet-admin', '/gamification'], group: 'Operação',
     children: [
       { key: 'menu-admin.view', label: 'Ver cardápio', icon: 'Eye' },

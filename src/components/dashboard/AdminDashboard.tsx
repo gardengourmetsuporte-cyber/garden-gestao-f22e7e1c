@@ -32,6 +32,7 @@ const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ defaul
 const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
 const LazyQuickStats = lazy(() => import('./QuickStatsWidget').then(m => ({ default: m.QuickStatsWidget })));
 const LazyAnalytics = lazy(() => import('./AnalyticsWidget'));
+import { SalesGoalWidget } from './SalesGoalWidget';
 function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
   const skeleton = fallback || <GenericWidgetSkeleton />;
@@ -156,6 +157,11 @@ export function AdminDashboard() {
 
       {/* Setup Onboarding — full width */}
       <SetupChecklistWidget />
+
+      {/* Sales Goal Widget — full width */}
+      <div className="mt-4">
+        <SalesGoalWidget />
+      </div>
 
       {/* Smart Scanner — full width */}
       <div className="mt-4">

@@ -4835,6 +4835,47 @@ export type Database = {
           },
         ]
       }
+      sales_goals: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          daily_goal: number | null
+          id: string
+          month: string
+          monthly_goal: number | null
+          unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          daily_goal?: number | null
+          id?: string
+          month: string
+          monthly_goal?: number | null
+          unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          daily_goal?: number | null
+          id?: string
+          month?: string
+          monthly_goal?: number | null
+          unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_goals_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shopping_list_items: {
         Row: {
           added_by: string | null

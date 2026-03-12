@@ -105,6 +105,7 @@ const ShareReceiptHandler = lazy(() => lazyRetry(() => import("./pages/ShareRece
 const Documentation = lazy(() => lazyRetry(() => import("./pages/Documentation")));
 const Compliance = lazy(() => lazyRetry(() => import("./pages/Compliance")));
 const AdminMonitor = lazy(() => lazyRetry(() => import("./pages/AdminMonitor")));
+const Reports = lazy(() => lazyRetry(() => import("./pages/Reports")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -307,6 +308,7 @@ function AuthenticatedRoutes() {
           <Route path="/compliance" element={<ProtectedRoute><Compliance /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/admin/monitor" element={<ProtectedRoute><AdminMonitor /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
