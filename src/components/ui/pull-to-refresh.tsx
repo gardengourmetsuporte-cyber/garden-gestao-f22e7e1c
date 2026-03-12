@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { AppIcon } from '@/components/ui/app-icon';
 
 interface PullToRefreshIndicatorProps {
   pullDistance: number;
@@ -13,26 +12,32 @@ export function PullToRefreshIndicator({ pullDistance, refreshing, threshold }: 
   const progress = Math.min(pullDistance / threshold, 1);
   const rotation = progress * 180;
   const ready = pullDistance >= threshold;
+  const displayHeight = refreshing ? 48 : pullDistance > 0 ? Math.min(pullDistance, 60) : 0;
 
   return (
     <div
-      className="flex items-center justify-center overflow-hidden transition-[height] duration-200"
-      style={{ height: refreshing ? 48 : pullDistance > 0 ? Math.min(pullDistance, 60) : 0 }}
+      className="flex items-center justify-center overflow-hidden will-change-transform"
+      style={{
+        height: displayHeight,
+        transition: refreshing || pullDistance <= 0 ? 'height 0.2s ease-out' : 'none',
+      }}
     >
-      <div
-        className={cn(
-          "w-8 h-8 rounded-full flex items-center justify-center transition-all",
-          ready ? "bg-primary/20" : "bg-muted/40",
-          refreshing && "animate-spin"
-        )}
-      >
-        <AppIcon
-          name={refreshing ? "Loader2" : "ArrowDown"}
-          size={18}
-          className={cn("text-primary transition-transform", !refreshing && "duration-100")}
-          style={{ transform: refreshing ? undefined : `rotate(${rotation}deg)` }}
-        />
-      </div>
+      {refreshing ? (
+        <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+      ) : (
+        <div
+          className={cn(
+            "w-8 h-8 rounded-full flex items-center justify-center will-change-transform",
+            ready ? "bg-primary/20" : "bg-muted/40"
+          )}
+          style={{ transform: `rotate(${rotation}deg)` }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+            <path d="M12 5v14" />
+            <path d="m19 12-7 7-7-7" />
+          </svg>
+        </div>
+      )}
     </div>
   );
 }
