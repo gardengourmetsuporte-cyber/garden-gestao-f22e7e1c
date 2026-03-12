@@ -1,49 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-## Plano: Dois modos de visualização no Checklist
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-### Objetivo
-Adicionar um toggle de modo de visualização na tela de Checklists: **"Completo"** (atual, lista todos os setores) e **"Meu Setor"** (funcionário escolhe um setor e vê apenas as tarefas daquele setor expandidas).
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-### UX
+---
 
-Abaixo dos cards Abertura/Fechamento, um toggle compacto com dois botões:
-```text
-[ 📋 Completo ] [ 🏷 Meu Setor ]
-```
+## Bloco de Relatórios Avançados ✅
 
-- **Completo**: comportamento atual, todos os setores colapsáveis
-- **Meu Setor**: mostra um seletor de setor (chips horizontais), e ao selecionar exibe todas as subcategorias e itens daquele setor já expandidos, sem os outros setores
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-A escolha do setor fica salva em `localStorage` para persistir entre sessões.
+## Dashboard Analytics ✅
 
-### Alterações
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-**`src/pages/Checklists.tsx`**
-- Novo state: `viewMode: 'full' | 'sector'` e `selectedSectorId: string | null`
-- Renderizar toggle de modo entre os cards de tipo e o conteúdo
-- Quando `viewMode === 'sector'`, mostrar chips de seleção de setor e filtrar `sectors` passados ao `ChecklistView` para apenas o setor escolhido
-- Persistir `viewMode` e `selectedSectorId` no localStorage
+## Operacional ✅
 
-**`src/components/checklists/ChecklistView.tsx`**
-- Nova prop opcional `autoExpandAll?: boolean` — quando `true`, todos os setores e subcategorias iniciam expandidos (usado no modo "Meu Setor" para UX direta)
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-### Layout mobile (modo Meu Setor)
+## CRM / Clientes ✅
 
-```text
-[ Completo ] [ Meu Setor ✓ ]
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-[Cozinha] [Salão] [Caixa]  ← chips scroll horizontal
-         ↓
-┌─────────────────────┐
-│ Subcategoria 1      │  (já expandida)
-│  ☐ Item 1           │
-│  ☑ Item 2           │
-├─────────────────────┤
-│ Subcategoria 2      │
-│  ☐ Item 3           │
-└─────────────────────┘
-```
+## Funcionários ✅
 
-Nenhuma mudança de banco de dados necessária.
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
