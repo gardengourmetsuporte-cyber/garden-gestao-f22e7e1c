@@ -238,7 +238,9 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   }, []);
 
   return (
-    <div className="px-4 py-3 lg:px-6 space-y-4">
+    <div className="space-y-0">
+      {/* ─── Sticky Filters ─── */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2 border-b border-border/20">
       {/* ─── Channel Pills ─── */}
       <div className="flex gap-2 overflow-x-auto scrollbar-none -mx-4 px-4 pb-1">
         {CHANNELS.map(ch => {
@@ -314,7 +316,10 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
           </span>
         )}
       </div>
+      </div>
 
+      {/* ─── Scrollable Content ─── */}
+      <div className="px-4 py-3 lg:px-6 space-y-4">
       {/* ─── Live Stats Bar ─── */}
       <div className="grid grid-cols-3 gap-2">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/15 to-amber-600/5 border border-amber-500/20 p-3 text-center">
@@ -360,6 +365,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
 
       {/* ─── Order Detail Sheet ─── */}
       <OrderDetailSheet order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+      </div>
     </div>
   );
 }
