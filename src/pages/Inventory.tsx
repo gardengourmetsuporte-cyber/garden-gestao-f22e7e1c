@@ -20,6 +20,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InventoryTemplateSelector } from '@/components/inventory/InventoryTemplateSelector';
 import { StockTransferSheet } from '@/components/inventory/StockTransferSheet';
+import { BatchExpiryManager } from '@/components/inventory/BatchExpiryManager';
 
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
