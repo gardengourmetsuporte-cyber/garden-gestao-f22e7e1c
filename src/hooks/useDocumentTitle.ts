@@ -29,6 +29,7 @@ export const ROUTE_TITLES: Record<string, string> = {
   '/calendar': 'Calendário',
   '/menu-admin': 'Cardápio',
   '/customers': 'Clientes',
+  '/reviews': 'Avaliações',
   '/deliveries': 'Entregas',
   '/brand': 'Marca',
   '/notifications': 'Notificações',
