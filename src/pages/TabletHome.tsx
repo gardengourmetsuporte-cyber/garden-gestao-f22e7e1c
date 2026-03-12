@@ -322,25 +322,50 @@ export default function TabletHome() {
         {/* Divider */}
         <div className="mx-6 h-px bg-border/30" />
 
-        {/* Menu items - centered grid */}
+        {/* Menu items / Game selection */}
         <div className="flex-1 flex items-center justify-center px-5 overflow-hidden">
-          <div className="grid grid-cols-2 gap-3 w-full max-w-[360px]">
-            {menuItems.map(item => (
-              <button
-                key={item.id}
-                onClick={item.onClick}
-                className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 border border-border/20 hover:bg-card hover:border-primary/20 active:scale-[0.97] transition-all group"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
-                  <AppIcon name={item.icon} size={24} className="text-primary" />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-bold text-foreground">{item.label}</p>
-                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{item.subtitle}</p>
-                </div>
-              </button>
-            ))}
-          </div>
+          {activeGame === 'select' ? (
+            <div className="w-full max-w-[360px] space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <button onClick={() => setActiveGame(null)} className="w-8 h-8 rounded-xl bg-card/60 border border-border/20 flex items-center justify-center">
+                  <AppIcon name="ArrowLeft" size={16} className="text-muted-foreground" />
+                </button>
+                <h2 className="text-sm font-bold text-foreground">Escolha um jogo</h2>
+              </div>
+              {GAMES.map(game => (
+                <button
+                  key={game.id}
+                  onClick={() => setActiveGame(game.id)}
+                  className={`w-full flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-br ${game.gradient} border ${game.border} shadow-lg ${game.shadow} hover:scale-[1.01] active:scale-[0.98] transition-all`}
+                >
+                  <span className="text-4xl">{game.emoji}</span>
+                  <div className="text-left">
+                    <p className="text-sm font-bold text-foreground">{game.title}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{game.description}</p>
+                  </div>
+                  <AppIcon name="ChevronRight" size={18} className="text-muted-foreground ml-auto" />
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 w-full max-w-[360px]">
+              {menuItems.map(item => (
+                <button
+                  key={item.id}
+                  onClick={item.onClick}
+                  className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 border border-border/20 hover:bg-card hover:border-primary/20 active:scale-[0.97] transition-all group"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                    <AppIcon name={item.icon} size={24} className="text-primary" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-foreground">{item.label}</p>
+                    <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{item.subtitle}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
