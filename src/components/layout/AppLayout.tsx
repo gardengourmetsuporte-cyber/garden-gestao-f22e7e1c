@@ -85,7 +85,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             }}
           >
             <div className="relative overflow-hidden">
-              <div className="flex items-center justify-between h-14 px-3 relative z-10">
+              <div className="flex items-center justify-between h-11 px-3 relative z-10">
                 {/* Left: Logo pill */}
                 <div className="flex items-center gap-1 relative" style={{ minWidth: '2.5rem' }}>
                   <button
@@ -93,13 +93,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     className={cn(
                       "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
                       !isScrolled
-                        ? "h-9 bg-card border border-border/50 shadow-sm pl-2 pr-3.5 gap-2.5"
-                        : "h-8 w-8 bg-transparent p-0 justify-center"
+                        ? "h-8 bg-card border border-border/50 shadow-sm pl-1.5 pr-3 gap-2"
+                        : "h-7 w-7 bg-transparent p-0 justify-center"
                     )}
                   >
                     <div className={cn(
                       "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-300",
-                      !isScrolled ? "w-6 h-6" : "w-8 h-8"
+                      !isScrolled ? "w-5 h-5" : "w-7 h-7"
                     )}>
                       <img alt="Garden Gestão" className="w-full h-full object-contain" src={customLogo || gardenLogo} fetchPriority="high" decoding="async" />
                     </div>
@@ -130,7 +130,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           {/* ======= Main Content ======= */}
           <main
             className="flex-1 lg:pt-0"
-            style={{ paddingTop: isLgScreen ? '0' : 'calc(env(safe-area-inset-top) + 3.5rem)' }}
+            style={{ paddingTop: isLgScreen ? '0' : 'calc(env(safe-area-inset-top) + 2.75rem)' }}
           >
             <PageTransition>
               {children}

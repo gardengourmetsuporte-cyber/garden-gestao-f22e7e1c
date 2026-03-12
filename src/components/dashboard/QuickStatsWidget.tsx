@@ -113,14 +113,14 @@ export function QuickStatsWidget() {
   ];
 
   return (
-    <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:-mx-8 lg:px-8 snap-x snap-mandatory">
+    <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:-mx-8 lg:px-8 snap-x snap-mandatory">
       {allCards.map((card) => (
         <button
           key={card.key}
           onClick={() => navigate(card.route)}
           className={cn(
             "card-stat-holo text-left transition-all duration-200 active:scale-[0.97] shrink-0 snap-start",
-            "min-w-[155px] max-w-[180px]",
+            "min-w-[145px] max-w-[170px]",
             card.isActive && "ring-1 ring-inset",
             card.isActive && card.variant === 'warning' && "ring-warning/20",
             card.isActive && card.variant === 'primary' && "ring-primary/20",
@@ -128,7 +128,7 @@ export function QuickStatsWidget() {
             card.isActive && card.variant === 'success' && "ring-success/20",
           )}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <div className={cn("stat-holo-icon shrink-0", variantIcon[card.variant])}>
               <AppIcon name={card.icon} size={20} />
             </div>
