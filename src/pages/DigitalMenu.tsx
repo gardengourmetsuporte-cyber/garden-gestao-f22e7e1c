@@ -265,8 +265,8 @@ export default function DigitalMenu() {
   if (!hasVisibleProducts) {
     return (
       <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-5 px-8">
-        <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3">
-          <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
+        <div className="w-20 h-20 rounded-full overflow-hidden bg-white shadow-lg flex items-center justify-center">
+          <img src={gardenLogo} alt="Garden" className="w-[70%] h-[70%] object-contain" />
         </div>
         <div className="flex flex-col items-center gap-3 text-center">
           <AppIcon name="UtensilsCrossed" size={44} className="text-muted-foreground/30" />
@@ -505,11 +505,11 @@ export default function DigitalMenu() {
       {/* Game tab */}
       {activeTab === 'game' && (
         <div className="px-5 pt-6 pb-28 flex flex-col items-center gap-6">
-          <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border/30 shadow-lg bg-white flex items-center justify-center p-2">
+          <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border/30 shadow-lg bg-white flex items-center justify-center">
             {unit?.store_info?.logo_url ? (
-              <img src={unit.store_info.logo_url} alt={unit.name} className="w-full h-full object-cover rounded-full" />
+              <img src={unit.store_info.logo_url} alt={unit.name} className="w-full h-full object-cover" />
             ) : (
-              <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
+              <img src={gardenLogo} alt="Garden" className="w-[70%] h-[70%] object-contain" />
             )}
           </div>
           <div className="text-center">

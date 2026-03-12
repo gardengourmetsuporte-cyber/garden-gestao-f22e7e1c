@@ -293,9 +293,7 @@ export default function TabletHome() {
             {logoUrl ? (
               <img src={logoUrl} alt={unit?.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-white flex items-center justify-center p-3">
-                <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
-              </div>
+              <img src={gardenLogo} alt="Garden" className="w-[70%] h-[70%] object-contain" />
             )}
           </div>
           <h1 className="text-xl md:text-2xl font-bold text-foreground leading-tight text-center mt-4">{unit?.name || 'Bem-vindo'}</h1>
