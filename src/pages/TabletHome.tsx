@@ -117,7 +117,7 @@ function TableConfigDialog({
               inputMode="numeric"
               maxLength={8}
               value={pin}
-              onChange={e => { setPin(e.target.value); setError(''); }}
+              onChange={e => { setPin(e.target.value.replace(/\D/g, '').slice(0, 8)); setError(''); }}
               placeholder="••••"
               className="w-full h-12 rounded-xl bg-secondary/50 border border-border/40 px-4 text-lg font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
