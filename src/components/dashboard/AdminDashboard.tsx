@@ -215,6 +215,18 @@ export function AdminDashboard() {
           Financeiro
         </button>
         <button
+          onClick={() => handleViewChange('service')}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+            view === 'service'
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <AppIcon name="storefront" size={14} />
+          Serviço
+        </button>
+        <button
           onClick={() => handleViewChange('team')}
           className={cn(
             "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
