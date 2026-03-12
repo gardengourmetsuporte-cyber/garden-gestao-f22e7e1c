@@ -38,6 +38,11 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [customerCoins, setCustomerCoins] = useState<number | null>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [comandaNumber, setComandaNumber] = useState<number | null>(null);
+  const [paymentOption, setPaymentOption] = useState<'presencial' | 'pix' | 'credit_card' | 'boleto'>('presencial');
+  const [showOnlinePayment, setShowOnlinePayment] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
+  const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
+  const { asaasActive } = useAsaasConfig(unitId);
 
   // Check customer coin balance
   const coinTotal = cart.reduce((sum, item) => {
