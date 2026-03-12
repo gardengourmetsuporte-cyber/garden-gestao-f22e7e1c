@@ -131,7 +131,7 @@ export default function TabletDigitalMenu() {
   if (!hasVisibleProducts) {
     return (
       <div className="h-[100dvh] bg-background flex flex-col items-center justify-center gap-5 px-8">
-        <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center p-3">
+        <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center p-3">
           <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
         </div>
         <div className="flex flex-col items-center gap-3 text-center">

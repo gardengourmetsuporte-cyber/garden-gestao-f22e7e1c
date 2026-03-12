@@ -509,7 +509,7 @@ export default function DigitalMenu() {
         <div className="px-5 pt-6 pb-28 flex flex-col items-center gap-6">
           <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border/30 shadow-lg bg-white flex items-center justify-center p-2">
             {unit?.store_info?.logo_url ? (
-              <img src={unit.store_info.logo_url} alt={unit.name} className="w-full h-full object-cover rounded-xl" />
+              <img src={unit.store_info.logo_url} alt={unit.name} className="w-full h-full object-cover rounded-full" />
             ) : (
               <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
             )}

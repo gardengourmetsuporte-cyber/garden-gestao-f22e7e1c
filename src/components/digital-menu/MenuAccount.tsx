@@ -216,7 +216,7 @@ export function MenuAccount({ customerUser, unitId, unitName, logoUrl, onLogin, 
       <div className="px-5 pt-8 pb-28 flex flex-col items-center gap-6">
         <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border/30 shadow-lg bg-card flex items-center justify-center p-2">
           {logoUrl ? (
-            <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-cover rounded-xl" />
+            <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-cover rounded-full" />
           ) : (
             <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain" />
           )}

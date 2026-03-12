@@ -44,7 +44,7 @@ export function LandingNavbar() {
             "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-500",
             scrolled ? "w-9 h-9" : "w-7 h-7"
           )}>
-            <div className="w-full h-full rounded-xl overflow-hidden bg-white flex items-center justify-center">
+            <div className="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center">
               <img src={logoImg} alt="Garden" className="w-[85%] h-[85%] object-contain" />
             </div>
           </div>
