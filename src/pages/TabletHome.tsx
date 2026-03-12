@@ -64,15 +64,17 @@ function TableConfigDialog({
   const [checking, setChecking] = useState(false);
 
   const handleConfirm = async () => {
+    const normalizedPin = pin.replace(/\D/g, '');
+
     if (!mesa || Number(mesa) < 1) { setError('Informe o número da mesa'); return; }
-    if (!pin || pin.length < 4) { setError('Informe a senha de 4 dígitos'); return; }
+    if (!normalizedPin || normalizedPin.length < 4) { setError('Informe a senha de 4 dígitos'); return; }
     if (!unitId) { setError('Unidade não identificada'); return; }
 
     setChecking(true);
     setError('');
     try {
       const { data, error: dbError } = await supabase
-        .rpc('validate_tablet_pin', { p_unit_id: unitId, p_pin: pin });
+        .rpc('validate_tablet_pin', { p_unit_id: unitId, p_pin: normalizedPin });
 
       if (dbError) throw dbError;
       if (!data) {
@@ -81,7 +83,7 @@ function TableConfigDialog({
         return;
       }
 
-      onConfirm(mesa, pin);
+      onConfirm(mesa, normalizedPin);
     } catch {
       setError('Erro ao validar senha. Tente novamente.');
     } finally {
