@@ -7,9 +7,6 @@ interface Props {
 export function MenuLoadingScreen({ message = 'Carregando...' }: Props) {
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center gap-3">
-       <div className="w-10 h-10 rounded-full overflow-hidden bg-white/90 shadow-md flex items-center justify-center animate-pulse" style={{ animationDuration: '2s' }}>
-         <img src={gardenLogo} alt="Garden" className="w-full h-full object-contain p-1.5" />
-       </div>
       <div className="flex flex-col items-center gap-1">
         <p className="text-xs font-medium text-muted-foreground">{message}</p>
         <div className="flex gap-1 mt-1">
