@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import type { Customer, LoyaltyEvent } from '@/types/customer';
 import { SEGMENT_CONFIG } from '@/types/customer';
+import { CustomerLGPD } from './CustomerLGPD';
+import { CustomerOrderHistory } from './CustomerOrderHistory';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
