@@ -409,17 +409,15 @@ export default function DigitalMenu() {
             </div>
           )}
 
-          {/* Full menu listing */}
-          <div className="mt-5">
-            <MenuProductList
-              categories={categories}
-              groups={groups}
-              products={products}
-              getGroupProducts={getGroupProducts}
-              selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
-              onSelectProduct={handleProductSelect}
-            />
+          {/* CTA to open full menu */}
+          <div className="mt-6 px-5 md:px-8 pb-4">
+            <button
+              onClick={() => setActiveTab('menu')}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-primary/10 text-primary text-sm font-semibold active:scale-[0.98] transition-transform border border-primary/20"
+            >
+              <AppIcon name="RestaurantMenu" size={18} />
+              Ver cardápio completo
+            </button>
           </div>
         </div>
       )}
