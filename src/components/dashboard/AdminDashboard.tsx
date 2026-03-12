@@ -32,6 +32,9 @@ const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ defaul
 const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
 const LazyQuickStats = lazy(() => import('./QuickStatsWidget').then(m => ({ default: m.QuickStatsWidget })));
 const LazyAnalytics = lazy(() => import('./AnalyticsWidget'));
+const LazyHeatmap = lazy(() => import('./SalesHeatmapWidget'));
+const LazyMonthComparison = lazy(() => import('./MonthComparisonWidget'));
+const LazyBreakEven = lazy(() => import('./BreakEvenWidget'));
 import { SalesGoalWidget } from './SalesGoalWidget';
 function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
@@ -133,6 +136,27 @@ export function AdminDashboard() {
         return (
           <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
             <LazyWidget fallback={<QuickStatsSkeleton />}><LazyQuickStats /></LazyWidget>
+          </div>
+        );
+
+      case 'heatmap':
+        return (
+          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyHeatmap /></LazyWidget>
+          </div>
+        );
+
+      case 'month-comparison':
+        return (
+          <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyMonthComparison /></LazyWidget>
+          </div>
+        );
+
+      case 'break-even':
+        return (
+          <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyBreakEven /></LazyWidget>
           </div>
         );
 

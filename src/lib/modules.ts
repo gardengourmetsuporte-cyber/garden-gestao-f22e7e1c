@@ -154,6 +154,17 @@ export const ALL_MODULES: ModuleDef[] = [
     key: 'reports', label: 'Relatórios', icon: 'BarChart3', route: '/reports', routes: ['/reports'], group: 'Gestão',
     children: [
       { key: 'reports.sales', label: 'Vendas', icon: 'ShoppingCart' },
+      { key: 'reports.cmv', label: 'CMV', icon: 'TrendingDown' },
+      { key: 'reports.inventory', label: 'Estoque Valorizado', icon: 'Package' },
+      { key: 'reports.abc', label: 'Curva ABC', icon: 'BarChart3' },
+      { key: 'reports.employees', label: 'Funcionários', icon: 'Users' },
+    ],
+  },
+  {
+    key: 'reservations', label: 'Reservas', icon: 'CalendarCheck', route: '/reservations', routes: ['/reservations'], group: 'Operação',
+    children: [
+      { key: 'reservations.view', label: 'Ver reservas', icon: 'Eye' },
+      { key: 'reservations.manage', label: 'Gerenciar reservas', icon: 'PenSquare' },
     ],
   },
   {

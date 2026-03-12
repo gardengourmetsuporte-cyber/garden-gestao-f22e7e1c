@@ -106,6 +106,7 @@ const Documentation = lazy(() => lazyRetry(() => import("./pages/Documentation")
 const Compliance = lazy(() => lazyRetry(() => import("./pages/Compliance")));
 const AdminMonitor = lazy(() => lazyRetry(() => import("./pages/AdminMonitor")));
 const Reports = lazy(() => lazyRetry(() => import("./pages/Reports")));
+const Reservations = lazy(() => lazyRetry(() => import("./pages/Reservations")));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -309,6 +310,7 @@ function AuthenticatedRoutes() {
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/admin/monitor" element={<ProtectedRoute><AdminMonitor /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+          <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
