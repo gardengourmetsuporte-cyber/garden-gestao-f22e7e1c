@@ -162,24 +162,32 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
         ? `${selectedAddress.street}, ${selectedAddress.number}${selectedAddress.complement ? ' - ' + selectedAddress.complement : ''}, ${selectedAddress.neighborhood}, ${selectedAddress.city}${selectedAddress.reference ? ' (Ref: ' + selectedAddress.reference + ')' : ''}`
         : null;
 
+      const isOnlinePayment = paymentOptionToBillingType(paymentOption) !== null;
+
       const orderData = isQrCode
         ? {
             unit_id: unitId, table_number: parseInt(tableNumber),
-            status: 'awaiting_confirmation', total: cartTotal,
+            status: isOnlinePayment ? 'awaiting_payment' : 'awaiting_confirmation',
+            total: cartTotal,
             source: 'qrcode' as string, customer_name: customerName.trim(),
             customer_phone: null as string | null, customer_address: null as string | null,
+            payment_method: paymentOption,
+            payment_status: isOnlinePayment ? 'pending' : null,
           }
         : {
             unit_id: unitId, table_number: 0,
-            status: 'confirmed', total: grandTotal,
+            status: isOnlinePayment ? 'awaiting_payment' : 'confirmed',
+            total: grandTotal,
             source: (orderType === 'pickup' ? 'pickup' : 'delivery') as string,
             customer_name: customerName.trim(),
             customer_phone: customerPhone.replace(/\D/g, ''),
             customer_address: fullAddress,
             customer_email: customerUser?.email || null,
+            payment_method: paymentOption,
+            payment_status: isOnlinePayment ? 'pending' : null,
           };
 
-      const { data: order, error: orderError } = await supabase.from('tablet_orders').insert(orderData).select('id').single();
+      const { data: order, error: orderError } = await supabase.from('tablet_orders').insert(orderData).select('id, order_number').single();
       if (orderError || !order) throw new Error(orderError?.message || 'Erro');
 
       const items = cart.map(c => ({
@@ -191,6 +199,16 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
       }));
       const { error: itemsError } = await supabase.from('tablet_order_items').insert(items);
       if (itemsError) throw new Error(itemsError.message);
+
+      // If online payment, show payment sheet
+      if (isOnlinePayment) {
+        const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
+        setPendingOrderId((order as any).id);
+        setPendingOrderNumber(orderNum);
+        setShowOnlinePayment(true);
+        setSending(false);
+        return;
+      }
 
       if (!isQrCode) {
         try {
