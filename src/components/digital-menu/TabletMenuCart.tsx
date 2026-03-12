@@ -211,55 +211,64 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
            );
            if (itemsError) throw new Error(itemsError.message);
 
-           if (shouldAutoConfirm) {
-             try {
-               await fetch(
-                 `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
-                 {
-                   method: 'POST',
-                   headers: {
-                     'Content-Type': 'application/json',
-                     apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-                   },
-                   body: JSON.stringify({ order_id: (order as any).id }),
-                 }
-               );
-             } catch (e) {
-               console.warn('[TabletMenuCart] send-to-pdv failed:', e);
-             }
+           // If online payment, show payment sheet
+           if (isOnlinePayment) {
+             const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
+             setPendingOrderId((order as any).id);
+             setPendingOrderNumber(orderNum);
+             setShowOnlinePayment(true);
+             setSending(false);
+             return;
            }
+
+           if (shouldAutoConfirm) {
+              try {
+                await fetch(
+                  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                    },
+                    body: JSON.stringify({ order_id: (order as any).id }),
+                  }
+                );
+              } catch (e) {
+                console.warn('[TabletMenuCart] send-to-pdv failed:', e);
+              }
+            }
 
            // Deduct coins if paying with coins
            if (payWithCoins && customerUser?.email) {
-             try {
-               const { data: cust } = await supabase
-                 .from('customers')
-                 .select('id, loyalty_points')
-                 .eq('unit_id', unitId)
-                 .eq('email', customerUser.email)
-                 .maybeSingle();
-               if (cust) {
-                 await supabase
-                   .from('customers')
-                   .update({ loyalty_points: Math.max(0, (cust.loyalty_points ?? 0) - coinTotal) })
-                   .eq('id', cust.id);
-                 // Log redemption event
-                 await supabase.from('loyalty_events').insert({
-                   customer_id: cust.id,
-                   unit_id: unitId,
-                   type: 'redeemed',
-                   points: -coinTotal,
-                   description: 'Pedido #' + ((order as any).order_number || (order as any).id.slice(0, 8) || (order as any).id.slice(0, 8)) + ' pago com moedas',
-                 });
-                 setCustomerCoins(Math.max(0, (cust.loyalty_points ?? 0) - coinTotal));
-               }
-             } catch (e) {
-               console.warn('[TabletMenuCart] coin deduction failed:', e);
-             }
-           }
+              try {
+                const { data: cust } = await supabase
+                  .from('customers')
+                  .select('id, loyalty_points')
+                  .eq('unit_id', unitId)
+                  .eq('email', customerUser.email)
+                  .maybeSingle();
+                if (cust) {
+                  await supabase
+                    .from('customers')
+                    .update({ loyalty_points: Math.max(0, (cust.loyalty_points ?? 0) - coinTotal) })
+                    .eq('id', cust.id);
+                  await supabase.from('loyalty_events').insert({
+                    customer_id: cust.id,
+                    unit_id: unitId,
+                    type: 'redeemed',
+                    points: -coinTotal,
+                    description: 'Pedido #' + ((order as any).order_number || (order as any).id.slice(0, 8)) + ' pago com moedas',
+                  });
+                  setCustomerCoins(Math.max(0, (cust.loyalty_points ?? 0) - coinTotal));
+                }
+              } catch (e) {
+                console.warn('[TabletMenuCart] coin deduction failed:', e);
+              }
+            }
 
            toast.success(payWithCoins ? 'Pedido enviado! Moedas debitadas ✨' : 'Pedido enviado com sucesso!');
-      setOrderSent((order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8));
+           setOrderSent((order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8));
            return; // Success — exit
         } catch (err: any) {
           lastError = err;
