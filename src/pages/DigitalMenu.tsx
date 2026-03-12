@@ -47,9 +47,9 @@ export default function DigitalMenu() {
   const [showAuth, setShowAuth] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [pendingTabAfterAuth, setPendingTabAfterAuth] = useState<MenuTab | null>(null);
-  // Gate: show auth screen on first visit (no session & hasn't skipped)
+  // Gate: show auth screen on first visit (use sessionStorage so it shows each new session)
   const [authGatePassed, setAuthGatePassed] = useState(() => {
-    return localStorage.getItem(`dm_auth_skipped_${unitId}`) === '1';
+    return sessionStorage.getItem(`dm_auth_skipped_${unitId}`) === '1';
   });
 
   // Check auth state on mount
