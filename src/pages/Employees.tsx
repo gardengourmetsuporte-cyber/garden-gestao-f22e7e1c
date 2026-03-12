@@ -11,6 +11,7 @@ import { EmployeeScheduleRequest } from '@/components/employees/EmployeeSchedule
 import { ScheduleManagement } from '@/components/employees/ScheduleManagement';
 import { TimeTracking } from '@/components/employees/TimeTracking';
 import { EmployeeWarnings } from '@/components/employees/EmployeeWarnings';
+import { HourBankManager } from '@/components/employees/HourBankManager';
 import { MaterialDeliveries } from '@/components/employees/MaterialDeliveries';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
