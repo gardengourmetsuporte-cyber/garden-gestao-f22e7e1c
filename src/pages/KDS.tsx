@@ -303,8 +303,8 @@ export default function KDS() {
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 12 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 300, tolerance: 8 } }),
   );
 
   const { data: orders = [], isPending, isError, error, refetch } = useQuery({
@@ -389,8 +389,9 @@ export default function KDS() {
 
   // Remove adjacent-only restriction — allow dragging to any column
   const handleDragEndFn = useCallback((event: DragEndEvent) => {
-    setActiveId(null);
     const { active, over } = event;
+    setActiveId(null);
+    
     if (!over) return;
 
     const orderId = active.id as string;
