@@ -120,7 +120,7 @@ export function HourBankManager() {
               const balance = getBalance(emp.id);
               return (
                 <div key={emp.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/30">
-                  <span className="text-sm font-medium">{emp.name}</span>
+                  <span className="text-sm font-medium">{emp.full_name}</span>
                   <span className={cn("text-sm font-bold", balance > 0 ? "text-emerald-600 dark:text-emerald-400" : balance < 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground")}>
                     {balance > 0 ? '+' : ''}{balance.toFixed(1)}h
                   </span>
