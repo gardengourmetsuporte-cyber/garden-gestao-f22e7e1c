@@ -316,7 +316,10 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
           </span>
         )}
       </div>
+      </div>
 
+      {/* ─── Scrollable Content ─── */}
+      <div className="px-4 py-3 lg:px-6 space-y-4">
       {/* ─── Live Stats Bar ─── */}
       <div className="grid grid-cols-3 gap-2">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/15 to-amber-600/5 border border-amber-500/20 p-3 text-center">
