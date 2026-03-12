@@ -2667,17 +2667,13 @@ select:focus {
 /* ===== iOS Keyboard viewport-jump fix (system-wide) ===== */
 
 /* Prevent body from scrolling when a drawer/dialog is open */
-html,
-body {
-  overscroll-behavior: none;
-}
-
 /* Lock the body in place when virtual keyboard is visible inside overlays */
 body:has([vaul-drawer][data-state="open"]),
 body:has([role="dialog"][data-state="open"]) {
   position: fixed;
   width: 100%;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* Scroll focused inputs into view smoothly inside drawers/dialogs */
