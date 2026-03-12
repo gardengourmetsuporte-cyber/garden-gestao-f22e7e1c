@@ -95,7 +95,7 @@ function SortableItem({ widget, onToggle, isDragActive }: { widget: DashboardWid
   );
 }
 
-export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, onReset }: Props) {
+export function DashboardWidgetManager({ open, onOpenChange, widgets, onSave, onReset, currentView = 'operational' }: Props) {
   const [draft, setDraft] = useState<DashboardWidget[]>(widgets);
   const [isDragActive, setIsDragActive] = useState(false);
 
