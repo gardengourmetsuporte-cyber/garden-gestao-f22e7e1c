@@ -240,82 +240,82 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   return (
     <div className="space-y-0">
       {/* ─── Sticky Filters ─── */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2 border-b border-border/20">
-      {/* ─── Channel Pills ─── */}
-      <div className="grid grid-cols-5 gap-1.5 pb-1">
-        {CHANNELS.map(ch => {
-          const active = channel === ch.id;
-          const count = channelCounts[ch.id];
-          return (
-            <button
-              key={ch.id}
-              onClick={() => setChannel(ch.id)}
-              className={cn(
-                "flex items-center justify-center gap-1 px-2 py-2.5 rounded-2xl text-[11px] font-bold whitespace-nowrap transition-all duration-200 touch-manipulation",
-                active
-                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-[1.02]"
-                  : "bg-card/80 border border-border/30 text-muted-foreground active:scale-95"
-              )}
-            >
-              <AppIcon name={ch.icon} size={13} />
-              <span className="truncate">{ch.label}</span>
-              {count > 0 && (
-                <span className={cn(
-                  "min-w-[16px] h-[16px] flex items-center justify-center text-[9px] font-extrabold rounded-full",
-                  active ? "bg-white/25 text-primary-foreground" : "bg-primary/15 text-primary"
-                )}>
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ─── Date Filter Pills ─── */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {DATE_PILLS.map(pill => {
-          if (pill.id === 'custom') {
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2.5 lg:px-6 space-y-2.5 border-b border-border/20">
+        {/* ─── Channel Pills ─── */}
+        <div className="flex items-center justify-center gap-1.5">
+          {CHANNELS.map(ch => {
+            const active = channel === ch.id;
+            const count = channelCounts[ch.id];
             return (
-              <div key={pill.id} className="shrink-0">
-                <DatePicker
-                  date={customDate}
-                  onSelect={handleCustomDate}
-                  formatStr="dd/MM"
-                  placeholder=""
-                  className={cn(
-                    "h-9 min-w-9 w-auto px-2.5 rounded-xl text-xs font-bold border",
-                    dateFilter === 'custom'
-                      ? "bg-primary/15 border-primary/40 text-primary"
-                      : "bg-card/60 border-border/30 text-muted-foreground"
-                  )}
-                />
-              </div>
+              <button
+                key={ch.id}
+                onClick={() => setChannel(ch.id)}
+                className={cn(
+                  "flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-bold whitespace-nowrap transition-all duration-200 touch-manipulation",
+                  active
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                    : "bg-card/80 border border-border/30 text-muted-foreground active:scale-95"
+                )}
+              >
+                <AppIcon name={ch.icon} size={14} />
+                {ch.label}
+                {count > 0 && (
+                  <span className={cn(
+                    "min-w-[18px] h-[18px] flex items-center justify-center text-[9px] font-extrabold rounded-full",
+                    active ? "bg-white/25 text-primary-foreground" : "bg-primary/15 text-primary"
+                  )}>
+                    {count}
+                  </span>
+                )}
+              </button>
             );
-          }
-          const isActive = dateFilter === pill.id;
-          return (
-            <button
-              key={pill.id}
-              onClick={() => handleDateFilterChange(pill.id)}
-              className={cn(
-                "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0",
-                isActive
-                  ? "bg-primary/15 border border-primary/40 text-primary"
-                  : "bg-card/60 border border-border/30 text-muted-foreground active:scale-95"
-              )}
-            >
-              {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
-              {pill.label}
-            </button>
-          );
-        })}
-        {dateFilter === 'custom' && customDate && (
-          <span className="text-[11px] font-semibold text-primary shrink-0">
-            {format(customDate, "dd 'de' MMM", { locale: ptBR })}
-          </span>
-        )}
-      </div>
+          })}
+        </div>
+
+        {/* ─── Date Filter Pills ─── */}
+        <div className="flex items-center justify-center gap-2">
+          {DATE_PILLS.map(pill => {
+            if (pill.id === 'custom') {
+              return (
+                <div key={pill.id} className="shrink-0">
+                  <DatePicker
+                    date={customDate}
+                    onSelect={handleCustomDate}
+                    formatStr="dd/MM"
+                    placeholder=""
+                    className={cn(
+                      "h-8 min-w-8 w-auto px-2.5 rounded-full text-xs font-bold border",
+                      dateFilter === 'custom'
+                        ? "bg-primary/15 border-primary/40 text-primary"
+                        : "bg-card/60 border-border/30 text-muted-foreground"
+                    )}
+                  />
+                </div>
+              );
+            }
+            const isActive = dateFilter === pill.id;
+            return (
+              <button
+                key={pill.id}
+                onClick={() => handleDateFilterChange(pill.id)}
+                className={cn(
+                  "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all shrink-0",
+                  isActive
+                    ? "bg-primary/15 border border-primary/40 text-primary"
+                    : "bg-card/60 border border-border/30 text-muted-foreground active:scale-95"
+                )}
+              >
+                {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                {pill.label}
+              </button>
+            );
+          })}
+          {dateFilter === 'custom' && customDate && (
+            <span className="text-[11px] font-semibold text-primary shrink-0">
+              {format(customDate, "dd 'de' MMM", { locale: ptBR })}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* ─── Scrollable Content ─── */}
