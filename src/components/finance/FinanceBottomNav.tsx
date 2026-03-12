@@ -7,7 +7,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { FinanceTab, TransactionType } from '@/types/finance';
 
-function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab; icon: string; label: string }; active: boolean; onTabChange: (tab: FinanceTab) => void }) {
+function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab; icon: string; customIcon?: string; label: string }; active: boolean; onTabChange: (tab: FinanceTab) => void }) {
   const [bouncing, setBouncing] = useState(false);
   const handledByPointer = useRef(false);
 
@@ -75,7 +75,11 @@ function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab;
             background: active ? 'radial-gradient(circle, hsl(var(--primary) / 0.12) 0%, transparent 70%)' : 'none',
           }}
         />
-        <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={cn("relative z-10 transition-colors duration-300", active ? 'text-primary' : '')} />
+        {tab.customIcon ? (
+          <img src={tab.customIcon} alt="" className={cn("w-[22px] h-[22px] relative z-10 transition-all", active ? "brightness-0 invert opacity-90" : "dark:invert dark:opacity-70 opacity-70")} />
+        ) : (
+          <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={cn("relative z-10 transition-colors duration-300", active ? 'text-primary' : '')} />
+        )}
       </div>
       <span className={cn("text-[10px] transition-all duration-300", active ? "font-semibold text-primary translate-y-[-1px]" : "font-normal")}>{tab.label}</span>
     </button>
@@ -90,10 +94,10 @@ interface FinanceBottomNavProps {
   variant?: 'business' | 'personal';
 }
 
-const tabs: { id: FinanceTab; icon: string; label: string }[] = [
+const tabs: { id: FinanceTab; icon: string; customIcon?: string; label: string }[] = [
   { id: 'home', icon: 'Home', label: 'Início' },
   { id: 'transactions', icon: 'FileText', label: 'Transações' },
-  { id: 'charts', icon: 'ChartPie', label: 'Gráficos' },
+  { id: 'charts', icon: 'ChartPie', customIcon: '/icons/graficos.png', label: 'Gráficos' },
   { id: 'more', icon: 'Menu', label: 'Mais' },
 ];
 
