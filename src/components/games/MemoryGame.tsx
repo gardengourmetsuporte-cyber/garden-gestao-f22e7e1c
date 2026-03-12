@@ -225,6 +225,9 @@ export function MemoryGame({ onBack, unitId }: Props) {
           )}
         </div>
       </div>
+      {showRanking && unitId && (
+        <GameRanking unitId={unitId} gameType="memory" accentColor="amber" onClose={() => setShowRanking(false)} />
+      )}
     </div>
   );
 }
