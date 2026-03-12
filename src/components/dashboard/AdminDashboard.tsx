@@ -136,6 +136,9 @@ export function AdminDashboard() {
   return (
     <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto">
 
+      {/* Pull to Refresh indicator */}
+      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} threshold={threshold} />
+
       {/* Greeting + Context Pills */}
       <DashboardContextBar firstName={firstName} stats={stats} />
 
