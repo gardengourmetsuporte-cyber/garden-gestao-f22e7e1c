@@ -1,5 +1,7 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useAuditLogs, getActionLabel } from '@/hooks/useAuditLogs';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -23,10 +25,13 @@ const ACTION_ICONS: Record<string, { icon: string; bg: string; text: string }> =
   employee_updated: { icon: 'UserCog', bg: 'bg-amber-500/12', text: 'text-amber-600 dark:text-amber-400' },
   employee_deleted: { icon: 'UserMinus', bg: 'bg-red-500/12', text: 'text-red-600 dark:text-red-400' },
   customer_deleted: { icon: 'UserX', bg: 'bg-red-500/12', text: 'text-red-600 dark:text-red-400' },
+  customer_anonymized: { icon: 'ShieldCheck', bg: 'bg-violet-500/12', text: 'text-violet-600 dark:text-violet-400' },
   finance_account_created: { icon: 'Wallet', bg: 'bg-emerald-500/12', text: 'text-emerald-600 dark:text-emerald-400' },
   finance_account_updated: { icon: 'Wallet', bg: 'bg-amber-500/12', text: 'text-amber-600 dark:text-amber-400' },
   finance_account_deleted: { icon: 'Wallet', bg: 'bg-red-500/12', text: 'text-red-600 dark:text-red-400' },
   user_login: { icon: 'LogIn', bg: 'bg-sky-500/12', text: 'text-sky-600 dark:text-sky-400' },
+  stock_transfer_created: { icon: 'ArrowLeftRight', bg: 'bg-blue-500/12', text: 'text-blue-600 dark:text-blue-400' },
+  stock_transfer_completed: { icon: 'PackageCheck', bg: 'bg-emerald-500/12', text: 'text-emerald-600 dark:text-emerald-400' },
 };
 
 function exportCSV(logs: any[]) {
@@ -50,7 +55,7 @@ function exportCSV(logs: any[]) {
 }
 
 export function AuditLogSettings() {
-  const { logs, isLoading, page, setPage, hasMore, actionFilter, setActionFilter, actionOptions } = useAuditLogs();
+  const { logs, isLoading, page, setPage, hasMore, actionFilter, setActionFilter, actionOptions, dateFrom, setDateFrom, dateTo, setDateTo } = useAuditLogs();
 
   return (
     <div className="space-y-4">
@@ -66,7 +71,37 @@ export function AuditLogSettings() {
         </button>
       </div>
 
-      {/* Filter */}
+      {/* Date range filters */}
+      <div className="flex gap-2">
+        <div className="flex-1">
+          <Label className="text-[10px] text-muted-foreground">De</Label>
+          <Input
+            type="date"
+            value={dateFrom}
+            onChange={e => { setDateFrom(e.target.value); setPage(0); }}
+            className="h-8 text-xs"
+          />
+        </div>
+        <div className="flex-1">
+          <Label className="text-[10px] text-muted-foreground">Até</Label>
+          <Input
+            type="date"
+            value={dateTo}
+            onChange={e => { setDateTo(e.target.value); setPage(0); }}
+            className="h-8 text-xs"
+          />
+        </div>
+        {(dateFrom || dateTo) && (
+          <button
+            onClick={() => { setDateFrom(''); setDateTo(''); setPage(0); }}
+            className="self-end px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+          >
+            Limpar
+          </button>
+        )}
+      </div>
+
+      {/* Action filter */}
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
         <button
           onClick={() => setActionFilter('all')}
