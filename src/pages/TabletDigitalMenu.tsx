@@ -203,6 +203,18 @@ export default function TabletDigitalMenu() {
           >
             <AppIcon name={searchOpen ? 'Close' : 'Search'} size={17} className="text-muted-foreground" />
           </button>
+          {/* Cart */}
+          <button
+            onClick={() => setCartOpen(!cartOpen)}
+            className="relative w-8 h-8 rounded-lg hover:bg-secondary/50 flex items-center justify-center transition-colors"
+          >
+            <AppIcon name="ShoppingCart" size={17} className="text-muted-foreground" />
+            {cartCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </button>
         </div>
       </header>
 
