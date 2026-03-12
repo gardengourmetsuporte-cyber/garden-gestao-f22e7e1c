@@ -41,6 +41,7 @@ interface ChecklistViewProps {
   validatePin?: (pin: string) => Promise<{ userId: string; userName: string } | null>;
   timeStats?: Map<string, ItemTimeStats>;
   timerMinExecutions?: number;
+  autoExpandAll?: boolean;
 }
 
 const isToday = (dateStr: string): boolean => {
