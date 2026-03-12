@@ -50,8 +50,16 @@ export function MarketingBrandTab() {
 
   useEffect(() => {
     if (identity) {
-      setColors(identity.colors || { primary: '#22c55e', secondary: '#0a1a10', accent: '#f59e0b', background: '#ffffff' });
-      setTypography(identity.typography || { headings: 'Inter', body: 'Inter' });
+      const rawColors = identity.colors;
+      const parsedColors = typeof rawColors === 'string' ? JSON.parse(rawColors) : rawColors;
+      setColors(parsedColors || { primary: '#22c55e', secondary: '#0a1a10', accent: '#f59e0b', background: '#ffffff' });
+
+      const rawTypo = identity.typography;
+      const parsedTypo = typeof rawTypo === 'string' ? JSON.parse(rawTypo) : rawTypo;
+      // Handle both 'heading' (singular) and 'headings' (plural) keys
+      const typo = parsedTypo || { headings: 'Inter', body: 'Inter' };
+      setTypography({ headings: typo.headings || typo.heading || 'Inter', body: typo.body || 'Inter' });
+
       setToneOfVoice(identity.tone_of_voice || '');
       setTagline(identity.tagline || '');
       setPhrases(identity.institutional_phrases || []);
