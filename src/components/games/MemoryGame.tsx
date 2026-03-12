@@ -102,12 +102,15 @@ export function MemoryGame({ onBack, unitId }: Props) {
           lockRef.current = false;
 
           if (newMatches === totalPairs) {
+            const finalMoves = moves + 1; // current move
             setGameState('won');
             if (timerRef.current) clearInterval(timerRef.current);
             if (!bestTime || timer < bestTime) {
               setBestTime(timer);
               try { localStorage.setItem('garden_memory_best', String(timer)); } catch {}
             }
+            // Save to ranking (fewer moves = better)
+            saveScore('memory', finalMoves, { time: timer });
           }
         }, 400);
       } else {
