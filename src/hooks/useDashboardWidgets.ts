@@ -18,7 +18,7 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
   { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true },
 ];
 
-const STORAGE_KEY = 'dashboard-widgets-config-v2';
+const STORAGE_KEY = 'dashboard-widgets-config-v3';
 
 function loadWidgets(): DashboardWidget[] {
   try {
