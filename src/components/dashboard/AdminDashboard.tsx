@@ -135,11 +135,8 @@ export function AdminDashboard() {
         ) : null;
 
       case 'quick-stats':
-        return (
-          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
-            <LazyWidget fallback={<QuickStatsSkeleton />}><LazyQuickStats /></LazyWidget>
-          </div>
-        );
+        // Rendered directly in layout, not in grid
+        return null;
 
       case 'heatmap':
         return (
@@ -180,8 +177,15 @@ export function AdminDashboard() {
       {/* Pull to Refresh indicator */}
       <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} threshold={threshold} />
 
-      {/* Greeting + Context Pills */}
+      {/* Greeting */}
       <DashboardContextBar firstName={firstName} stats={stats} />
+
+      {/* Quick Stats — horizontal scroll strip */}
+      <div className="mt-3">
+        <Suspense fallback={<QuickStatsSkeleton />}>
+          <LazyQuickStats />
+        </Suspense>
+      </div>
 
       {/* Upgrade Banner for free users */}
       <div className="mt-4">
