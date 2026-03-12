@@ -139,6 +139,27 @@ export function AdminDashboard() {
           </div>
         );
 
+      case 'heatmap':
+        return (
+          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyHeatmap /></LazyWidget>
+          </div>
+        );
+
+      case 'month-comparison':
+        return (
+          <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyMonthComparison /></LazyWidget>
+          </div>
+        );
+
+      case 'break-even':
+        return (
+          <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
+            <LazyWidget><LazyBreakEven /></LazyWidget>
+          </div>
+        );
+
       default:
         return null;
     }
