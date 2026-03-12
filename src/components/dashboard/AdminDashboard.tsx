@@ -19,7 +19,9 @@ import { SmartScannerWidget } from './SmartScannerWidget';
 import { UpgradeBanner } from './UpgradeBanner';
 import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
-import { Skeleton } from '@/components/ui/skeleton';
+import { FinanceSkeleton, QuickStatsSkeleton, LeaderboardSkeleton, CalendarSkeleton, GenericWidgetSkeleton } from '@/components/ui/widget-skeleton';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh';
 
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
 const LazyCalendar = lazy(() => import('./UnifiedCalendarWidget').then(m => ({ default: m.UnifiedCalendarWidget })));
@@ -30,14 +32,15 @@ const LazyAutoOrder = lazy(() => import('./AutoOrderWidget').then(m => ({ defaul
 const LazyCashFlow = lazy(() => import('../finance/CashFlowProjection').then(m => ({ default: m.CashFlowProjection })));
 const LazyQuickStats = lazy(() => import('./QuickStatsWidget').then(m => ({ default: m.QuickStatsWidget })));
 
-function LazyWidget({ children }: { children: React.ReactNode }) {
+function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
+  const skeleton = fallback || <GenericWidgetSkeleton />;
   return (
     <div ref={ref}>
       {visible ? (
-        <Suspense fallback={<Skeleton className="h-32 w-full rounded-2xl" />}>{children}</Suspense>
+        <Suspense fallback={skeleton}>{children}</Suspense>
       ) : (
-        <Skeleton className="h-32 w-full rounded-2xl" />
+        skeleton
       )}
     </div>
   );
@@ -51,6 +54,7 @@ export function AdminDashboard() {
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { widgets, setWidgets, resetDefaults } = useDashboardWidgets();
   const [managerOpen, setManagerOpen] = useState(false);
+  const { pullDistance, refreshing, threshold } = usePullToRefresh([['dashboard-stats']]);
 
   const isReady = !statsLoading && !modulesLoading && !!profile;
 
@@ -90,7 +94,7 @@ export function AdminDashboard() {
       case 'bills-due':
         return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
           <div key={widget.key} className={`animate-card-reveal ${stagger}`}>
-            <Suspense fallback={<Skeleton className="h-32 w-full rounded-2xl" />}>
+            <Suspense fallback={<GenericWidgetSkeleton />}>
               <BillsDueWidget bills={stats.billsDueSoon || []} onNavigate={() => navigate('/finance')} />
             </Suspense>
           </div>
@@ -99,7 +103,7 @@ export function AdminDashboard() {
       case 'calendar':
         return hasAccess('agenda') ? (
           <DashboardSection key={widget.key} onNavigate={() => navigate('/calendar')} className={`animate-card-reveal ${stagger}`}>
-            <LazyWidget><LazyCalendar /></LazyWidget>
+            <LazyWidget fallback={<CalendarSkeleton />}><LazyCalendar /></LazyWidget>
           </DashboardSection>
         ) : null;
 
@@ -113,14 +117,14 @@ export function AdminDashboard() {
       case 'leaderboard':
         return hasAccess('ranking') ? (
           <DashboardSection key={widget.key} onNavigate={() => navigate('/ranking')} className={`animate-card-reveal ${stagger}`}>
-            <LazyWidget><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
+            <LazyWidget fallback={<LeaderboardSkeleton />}><LazyLeaderboard currentUserId={user?.id} /></LazyWidget>
           </DashboardSection>
         ) : null;
 
       case 'quick-stats':
         return (
           <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
-            <LazyWidget><LazyQuickStats /></LazyWidget>
+            <LazyWidget fallback={<QuickStatsSkeleton />}><LazyQuickStats /></LazyWidget>
           </div>
         );
 
@@ -132,8 +136,16 @@ export function AdminDashboard() {
   return (
     <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto">
 
+      {/* Pull to Refresh indicator */}
+      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} threshold={threshold} />
+
+      {/* Greeting + Context Pills */}
+      <DashboardContextBar firstName={firstName} stats={stats} />
+
       {/* Upgrade Banner for free users */}
-      <UpgradeBanner />
+      <div className="mt-4">
+        <UpgradeBanner />
+      </div>
 
       {/* Setup Onboarding — full width */}
       <SetupChecklistWidget />
