@@ -38,7 +38,7 @@ export function MenuCustomerAuth({ unitName, logoUrl, cuisineType, city, isOpen 
   const content = (
     <>
       {/* Logo */}
-      <div className="w-24 h-24 rounded-full overflow-hidden bg-white border-[3px] border-border/20 flex items-center justify-center shadow-sm">
+      <div className="w-24 h-24 rounded-full overflow-hidden bg-white border-[3px] border-border/20 flex items-center justify-center shadow-sm mb-4">
         {logoUrl ? (
           <img src={logoUrl} alt={unitName || 'Logo'} className="w-full h-full object-cover" />
         ) : (
