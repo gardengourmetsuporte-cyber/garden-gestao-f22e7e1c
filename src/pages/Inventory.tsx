@@ -374,7 +374,7 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        <QuickMovementSheetNew
+        <QuickMovementSheet
           item={selectedItem}
           open={movementSheetOpen}
           onOpenChange={setMovementSheetOpen}
