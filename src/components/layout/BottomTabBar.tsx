@@ -143,33 +143,32 @@ export function BottomTabBar() {
             className="fixed inset-0 bottom-[calc(64px+env(safe-area-inset-bottom,0px))] z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
             onClick={() => setSpeedDialOpen(false)}
           />
-          <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom,0px))] left-0 right-0 z-40 flex justify-center pb-4">
-            <div className="flex items-end gap-8">
-              {fabActions.map((action, i) => {
-                const isMiddle = fabActions.length === 3 && i === 1;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      navigator.vibrate?.(10);
-                      setSpeedDialOpen(false);
-                      action.onClick();
-                    }}
-                    className={cn("flex flex-col items-center gap-2 animate-scale-in", isMiddle && "mb-6")}
-                    style={{ animationDelay: `${i * 50}ms` }}
+          <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom,0px))] left-1/2 -translate-x-1/2 z-40 pb-4 w-auto max-w-[240px]">
+            <div className="bg-card/80 backdrop-blur-xl border border-border/30 rounded-2xl shadow-2xl overflow-hidden">
+              {fabActions.map((action, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    navigator.vibrate?.(10);
+                    setSpeedDialOpen(false);
+                    action.onClick();
+                  }}
+                  className="flex items-center gap-3 w-full px-4 py-3 hover:bg-secondary/50 active:bg-secondary/70 transition-colors"
+                >
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: action.color || 'hsl(var(--primary) / 0.15)' }}
                   >
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center active:scale-90 transition-transform duration-150 shadow-lg relative" style={{ background: action.color || 'hsl(var(--primary) / 0.9)' }}>
-                      <AppIcon name={action.icon} size={24} fill={1} style={{ color: 'white' }} />
-                      {action.badge && action.badge > 0 && (
-                        <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
-                          {action.badge}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[11px] font-bold text-white">{action.label}</span>
-                  </button>
-                );
-              })}
+                    <AppIcon name={action.icon} size={16} fill={1} style={{ color: 'white' }} />
+                  </div>
+                  <span className="text-[13px] font-semibold text-foreground whitespace-nowrap">{action.label}</span>
+                  {action.badge && action.badge > 0 && (
+                    <span className="ml-auto h-5 min-w-5 px-1 text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
+                      {action.badge}
+                    </span>
+                  )}
+                </button>
+              ))}
             </div>
           </div>
         </>
