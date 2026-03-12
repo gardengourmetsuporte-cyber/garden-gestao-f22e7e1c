@@ -268,13 +268,18 @@ export function AdminDashboard() {
         </div>
       )}
 
+      {/* Team View */}
+      {view === 'team' && <TeamDashboardView currentUserId={user?.id} />}
+
       {/* Widgets Grid — 2 columns on desktop */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
-        {widgets.map((widget) => {
-          const stagger = nextStagger();
-          return renderWidget(widget, stagger);
-        })}
-      </div>
+      {view !== 'team' && (
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+          {widgets.map((widget) => {
+            const stagger = nextStagger();
+            return renderWidget(widget, stagger);
+          })}
+        </div>
+      )}
 
       {/* Manage button */}
       <button
