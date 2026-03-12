@@ -598,6 +598,16 @@ export default function PDV() {
         onReset={ifoodScanner.reset}
         onUpdateResult={(data) => ifoodScanner.setResult(data)}
       />
+
+      {/* Product Detail */}
+      <PDVProductDetailSheet
+        product={selectedProduct}
+        open={!!selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onAdd={(product, qty, notes, options) => {
+          pos.addToCart(product, qty, notes, options);
+        }}
+      />
     </AppLayout>
   );
 }
