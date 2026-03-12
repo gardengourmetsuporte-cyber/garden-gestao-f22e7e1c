@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { useGameScore } from '@/hooks/useGameScore';
+import { GameRanking } from './GameRanking';
+import { Trophy } from 'lucide-react';
 
 interface Point { x: number; y: number; }
 
