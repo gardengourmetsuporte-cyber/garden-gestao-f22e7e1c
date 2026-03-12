@@ -541,7 +541,7 @@ export default function TabletHome() {
   return (
     <div className="fixed inset-0 bg-black overflow-hidden select-none flex">
       {/* ─── Left Sidebar ─── */}
-      <aside className="relative z-20 w-[340px] md:w-[400px] lg:w-[420px] h-full flex flex-col bg-background/95 backdrop-blur-xl border-r border-border/20">
+      <aside className="relative z-20 w-full md:w-[400px] lg:w-[420px] h-full flex flex-col bg-background/95 backdrop-blur-xl border-r border-border/20">
         {/* Mesa badge */}
         <div className="px-6 pt-[max(env(safe-area-inset-top,12px),16px)] pb-3 flex justify-center">
           <button
@@ -552,6 +552,34 @@ export default function TabletHome() {
             <span className="text-sm font-bold text-foreground">Mesa {mesa || '?'}</span>
             <AppIcon name="ChevronDown" size={13} className="text-muted-foreground" />
           </button>
+        </div>
+
+        {/* Mobile quick actions */}
+        <div className="px-6 pb-2 md:hidden">
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setActivePanel(activePanel === 'bill' ? null : 'bill')}
+              className={cn(
+                'h-10 rounded-full border text-xs font-bold transition-colors',
+                activePanel === 'bill'
+                  ? 'bg-primary/15 border-primary/40 text-primary'
+                  : 'bg-card/60 border-border/30 text-foreground'
+              )}
+            >
+              Minha Conta
+            </button>
+            <button
+              onClick={() => setActivePanel(activePanel === 'orders' ? null : 'orders')}
+              className={cn(
+                'h-10 rounded-full border text-xs font-bold transition-colors',
+                activePanel === 'orders'
+                  ? 'bg-primary/15 border-primary/40 text-primary'
+                  : 'bg-card/60 border-border/30 text-foreground'
+              )}
+            >
+              Pedido
+            </button>
+          </div>
         </div>
 
         {/* Logo & Brand */}
@@ -597,8 +625,8 @@ export default function TabletHome() {
         </div>
       </aside>
 
-      {/* ─── Right Area: Hero or Panel ─── */}
-      <div className="flex-1 relative">
+      {/* ─── Right Area: Hero ─── */}
+      <div className="hidden md:block flex-1 relative">
         {/* Hero Image (always behind) */}
         <img src={bannerUrl || tabletHero} alt="Hero" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />
@@ -631,53 +659,53 @@ export default function TabletHome() {
             <span className="text-sm font-bold">Pedido</span>
           </button>
         </div>
+      </div>
 
-        {/* Panel overlay */}
-        {hasRightPanel && (
-          <div className="absolute inset-0 z-20 bg-background/98 backdrop-blur-2xl animate-in fade-in slide-in-from-right-5 duration-300">
-            {activePanel === 'bill' && unitId && mesa && (
-              <BillPanel
-                unitId={unitId}
-                mesa={mesa}
-                storeInfo={unit?.store_info as Record<string, any> | null}
-                storeName={unit?.name || 'Loja'}
-                onClose={() => setActivePanel(null)}
-              />
-            )}
-            {activePanel === 'orders' && unitId && mesa && (
-              <OrdersPanel unitId={unitId} mesa={mesa} onClose={() => setActivePanel(null)} />
-            )}
-            {activePanel === 'games' && (
-              <div className="h-full flex flex-col">
-                <div className="flex items-center gap-3 px-5 py-4 border-b border-border/20">
-                  <button onClick={() => setActivePanel(null)} className="w-9 h-9 rounded-xl hover:bg-secondary/50 flex items-center justify-center">
-                    <AppIcon name="ArrowLeft" size={18} className="text-muted-foreground" />
-                  </button>
-                  <h2 className="text-base font-bold text-foreground">Jogos</h2>
-                </div>
-                <div className="flex-1 flex items-center justify-center px-6">
-                  <div className="w-full max-w-md space-y-4">
-                    {GAMES.map(game => (
-                      <button
-                        key={game.id}
-                        onClick={() => { setActivePanel(null); setActiveGame(game.id); }}
-                        className={`w-full flex items-center gap-4 p-6 rounded-2xl bg-gradient-to-br ${game.gradient} border ${game.border} hover:scale-[1.01] active:scale-[0.98] transition-all`}
-                      >
-                        <span className="text-5xl">{game.emoji}</span>
-                        <div className="text-left flex-1">
-                          <p className="text-base font-bold text-foreground">{game.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{game.description}</p>
-                        </div>
-                        <AppIcon name="ChevronRight" size={20} className="text-muted-foreground" />
-                      </button>
-                    ))}
-                  </div>
+      {/* Panel overlay */}
+      {hasRightPanel && (
+        <div className="absolute inset-0 z-30 md:left-[400px] lg:left-[420px] bg-background/98 backdrop-blur-2xl animate-in fade-in slide-in-from-right-5 duration-300">
+          {activePanel === 'bill' && unitId && mesa && (
+            <BillPanel
+              unitId={unitId}
+              mesa={mesa}
+              storeInfo={unit?.store_info as Record<string, any> | null}
+              storeName={unit?.name || 'Loja'}
+              onClose={() => setActivePanel(null)}
+            />
+          )}
+          {activePanel === 'orders' && unitId && mesa && (
+            <OrdersPanel unitId={unitId} mesa={mesa} onClose={() => setActivePanel(null)} />
+          )}
+          {activePanel === 'games' && (
+            <div className="h-full flex flex-col">
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-border/20">
+                <button onClick={() => setActivePanel(null)} className="w-9 h-9 rounded-xl hover:bg-secondary/50 flex items-center justify-center">
+                  <AppIcon name="ArrowLeft" size={18} className="text-muted-foreground" />
+                </button>
+                <h2 className="text-base font-bold text-foreground">Jogos</h2>
+              </div>
+              <div className="flex-1 flex items-center justify-center px-6">
+                <div className="w-full max-w-md space-y-4">
+                  {GAMES.map(game => (
+                    <button
+                      key={game.id}
+                      onClick={() => { setActivePanel(null); setActiveGame(game.id); }}
+                      className={`w-full flex items-center gap-4 p-6 rounded-2xl bg-gradient-to-br ${game.gradient} border ${game.border} hover:scale-[1.01] active:scale-[0.98] transition-all`}
+                    >
+                      <span className="text-5xl">{game.emoji}</span>
+                      <div className="text-left flex-1">
+                        <p className="text-base font-bold text-foreground">{game.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{game.description}</p>
+                      </div>
+                      <AppIcon name="ChevronRight" size={20} className="text-muted-foreground" />
+                    </button>
+                  ))}
                 </div>
               </div>
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ─── Table Config Dialog ─── */}
       {showConfig && (
