@@ -22,6 +22,7 @@ import { PageSkeleton } from '@/components/ui/page-skeleton';
 import { FinanceSkeleton, QuickStatsSkeleton, LeaderboardSkeleton, CalendarSkeleton, GenericWidgetSkeleton } from '@/components/ui/widget-skeleton';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh';
+import { cn } from '@/lib/utils';
 
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
 const LazyCalendar = lazy(() => import('./UnifiedCalendarWidget').then(m => ({ default: m.UnifiedCalendarWidget })));
@@ -38,6 +39,7 @@ const LazyBreakEven = lazy(() => import('./BreakEvenWidget'));
 const LazyMultiUnit = lazy(() => import('./MultiUnitOverview'));
 import { SalesGoalWidget } from './SalesGoalWidget';
 import { GuidedTour } from '@/components/onboarding/GuidedTour';
+
 function LazyWidget({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   const { ref, visible } = useLazyVisible('300px');
   const skeleton = fallback || <GenericWidgetSkeleton />;
@@ -52,6 +54,10 @@ function LazyWidget({ children, fallback }: { children: React.ReactNode; fallbac
   );
 }
 
+type DashboardView = 'operational' | 'financial';
+
+const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'leaderboard', 'calendar', 'multi-unit']);
+const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -60,11 +66,20 @@ export function AdminDashboard() {
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { widgets, setWidgets, resetDefaults } = useDashboardWidgets();
   const [managerOpen, setManagerOpen] = useState(false);
+  const [view, setView] = useState<DashboardView>(() => {
+    try {
+      return (localStorage.getItem('dashboard-view') as DashboardView) || 'operational';
+    } catch { return 'operational'; }
+  });
   const { pullDistance, refreshing, threshold } = usePullToRefresh([['dashboard-stats']]);
 
   const isReady = !statsLoading && !modulesLoading && !!profile;
-
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
+
+  const handleViewChange = (v: DashboardView) => {
+    setView(v);
+    try { localStorage.setItem('dashboard-view', v); } catch {}
+  };
 
   if (!isReady) {
     return (
@@ -77,9 +92,12 @@ export function AdminDashboard() {
   let staggerIndex = 0;
   const nextStagger = () => `dash-stagger-${++staggerIndex}`;
 
-  // Categorize widgets into full-width vs grid-able
   const renderWidget = (widget: typeof widgets[number], stagger: string) => {
     if (!widget.visible) return null;
+
+    // Filter by current view
+    if (view === 'operational' && FINANCIAL_WIDGETS.has(widget.key)) return null;
+    if (view === 'financial' && OPERATIONAL_WIDGETS.has(widget.key)) return null;
 
     switch (widget.key) {
       case 'finance':
@@ -94,7 +112,6 @@ export function AdminDashboard() {
         ) : null;
 
       case 'checklist':
-        // Now embedded inside QuickStatsWidget
         return null;
 
       case 'bills-due':
@@ -135,7 +152,6 @@ export function AdminDashboard() {
         ) : null;
 
       case 'quick-stats':
-        // Rendered directly in layout, not in grid
         return null;
 
       case 'heatmap':
@@ -180,30 +196,64 @@ export function AdminDashboard() {
       {/* Greeting */}
       <DashboardContextBar firstName={firstName} stats={stats} />
 
-      {/* Quick Stats — horizontal scroll strip */}
-      <div className="mt-3">
-        <Suspense fallback={<QuickStatsSkeleton />}>
-          <LazyQuickStats />
-        </Suspense>
+      {/* View Selector */}
+      <div className="mt-3 flex gap-1.5 p-1 rounded-xl bg-card/70 border border-border/30 w-fit">
+        <button
+          onClick={() => handleViewChange('operational')}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+            view === 'operational'
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <AppIcon name="dashboard" size={14} />
+          Operacional
+        </button>
+        <button
+          onClick={() => handleViewChange('financial')}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200",
+            view === 'financial'
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <AppIcon name="account_balance" size={14} />
+          Financeiro
+        </button>
       </div>
+
+      {/* Quick Stats — only on operational view */}
+      {view === 'operational' && (
+        <div className="mt-3">
+          <Suspense fallback={<QuickStatsSkeleton />}>
+            <LazyQuickStats />
+          </Suspense>
+        </div>
+      )}
 
       {/* Upgrade Banner for free users */}
       <div className="mt-4">
         <UpgradeBanner />
       </div>
 
-      {/* Setup Onboarding — full width */}
-      <SetupChecklistWidget />
+      {/* Setup Onboarding — full width, operational only */}
+      {view === 'operational' && <SetupChecklistWidget />}
 
-      {/* Sales Goal Widget — full width */}
-      <div className="mt-4">
-        <SalesGoalWidget />
-      </div>
+      {/* Sales Goal Widget — operational */}
+      {view === 'operational' && (
+        <div className="mt-4">
+          <SalesGoalWidget />
+        </div>
+      )}
 
-      {/* Smart Scanner — full width */}
-      <div className="mt-4">
-        <SmartScannerWidget />
-      </div>
+      {/* Smart Scanner — operational */}
+      {view === 'operational' && (
+        <div className="mt-4">
+          <SmartScannerWidget />
+        </div>
+      )}
 
       {/* Widgets Grid — 2 columns on desktop */}
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
