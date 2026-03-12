@@ -94,10 +94,10 @@ interface FinanceBottomNavProps {
   variant?: 'business' | 'personal';
 }
 
-const tabs: { id: FinanceTab; icon: string; label: string }[] = [
+const tabs: { id: FinanceTab; icon: string; customIcon?: string; label: string }[] = [
   { id: 'home', icon: 'Home', label: 'Início' },
   { id: 'transactions', icon: 'FileText', label: 'Transações' },
-  { id: 'charts', icon: 'ChartPie', label: 'Gráficos' },
+  { id: 'charts', icon: 'ChartPie', customIcon: '/icons/graficos.png', label: 'Gráficos' },
   { id: 'more', icon: 'Menu', label: 'Mais' },
 ];
 
