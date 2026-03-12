@@ -1,79 +1,62 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Plano: Nova aba "Serviço" no Dashboard
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+### Objetivo
+Adicionar uma quarta aba **"Serviço"** ao seletor do dashboard, com uma visão em tempo real do operacional durante o turno: pedidos do PDV, comandas, entregas e pedidos de delivery hub (iFood etc).
 
----
+### Widgets da aba Serviço
 
-## Bloco de Relatórios Avançados ✅
+1. **KPI Bar** — 4 cards: Vendas hoje (R$), Pedidos ativos, Entregas em andamento, Pedidos delivery hub
+2. **Pedidos Ativos** — Lista compacta dos pedidos `tablet_orders` com status pendente/em preparo, agrupados por fonte (balcão, mesa, delivery), com badges de tempo decorrido
+3. **Delivery Hub Live** — Cards dos pedidos iFood/Rappi ativos com status e tempo desde recebimento
+4. **Vendas do Turno** — Mini gráfico (BarChart) de vendas por hora do dia atual via `pos_sales`
+5. **Entregas em Rota** — Resumo das entregas ativas (busca da tabela `deliveries` com status em trânsito)
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+### Alterações técnicas
 
-## Dashboard Analytics ✅
+**Arquivos criados:**
+- `src/hooks/useServiceDashboard.ts` — Hook que busca: vendas do dia (`pos_sales`), pedidos ativos (`tablet_orders`), entregas em rota (`deliveries`), pedidos hub (`delivery_hub_orders`). Usa realtime para tablet_orders e delivery_hub_orders.
+- `src/components/dashboard/ServiceDashboardView.tsx` — Componente principal com KPI bar + grid de widgets
+- `src/components/dashboard/ServiceActiveOrders.tsx` — Lista de pedidos ativos agrupados por fonte com tempo decorrido
+- `src/components/dashboard/ServiceHourlySales.tsx` — Gráfico de barras vendas/hora do dia (Recharts)
+- `src/components/dashboard/ServiceDeliveryStatus.tsx` — Cards de entregas ativas e pedidos delivery hub
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+**Arquivo modificado:**
+- `src/components/dashboard/AdminDashboard.tsx` — Expandir `DashboardView` para incluir `'service'`, adicionar botão "Serviço" no seletor com ícone `storefront`, renderizar `ServiceDashboardView` quando ativo, filtrar widgets do grid
 
-## Operacional ✅
+### Dados
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+| Widget | Tabela | Filtro |
+|--------|--------|--------|
+| Vendas hoje | `pos_sales` | `unit_id`, `status=paid`, `created_at >= hoje` |
+| Pedidos ativos | `tablet_orders` | `unit_id`, status in (pending, confirmed, preparing, ready) |
+| Delivery hub | `delivery_hub_orders` | `unit_id`, status in (new, accepted, preparing, ready, dispatched) |
+| Entregas em rota | `deliveries` | `unit_id`, status in (assigned, picked_up, in_transit) |
+| Vendas/hora | `pos_sales` | agrupado por `extract(hour from created_at)` |
 
-## CRM / Clientes ✅
+Realtime ativo para `tablet_orders` e `delivery_hub_orders` (já existente nos hooks atuais, será reaproveitado).
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+### Layout mobile (428px)
 
-## Funcionários ✅
+```text
+[Operacional] [Financeiro] [Serviço] [Equipe]
+                              ↓
+┌──────────┬──────────┐
+│ Vendas $ │ Pedidos  │
+├──────────┼──────────┤
+│ Entregas │ Hub iFood│
+└──────────┴──────────┘
+┌─────────────────────┐
+│ Pedidos Ativos      │
+│ (lista scrollável)  │
+└─────────────────────┘
+┌─────────────────────┐
+│ Vendas por Hora     │
+│ (BarChart)          │
+└─────────────────────┘
+┌─────────────────────┐
+│ Entregas / Hub Live │
+└─────────────────────┘
+```
 
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
