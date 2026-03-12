@@ -85,7 +85,7 @@ export function AdminDashboard() {
 
       case 'checklist':
         return hasAccess('checklists') ? (
-          <DashboardSection key={widget.key} onNavigate={() => navigate('/checklists')} className={`animate-card-reveal ${stagger}`}>
+          <DashboardSection key={widget.key} onNavigate={() => navigate('/checklists')} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
             <LazyWidget><LazyChecklist /></LazyWidget>
           </DashboardSection>
         ) : null;
