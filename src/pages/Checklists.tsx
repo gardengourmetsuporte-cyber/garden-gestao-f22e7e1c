@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DatePicker } from '@/components/ui/date-picker';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ChecklistView } from '@/components/checklists/ChecklistView';
@@ -33,6 +33,21 @@ export default function ChecklistsPage() {
     isItemCompleted, getCompletionProgress, contestCompletion, splitCompletion,
   } = useChecklistPage();
   const [reminderOpen, setReminderOpen] = useState(false);
+
+  // View mode: 'full' (all sectors) or 'sector' (single sector)
+  const [viewMode, setViewMode] = useState<'full' | 'sector'>(() => {
+    try { return (localStorage.getItem('checklist-view-mode') as 'full' | 'sector') || 'full'; } catch { return 'full'; }
+  });
+  const [selectedSectorId, setSelectedSectorId] = useState<string | null>(() => {
+    try { return localStorage.getItem('checklist-selected-sector') || null; } catch { return null; }
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem('checklist-view-mode', viewMode); } catch {}
+  }, [viewMode]);
+  useEffect(() => {
+    try { if (selectedSectorId) localStorage.setItem('checklist-selected-sector', selectedSectorId); else localStorage.removeItem('checklist-selected-sector'); } catch {}
+  }, [selectedSectorId]);
 
   if (isLoading) {
     return (
