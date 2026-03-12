@@ -210,7 +210,7 @@ export default function TabletHome() {
         icon: 'SportsEsports',
         label: 'Jogos',
         subtitle: 'Diversão na mesa',
-        onClick: () => navigate(`/tablet/${unitId}/games?mesa=${mesa}`),
+        onClick: () => setActiveGame('select'),
       },
       {
         id: 'mural',
