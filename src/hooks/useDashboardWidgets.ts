@@ -20,9 +20,10 @@ const DEFAULT_WIDGETS: DashboardWidget[] = [
   { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },
   { key: 'calendar', label: 'Calendário', icon: 'CalendarDays', visible: true },
   { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true },
+  { key: 'multi-unit', label: 'Visão multi-unidade', icon: 'Building2', visible: true },
 ];
 
-const STORAGE_KEY = 'dashboard-widgets-config-v5';
+const STORAGE_KEY = 'dashboard-widgets-config-v6';
 
 function loadWidgets(): DashboardWidget[] {
   try {
