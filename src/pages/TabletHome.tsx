@@ -289,23 +289,22 @@ export default function TabletHome() {
         {/* Divider */}
         <div className="mx-6 h-px bg-border/30" />
 
-        {/* Menu items */}
-        <div className="flex-1 px-4 py-3 overflow-hidden">
-          <div className="space-y-1">
+        {/* Menu items - centered grid */}
+        <div className="flex-1 flex items-center justify-center px-5 overflow-hidden">
+          <div className="grid grid-cols-2 gap-3 w-full max-w-[360px]">
             {menuItems.map(item => (
               <button
                 key={item.id}
                 onClick={item.onClick}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left hover:bg-card active:bg-card/80 transition-all group"
+                className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-card/50 border border-border/20 hover:bg-card hover:border-primary/20 active:scale-[0.97] transition-all group"
               >
-                <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-                  <AppIcon name={item.icon} size={20} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                  <AppIcon name={item.icon} size={24} className="text-primary" />
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="text-center">
                   <p className="text-sm font-bold text-foreground">{item.label}</p>
-                  <p className="text-[11px] text-muted-foreground leading-tight">{item.subtitle}</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{item.subtitle}</p>
                 </div>
-                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground/30 group-hover:text-muted-foreground/60 transition-colors shrink-0" />
               </button>
             ))}
           </div>
