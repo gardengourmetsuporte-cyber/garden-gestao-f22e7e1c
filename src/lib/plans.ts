@@ -73,7 +73,7 @@ export const MODULE_REQUIRED_PLAN: Record<string, PlanTier> = {
 };
 
 /** Modules that are still in production (shown with a beta/production badge) */
-export const PRODUCTION_MODULES: string[] = ['menu-admin', 'whatsapp', 'pdv', 'deliveries'];
+export const PRODUCTION_MODULES: string[] = [];
 
 /** Check if a plan satisfies the required plan level */
 export function planSatisfies(userPlan: PlanTier, requiredPlan: PlanTier): boolean {
