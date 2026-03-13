@@ -456,7 +456,7 @@ export default function KDS() {
       </header>
 
       {/* Error bar */}
-      {isError && (
+      {showError && (
         <div className="mx-2 mt-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 flex items-center justify-between gap-2 shrink-0">
           <p className="text-[11px] text-red-400 font-medium truncate">{(error as Error)?.message || 'Falha ao carregar'}</p>
           <button onClick={() => refetch()} className="h-6 px-2.5 rounded-md bg-red-500 text-white text-[10px] font-bold shrink-0 active:scale-95">
