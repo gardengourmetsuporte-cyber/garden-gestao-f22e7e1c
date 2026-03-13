@@ -243,15 +243,12 @@ export function AdminDashboard() {
 
       {/* Widgets Grid */}
       {view !== 'team' && view !== 'service' && (
-        <>
-          <SectionHeader title="Atividade" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {widgets.map((widget) => {
               const stagger = nextStagger();
               return renderWidget(widget, stagger);
             })}
           </div>
-        </>
       )}
 
       {/* Manage button */}
