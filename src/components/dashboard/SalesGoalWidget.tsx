@@ -4,13 +4,31 @@ import { useDashboardAnalytics } from '@/hooks/useDashboardAnalytics';
 import { formatCurrency } from '@/lib/format';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
+
+function GoalRing({ pct, size = 56, stroke = 5 }: { pct: number; size?: number; stroke?: number }) {
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (Math.min(pct, 100) / 100) * circ;
+  return (
+    <svg width={size} height={size} className="shrink-0 -rotate-90">
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="hsl(var(--muted))" strokeWidth={stroke} />
+      <circle
+        cx={size / 2} cy={size / 2} r={r} fill="none"
+        stroke={pct >= 100 ? 'hsl(var(--success))' : 'hsl(var(--primary))'}
+        strokeWidth={stroke} strokeLinecap="round"
+        strokeDasharray={circ} strokeDashoffset={offset}
+        className="transition-all duration-700 ease-out"
+      />
+    </svg>
+  );
+}
 
 export function SalesGoalWidget() {
   const { goal, isLoading: goalLoading, upsertGoal } = useSalesGoals();
@@ -40,79 +58,46 @@ export function SalesGoalWidget() {
   if (goalLoading) return null;
   if (!goal && !isAdmin) return null;
 
-  return (
-    <div className="card-base p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
-            <AppIcon name="Target" size={14} className="text-primary" />
+  const settingsSheet = isAdmin && (
+    <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (v) { setDailyInput(String(dailyGoal || '')); setMonthlyInput(String(monthlyGoal || '')); } }}>
+      <SheetTrigger asChild>
+        <button className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+          <AppIcon name="Settings" size={13} className="text-muted-foreground" />
+        </button>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="rounded-t-2xl">
+        <SheetHeader>
+          <SheetTitle>Definir Metas — {format(new Date(), 'MMMM yyyy', { locale: ptBR })}</SheetTitle>
+        </SheetHeader>
+        <div className="space-y-4 mt-4">
+          <div>
+            <Label>Meta Diária (R$)</Label>
+            <Input type="number" value={dailyInput} onChange={e => setDailyInput(e.target.value)} placeholder="Ex: 3000" />
           </div>
-          <h3 className="text-sm font-semibold text-foreground">Metas de Vendas</h3>
+          <div>
+            <Label>Meta Mensal (R$)</Label>
+            <Input type="number" value={monthlyInput} onChange={e => setMonthlyInput(e.target.value)} placeholder="Ex: 80000" />
+          </div>
+          <Button onClick={handleSave} disabled={upsertGoal.isPending} className="w-full">
+            {upsertGoal.isPending ? 'Salvando...' : 'Salvar Metas'}
+          </Button>
         </div>
-        {isAdmin && (
-          <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (v) { setDailyInput(String(dailyGoal || '')); setMonthlyInput(String(monthlyGoal || '')); } }}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full hover:bg-muted/30">
-                <AppIcon name="Settings" size={14} className="text-muted-foreground" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="rounded-t-2xl">
-              <SheetHeader>
-                <SheetTitle>Definir Metas — {format(new Date(), 'MMMM yyyy', { locale: ptBR })}</SheetTitle>
-              </SheetHeader>
-              <div className="space-y-4 mt-4">
-                <div>
-                  <Label>Meta Diária (R$)</Label>
-                  <Input type="number" value={dailyInput} onChange={e => setDailyInput(e.target.value)} placeholder="Ex: 3000" />
-                </div>
-                <div>
-                  <Label>Meta Mensal (R$)</Label>
-                  <Input type="number" value={monthlyInput} onChange={e => setMonthlyInput(e.target.value)} placeholder="Ex: 80000" />
-                </div>
-                <Button onClick={handleSave} disabled={upsertGoal.isPending} className="w-full">
-                  {upsertGoal.isPending ? 'Salvando...' : 'Salvar Metas'}
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
-        )}
-      </div>
+      </SheetContent>
+    </Sheet>
+  );
 
-      {dailyGoal > 0 || monthlyGoal > 0 ? (
-        <div className="space-y-4">
-          {dailyGoal > 0 && (
-            <div>
-              <div className="flex justify-between text-xs mb-1.5">
-                <span className="text-muted-foreground">Hoje</span>
-                <span className="font-semibold text-foreground tabular-nums">
-                  {formatCurrency(todayRevenue)} / {formatCurrency(dailyGoal)}
-                </span>
-              </div>
-              <Progress value={dailyPct} className="h-2" />
-              <p className="text-[10px] text-muted-foreground mt-1 tabular-nums">{dailyPct.toFixed(0)}% da meta diária</p>
-            </div>
-          )}
-          {monthlyGoal > 0 && (
-            <div>
-              <div className="flex justify-between text-xs mb-1.5">
-                <span className="text-muted-foreground">{format(new Date(), 'MMMM', { locale: ptBR })}</span>
-                <span className="font-semibold text-foreground tabular-nums">
-                  {formatCurrency(monthRevenue)} / {formatCurrency(monthlyGoal)}
-                </span>
-              </div>
-              <Progress value={monthlyPct} className="h-2" />
-              <p className="text-[10px] text-muted-foreground mt-1 tabular-nums">{monthlyPct.toFixed(0)}% da meta mensal</p>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center py-6 gap-2">
-          <div className="w-12 h-12 rounded-2xl bg-muted/50 flex items-center justify-center">
-            <AppIcon name="Target" size={24} className="text-muted-foreground/50" />
+  const hasGoals = dailyGoal > 0 || monthlyGoal > 0;
+
+  if (!hasGoals) {
+    return (
+      <div className="card-base p-5">
+        <div className="flex flex-col items-center py-4 gap-2">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <AppIcon name="Target" size={24} className="text-primary/50" />
           </div>
           <p className="text-sm font-medium text-foreground">Sem metas ainda</p>
           <p className="text-xs text-muted-foreground text-center max-w-[200px]">
-            Defina metas diárias e mensais para acompanhar seu progresso de vendas.
+            Defina metas diárias e mensais para acompanhar seu progresso.
           </p>
           {isAdmin && (
             <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="text-xs mt-1 h-8">
@@ -120,7 +105,66 @@ export function SalesGoalWidget() {
             </Button>
           )}
         </div>
-      )}
+        {settingsSheet}
+      </div>
+    );
+  }
+
+  return (
+    <div className="card-base p-4 space-y-3">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <AppIcon name="Target" size={15} className="text-primary" />
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Metas</h3>
+        </div>
+        {settingsSheet}
+      </div>
+
+      {/* Goal rows */}
+      <div className="flex gap-3">
+        {dailyGoal > 0 && (
+          <div className="flex-1 flex items-center gap-3 rounded-xl bg-muted/30 border border-border/20 p-3">
+            <div className="relative">
+              <GoalRing pct={dailyPct} size={48} stroke={4} />
+              <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-foreground tabular-nums">
+                {dailyPct.toFixed(0)}%
+              </span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">Hoje</p>
+              <p className="text-sm font-bold text-foreground tabular-nums leading-tight truncate">
+                {formatCurrency(todayRevenue)}
+              </p>
+              <p className="text-[10px] text-muted-foreground tabular-nums truncate">
+                de {formatCurrency(dailyGoal)}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {monthlyGoal > 0 && (
+          <div className="flex-1 flex items-center gap-3 rounded-xl bg-muted/30 border border-border/20 p-3">
+            <div className="relative">
+              <GoalRing pct={monthlyPct} size={48} stroke={4} />
+              <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-foreground tabular-nums">
+                {monthlyPct.toFixed(0)}%
+              </span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">
+                {format(new Date(), 'MMM', { locale: ptBR })}
+              </p>
+              <p className="text-sm font-bold text-foreground tabular-nums leading-tight truncate">
+                {formatCurrency(monthRevenue)}
+              </p>
+              <p className="text-[10px] text-muted-foreground tabular-nums truncate">
+                de {formatCurrency(monthlyGoal)}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
