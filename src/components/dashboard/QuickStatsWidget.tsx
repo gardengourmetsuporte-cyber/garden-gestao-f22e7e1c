@@ -119,8 +119,8 @@ export function QuickStatsWidget() {
           key={card.key}
           onClick={() => navigate(card.route)}
           className={cn(
-            "flex items-center gap-2.5 rounded-xl px-3 py-2.5 transition-all duration-200 active:scale-[0.97]",
-            "bg-card/70 border border-border/30 min-w-0",
+            "flex items-center gap-2.5 shrink-0 rounded-xl px-3 py-2 transition-all duration-200 active:scale-[0.97]",
+            "bg-card/70 border border-border/30 min-w-[120px] lg:min-w-0",
           )}
         >
           <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", variantIcon[card.variant])}>
