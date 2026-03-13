@@ -25,7 +25,7 @@ export function ServiceDashboardView() {
   };
 
   return (
-    <div className="mt-4 space-y-4">
+    <div className="space-y-4">
       {/* Operation Pulse Hero */}
       <ServiceOperationStatus pulse={pulse} />
 

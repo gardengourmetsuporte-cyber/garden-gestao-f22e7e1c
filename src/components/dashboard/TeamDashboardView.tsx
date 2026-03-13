@@ -63,7 +63,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
   }
 
   return (
-    <div className="mt-4 space-y-4">
+    <div className="space-y-4">
       {/* Operation Pulse Hero */}
       <div className={cn('card-base p-4 border ring-1', pulseCfg.ring)}>
         <div className="flex items-center gap-2 mb-4">
