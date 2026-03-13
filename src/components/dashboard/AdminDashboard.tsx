@@ -13,7 +13,7 @@ import { DashboardSection } from './DashboardSection';
 
 
 const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
-import { SmartScannerWidget } from './SmartScannerWidget';
+
 import { UpgradeBanner } from './UpgradeBanner';
 import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
