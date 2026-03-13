@@ -1382,7 +1382,7 @@ select:focus {
 
 /* Scanner Widget */
 .scanner-card-glow {
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
 }
 
 @keyframes scannerShimmer {
