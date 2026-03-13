@@ -76,7 +76,7 @@ function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab;
           }}
         />
         {tab.customIcon ? (
-          <img src={tab.customIcon} alt="" className={cn("w-[22px] h-[22px] relative z-10", active ? "icon-tint-primary" : "icon-tint-muted opacity-70")} />
+          <img src={tab.customIcon} alt="" className={cn("w-[22px] h-[22px] relative z-10", active ? "icon-tint-primary" : "icon-tint-muted")} />
         ) : (
           <AppIcon name={tab.icon} size={22} fill={active ? 1 : 0} weight={active ? 600 : 400} className={cn("relative z-10 transition-colors duration-300", active ? 'text-primary' : 'text-muted-foreground')} />
         )}
