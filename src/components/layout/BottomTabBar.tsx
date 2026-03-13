@@ -216,7 +216,7 @@ export function BottomTabBar() {
                 className={cn(
                   "w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all duration-500",
                   (fabAction || hasMultiActions)
-                    ? "bg-accent-foreground fab-contextual-glow"
+                    ? "fab-contextual-glow"
                     : "bg-primary fab-button-glow",
                   speedDialOpen && "rotate-45",
                   "hover:scale-[1.08] active:scale-[0.92]"

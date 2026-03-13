@@ -168,7 +168,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
               </>
             ) : (
               <>
-                <span className="material-symbols-rounded mr-2" style={{ fontSize: 18 }}>send</span>
+                <AppIcon name="send" size={18} className="mr-2" />
                 Enviar para {recipients.length} cliente{recipients.length !== 1 ? 's' : ''}
               </>
             )}
