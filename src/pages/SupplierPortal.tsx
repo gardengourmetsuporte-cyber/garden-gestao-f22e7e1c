@@ -88,7 +88,7 @@ const statusLabel: Record<string, string> = {
 const statusColor: Record<string, string> = {
   draft: 'bg-muted text-muted-foreground',
   sent: 'bg-primary/20 text-primary',
-  received: 'bg-green-500/20 text-green-400',
+  received: 'bg-success/20 text-success',
   cancelled: 'bg-destructive/20 text-destructive',
 };
 
