@@ -76,7 +76,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
       <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <span className="material-symbols-rounded text-primary" style={{ fontSize: 22 }}>campaign</span>
+            <AppIcon name="campaign" size={22} className="text-primary" />
             Enviar mensagem em massa
           </SheetTitle>
         </SheetHeader>
