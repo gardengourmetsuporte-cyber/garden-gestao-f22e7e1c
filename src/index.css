@@ -24,66 +24,63 @@ html {
 }
 
 /* =========================================================
-   DESIGN SYSTEM - Garden Gestão (Clean SaaS)
+   DESIGN SYSTEM - Garden Gestão (Spotify Dark)
    ========================================================= */
 
 @layer base {
 
   :root {
-    --radius: 1rem;
-
-    /* Brand base */
-    --garden-green: 270 70% 55%;
+    --radius: 0.5rem;
 
     /* Semantic finance tokens */
-    --color-income: 156 72% 45%;
-    --color-expense: 348 83% 53%;
-    --color-transfer: 220 80% 65%;
+    --color-income: 141 73% 42%;
+    --color-expense: 0 72% 51%;
+    --color-transfer: 210 60% 55%;
     --color-pending: 43 96% 56%;
-    --color-credit-card: 260 70% 60%;
+    --color-credit-card: 260 60% 55%;
 
-    /* Premium surface */
-    --surface-elevated: 240 5% 15%;
-    --surface-sunken: 240 10% 4%;
+    /* Surface layers */
+    --surface-elevated: 0 0% 16%;
+    --surface-sunken: 0 0% 5%;
   }
 
-  /* ===== DARK THEME (Clean Slate) ===== */
+  /* ===== DARK THEME (Spotify) ===== */
   .dark {
-    --background: 220 14% 8%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 7%;
+    --foreground: 0 0% 100%;
 
-    --card: 220 13% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 220 13% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 13%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 270 70% 55%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 141 73% 42%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 220 12% 15%;
-    --secondary-foreground: 220 5% 85%;
+    --secondary: 0 0% 16%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 220 12% 15%;
-    --muted-foreground: 220 8% 62%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 220 12% 18%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 348 83% 53%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 156 72% 45%;
-    --success-foreground: 0 0% 100%;
+    --success: 141 73% 42%;
+    --success-foreground: 0 0% 0%;
 
     --warning: 43 96% 56%;
-    --warning-foreground: 0 0% 100%;
+    --warning-foreground: 0 0% 0%;
 
-    --border: 220 12% 18%;
-    --input: 220 12% 15%;
-    --ring: 270 70% 55%;
+    --border: 0 0% 15%;
+    --input: 0 0% 16%;
+    --ring: 141 73% 42%;
 
-    /* No colored glows — neutral shadows only */
+    /* No glows — Spotify is flat */
     --glow-primary: none;
     --glow-accent: none;
     --glow-success: none;
@@ -91,106 +88,107 @@ html {
     --glow-warning: none;
     --glow-cyan: none;
 
-    /* Subtle Gradients */
-    --gradient-brand: linear-gradient(135deg, hsl(270 70% 50%), hsl(280 80% 60%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(270 70% 55% / 0.15), hsl(280 80% 60% / 0.05));
-    --gradient-surface: linear-gradient(180deg, hsl(220 13% 13%), hsl(220 14% 8%));
+    /* Gradients */
+    --gradient-brand: linear-gradient(135deg, hsl(141 73% 42%), hsl(141 73% 48%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(141 73% 42% / 0.15), hsl(141 73% 48% / 0.05));
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 11%), hsl(0 0% 7%));
 
-    /* Neutral shadows */
-    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.2), 0 4px 12px hsl(0 0% 0% / 0.12);
-    --shadow-card-hover: 0 4px 12px hsl(0 0% 0% / 0.25), 0 8px 24px hsl(0 0% 0% / 0.15);
-    --shadow-elevated: 0 6px 20px hsl(0 0% 0% / 0.3), 0 12px 40px hsl(0 0% 0% / 0.18);
-    --shadow-floating: 0 8px 28px hsl(0 0% 0% / 0.25);
+    /* Zero shadows */
+    --shadow-card: none;
+    --shadow-card-hover: none;
+    --shadow-elevated: none;
+    --shadow-floating: none;
     --shadow-glow: none;
 
-    /* Sidebar tokens */
-    --sidebar-background: 220 14% 9%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 270 70% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 12% 16%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 12% 18%;
-    --sidebar-ring: 270 70% 55%;
+    /* Sidebar = same as background */
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 141 73% 42%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 141 73% 42%;
   }
 
-  /* ===== LIGHT THEME ===== */
+  /* ===== LIGHT THEME (Spotify Light) ===== */
   :root:not(.dark) {
-    --color-income: 156 72% 38%;
-    --color-expense: 348 83% 45%;
-    --color-transfer: 220 80% 50%;
+    --color-income: 141 73% 35%;
+    --color-expense: 0 72% 45%;
+    --color-transfer: 210 60% 45%;
     --color-pending: 43 96% 45%;
-    --color-credit-card: 260 70% 50%;
+    --color-credit-card: 260 60% 45%;
 
     --surface-elevated: 0 0% 100%;
-    --surface-sunken: 240 5% 96%;
-    --background: 240 5% 98%;
-    --foreground: 240 10% 10%;
+    --surface-sunken: 0 0% 96%;
+
+    --background: 0 0% 98%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 10%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 10%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 270 70% 48%;
+    --primary: 141 73% 37%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 94%;
-    --secondary-foreground: 240 10% 20%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 5% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 240 5% 92%;
-    --accent-foreground: 240 10% 10%;
+    --accent: 0 0% 92%;
+    --accent-foreground: 0 0% 9%;
 
-    --destructive: 348 83% 50%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 156 72% 40%;
+    --success: 141 73% 35%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 43 96% 45%;
+    --warning: 43 96% 42%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%;
-    --input: 240 5% 94%;
-    --ring: 270 70% 48%;
+    --border: 0 0% 92%;
+    --input: 0 0% 94%;
+    --ring: 141 73% 37%;
 
-    /* No glows in light */
+    /* No glows */
     --glow-primary: none;
     --glow-success: none;
     --glow-destructive: none;
     --glow-warning: none;
     --glow-cyan: none;
 
-    --shadow-card: 0 1px 3px hsl(234 20% 30% / 0.06), 0 4px 12px hsl(234 20% 30% / 0.04);
-    --shadow-card-hover: 0 4px 16px hsl(234 20% 30% / 0.08), 0 8px 28px hsl(234 20% 30% / 0.04);
-    --shadow-elevated: 0 6px 20px hsl(234 20% 30% / 0.08), 0 12px 40px hsl(234 20% 30% / 0.04);
-    --shadow-floating: 0 8px 32px hsl(234 20% 30% / 0.08), 0 2px 8px hsl(234 20% 30% / 0.04);
-
-    --gradient-brand: linear-gradient(135deg, hsl(270 50% 30%), hsl(270 60% 40%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(270 60% 45% / 0.06), hsl(280 60% 50% / 0.03));
-    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(270 5% 97%));
+    --shadow-card: none;
+    --shadow-card-hover: none;
+    --shadow-elevated: none;
+    --shadow-floating: none;
     --shadow-glow: none;
+
+    --gradient-brand: linear-gradient(135deg, hsl(141 73% 37%), hsl(141 73% 42%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(141 73% 37% / 0.06), hsl(141 73% 42% / 0.03));
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 97%));
 
     /* Sidebar tokens */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 10%;
-    --sidebar-primary: 270 70% 48%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 141 73% 37%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 94%;
-    --sidebar-accent-foreground: 240 10% 10%;
-    --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 270 70% 48%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 92%;
+    --sidebar-ring: 141 73% 37%;
   }
 
 }
 
 @layer base {
   * {
-    @apply border-border/50;
+    @apply border-border;
   }
 
   html {
@@ -255,43 +253,43 @@ html {
     @apply min-h-[48px] min-w-[48px];
   }
 
-  /* ========== GRADIENT PRIMARY (Clean) ========== */
+  /* ========== GRADIENT PRIMARY (Spotify) ========== */
 
   .gradient-primary {
-    background: linear-gradient(135deg, hsl(270 70% 45%), hsl(270 70% 55%));
-    color: hsl(0 0% 100%);
-    border: 1px solid hsl(270 70% 50% / 0.3);
-    box-shadow: var(--shadow-card);
-    --foreground: 0 0% 95%;
-    --muted-foreground: 0 0% 70%;
-    --gp-label: hsl(0 0% 80%);
-    --gp-sublabel: hsl(0 0% 70%);
-    --gp-value: hsl(0 0% 100%);
-    --gp-icon: hsl(270 45% 70%);
-    --gp-positive: hsl(142 60% 60%);
-    --gp-negative: hsl(0 70% 65%);
+    background: hsl(var(--primary));
+    color: hsl(0 0% 0%);
+    border: none;
+    box-shadow: none;
+    --foreground: 0 0% 0%;
+    --muted-foreground: 0 0% 30%;
+    --gp-label: hsl(0 0% 30%);
+    --gp-sublabel: hsl(0 0% 40%);
+    --gp-value: hsl(0 0% 0%);
+    --gp-icon: hsl(0 0% 20%);
+    --gp-positive: hsl(141 73% 30%);
+    --gp-negative: hsl(0 70% 45%);
   }
 
   .dark .gradient-primary {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(145deg, hsl(0 0% 98%), hsl(270 20% 93%));
-    color: hsl(270 30% 15%);
-    box-shadow: var(--shadow-elevated);
-    border-color: hsl(270 20% 80% / 0.3);
-    --foreground: 270 30% 15%;
-    --muted-foreground: 270 15% 45%;
-    --gp-label: hsl(270 15% 50%);
-    --gp-sublabel: hsl(270 10% 55%);
-    --gp-value: hsl(270 30% 15%);
-    --gp-icon: hsl(270 15% 45%);
-    --gp-positive: hsl(142 60% 38%);
-    --gp-negative: hsl(0 70% 50%);
+    background: hsl(var(--primary));
+    color: hsl(0 0% 0%);
+    box-shadow: none;
+    border: none;
+    --foreground: 0 0% 0%;
+    --muted-foreground: 0 0% 30%;
+    --gp-label: hsl(0 0% 30%);
+    --gp-sublabel: hsl(0 0% 40%);
+    --gp-value: hsl(0 0% 0%);
+    --gp-icon: hsl(0 0% 20%);
+    --gp-positive: hsl(141 73% 30%);
+    --gp-negative: hsl(0 70% 45%);
   }
 
   @media (hover: hover) {
     .gradient-primary:hover {
-      box-shadow: var(--shadow-card-hover);
+      filter: brightness(1.1);
     }
   }
 
@@ -299,55 +297,53 @@ html {
     transform: scale(0.98);
   }
 
-  /* ========== UNIFIED CARDS — 2 variants only ========== */
+  /* ========== UNIFIED CARDS — Spotify: no border, no shadow ========== */
 
   .card-base,
   .card-surface {
-    @apply bg-card rounded-2xl transition-all duration-200;
-    border: 1px solid hsl(var(--border) / 0.5);
-    box-shadow: var(--shadow-card);
+    @apply bg-card rounded-lg transition-all duration-200;
+    border: none;
+    box-shadow: none;
   }
 
   .card-press {
     @apply card-surface active:scale-[0.985] transition-all duration-200;
-    @media (hover: hover) { &:hover { border-color: hsl(var(--border) / 0.8); } }
   }
 
   .card-elevated {
-    @apply bg-card rounded-2xl transition-all duration-200;
-    border: 1px solid hsl(var(--border) / 0.3);
-    box-shadow: var(--shadow-elevated);
+    @apply rounded-lg transition-all duration-200;
+    background: hsl(var(--secondary));
+    border: none;
+    box-shadow: none;
   }
 
   .card-interactive {
-    @apply bg-card rounded-2xl cursor-pointer transition-all duration-200 active:scale-[0.98];
-    border: 1px solid hsl(var(--border) / 0.4);
-    box-shadow: var(--shadow-card);
+    @apply bg-card rounded-lg cursor-pointer transition-all duration-200 active:scale-[0.98];
+    border: none;
+    box-shadow: none;
   }
 
   @media (hover: hover) {
     .card-interactive:hover {
-      border-color: hsl(var(--border) / 0.7);
-      box-shadow: var(--shadow-card-hover);
+      background: hsl(var(--secondary));
     }
   }
 
-  /* Glass card — minimal */
+  /* Glass card — Spotify: just surface with opacity */
   .card-glass {
-    @apply rounded-2xl transition-all duration-200;
-    background: hsl(var(--card) / 0.7);
+    @apply rounded-lg transition-all duration-200;
+    background: hsl(var(--card) / 0.85);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid hsl(var(--border) / 0.3);
-    box-shadow: var(--shadow-card);
+    border: none;
+    box-shadow: none;
   }
 
   .card-gradient {
-    @apply rounded-2xl p-5 text-white transition-all duration-200 active:scale-[0.98];
-    box-shadow: var(--shadow-elevated);
+    @apply rounded-lg p-5 text-white transition-all duration-200 active:scale-[0.98];
+    box-shadow: none;
   }
 
-  /* Holographic — simplified to card-elevated alias */
   .card-holographic {
     @apply card-elevated;
   }
@@ -357,10 +353,10 @@ html {
     display: none;
   }
 
-  /* Stat card — Mobills clean style */
+  /* Stat card — Spotify clean */
   .card-stat-holo {
-    @apply bg-card rounded-2xl p-3.5 transition-all duration-200 active:scale-[0.97];
-    border: 1px solid hsl(var(--border) / 0.4);
+    @apply bg-card rounded-lg p-3.5 transition-all duration-200 active:scale-[0.97];
+    border: none;
   }
 
   .stat-holo-icon {
@@ -372,48 +368,41 @@ html {
   }
 
   .stat-holo-trend--up {
-    background: hsl(156 60% 45% / 0.12);
-    color: hsl(156 60% 50%);
+    background: hsl(141 73% 42% / 0.15);
+    color: hsl(141 73% 50%);
   }
 
   :root:not(.dark) .stat-holo-trend--up {
-    color: hsl(156 60% 35%);
+    color: hsl(141 73% 32%);
   }
 
   .stat-holo-trend--down {
-    background: hsl(348 80% 55% / 0.12);
-    color: hsl(348 80% 58%);
+    background: hsl(0 72% 51% / 0.15);
+    color: hsl(0 72% 60%);
   }
 
   :root:not(.dark) .stat-holo-trend--down {
-    color: hsl(348 80% 45%);
+    color: hsl(0 72% 42%);
   }
 
-  /* ========== FINANCE HERO CARD — Clean ========== */
+  /* ========== FINANCE HERO CARD — Spotify flat ========== */
 
   .finance-hero-card {
-    @apply relative overflow-hidden rounded-2xl transition-all duration-300 active:scale-[0.98];
+    @apply relative overflow-hidden rounded-lg transition-all duration-300 active:scale-[0.98];
     background: hsl(var(--card));
-    border: 1px solid hsl(var(--border) / 0.5);
-    box-shadow: var(--shadow-card);
+    border: none;
+    box-shadow: none;
     color: hsl(var(--foreground)) !important;
     --gp-label: hsl(var(--muted-foreground));
     --gp-sublabel: hsl(var(--muted-foreground));
     --gp-value: hsl(var(--foreground));
     --gp-icon: hsl(var(--muted-foreground));
-    --gp-positive: hsl(152 62% 50%);
+    --gp-positive: hsl(141 73% 50%);
     --gp-negative: hsl(0 72% 58%);
   }
 
-  /* Subtle brand accent — static gradient, no aurora */
   .finance-hero-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: radial-gradient(ellipse 80% 60% at 10% 20%, hsl(var(--primary) / 0.08) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
+    display: none;
   }
 
   .finance-hero-card::after {
@@ -426,74 +415,57 @@ html {
   }
 
   .finance-hero-chip {
-    @apply flex-1 rounded-xl px-3 py-2.5 flex flex-col gap-1;
-    background: hsl(var(--muted) / 0.5);
-    border: 1px solid hsl(var(--border) / 0.4);
+    @apply flex-1 rounded-lg px-3 py-2.5 flex flex-col gap-1;
+    background: hsl(var(--secondary));
+    border: none;
     transition: background 0.2s ease;
   }
 
   .finance-hero-chip:hover {
-    background: hsl(var(--muted) / 0.7);
+    background: hsl(var(--accent));
   }
 
-  /* Light mode */
   :root:not(.dark) .finance-hero-card {
     background: hsl(var(--card));
-    border-color: hsl(var(--border));
-    box-shadow: var(--shadow-card);
+    border: none;
+    box-shadow: none;
   }
 
   :root:not(.dark) .finance-hero-chip {
-    background: hsl(var(--muted) / 0.5);
-    border-color: hsl(var(--border));
+    background: hsl(var(--secondary));
+    border: none;
   }
 
-  /* Calendar card — use card-surface base */
+  /* Calendar card */
   .calendar-card-brand {
-    @apply bg-card rounded-2xl transition-all duration-200;
-    border: 1px solid hsl(var(--primary) / 0.2);
-    box-shadow: var(--shadow-card);
+    @apply bg-card rounded-lg transition-all duration-200;
+    border: none;
+    box-shadow: none;
   }
 
   .calendar-card-brand::before {
     display: none;
   }
 
-  /* ========== COMMAND CENTER CARDS — simplified ========== */
+  /* ========== COMMAND CENTER CARDS — Spotify ========== */
 
   .card-command {
-    @apply rounded-2xl border transition-all duration-200 active:scale-[0.98];
+    @apply rounded-lg transition-all duration-200 active:scale-[0.98];
     background: hsl(var(--card));
-    border-color: hsl(var(--border) / 0.5);
-    box-shadow: var(--shadow-card);
+    border: none;
+    box-shadow: none;
   }
 
   @media (hover: hover) {
     .card-command:hover {
-      border-color: hsl(var(--border) / 0.8);
-      box-shadow: var(--shadow-card-hover);
+      background: hsl(var(--secondary));
     }
   }
 
-  .card-command-success {
-    @apply card-command;
-    border-color: hsl(var(--success) / 0.2);
-  }
-
-  .card-command-danger {
-    @apply card-command;
-    border-color: hsl(var(--destructive) / 0.2);
-  }
-
-  .card-command-warning {
-    @apply card-command;
-    border-color: hsl(var(--warning) / 0.2);
-  }
-
-  .card-command-info {
-    @apply card-command;
-    border-color: hsl(var(--primary) / 0.2);
-  }
+  .card-command-success { @apply card-command; }
+  .card-command-danger { @apply card-command; }
+  .card-command-warning { @apply card-command; }
+  .card-command-info { @apply card-command; }
 
   /* Glow card — just elevated */
   .card-glow {
@@ -503,8 +475,9 @@ html {
   /* ========== PAGE HEADERS ========== */
 
   .page-header {
-    @apply bg-background/90 backdrop-blur-xl border-b border-border/30 sticky z-40 transition-all duration-200;
+    @apply bg-background sticky z-40 transition-all duration-200;
     top: calc(env(safe-area-inset-top) + 3.5rem);
+    border: none;
   }
 
   @media (min-width: 1024px) {
@@ -514,9 +487,9 @@ html {
   }
 
   .page-header-bar {
-    @apply bg-card/90 backdrop-blur-xl sticky z-40;
+    @apply bg-background sticky z-40;
     top: calc(env(safe-area-inset-top) + 3.5rem);
-    border-bottom: 1px solid hsl(var(--border) / 0.3);
+    border: none;
   }
 
   @media (min-width: 1024px) {
@@ -530,9 +503,9 @@ html {
   }
 
   .page-title {
-    @apply text-2xl font-extrabold tracking-tight text-foreground;
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-    letter-spacing: -0.03em;
+    @apply text-xl font-bold tracking-tight text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.02em;
   }
 
   .page-subtitle {
@@ -540,13 +513,13 @@ html {
   }
 
   .page-header-icon {
-    @apply w-10 h-10 rounded-xl flex items-center justify-center;
-    border: 1px solid hsl(var(--primary) / 0.15);
+    @apply w-10 h-10 rounded-full flex items-center justify-center;
+    border: none;
   }
 
   .stat-icon {
-    @apply w-10 h-10 rounded-xl flex items-center justify-center;
-    border: 1px solid hsl(var(--border) / 0.3);
+    @apply w-10 h-10 rounded-full flex items-center justify-center;
+    border: none;
   }
 
   .stat-value {
@@ -563,12 +536,12 @@ html {
 
   /* ========== TYPOGRAPHY UTILITIES ========== */
   .text-display-tight {
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     letter-spacing: -0.03em;
   }
 
   .text-display {
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
 
@@ -578,35 +551,35 @@ html {
     letter-spacing: -0.01em;
   }
 
-  /* ========== ICON SYSTEM — Clean, no glows ========== */
+  /* ========== ICON SYSTEM — Spotify flat ========== */
 
   .icon-glow {
-    @apply flex items-center justify-center rounded-xl;
-    border: 1px solid hsl(var(--border) / 0.2);
+    @apply flex items-center justify-center rounded-full;
+    border: none;
   }
 
   .icon-glow-sm { @apply w-8 h-8; }
   .icon-glow-md { @apply w-10 h-10; }
   .icon-glow-lg { @apply w-12 h-12; }
 
-  .icon-glow-primary { @apply bg-primary/10 text-primary; }
-  .icon-glow-cyan { @apply bg-primary/8 text-primary; }
-  .icon-glow-success { @apply bg-success/10 text-success; }
-  .icon-glow-warning { @apply bg-warning/10 text-warning; }
-  .icon-glow-destructive { @apply bg-destructive/10 text-destructive; }
-  .icon-glow-purple { @apply bg-primary/8 text-primary; }
-  .icon-glow-muted { @apply bg-secondary/80 text-muted-foreground; }
+  .icon-glow-primary { @apply bg-primary/15 text-primary; }
+  .icon-glow-cyan { @apply bg-primary/10 text-primary; }
+  .icon-glow-success { @apply bg-success/15 text-success; }
+  .icon-glow-warning { @apply bg-warning/15 text-warning; }
+  .icon-glow-destructive { @apply bg-destructive/15 text-destructive; }
+  .icon-glow-purple { @apply bg-primary/10 text-primary; }
+  .icon-glow-muted { @apply bg-secondary text-muted-foreground; }
 
   /* ========== LIST COMMAND ========== */
 
   .list-command {
-    @apply bg-card rounded-2xl p-4 transition-all duration-200 cursor-pointer;
-    border: 1px solid hsl(var(--border) / 0.4);
+    @apply bg-card rounded-lg p-4 transition-all duration-200 cursor-pointer;
+    border: none;
   }
 
   @media (hover: hover) {
     .list-command:hover {
-      border-color: hsl(var(--border) / 0.7);
+      background: hsl(var(--secondary));
     }
   }
 
@@ -614,27 +587,33 @@ html {
     transform: scale(0.985);
   }
 
-  /* ========== TAB COMMAND ========== */
+  /* ========== TAB COMMAND — Spotify pill tabs ========== */
 
   .tab-command {
-    @apply flex gap-1 bg-muted/50 p-1 rounded-xl;
-    border: 1px solid hsl(var(--border) / 0.3);
+    @apply flex gap-2 bg-transparent p-0;
+    border: none;
     max-width: 480px;
   }
 
   .tab-command-item {
-    @apply flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium text-sm transition-all duration-200;
+    @apply flex items-center justify-center gap-2 py-2 px-4 rounded-full font-medium text-sm transition-all duration-200;
   }
 
   .tab-command-active,
   .tab-command-item-active {
-    background: hsl(var(--primary) / 0.12);
-    color: hsl(var(--primary));
-    font-weight: 600;
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+    font-weight: 700;
   }
 
   .tab-command-inactive {
-    @apply text-muted-foreground hover:text-foreground;
+    @apply text-muted-foreground;
+    background: hsl(var(--secondary));
+  }
+
+  .tab-command-inactive:hover {
+    background: hsl(var(--accent));
+    color: hsl(var(--foreground));
   }
 
   /* ========== EMPTY STATE ========== */
@@ -647,14 +626,14 @@ html {
   /* ========== LISTS ========== */
 
   .list-item {
-    @apply flex items-center justify-between p-3 rounded-xl bg-secondary/50 hover:bg-secondary/80 transition-colors;
+    @apply flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors;
   }
 
   .list-item-interactive {
     @apply list-item cursor-pointer active:scale-[0.99];
   }
 
-  /* ========== STATUS BADGES ========== */
+  /* ========== STATUS BADGES — pill style ========== */
 
   .badge-status { @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold; }
   .badge-success { @apply bg-success/15 text-success; }
@@ -666,23 +645,23 @@ html {
 
   .section-title {
     @apply text-base font-bold text-foreground;
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-    letter-spacing: -0.02em;
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.01em;
   }
 
   .section-label {
-    @apply text-xs font-semibold text-muted-foreground/80 uppercase tracking-wider;
+    @apply text-xs font-bold text-muted-foreground uppercase tracking-wider;
   }
 
-  /* ========== ACTION BUTTONS ========== */
+  /* ========== ACTION BUTTONS — Spotify pill ========== */
 
   .action-button {
-    @apply touch-target flex items-center justify-center gap-2 rounded-xl font-semibold text-base transition-all active:scale-[0.97];
+    @apply touch-target flex items-center justify-center gap-2 rounded-full font-bold text-base transition-all active:scale-[0.97];
   }
 
   .action-button-primary {
     @apply action-button bg-primary text-primary-foreground hover:bg-primary/90;
-    box-shadow: var(--shadow-card);
+    box-shadow: none;
   }
 
   .action-button-success {
@@ -696,10 +675,10 @@ html {
   /* ========== INPUTS ========== */
 
   .input-large {
-    @apply h-14 text-lg px-4 rounded-xl border border-input bg-input/50 focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all duration-200;
+    @apply h-14 text-lg px-4 rounded-lg border-0 bg-secondary focus:ring-2 focus:ring-primary/30 transition-all duration-200;
   }
 
-  /* ========== FAB ========== */
+  /* ========== FAB — Spotify circular ========== */
 
   .fab-neon-border,
   .fab-neon-border-personal {
@@ -708,36 +687,40 @@ html {
   }
 
   .fab {
-    @apply fixed w-14 h-14 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center z-[9990] active:scale-95 transition-transform;
+    @apply fixed w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center z-[9990] active:scale-95 transition-transform;
     right: 20px;
     bottom: calc(env(safe-area-inset-bottom) + 120px);
-    box-shadow: 0 4px 16px hsl(var(--primary) / 0.25);
+    box-shadow: none;
   }
 
-  /* ========== VIEW TOGGLES ========== */
+  /* ========== VIEW TOGGLES — Spotify pills ========== */
 
   .view-toggle-group {
-    @apply flex gap-1 bg-secondary/60 p-1 rounded-xl;
+    @apply flex gap-2 bg-transparent p-0;
   }
 
   .view-toggle-item {
-    @apply flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all;
+    @apply flex items-center justify-center gap-2 py-2 px-4 rounded-full font-medium transition-all;
   }
 
   .view-toggle-active {
-    @apply bg-card shadow-sm text-foreground border border-border/40;
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+    font-weight: 700;
+    border: none;
   }
 
   .view-toggle-inactive {
-    @apply text-muted-foreground hover:text-foreground;
+    @apply text-muted-foreground;
+    background: hsl(var(--secondary));
   }
 
   /* ========== ALERTS ========== */
 
   .alert-card { @apply card-base p-4 flex items-start gap-3; }
-  .alert-warning { @apply border-warning/20 bg-warning/5; }
-  .alert-error { @apply border-destructive/20 bg-destructive/5; }
-  .alert-info { @apply border-primary/20 bg-primary/5; }
+  .alert-warning { @apply bg-warning/5; }
+  .alert-error { @apply bg-destructive/5; }
+  .alert-info { @apply bg-primary/5; }
 }
 
 /* =========================================================
@@ -1046,7 +1029,7 @@ html {
   /* FAB styles */
   .fab-gradient {
     background: hsl(var(--primary));
-    border: 1px solid hsl(var(--primary) / 0.5);
+    border: none;
   }
 
   .fab-cradle-ring {
@@ -1055,25 +1038,25 @@ html {
     display: flex; align-items: center; justify-content: center;
     background: hsl(var(--background));
     padding: 4px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    box-shadow: none;
   }
 
   .dark .fab-cradle-ring {
-    box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+    box-shadow: none;
   }
 
   .fab-button-glow {
     transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 4px 16px hsl(var(--primary) / 0.25);
+    box-shadow: none;
   }
 
   .fab-button-glow:active {
-    box-shadow: 0 2px 8px hsl(var(--primary) / 0.15);
+    box-shadow: none;
   }
 
   .fab-contextual-glow {
     background: hsl(36 90% 50%) !important;
-    box-shadow: 0 4px 16px hsl(36 90% 50% / 0.3);
+    box-shadow: none;
   }
 
   @keyframes fabMorph {
@@ -1086,7 +1069,7 @@ html {
   }
 
   .tab-dot-glow {
-    box-shadow: 0 0 4px hsl(var(--primary) / 0.4);
+    box-shadow: none;
   }
 
   /* Tabbar notch */
@@ -1095,14 +1078,14 @@ html {
     -webkit-mask-image: radial-gradient(circle 34px at 50% 0, transparent 32px, black 33px);
   }
 
-  /* Nav bar — clean */
+  /* Nav bar — Spotify: bg = background, no border */
   .nav-bar-neon-glow {
-    background: hsl(var(--card));
-    box-shadow: 0 -1px 0 hsl(var(--border) / 0.3);
+    background: hsl(var(--background));
+    box-shadow: none;
   }
 
   .glass-border {
-    border: 1px solid hsl(var(--border) / 0.3);
+    border: none;
   }
 
   .glass-border::before {
@@ -1129,11 +1112,11 @@ html {
 
   /* Ambient glow — subtle */
   .header-ambient-glow {
-    background: radial-gradient(ellipse 60% 100% at 50% 100%, hsl(156 60% 40% / 0.12) 0%, transparent 70%);
+    background: none;
   }
 
   .tabbar-ambient-glow {
-    background: radial-gradient(ellipse 50% 120% at 50% 0%, hsl(156 60% 40% / 0.06) 0%, transparent 70%);
+    background: none;
   }
 
   /* Reduced motion */
@@ -1229,9 +1212,9 @@ select:focus {
 .dash-hero {
   display: block;
   padding: 1.25rem;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   background: hsl(var(--primary) / 0.1);
-  border: 1px solid hsl(var(--primary) / 0.2);
+  border: none;
   transition: transform 0.2s ease;
 }
 
@@ -1244,12 +1227,12 @@ select:focus {
   flex-direction: column;
   align-items: flex-start;
   padding: 0.875rem 1rem;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   background: hsl(var(--card));
-  border: 1px solid hsl(var(--border) / 0.5);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  border: none;
+  transition: background 0.2s ease, transform 0.15s ease;
   cursor: pointer;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
 }
 
 .dash-kpi-card:active {
@@ -1258,8 +1241,7 @@ select:focus {
 
 @media (hover: hover) {
   .dash-kpi-card:hover {
-    border-color: hsl(var(--border) / 0.8);
-    box-shadow: var(--shadow-card-hover);
+    background: hsl(var(--secondary));
   }
 }
 
@@ -1269,7 +1251,7 @@ select:focus {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 0.625rem;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
@@ -1298,11 +1280,11 @@ select:focus {
 }
 
 .dash-section-body {
-  border: 1px solid hsl(var(--border) / 0.5);
-  border-radius: 1rem;
+  border: none;
+  border-radius: 0.5rem;
   background: hsl(var(--card));
   overflow: hidden;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
 }
 
 /* Dashboard animations */
@@ -1400,7 +1382,7 @@ select:focus {
 
 /* Scanner Widget */
 .scanner-card-glow {
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
 }
 
 @keyframes scannerShimmer {

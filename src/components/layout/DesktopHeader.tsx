@@ -11,10 +11,10 @@ export function DesktopHeader() {
   const title = useMemo(() => getRouteTitle(location.pathname), [location.pathname]);
 
   return (
-    <header className="hidden lg:flex items-center h-14 px-4 border-b border-border/40 bg-background/80 backdrop-blur-xl sticky top-0 z-40">
+    <header className="hidden lg:flex items-center h-14 px-4 bg-background sticky top-0 z-40">
       <SidebarTrigger className="mr-3" />
 
-      <h1 className="text-sm font-semibold text-foreground truncate flex-1">
+      <h1 className="text-sm font-bold text-foreground truncate flex-1">
         {title || 'Garden Gestão'}
       </h1>
 

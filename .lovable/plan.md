@@ -1,162 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-# Redesign Completo — Estilo Spotify Dark
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-## Analise da Referencia Spotify
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-O design system do Spotify se baseia em:
+---
 
-```text
-┌─────────────────────────────────────┐
-│  Background: #121212 (quase preto)  │
-│  Surface:    #1E1E1E / #282828      │
-│  Cards:      #181818 sem borda      │
-│  Primary:    #1DB954 (verde)        │
-│  Text:       #FFFFFF / #B3B3B3      │
-│  Border:     nenhuma visivel        │
-│  Radius:     8px (cards), pill      │
-│  Shadows:    zero                   │
-│  Depth:      contraste de bg only   │
-└─────────────────────────────────────┘
-```
+## Bloco de Relatórios Avançados ✅
 
-**Principios extraidos:**
-- Fundo muito escuro, quase preto puro
-- Cards sem borda, sem sombra — apenas bg levemente mais claro
-- Verde vibrante `#1DB954` como accent unico
-- Pill buttons (rounded-full) para filtros/tabs
-- Tipografia bold, branca, grande para titulos
-- Texto secundario em cinza medio `#B3B3B3`
-- Espacamento generoso
-- Bottom nav com icones solidos e dot indicator
-- Zero decoracao — sem gradientes, sem glows, sem bordas
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-## Paleta Final — Spotify Adapted
+## Dashboard Analytics ✅
 
-| Token | Valor HSL | Hex aprox |
-|---|---|---|
-| `--background` | `0 0% 7%` | #121212 |
-| `--card` | `0 0% 11%` | #1C1C1C |
-| `--secondary` | `0 0% 16%` | #282828 |
-| `--accent` | `0 0% 20%` | #333333 |
-| `--primary` | `141 73% 42%` | #1DB954 |
-| `--foreground` | `0 0% 100%` | #FFFFFF |
-| `--muted-foreground` | `0 0% 70%` | #B3B3B3 |
-| `--border` | `0 0% 15%` | #262626 |
-| `--success` | `141 73% 42%` | #1DB954 |
-| `--warning` | `43 96% 56%` | #F5A623 |
-| `--destructive` | `0 72% 51%` | #E23636 |
-| `--ring` | `141 73% 42%` | #1DB954 |
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-## Mudancas Tecnicas
+## Operacional ✅
 
-### Fase 1 — Tokens CSS (`src/index.css`)
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-**Reescrever toda a secao `.dark`** com a nova paleta Spotify:
-- Background quase preto `0 0% 7%`
-- Cards sem borda visivel, apenas bg `0 0% 11%`
-- Primary verde Spotify `141 73% 42%`
-- Remover TODAS as sombras (`--shadow-card: none`, `--shadow-elevated: none`)
-- Gradientes: `--gradient-brand: linear-gradient(135deg, #1DB954, #1ED760)`
-- Sidebar: bg igual ao background principal
+## CRM / Clientes ✅
 
-**Reescrever `.card-base`, `.card-surface`, `.card-elevated`:**
-- Remover `border` e `box-shadow` de todos
-- Apenas `bg-card rounded-xl` (8px, nao 16px — Spotify usa menos)
-- `.card-elevated` = `bg-secondary` (levemente mais claro)
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-**Reescrever page headers, tabs, badges** com estilo pill:
-- `.tab-command` → `bg-transparent gap-2`, items como pills `rounded-full`
-- `.badge-status` → ja e pill, manter
-- `.page-title` → `text-xl font-bold text-white` (mais compacto)
+## Funcionários ✅
 
-**Reescrever FAB e nav bar:**
-- Nav bar: bg igual ao background, sem border-top, sem sombra
-- FAB: `bg-primary rounded-full` (circular, nao rounded-2xl)
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
-### Fase 2 — Componentes base
+## Cardápio Digital ✅
 
-**`src/components/ui/card.tsx`:**
-- `.card-base` → `bg-card rounded-xl` sem borda, sem sombra
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
 
-**`src/components/ui/button.tsx`:**
-- Primary: `bg-primary text-black font-bold rounded-full` (pill, texto preto como Spotify)
-- Secondary: `bg-[#282828] text-white rounded-full`
-- Outline: `border border-[#727272] text-white rounded-full`
-- Ghost: `text-white hover:bg-white/10 rounded-full`
-- Remover shadows, remover `hover:-translate-y`
+## Sistema / UX ✅
 
-**`src/lib/unitThemes.ts`:**
-- Trocar primary para `141 73% 42%`
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
 
-**`tailwind.config.ts`:**
-- `--radius: 0.5rem` (8px base, nao 16px)
-- Remover `glow-*` shadows
-- Atualizar `glow-border` keyframe para verde
+## Multi-Unit ✅
 
-### Fase 3 — Varredura global (~95 arquivos)
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
 
-- Trocar `rounded-2xl` → `rounded-xl` em cards
-- Trocar `bg-primary/15` (icon bgs) → `bg-[#1DB954]/15`
-- Trocar `text-primary` → verde Spotify
-- Remover referencias a `box-shadow`, `shadow-card`, `shadow-elevated` inline
-- Trocar `border border-border/40` → remover de cards (sem borda)
-- Manter cores semanticas: `text-success` (receita), `text-destructive` (despesa)
+## NPS / Avaliações ✅
 
-### Fase 4 — Layout do Dashboard
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
 
-- Header: "Boa noite, [Nome]" em bold grande, sem icone decorativo
-- Tab pills: `rounded-full bg-[#282828]` quando ativo, transparente quando inativo
-- Stat cards: bg `#1C1C1C`, sem borda, sem sombra, icone circular verde/semantico
-- Secoes: titulo em `text-sm font-bold text-[#B3B3B3] uppercase tracking-wider`
-- Bottom nav: icones solidos, dot verde em baixo do ativo, sem labels
+## Estoque Avançado ✅
 
-### Fase 5 — Light theme
-
-- Adaptar a mesma logica: bg branco `#FAFAFA`, cards brancos puros, sem sombra pesada
-- Primary permanece verde `#1DB954`
-- Bordas quase invisiveis `#F0F0F0`
-
-## Resultado Esperado
-
-```text
-┌────────────────────────────┐
-│ #121212 background         │
-│                            │
-│  Boa noite, João    👁 ⚙   │
-│                            │
-│ ┌──────┐┌──────┐┌──────┐   │
-│ │#1C1C1C││#1C1C1C││#1C1C│   │
-│ │ 🟢 3  ││ 🔴 2  ││ 📦 5│   │
-│ │critic ││fecham ││pedi │   │
-│ └──────┘└──────┘└──────┘   │
-│                            │
-│ ● Operacional  Financeiro  │
-│                            │
-│ ┌──────────────────────┐   │
-│ │ Saldo      R$ 12.450 │   │
-│ │ Receitas    R$ 8.200 │   │
-│ │ Despesas    R$ 3.100 │   │
-│ └──────────────────────┘   │
-│                            │
-│ CONTAS A VENCER            │
-│ ┌──────────────────────┐   │
-│ │ Fornecedor X  R$ 500 │   │
-│ │ Aluguel      R$ 3.2k │   │
-│ └──────────────────────┘   │
-│                            │
-│  🏠    🔍    ➕    📊    👤  │
-└────────────────────────────┘
-```
-
-Zero bordas visiveis. Zero sombras. Profundidade apenas por contraste de superficie. Verde vibrante como unico accent. Botoes pill. Tipografia bold e limpa.
-
-## Ordem de Implementacao
-
-1. `src/index.css` — reescrever tokens + card classes + componentes
-2. `src/components/ui/button.tsx` — pill style, sem sombra
-3. `src/components/ui/card.tsx` — sem borda, sem sombra
-4. `src/lib/unitThemes.ts` + `tailwind.config.ts` — verde Spotify
-5. Varredura dos 95 arquivos com cores/bordas hardcoded
-6. Dashboard + Finance + pages principais
-
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)

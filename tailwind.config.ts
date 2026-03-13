@@ -89,14 +89,14 @@ export default {
         "3xl": "calc(var(--radius) + 12px)",
       },
       boxShadow: {
-        'card': 'var(--shadow-card)',
-        'card-hover': 'var(--shadow-card-hover)',
-        'elevated': 'var(--shadow-elevated)',
-        'glow-primary': 'var(--glow-primary)',
-        'glow-success': 'var(--glow-success)',
-        'glow-destructive': 'var(--glow-destructive)',
-        'glow-warning': 'var(--glow-warning)',
-        'glow-cyan': 'var(--glow-cyan)',
+        'card': 'none',
+        'card-hover': 'none',
+        'elevated': 'none',
+        'glow-primary': 'none',
+        'glow-success': 'none',
+        'glow-destructive': 'none',
+        'glow-warning': 'none',
+        'glow-cyan': 'none',
       },
       keyframes: {
         "accordion-down": {
