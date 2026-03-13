@@ -61,21 +61,44 @@ function getSignificantCityWords(city: string): string[] {
     .filter((w) => w.length > 2 && !['de', 'da', 'do', 'das', 'dos'].includes(w));
 }
 
+// Common business-name words that indicate a unit name, not a city
+const BUSINESS_KEYWORDS = ['restaurante', 'pizzaria', 'lanchonete', 'padaria', 'bar', 'cafe', 'empresa', 'loja', 'hamburgueria', 'garden', 'demo', 'teste', 'minha', 'pizza', 'beni', 'grill', 'bistrô', 'bistro', 'cantina', 'churrascaria', 'sorveteria', 'açaiteria', 'doceria', 'confeitaria', 'sushi', 'poke', 'food', 'burguer', 'burger', 'delivery'];
+
+function looksLikeBusinessName(value: string): boolean {
+  if (!value?.trim()) return true;
+  const words = normalizeText(value).split(/\s+/);
+  return words.some(w => BUSINESS_KEYWORDS.includes(w));
+}
+
 function resolveGeocodeCity(city: string, unitName: string): string {
   const cityTrimmed = city?.trim() || '';
   const unitTrimmed = unitName?.trim() || '';
+  
+  // If city looks like a business name, discard it
+  if (looksLikeBusinessName(cityTrimmed)) {
+    // Check if unitName is a valid city
+    if (!looksLikeBusinessName(unitTrimmed)) return unitTrimmed;
+    return ''; // Neither is a valid city
+  }
+  
   const cityWords = getSignificantCityWords(cityTrimmed);
   const unitWords = getSignificantCityWords(unitTrimmed);
 
-  if (!cityTrimmed) return unitTrimmed;
+  if (!cityTrimmed) {
+    if (!looksLikeBusinessName(unitTrimmed)) return unitTrimmed;
+    return '';
+  }
   if (!unitTrimmed) return cityTrimmed;
 
   // If OCR gives ambiguous city like "SAO JOAO", prefer full unit city
-  if (cityWords.length < 3 && unitWords.length >= cityWords.length) return unitTrimmed;
+  if (cityWords.length < 3 && unitWords.length >= cityWords.length && !looksLikeBusinessName(unitTrimmed)) return unitTrimmed;
 
   const cityBase = normalizeText(cityTrimmed);
   const unitBase = normalizeText(unitTrimmed);
-  if (unitBase.includes(cityBase) || cityBase.includes(unitBase)) return unitTrimmed;
+  if (unitBase.includes(cityBase) || cityBase.includes(unitBase)) {
+    if (!looksLikeBusinessName(unitTrimmed)) return unitTrimmed;
+    return cityTrimmed;
+  }
 
   return cityTrimmed;
 }
