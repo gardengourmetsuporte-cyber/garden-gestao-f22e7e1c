@@ -178,7 +178,7 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-8">
+    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-4">
 
 
       {/* Greeting + Refresh */}
