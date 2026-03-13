@@ -300,7 +300,7 @@ export default function KDS() {
 
   const { data: orders = [], isPending, isError, error, refetch } = useQuery({
     queryKey: ['kds-orders', unitId],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!unitId) return [];
       const { data, error } = await supabase
         .from('tablet_orders')
@@ -309,6 +309,7 @@ export default function KDS() {
         .in('status', ACTIVE_STATUSES)
         .order('created_at', { ascending: true })
         .limit(50);
+      if (signal?.aborted) throw new DOMException('Query cancelled', 'AbortError');
       if (error) throw error;
       return (data as unknown as KDSOrder[]) || [];
     },
@@ -316,8 +317,14 @@ export default function KDS() {
     staleTime: 5_000,
     refetchInterval: 10_000,
     refetchOnWindowFocus: false,
-    retry: 1,
+    retry: (failureCount, err) => {
+      if (err instanceof DOMException && err.name === 'AbortError') return false;
+      return failureCount < 1;
+    },
   });
+
+  // Filter out AbortError from display
+  const showError = isError && !(error instanceof DOMException && error.name === 'AbortError') && !String(error?.message).toLowerCase().includes('abort');
 
   // Realtime
   useEffect(() => {
