@@ -65,7 +65,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
   return (
     <div className="space-y-4">
       {/* Operation Pulse Hero */}
-      <div className={cn('card-base p-4 border ring-1', pulseCfg.ring)}>
+      <div className={cn('card-base p-4 border ring-1 animate-slide-up', pulseCfg.ring)}>
         <div className="flex items-center gap-2 mb-4">
           <div className={cn('w-2.5 h-2.5 rounded-full animate-pulse', pulseCfg.dot)} />
           <p className={cn('text-xs font-semibold', pulseCfg.color)}>{summary}</p>
