@@ -289,8 +289,8 @@ export default function TabletBill() {
           {/* Waiter */}
           {selectedPayment === 'waiter' && (
             <div className="card-base rounded-2xl p-6 flex flex-col items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-                <AppIcon name="Bell" size={32} className="text-blue-500" />
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <AppIcon name="Bell" size={32} className="text-primary" />
               </div>
               <div className="text-center">
                 <p className="text-sm font-bold text-foreground">Chamar garçom para a mesa</p>

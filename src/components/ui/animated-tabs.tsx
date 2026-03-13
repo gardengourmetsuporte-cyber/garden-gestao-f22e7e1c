@@ -72,7 +72,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             <span className={cn(
               "min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0",
               activeTab === tab.key
-                ? "bg-emerald-500/15 text-emerald-400"
+                ? "bg-primary/15 text-primary"
                 : "bg-muted text-muted-foreground"
             )}>
               {tab.badge > 99 ? '99+' : tab.badge}

@@ -73,7 +73,7 @@ export default function WhatsAppHub() {
               className="card-command p-4 text-left space-y-3 active:scale-[0.97] transition-all"
             >
               <div className="flex items-center justify-between">
-                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center bg-secondary", s.color)}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary">
                   <AppIcon name={s.icon} size={20} />
                 </div>
                 {(counters[s.key] ?? 0) > 0 && (

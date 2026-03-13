@@ -379,7 +379,7 @@ function OrdersPanel({ unitId, mesa, onClose }: { unitId: string; mesa: string; 
     pending: { label: 'Pendente', color: 'bg-amber-500/15 text-amber-500' },
     confirmed: { label: 'Confirmado', color: 'bg-blue-500/15 text-blue-500' },
     preparing: { label: 'Preparando', color: 'bg-orange-500/15 text-orange-500' },
-    ready: { label: 'Pronto', color: 'bg-emerald-500/15 text-emerald-500' },
+    ready: { label: 'Pronto', color: 'bg-success/15 text-success' },
   };
 
   return (

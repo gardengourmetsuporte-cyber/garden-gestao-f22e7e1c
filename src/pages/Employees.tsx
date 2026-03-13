@@ -59,23 +59,26 @@ export default function Employees() {
             <>
               {/* Navigation Cards */}
               <div className="grid grid-cols-3 gap-2">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={cn(
-                      "relative flex flex-col items-center justify-center gap-1.5 py-3 px-1.5 rounded-2xl border transition-all duration-200 active:scale-[0.97] min-w-0 overflow-hidden",
-                      activeTab === tab.key
-                        ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
-                        : "bg-card border-border hover:border-primary/20"
-                    )}
-                  >
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", activeTab === tab.key ? "bg-primary/20" : tab.bg)}>
-                      <AppIcon name={tab.icon} size={20} fill={(tab as any).iconFill ?? 1} className={activeTab === tab.key ? "text-primary" : tab.color} />
-                    </div>
-                    <span className={cn("text-[10px] font-semibold truncate w-full text-center", activeTab === tab.key ? "text-primary" : "text-foreground")}>{tab.label}</span>
-                  </button>
-                ))}
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => setActiveTab(tab.key)}
+                      className={cn(
+                        "relative flex flex-col items-center justify-center gap-1.5 py-3 px-1.5 rounded-2xl border transition-all duration-200 active:scale-[0.97] min-w-0 overflow-hidden",
+                        isActive
+                          ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
+                          : "bg-card border-border hover:border-primary/20"
+                      )}
+                    >
+                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", isActive ? "bg-primary/20" : "bg-primary/10")}>
+                        <AppIcon name={tab.icon} size={20} fill={tab.iconFill ?? 1} className={isActive ? "text-primary" : "text-muted-foreground"} />
+                      </div>
+                      <span className={cn("text-[10px] font-semibold truncate w-full text-center", isActive ? "text-primary" : "text-muted-foreground")}>{tab.label}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="animate-fade-in" key={activeTab}>

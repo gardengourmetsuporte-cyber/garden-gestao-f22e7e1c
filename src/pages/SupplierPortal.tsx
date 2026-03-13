@@ -369,7 +369,7 @@ export default function SupplierPortal() {
                       <span>Emissão: {formatDate(inv.issue_date)}</span>
                       <span>Venc: {formatDate(inv.due_date)}</span>
                       {inv.is_paid && inv.paid_at && (
-                        <span className="text-green-400">Pago em {formatDate(inv.paid_at.split('T')[0])}</span>
+                        <span className="text-success">Pago em {formatDate(inv.paid_at.split('T')[0])}</span>
                       )}
                     </div>
                   </div>
