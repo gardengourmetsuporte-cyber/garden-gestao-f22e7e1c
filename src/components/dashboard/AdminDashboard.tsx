@@ -183,7 +183,7 @@ export function AdminDashboard() {
       <DashboardContextBar firstName={firstName} stats={stats} />
 
       {/* View Selector */}
-      <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-card/70 border border-border/30">
+      <div className="grid grid-cols-2 gap-3">
         {([
           { key: 'operational' as const, icon: 'dashboard', label: 'Operacional' },
           { key: 'financial' as const, icon: 'account_balance', label: 'Financeiro' },
@@ -194,14 +194,21 @@ export function AdminDashboard() {
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "flex items-center justify-center gap-1.5 px-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 min-w-0 touch-manipulation",
+              "relative flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300 touch-manipulation border",
               view === tab.key
-                ? "bg-primary text-primary-foreground shadow-sm scale-[1.02]"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 border-primary/50 scale-[1.02]"
+                : "bg-card/80 text-muted-foreground hover:text-foreground hover:bg-card border-border/40 hover:border-border/60 hover:shadow-md"
             )}
           >
-            <AppIcon name={tab.icon} size={16} className="shrink-0" />
-            <span className="truncate">{tab.label}</span>
+            <div className={cn(
+              "flex items-center justify-center w-9 h-9 rounded-xl transition-colors",
+              view === tab.key
+                ? "bg-primary-foreground/20"
+                : "bg-muted/60"
+            )}>
+              <AppIcon name={tab.icon} size={18} className="shrink-0" />
+            </div>
+            <span>{tab.label}</span>
           </button>
         ))}
       </div>
