@@ -178,7 +178,7 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-5">
+    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-8">
       {/* Greeting + Refresh */}
       <DashboardContextBar firstName={firstName} stats={stats} />
 
@@ -243,15 +243,12 @@ export function AdminDashboard() {
 
       {/* Widgets Grid */}
       {view !== 'team' && view !== 'service' && (
-        <>
-          <SectionHeader title="Atividade" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {widgets.map((widget) => {
               const stagger = nextStagger();
               return renderWidget(widget, stagger);
             })}
           </div>
-        </>
       )}
 
       {/* Manage button */}
