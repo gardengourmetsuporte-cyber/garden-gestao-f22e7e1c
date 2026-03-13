@@ -1,79 +1,68 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+# Implementar Design System Mobills no Garden Gestao
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+## Analise do Design System Mobills (extraido do dashboard + site)
 
----
+### Paleta de Cores
+- **Primary**: Roxo/Violeta `hsl(270 70% 55%)` — botoes, links, sidebar ativa, CTAs
+- **Background**: Cinza escuro profundo `hsl(240 15% 10%)` 
+- **Card**: Cinza elevado `hsl(240 12% 16%)` com bordas sutis `hsl(240 10% 22%)`
+- **Muted text**: Cinza medio `hsl(240 8% 55%)`
+- **Icones semanticos** (mantidos distintos): Azul (banco), Verde (receitas), Vermelho (despesas), Ciano (cartao credito)
 
-## Bloco de Relatórios Avançados ✅
+### Modelo de Cards
+- Border-radius: 16px (rounded-2xl)
+- Bordas: 1px solid cinza sutil (quase imperceptivel)
+- Sem sombras pesadas — profundidade por contraste de superficie
+- Padding interno: 16-20px
+- Cards de stat com icone circular colorido a esquerda + label + valor
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+### Espacamento
+- Gap entre cards: 16px (gap-4)
+- Padding de pagina: 16px mobile, 24-32px desktop
+- Secoes separadas por 20-24px
 
-## Dashboard Analytics ✅
+### Comunicacao Visual
+- Tipografia clean, Inter/system-ui
+- Labels em cinza medio, valores em branco bold
+- Setas de navegacao discretas (chevron right)
+- Progress bars com cantos arredondados
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+## Mudancas no Codigo
 
-## Operacional ✅
+### 1. `src/index.css` — Trocar paleta dark theme
+- `--primary`: de `156 72% 40%` (verde) para `270 70% 55%` (roxo Mobills)
+- `--ring`: acompanha primary
+- `--success` permanece verde (semantico)
+- `--gradient-brand`: gradiente roxo
+- Sidebar tokens acompanham novo primary
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+### 2. `src/index.css` — Light theme
+- `--primary` light: `270 70% 48%`
+- Manter estrutura existente, apenas trocar hue
 
-## CRM / Clientes ✅
+### 3. `src/lib/unitThemes.ts` — Atualizar tema padrao
+- Trocar `156 72% 40%` por `270 70% 55%` em todas as referencias
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+### 4. `tailwind.config.ts` — Atualizar keyframes
+- `glow-border` usa hsl do primary (atualizar para novo hue)
 
-## Funcionários ✅
+### 5. Limpeza global de cores hardcoded (121 arquivos com matches)
+- Substituir `emerald-500` / `emerald-400` por tokens `primary` ou `success` conforme contexto
+- Substituir `green-*` hardcoded por tokens do design system
+- Manter cores semanticas: `bg-blue-500/15` (banco), `bg-red-500/15` (despesa) — estes sao semanticos no modelo Mobills tambem
 
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
+### 6. Componentes que referenciam cores diretas
+- `src/components/finance/FinanceHome.tsx` — `bg-emerald-500/15` → `bg-success/15`
+- `src/components/whatsapp/WhatsAppOrders.tsx` — `emerald-500` → `primary`
+- `src/pages/WhatsApp.tsx` — conexao status `emerald` → `success` (semantico)
+- `src/components/marketing/PostSheet.tsx` — `emerald-400` → `primary`
+- Demais 117 arquivos com hardcoded colors serao varridos e padronizados
 
-## Cardápio Digital ✅
+### Impacto
+- A identidade do app muda de **verde** para **roxo** (como Mobills)
+- Cards e espacamentos ja estao proximos do padrao Mobills
+- Cores semanticas de financas (verde=receita, vermelho=despesa) permanecem
+- O primary roxo unifica botoes, navegacao, links, sidebar, badges ativos
 
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
