@@ -51,7 +51,7 @@ export function NPSSurveyWidget({ unitId, orderId, customerName, onSubmit, onDis
   const getLabelColor = (val: number) => {
     if (val <= 6) return 'text-red-500';
     if (val <= 8) return 'text-amber-500';
-    return 'text-emerald-500';
+    return 'text-success';
   };
 
   return (
