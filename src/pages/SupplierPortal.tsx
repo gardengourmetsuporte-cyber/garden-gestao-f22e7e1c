@@ -352,7 +352,7 @@ export default function SupplierPortal() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {inv.is_paid ? (
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-500/20 text-green-400">Pago</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-success/20 text-success">Pago</span>
                         ) : isOverdue ? (
                           <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-destructive/20 text-destructive">Vencido</span>
                         ) : (
