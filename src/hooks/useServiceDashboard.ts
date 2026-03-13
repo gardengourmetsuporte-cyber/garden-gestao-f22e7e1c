@@ -4,6 +4,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { startOfDay, differenceInMinutes } from 'date-fns';
 
+export type Pulse = 'calm' | 'moderate' | 'intense';
+
+export interface OperationPulse {
+  overall: Pulse;
+  salon: Pulse;
+  kitchen: Pulse;
+  delivery: Pulse;
+  summary: string;
+  totalActive: number;
+}
+
 export interface ServiceStats {
   salesToday: number;
   salesCount: number;
@@ -50,12 +61,35 @@ export interface HubActiveOrder {
   minutesAgo: number;
 }
 
+export interface PipelineGroups {
+  pending: ActiveOrder[];
+  preparing: ActiveOrder[];
+  ready: ActiveOrder[];
+}
+
+function calcPulse(count: number, avgMin: number, maxMin: number): Pulse {
+  if (count > 15 || maxMin > 30) return 'intense';
+  if (count >= 5 || avgMin >= 10) return 'moderate';
+  return 'calm';
+}
+
+function worstPulse(...pulses: Pulse[]): Pulse {
+  if (pulses.includes('intense')) return 'intense';
+  if (pulses.includes('moderate')) return 'moderate';
+  return 'calm';
+}
+
+const PULSE_LABELS: Record<Pulse, string> = {
+  calm: 'tranquila',
+  moderate: 'moderada',
+  intense: 'intensa',
+};
+
 export function useServiceDashboard() {
   const { activeUnitId } = useUnit();
   const queryClient = useQueryClient();
   const todayStart = startOfDay(new Date()).toISOString();
 
-  // POS Sales today
   const { data: sales = [] } = useQuery({
     queryKey: ['service-sales', activeUnitId, todayStart],
     queryFn: async () => {
@@ -73,7 +107,6 @@ export function useServiceDashboard() {
     refetchInterval: 30000,
   });
 
-  // Active tablet orders
   const { data: activeOrders = [] } = useQuery({
     queryKey: ['service-active-orders', activeUnitId],
     queryFn: async () => {
@@ -90,7 +123,6 @@ export function useServiceDashboard() {
     refetchInterval: 10000,
   });
 
-  // Active deliveries
   const { data: activeDeliveries = [] } = useQuery({
     queryKey: ['service-deliveries', activeUnitId],
     queryFn: async () => {
@@ -107,7 +139,6 @@ export function useServiceDashboard() {
     refetchInterval: 15000,
   });
 
-  // Hub orders active
   const { data: hubOrders = [] } = useQuery({
     queryKey: ['service-hub-orders', activeUnitId],
     queryFn: async () => {
@@ -124,7 +155,6 @@ export function useServiceDashboard() {
     refetchInterval: 10000,
   });
 
-  // Realtime for tablet_orders and delivery_hub_orders
   useEffect(() => {
     if (!activeUnitId) return;
     const channel = supabase
@@ -155,6 +185,19 @@ export function useServiceDashboard() {
       minutesAgo: differenceInMinutes(n, new Date(o.created_at)),
     })) as ActiveOrder[];
   }, [activeOrders]);
+
+  const pipeline: PipelineGroups = useMemo(() => {
+    const pending: ActiveOrder[] = [];
+    const preparing: ActiveOrder[] = [];
+    const ready: ActiveOrder[] = [];
+    orders.forEach(o => {
+      if (['pending', 'awaiting_confirmation', 'confirmed'].includes(o.status)) pending.push(o);
+      else if (o.status === 'preparing') preparing.push(o);
+      else if (o.status === 'ready') ready.push(o);
+    });
+    return { pending, preparing, ready };
+  }, [orders]);
+
   const hourlySales: HourlySale[] = useMemo(() => {
     const map = new Map<number, { total: number; count: number }>();
     sales.forEach(s => {
@@ -178,5 +221,32 @@ export function useServiceDashboard() {
     })) as HubActiveOrder[];
   }, [hubOrders]);
 
-  return { stats, orders, hourlySales, deliveries, hubActive };
+  // Pulse calculation
+  const pulse: OperationPulse = useMemo(() => {
+    const salonOrders = orders.filter(o => ['mesa', 'mesa_levar', 'qrcode'].includes(o.source));
+    const kitchenOrders = orders.filter(o => o.status === 'preparing');
+    const deliveryCount = activeDeliveries.length + hubActive.length;
+
+    const avg = (arr: ActiveOrder[]) => arr.length === 0 ? 0 : arr.reduce((s, o) => s + o.minutesAgo, 0) / arr.length;
+    const max = (arr: ActiveOrder[]) => arr.length === 0 ? 0 : Math.max(...arr.map(o => o.minutesAgo));
+
+    const salon = calcPulse(salonOrders.length, avg(salonOrders), max(salonOrders));
+    const kitchen = calcPulse(kitchenOrders.length, avg(kitchenOrders), max(kitchenOrders));
+    const delivery = calcPulse(deliveryCount, 0, Math.max(...hubActive.map(h => h.minutesAgo), 0));
+
+    const overall = worstPulse(salon, kitchen, delivery);
+    const totalActive = orders.length + deliveryCount;
+
+    const parts: string[] = [];
+    if (kitchen === 'intense') parts.push('cozinha sob pressão');
+    if (delivery === 'intense') parts.push('entregas acumulando');
+    
+    const summary = parts.length > 0
+      ? `Operação ${PULSE_LABELS[overall]} — ${parts.join(', ')}`
+      : `Operação ${PULSE_LABELS[overall]} — ${totalActive} pedido${totalActive !== 1 ? 's' : ''} ativo${totalActive !== 1 ? 's' : ''}`;
+
+    return { overall, salon, kitchen, delivery, summary, totalActive };
+  }, [orders, activeDeliveries, hubActive]);
+
+  return { stats, orders, pipeline, hourlySales, deliveries, hubActive, pulse };
 }
