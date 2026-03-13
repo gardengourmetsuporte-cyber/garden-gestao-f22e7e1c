@@ -72,7 +72,7 @@ function ClientCard({ client, onSelect }: { client: MonitoredClient; onSelect: (
         </div>
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="rounded-md bg-muted/50 p-2">
-            <LogIn className="w-3.5 h-3.5 mx-auto mb-1 text-green-500" />
+            <LogIn className="w-3.5 h-3.5 mx-auto mb-1 text-success" />
             <p className="text-lg font-bold">{client.login_count}</p>
             <p className="text-[10px] text-muted-foreground">Logins</p>
           </div>

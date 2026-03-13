@@ -62,7 +62,7 @@ function BriefingCard({ stats, contextStats, visible }: {
           </div>
         )}
         {allGood && (
-          <div className="flex items-center gap-1.5 text-xs text-green-500">
+          <div className="flex items-center gap-1.5 text-xs text-success">
             <AppIcon name="CheckCircle" size={12} />
             <span>Tudo em dia 🎉</span>
           </div>

@@ -555,7 +555,7 @@ export function FinanceCharts({
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground mb-0.5">Saldo</p>
-                      <p className={cn("text-sm font-bold tabular-nums", finalBalance >= 0 ? "text-green-500" : "text-red-500")}>
+                      <p className={cn("text-sm font-bold tabular-nums", finalBalance >= 0 ? "text-success" : "text-destructive")}>
                         {finalBalance >= 0 ? '+' : ''}{formatCurrency(finalBalance)}
                       </p>
                     </div>
