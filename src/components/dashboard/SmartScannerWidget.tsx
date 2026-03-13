@@ -25,7 +25,7 @@ export function SmartScannerWidget() {
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-2xl scanner-card-glow" style={{ minHeight: 140 }}>
+      <div className="relative overflow-hidden rounded-2xl scanner-card-glow" style={{ minHeight: 70 }}>
         {/* Full background image */}
         <img
           src={scannerHero}
@@ -41,7 +41,7 @@ export function SmartScannerWidget() {
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent scanner-shimmer pointer-events-none" />
 
         {/* Content */}
-        <div className="relative flex items-end justify-between p-4 h-full" style={{ minHeight: 140 }}>
+        <div className="relative flex items-center justify-between p-3 h-full" style={{ minHeight: 70 }}>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-1">
               <span className="text-[10px] font-bold uppercase tracking-widest text-primary drop-shadow-sm">IA Scanner</span>
