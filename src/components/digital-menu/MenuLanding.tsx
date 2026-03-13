@@ -106,7 +106,7 @@ export function MenuLanding({ unit, unitInitials = '?', customerUser, onProfileC
               : 'bg-destructive/10 text-destructive'
           }`}>
             <span className={`w-2 h-2 rounded-full ${isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-destructive'}`} />
-            {isOpen ? 'Aberto agora' : 'Fechado'}
+            {isOpen ? t('landing.open_now') : t('landing.closed')}
           </div>
 
           {currentHours && (
