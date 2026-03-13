@@ -431,7 +431,7 @@ html {
 
   .card-press {
     @apply card-surface active:scale-[0.985] transition-all duration-300;
-    @media (hover: hover) { &:hover { border-color: hsl(200 60% 50% / 0.25); } }
+    @media (hover: hover) { &:hover { border-color: hsl(var(--border) / 0.6); } }
   }
 
   .card-elevated {
