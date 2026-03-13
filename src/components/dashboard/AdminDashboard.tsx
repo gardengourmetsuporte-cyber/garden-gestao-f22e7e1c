@@ -178,7 +178,7 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-8">
+    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-4">
 
 
       {/* Greeting + Refresh */}
@@ -247,7 +247,7 @@ export function AdminDashboard() {
 
       {/* Widgets Grid */}
       {view !== 'team' && view !== 'service' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {widgets.map((widget) => {
               const stagger = nextStagger();
               return renderWidget(widget, stagger);
