@@ -240,7 +240,7 @@ function KDSColumn({
 
   return (
     <div className={cn(
-      'flex flex-col h-full min-w-0',
+      'flex flex-col h-full min-w-[260px] w-[25vw] shrink-0 snap-start',
       'border-r border-white/[0.04] last:border-r-0',
     )}>
       {/* Column header */}
@@ -473,7 +473,7 @@ export default function KDS() {
         onDragEnd={handleDragEndFn}
         onDragCancel={handleDragCancel}
       >
-        <div className="flex-1 grid grid-cols-4 overflow-hidden">
+        <div className="flex-1 flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory" style={{ scrollbarWidth: 'none' }}>
           {COLUMNS.map(col => (
             <KDSColumn
               key={col.key}
