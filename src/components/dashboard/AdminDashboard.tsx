@@ -10,6 +10,7 @@ import { SetupChecklistWidget } from './SetupChecklistWidget';
 import { DashboardContextBar } from './DashboardContextBar';
 import { DashboardHeroFinance } from './DashboardHeroFinance';
 import { DashboardSection } from './DashboardSection';
+import { QuickActionsRow } from './QuickActionsRow';
 
 const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
 import { SmartScannerWidget } from './SmartScannerWidget';
@@ -21,7 +22,6 @@ import { cn } from '@/lib/utils';
 
 const LazyLeaderboard = lazy(() => import('./LazyLeaderboardWidget'));
 const LazyCalendar = lazy(() => import('./UnifiedCalendarWidget').then(m => ({ default: m.UnifiedCalendarWidget })));
-
 const LazyWeeklySummary = lazy(() => import('./LazyWeeklySummaryWidget'));
 const LazyQuickStats = lazy(() => import('./QuickStatsWidget').then(m => ({ default: m.QuickStatsWidget })));
 const LazyAnalytics = lazy(() => import('./AnalyticsWidget'));
@@ -54,6 +54,14 @@ const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'calendar', 'mu
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
 const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 px-0.5">
+      {title}
+    </h3>
+  );
+}
+
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
@@ -66,7 +74,6 @@ export function AdminDashboard() {
       return (localStorage.getItem('dashboard-view') as DashboardView) || 'operational';
     } catch { return 'operational'; }
   });
-  
 
   const isReady = !statsLoading && !modulesLoading && !!profile;
   const firstName = profile?.full_name?.split(' ')[0] || 'Admin';
@@ -90,16 +97,14 @@ export function AdminDashboard() {
   const renderWidget = (widget: typeof widgets[number], stagger: string) => {
     if (!widget.visible) return null;
 
-    // Filter by current view — team view renders its own widgets
     if (view === 'team' || view === 'service') return null;
     if (view === 'operational' && (FINANCIAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
     if (view === 'financial' && (OPERATIONAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
 
     switch (widget.key) {
       case 'finance':
-        return null; // Rendered outside grid
-
       case 'checklist':
+      case 'quick-stats':
         return null;
 
       case 'bills-due':
@@ -139,9 +144,6 @@ export function AdminDashboard() {
           </DashboardSection>
         ) : null;
 
-      case 'quick-stats':
-        return null;
-
       case 'heatmap':
         return (
           <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
@@ -176,12 +178,12 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto">
-      {/* Greeting */}
+    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-5">
+      {/* Greeting + Refresh */}
       <DashboardContextBar firstName={firstName} stats={stats} />
 
       {/* View Selector */}
-      <div className="mt-3 grid grid-cols-4 gap-1 p-1 rounded-xl bg-card/70 border border-border/30">
+      <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-card/70 border border-border/30">
         {([
           { key: 'operational' as const, icon: 'dashboard', label: 'Operacional' },
           { key: 'financial' as const, icon: 'account_balance', label: 'Financeiro' },
@@ -192,59 +194,48 @@ export function AdminDashboard() {
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "flex items-center justify-center gap-1 px-1 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-200 min-w-0",
+              "flex items-center justify-center gap-1.5 px-1 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 min-w-0 touch-manipulation",
               view === tab.key
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-primary text-primary-foreground shadow-sm scale-[1.02]"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
-            <AppIcon name={tab.icon} size={14} className="shrink-0" />
+            <AppIcon name={tab.icon} size={16} className="shrink-0" />
             <span className="truncate">{tab.label}</span>
           </button>
         ))}
       </div>
 
-      {/* Quick Stats — only on operational view */}
+      {/* Quick Actions — operational only */}
+      {view === 'operational' && <QuickActionsRow />}
+
+      {/* Quick Stats — operational only */}
       {view === 'operational' && (
-        <div className="mt-3">
-          <Suspense fallback={<QuickStatsSkeleton />}>
-            <LazyQuickStats />
-          </Suspense>
-        </div>
+        <Suspense fallback={<QuickStatsSkeleton />}>
+          <LazyQuickStats />
+        </Suspense>
       )}
 
-      {/* Upgrade Banner for free users */}
-      <div className="mt-4">
-        <UpgradeBanner />
-      </div>
+      {/* Upgrade Banner */}
+      <UpgradeBanner />
 
-      {/* Setup Onboarding — full width, operational only */}
+      {/* Setup Onboarding — operational only */}
       {view === 'operational' && <SetupChecklistWidget />}
 
-      {/* Finance Hero — financial, first */}
+      {/* Finance Hero — financial */}
       {view === 'financial' && hasAccess('finance') && (
-        <div className="mt-4">
-          <DashboardHeroFinance
-            balance={stats.monthBalance}
-            pendingExpenses={stats.pendingExpenses}
-            isLoading={statsLoading}
-          />
-        </div>
+        <DashboardHeroFinance
+          balance={stats.monthBalance}
+          pendingExpenses={stats.pendingExpenses}
+          isLoading={statsLoading}
+        />
       )}
 
-      {/* Sales Goal Widget — financial */}
-      {view === 'financial' && (
-        <div className="mt-4">
-          <SalesGoalWidget />
-        </div>
-      )}
+      {/* Sales Goal — financial */}
+      {view === 'financial' && <SalesGoalWidget />}
 
       {/* Smart Scanner — operational */}
-      {view === 'operational' && (
-        <div className="mt-4">
-          <SmartScannerWidget />
-        </div>
-      )}
+      {view === 'operational' && <SmartScannerWidget />}
 
       {/* Service View */}
       {view === 'service' && <ServiceDashboardView />}
@@ -252,20 +243,23 @@ export function AdminDashboard() {
       {/* Team View */}
       {view === 'team' && <TeamDashboardView currentUserId={user?.id} />}
 
-      {/* Widgets Grid — 2 columns on desktop */}
+      {/* Widgets Grid */}
       {view !== 'team' && view !== 'service' && (
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
-          {widgets.map((widget) => {
-            const stagger = nextStagger();
-            return renderWidget(widget, stagger);
-          })}
-        </div>
+        <>
+          <SectionHeader title="Atividade" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+            {widgets.map((widget) => {
+              const stagger = nextStagger();
+              return renderWidget(widget, stagger);
+            })}
+          </div>
+        </>
       )}
 
       {/* Manage button */}
       <button
         onClick={() => setManagerOpen(true)}
-        className="flex items-center justify-center gap-2 w-full py-3 mt-6 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors touch-manipulation"
       >
         <AppIcon name="Settings" size={16} />
         Gerenciar tela inicial

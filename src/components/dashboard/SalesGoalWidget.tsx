@@ -106,10 +106,16 @@ export function SalesGoalWidget() {
           )}
         </div>
       ) : (
-        <div className="flex flex-col items-center py-4 gap-1.5">
-          <p className="text-xs text-muted-foreground">Nenhuma meta definida para este mês</p>
+        <div className="flex flex-col items-center py-6 gap-2">
+          <div className="w-12 h-12 rounded-2xl bg-muted/50 flex items-center justify-center">
+            <AppIcon name="Target" size={24} className="text-muted-foreground/50" />
+          </div>
+          <p className="text-sm font-medium text-foreground">Sem metas ainda</p>
+          <p className="text-xs text-muted-foreground text-center max-w-[200px]">
+            Defina metas diárias e mensais para acompanhar seu progresso de vendas.
+          </p>
           {isAdmin && (
-            <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="text-xs mt-1">
+            <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="text-xs mt-1 h-8">
               Definir Metas
             </Button>
           )}
