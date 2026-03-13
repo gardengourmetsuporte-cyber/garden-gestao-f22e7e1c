@@ -99,7 +99,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
           {configError && (
             <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 space-y-2">
               <p className="text-sm font-medium text-destructive flex items-center gap-2">
-                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>error</span>
+                <AppIcon name="error" size={18} />
                 Canal WhatsApp não configurado
               </p>
               <p className="text-xs text-muted-foreground">
