@@ -1,79 +1,64 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+# Padronizacao Global do Design System
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+## Problema Identificado
 
----
+O sistema usa **pelo menos 5 padroes visuais diferentes** dependendo da pagina:
 
-## Bloco de Relatórios Avançados ✅
+1. **Pagina Orders** — grid 3-cols com icones coloridos individuais (emerald, blue, amber, violet, red, cyan)
+2. **Pagina Employees** — mesmo grid 3-cols mas com cores diferentes por aba (emerald, blue, amber, violet, red, cyan)
+3. **AnimatedTabs** (Inventory, Marketing, Recipes, Ranking) — pills horizontais com slider emerald hardcoded
+4. **QuickActionsRow** (Dashboard) — grid 4-cols com icones em `bg-primary/10`
+5. **Checklists** — grid 2-cols com cards de progresso proprios
+6. **WhatsApp** — grid 2-cols com cores individuais por secao (emerald, blue, purple, orange)
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+Botoes de acao tambem variam: `bg-primary` cheio, `bg-emerald-500/15`, outline com `border-primary/30`, `variant="outline"`, etc.
 
-## Dashboard Analytics ✅
+## Regra Unica Proposta
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+### Navegacao interna (abas de pagina)
+- **Padrao unico**: Grid fixo (3-cols mobile, 6-cols desktop) com icone + label empilhados
+- **Cor unica**: `bg-primary/10` + `border-primary/30` + `text-primary` quando ativo
+- **Inativo**: `bg-card` + `border-border` + `text-muted-foreground`
+- **Eliminar** cores individuais por aba (emerald, blue, amber, violet, etc.)
+- Icone ativo em `text-primary`, inativo em `text-muted-foreground`
 
-## Operacional ✅
+### AnimatedTabs (slider horizontal)
+- Trocar `bg-emerald-500/10` hardcoded por `bg-primary/10`
+- Trocar `text-emerald-400` por `text-primary`
+- Badges: `bg-primary/15 text-primary` quando ativo
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+### Botoes de acao
+- **Primario (CTA principal)**: `bg-primary text-primary-foreground` (botao cheio)
+- **Secundario**: `variant="outline"` com `border-primary/30 text-primary hover:bg-primary/10`
+- **Eliminar** qualquer `bg-emerald-*`, `bg-green-*` hardcoded em botoes de acao
 
-## CRM / Clientes ✅
+### Status badges (manter semanticos)
+- Success/Paid: `bg-success/15 text-success`
+- Warning/Pending: `bg-warning/15 text-warning`
+- Error/Cancelled: `bg-destructive/15 text-destructive`
+- Info: `bg-primary/15 text-primary`
+- Estes sao semanticos e devem manter cores distintas
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+### Icones de destaque em cards
+- Padrao unico: `bg-primary/10 text-primary` para icones decorativos
+- Nao usar `bg-emerald-500/10 text-emerald-500` — usar tokens do design system
 
-## Funcionários ✅
+## Arquivos a Modificar
 
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
+1. **`src/components/ui/animated-tabs.tsx`** — trocar emerald hardcoded por primary
+2. **`src/pages/Employees.tsx`** — remover cores individuais, usar primary unico
+3. **`src/pages/Orders.tsx`** — ja esta ok (usa primary), limpar restos de emerald nos botoes de cotacao
+4. **`src/pages/WhatsApp.tsx`** — padronizar icones para primary
+5. **`src/pages/Recipes.tsx`** — trocar `bg-emerald-500/10 text-emerald-500` por primary
+6. **`src/pages/Customers.tsx`** — verificar e padronizar
+7. **`src/pages/DeliveryHub.tsx`** — padronizar icones (manter cores de status)
+8. **`src/pages/KDS.tsx`** — manter cores de status (sao semanticas)
+9. **`src/components/dashboard/QuickActionsRow.tsx`** — ja esta ok
+10. **`src/pages/SupplierPortal.tsx`** — trocar `bg-green-500/20 text-green-400` por tokens
+11. **`src/pages/TabletHome.tsx`** — padronizar
+12. **`src/pages/TabletBill.tsx`** — padronizar
 
-## Cardápio Digital ✅
+A ideia central: **tudo que e decorativo ou de navegacao usa `primary`**. Apenas indicadores de **status semantico** (sucesso, erro, pendente) mantem cores distintas.
 
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
