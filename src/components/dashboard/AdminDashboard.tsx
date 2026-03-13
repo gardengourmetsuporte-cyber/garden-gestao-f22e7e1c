@@ -223,8 +223,8 @@ export function AdminDashboard() {
         </Suspense>
       )}
 
-      {/* Upgrade Banner */}
-      <UpgradeBanner />
+      {/* Upgrade Banner — operational only */}
+      {view === 'operational' && <UpgradeBanner />}
 
       {/* Setup Onboarding — operational only */}
       {view === 'operational' && <SetupChecklistWidget />}

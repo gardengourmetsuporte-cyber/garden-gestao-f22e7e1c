@@ -19,7 +19,7 @@ export function UpgradeBanner() {
 
   return (
     <div
-      className="relative w-full rounded-2xl overflow-hidden animate-fade-in cursor-pointer mb-4"
+      className="relative w-full rounded-2xl overflow-hidden animate-fade-in cursor-pointer"
       onClick={() => navigate('/plans')}
       style={{
         background: 'linear-gradient(135deg, #1a0a2e 0%, #3d1466 30%, #6b2fa0 55%, #a855f7 80%, #e74694 100%)',
