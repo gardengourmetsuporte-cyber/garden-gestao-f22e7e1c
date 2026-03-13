@@ -133,7 +133,7 @@ const CHANNEL_ACCENT: Record<Channel, string> = {
   todos: 'border-l-primary',
   delivery: 'border-l-blue-500',
   mesa: 'border-l-amber-500',
-  balcao: 'border-l-emerald-500',
+  balcao: 'border-l-primary',
   qrcode: 'border-l-purple-500',
   ifood: 'border-l-red-500',
 };
