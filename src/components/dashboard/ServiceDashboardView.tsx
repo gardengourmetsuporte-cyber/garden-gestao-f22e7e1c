@@ -1,5 +1,6 @@
 import { useServiceDashboard } from '@/hooks/useServiceDashboard';
-import { ServiceActiveOrders } from './ServiceActiveOrders';
+import { ServiceOperationStatus } from './ServiceOperationStatus';
+import { ServiceOrderPipeline } from './ServiceOrderPipeline';
 import { ServiceHourlySales } from './ServiceHourlySales';
 import { ServiceDeliveryStatus } from './ServiceDeliveryStatus';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -14,7 +15,7 @@ const KPI_ITEMS = [
 ] as const;
 
 export function ServiceDashboardView() {
-  const { stats, orders, hourlySales, deliveries, hubActive } = useServiceDashboard();
+  const { stats, pipeline, hourlySales, deliveries, hubActive, pulse } = useServiceDashboard();
 
   const values: Record<string, string> = {
     sales: formatCurrency(stats.salesToday),
@@ -25,15 +26,18 @@ export function ServiceDashboardView() {
 
   return (
     <div className="mt-4 space-y-4">
-      {/* KPI Strip — horizontal scroll like QuickStats */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:-mx-8 lg:px-8 snap-x snap-mandatory">
+      {/* Operation Pulse Hero */}
+      <ServiceOperationStatus pulse={pulse} />
+
+      {/* KPI Grid 2x2 */}
+      <div className="grid grid-cols-2 gap-2">
         {KPI_ITEMS.map(kpi => (
           <div
             key={kpi.key}
-            className="flex items-center gap-2.5 shrink-0 snap-start rounded-xl px-3.5 py-2.5 bg-card/70 border border-border/30 min-w-[140px]"
+            className="flex items-center gap-2.5 rounded-xl px-3.5 py-3 bg-card/70 border border-border/30"
           >
-            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", kpi.variant)}>
-              <AppIcon name={kpi.icon} size={16} />
+            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", kpi.variant)}>
+              <AppIcon name={kpi.icon} size={18} />
             </div>
             <div className="text-left min-w-0">
               <p className="text-lg font-extrabold font-display leading-tight" style={{ letterSpacing: '-0.02em' }}>
@@ -45,10 +49,10 @@ export function ServiceDashboardView() {
         ))}
       </div>
 
-      {/* Active Orders */}
-      <ServiceActiveOrders orders={orders} />
+      {/* Order Pipeline */}
+      <ServiceOrderPipeline pipeline={pipeline} />
 
-      {/* Hourly Sales Chart */}
+      {/* Hourly Sales */}
       <ServiceHourlySales data={hourlySales} />
 
       {/* Deliveries & Hub */}
