@@ -356,7 +356,7 @@ export default function SupplierPortal() {
                         ) : isOverdue ? (
                           <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-destructive/20 text-destructive">Vencido</span>
                         ) : (
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-yellow-500/20 text-yellow-400">Pendente</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-warning/20 text-warning">Pendente</span>
                         )}
                         {inv.invoice_number && (
                           <span className="text-xs text-muted-foreground">#{inv.invoice_number}</span>
