@@ -338,8 +338,8 @@ function BillPanel({ unitId, mesa, storeInfo, storeName, onClose }: {
 
             {selectedPayment === 'waiter' && (
               <div className="rounded-2xl bg-card border border-border/20 p-5 flex flex-col items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
-                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-                  <AppIcon name="Bell" size={24} className="text-blue-500" />
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                   <AppIcon name="Bell" size={24} className="text-primary" />
                 </div>
                 <p className="text-sm font-bold text-foreground">Chamar garçom para a mesa</p>
                 <Button className="w-full" onClick={() => callWaiter.mutate()} disabled={callWaiter.isPending}>
