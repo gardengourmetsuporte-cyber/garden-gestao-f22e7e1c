@@ -181,17 +181,17 @@ export function AdminDashboard() {
       {/* Greeting */}
       <DashboardContextBar firstName={firstName} stats={stats} />
 
-      {/* View Selector — Tab Pills */}
-      <div className="flex gap-1.5 bg-muted/50 p-1 rounded-xl border border-border/30">
+      {/* View Selector — Spotify Pill Tabs */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar">
         {VIEW_TABS.map(tab => (
           <button
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "flex-1 flex items-center justify-center gap-1.5 h-9 rounded-lg text-xs font-semibold transition-all duration-200 touch-manipulation",
+              "flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 touch-manipulation",
               view === tab.key
-                ? "bg-card text-foreground shadow-sm border border-border/40"
-                : "text-muted-foreground hover:text-foreground active:scale-[0.97]"
+                ? "bg-foreground text-background"
+                : "bg-secondary text-muted-foreground hover:text-foreground active:scale-[0.97]"
             )}
           >
             <AppIcon name={tab.icon} size={14} className="shrink-0" />
