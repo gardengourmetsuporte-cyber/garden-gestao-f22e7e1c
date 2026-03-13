@@ -19,8 +19,8 @@ const problems = [
     icon: "Users",
     title: '"A equipe não se engaja"',
     desc: "Funcionário sem feedback, sem meta, sem motivação. Alta rotatividade e baixa produtividade.",
-    glow: "from-emerald-500/20 via-emerald-500/5 to-transparent",
-    iconColor: "text-emerald-400",
+    glow: "from-primary/20 via-primary/5 to-transparent",
+    iconColor: "text-primary",
   },
 ];
 
