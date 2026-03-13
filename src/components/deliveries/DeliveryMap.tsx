@@ -153,10 +153,13 @@ async function geocodeAddress(
   const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 
   const neighborhoodPart = neighborhood?.trim() ? `${neighborhood.trim()}, ` : '';
+  const cityPart = normalizedCity ? `${normalizedCity}, ` : '';
   const queries = Array.from(new Set([
-    `${cleaned}, ${neighborhoodPart}${normalizedCity}, SP, Brasil`,
-    `${streetOnly}, ${normalizedCity}, SP, Brasil`,
-    `${cleaned}, ${normalizedCity}, Brasil`,
+    `${cleaned}, ${neighborhoodPart}${cityPart}SP, Brasil`,
+    `${streetOnly}, ${cityPart}SP, Brasil`,
+    `${cleaned}, ${cityPart}Brasil`,
+    // Broader fallback without city
+    ...(normalizedCity ? [] : [`${cleaned}, Brasil`]),
   ].filter((q) => q.replace(/[,\s]/g, '').length > 0)));
 
   let anchor: { lat: number; lng: number } | null = null;
