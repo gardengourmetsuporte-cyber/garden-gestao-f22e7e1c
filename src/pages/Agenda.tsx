@@ -230,7 +230,7 @@ export default function Agenda() {
                       className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border shadow-inner"
                       style={{ backgroundColor: category.color + '15', border: `1px solid ${category.color}30` }}
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: 20, color: category.color, filter: `drop-shadow(0 0 4px ${category.color}60)` }}>{category.icon || 'folder'}</span>
+                      <AppIcon name={category.icon || 'folder'} size={20} style={{ color: category.color, filter: `drop-shadow(0 0 4px ${category.color}60)` }} />
                     </div>
                     <div className="flex flex-col items-start">
                       <span className="font-semibold text-[15px] leading-tight text-foreground">{category.name}</span>
