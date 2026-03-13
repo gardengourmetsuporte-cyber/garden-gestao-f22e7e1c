@@ -10,7 +10,7 @@ import { SetupChecklistWidget } from './SetupChecklistWidget';
 import { DashboardContextBar } from './DashboardContextBar';
 import { DashboardHeroFinance } from './DashboardHeroFinance';
 import { DashboardSection } from './DashboardSection';
-import { QuickActionsRow } from './QuickActionsRow';
+
 
 const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
 import { SmartScannerWidget } from './SmartScannerWidget';
