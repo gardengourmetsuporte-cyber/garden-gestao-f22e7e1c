@@ -71,12 +71,12 @@ export function SolutionSection() {
               <div className="lg:[direction:ltr] space-y-6">
                 <div className="inline-flex items-center gap-4">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-emerald-500 blur-xl opacity-30" />
-                    <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-lg text-white bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] border border-emerald-400/30">
+                    <div className="absolute inset-0 bg-primary blur-xl opacity-30" />
+                    <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-lg text-white bg-gradient-to-br from-primary to-primary/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] border border-primary/30">
                       {step.number}
                     </div>
                   </div>
-                  <div className="h-px flex-1 min-w-[60px] max-w-[100px] bg-gradient-to-r from-emerald-500/50 to-transparent" />
+                  <div className="h-px flex-1 min-w-[60px] max-w-[100px] bg-gradient-to-r from-primary/50 to-transparent" />
                 </div>
                 <div>
                   <h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-4 tracking-tight">{step.title}</h3>
