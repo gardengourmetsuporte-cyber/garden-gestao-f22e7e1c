@@ -103,8 +103,8 @@ export function ProfileDropdown() {
       <>
         {triggerButton}
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetContent side="bottom" className="p-0">
-            <div className="px-4 pt-2 pb-1">
+          <SheetContent side="top" className="p-0 rounded-b-2xl">
+            <div className="px-4 pt-4 pb-1">
               <div className="flex items-center gap-3">
                 <Avatar className="w-10 h-10 ring-1 ring-border/40">
                   {profile?.avatar_url ? (
