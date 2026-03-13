@@ -83,7 +83,7 @@ export function UnitRankingWidget() {
                   </span>
                   <span className={cn(
                     "text-[10px] font-medium",
-                    r.completionRate >= 80 ? "text-emerald-600 dark:text-emerald-400" :
+                    r.completionRate >= 80 ? "text-primary" :
                     r.completionRate >= 50 ? "text-amber-600 dark:text-amber-400" :
                     "text-red-600 dark:text-red-400"
                   )}>

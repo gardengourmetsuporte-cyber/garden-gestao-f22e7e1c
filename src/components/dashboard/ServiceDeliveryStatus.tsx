@@ -6,7 +6,7 @@ import type { ActiveDelivery, HubActiveOrder } from '@/hooks/useServiceDashboard
 const PLATFORM_CONFIG: Record<string, { label: string; variant: string }> = {
   ifood: { label: 'iFood', variant: 'bg-red-500/15 text-red-400' },
   rappi: { label: 'Rappi', variant: 'bg-orange-500/15 text-orange-400' },
-  uber_eats: { label: 'Uber Eats', variant: 'bg-emerald-500/15 text-emerald-400' },
+  uber_eats: { label: 'Uber Eats', variant: 'bg-primary/15 text-primary' },
   aiqfome: { label: 'AiQFome', variant: 'bg-violet-500/15 text-violet-400' },
   manual: { label: 'Manual', variant: 'bg-muted/40 text-muted-foreground' },
 };

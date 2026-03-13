@@ -31,7 +31,7 @@ export function TeamMemberRow({ member, compact }: Props) {
   const lastInitial = member.full_name.split(' ')[1]?.[0];
   const shortName = lastInitial ? `${firstName} ${lastInitial}.` : firstName;
 
-  const pctColor = member.utilizationPct >= 80 ? 'text-emerald-400' :
+  const pctColor = member.utilizationPct >= 80 ? 'text-primary' :
     member.utilizationPct >= 50 ? 'text-amber-400' : 'text-muted-foreground';
 
   return (

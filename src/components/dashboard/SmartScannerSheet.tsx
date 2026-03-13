@@ -16,7 +16,7 @@ interface Props {
 }
 
 const TYPE_COLORS: Record<DocumentType, string> = {
-  pix_receipt: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  pix_receipt: 'bg-primary/20 text-primary border-primary/30',
   invoice: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
   boleto: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
   stock_exit: 'bg-orange-500/20 text-orange-400 border-orange-500/30',

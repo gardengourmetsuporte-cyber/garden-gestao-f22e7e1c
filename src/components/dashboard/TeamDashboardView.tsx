@@ -99,7 +99,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
           <h3 className="text-sm font-semibold text-foreground flex-1">Aproveitamento Geral</h3>
           <span className={cn(
             'text-sm font-bold tabular-nums',
-            utilizationPct >= 80 ? 'text-emerald-400' :
+            utilizationPct >= 80 ? 'text-primary' :
             utilizationPct >= 50 ? 'text-amber-400' :
             'text-destructive'
           )}>
