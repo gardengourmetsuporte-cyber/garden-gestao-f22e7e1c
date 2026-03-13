@@ -216,10 +216,12 @@ export function AdminDashboard() {
       </div>
 
 
-      {/* Quick Stats — all views */}
-      <Suspense fallback={<QuickStatsSkeleton />}>
-        <LazyQuickStats />
-      </Suspense>
+      {/* Quick Stats — operational only */}
+      {view === 'operational' && (
+        <Suspense fallback={<QuickStatsSkeleton />}>
+          <LazyQuickStats />
+        </Suspense>
+      )}
 
       {/* Upgrade Banner */}
       <UpgradeBanner />
