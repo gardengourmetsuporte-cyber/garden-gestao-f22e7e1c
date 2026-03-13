@@ -35,7 +35,7 @@ export default function WhatsAppHub() {
           className={cn(
             "rounded-2xl border p-4 flex items-center gap-4 cursor-pointer active:scale-[0.98] transition-all",
             isConnected
-              ? "border-emerald-500/30 bg-emerald-500/5"
+              ? "border-success/30 bg-success/5"
               : "border-border/30 bg-card"
           )}
           onClick={() => navigate('/whatsapp/settings')}
