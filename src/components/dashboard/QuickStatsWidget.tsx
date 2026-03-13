@@ -113,7 +113,7 @@ export function QuickStatsWidget() {
   ];
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:-mx-8 lg:px-8 snap-x snap-mandatory">
+    <div className="grid grid-cols-3 gap-2 lg:grid-cols-6">
       {allCards.map((card) => (
         <button
           key={card.key}
