@@ -29,19 +29,19 @@ export default function Employees() {
   );
 
   const adminTabs = [
-    { key: 'employees', label: 'Funcionários', icon: 'Users', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { key: 'deliveries', label: 'Entregas', icon: 'Package', color: 'text-violet-400', bg: 'bg-violet-500/10' },
-    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10', iconFill: 0 },
-    { key: 'hour-bank', label: 'Banco Horas', icon: 'Timer', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+    { key: 'employees', label: 'Funcionários', icon: 'Users', iconFill: 1 },
+    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', iconFill: 1 },
+    { key: 'schedules', label: 'Folgas', icon: 'Calendar', iconFill: 1 },
+    { key: 'deliveries', label: 'Entregas', icon: 'Package', iconFill: 1 },
+    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', iconFill: 0 },
+    { key: 'hour-bank', label: 'Banco Horas', icon: 'Timer', iconFill: 1 },
   ];
 
   const employeeTabs = [
-    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { key: 'payslips', label: 'Holerites', icon: 'FileText', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10', iconFill: 0 },
+    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', iconFill: 1 },
+    { key: 'payslips', label: 'Holerites', icon: 'FileText', iconFill: 1 },
+    { key: 'schedules', label: 'Folgas', icon: 'Calendar', iconFill: 1 },
+    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', iconFill: 0 },
   ];
 
   const tabs = isAdmin ? adminTabs : employeeTabs;
@@ -59,23 +59,26 @@ export default function Employees() {
             <>
               {/* Navigation Cards */}
               <div className="grid grid-cols-3 gap-2">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={cn(
-                      "relative flex flex-col items-center justify-center gap-1.5 py-3 px-1.5 rounded-2xl border transition-all duration-200 active:scale-[0.97] min-w-0 overflow-hidden",
-                      activeTab === tab.key
-                        ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
-                        : "bg-card border-border hover:border-primary/20"
-                    )}
-                  >
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", activeTab === tab.key ? "bg-primary/20" : tab.bg)}>
-                      <AppIcon name={tab.icon} size={20} fill={(tab as any).iconFill ?? 1} className={activeTab === tab.key ? "text-primary" : tab.color} />
-                    </div>
-                    <span className={cn("text-[10px] font-semibold truncate w-full text-center", activeTab === tab.key ? "text-primary" : "text-foreground")}>{tab.label}</span>
-                  </button>
-                ))}
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => setActiveTab(tab.key)}
+                      className={cn(
+                        "relative flex flex-col items-center justify-center gap-1.5 py-3 px-1.5 rounded-2xl border transition-all duration-200 active:scale-[0.97] min-w-0 overflow-hidden",
+                        isActive
+                          ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
+                          : "bg-card border-border hover:border-primary/20"
+                      )}
+                    >
+                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", isActive ? "bg-primary/20" : "bg-primary/10")}>
+                        <AppIcon name={tab.icon} size={20} fill={(tab.iconFill ?? 1) as 0 | 1} className={isActive ? "text-primary" : "text-muted-foreground"} />
+                      </div>
+                      <span className={cn("text-[10px] font-semibold truncate w-full text-center", isActive ? "text-primary" : "text-muted-foreground")}>{tab.label}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="animate-fade-in" key={activeTab}>

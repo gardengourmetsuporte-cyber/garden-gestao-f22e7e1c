@@ -88,7 +88,7 @@ const statusLabel: Record<string, string> = {
 const statusColor: Record<string, string> = {
   draft: 'bg-muted text-muted-foreground',
   sent: 'bg-primary/20 text-primary',
-  received: 'bg-green-500/20 text-green-400',
+  received: 'bg-success/20 text-success',
   cancelled: 'bg-destructive/20 text-destructive',
 };
 
@@ -274,7 +274,7 @@ export default function SupplierPortal() {
               icon="DollarSign"
               label="Vendas do mês"
               value={formatCurrency(summary.total_sold_month)}
-              accent="text-green-400"
+              accent="text-primary"
             />
             <SummaryCard
               icon="Package"
@@ -352,11 +352,11 @@ export default function SupplierPortal() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {inv.is_paid ? (
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-500/20 text-green-400">Pago</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-success/20 text-success">Pago</span>
                         ) : isOverdue ? (
                           <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-destructive/20 text-destructive">Vencido</span>
                         ) : (
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-yellow-500/20 text-yellow-400">Pendente</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-warning/20 text-warning">Pendente</span>
                         )}
                         {inv.invoice_number && (
                           <span className="text-xs text-muted-foreground">#{inv.invoice_number}</span>
@@ -369,7 +369,7 @@ export default function SupplierPortal() {
                       <span>Emissão: {formatDate(inv.issue_date)}</span>
                       <span>Venc: {formatDate(inv.due_date)}</span>
                       {inv.is_paid && inv.paid_at && (
-                        <span className="text-green-400">Pago em {formatDate(inv.paid_at.split('T')[0])}</span>
+                        <span className="text-success">Pago em {formatDate(inv.paid_at.split('T')[0])}</span>
                       )}
                     </div>
                   </div>

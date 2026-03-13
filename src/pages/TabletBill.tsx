@@ -229,8 +229,8 @@ export default function TabletBill() {
                     : 'border-border/30 bg-card hover:border-primary/30'
                 }`}
               >
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                  <AppIcon name="QrCode" size={24} className="text-emerald-500" />
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <AppIcon name="QrCode" size={24} className="text-primary" />
                 </div>
                 <span className="text-sm font-bold text-foreground">Pix</span>
                 <span className="text-[10px] text-muted-foreground leading-tight text-center">QR Code na tela</span>
@@ -244,8 +244,8 @@ export default function TabletBill() {
                     : 'border-border/30 bg-card hover:border-primary/30'
                 }`}
               >
-                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                  <AppIcon name="HandCoins" size={24} className="text-blue-500" />
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <AppIcon name="HandCoins" size={24} className="text-primary" />
                 </div>
                 <span className="text-sm font-bold text-foreground">Garçom</span>
                 <span className="text-[10px] text-muted-foreground leading-tight text-center">Receber na mesa</span>
@@ -289,8 +289,8 @@ export default function TabletBill() {
           {/* Waiter */}
           {selectedPayment === 'waiter' && (
             <div className="card-base rounded-2xl p-6 flex flex-col items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-                <AppIcon name="Bell" size={32} className="text-blue-500" />
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <AppIcon name="Bell" size={32} className="text-primary" />
               </div>
               <div className="text-center">
                 <p className="text-sm font-bold text-foreground">Chamar garçom para a mesa</p>

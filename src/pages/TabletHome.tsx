@@ -300,8 +300,8 @@ function BillPanel({ unitId, mesa, storeInfo, storeName, onClose }: {
                     selectedPayment === 'pix' ? 'border-primary bg-primary/10' : 'border-border/20 bg-card hover:border-primary/30'
                   )}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                    <AppIcon name="QrCode" size={20} className="text-emerald-500" />
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <AppIcon name="QrCode" size={20} className="text-primary" />
                   </div>
                   <span className="text-xs font-bold text-foreground">Pix</span>
                 </button>
@@ -311,8 +311,8 @@ function BillPanel({ unitId, mesa, storeInfo, storeName, onClose }: {
                     selectedPayment === 'waiter' ? 'border-primary bg-primary/10' : 'border-border/20 bg-card hover:border-primary/30'
                   )}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                    <AppIcon name="HandCoins" size={20} className="text-blue-500" />
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <AppIcon name="HandCoins" size={20} className="text-primary" />
                   </div>
                   <span className="text-xs font-bold text-foreground">Garçom</span>
                 </button>
@@ -338,8 +338,8 @@ function BillPanel({ unitId, mesa, storeInfo, storeName, onClose }: {
 
             {selectedPayment === 'waiter' && (
               <div className="rounded-2xl bg-card border border-border/20 p-5 flex flex-col items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
-                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-                  <AppIcon name="Bell" size={24} className="text-blue-500" />
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                   <AppIcon name="Bell" size={24} className="text-primary" />
                 </div>
                 <p className="text-sm font-bold text-foreground">Chamar garçom para a mesa</p>
                 <Button className="w-full" onClick={() => callWaiter.mutate()} disabled={callWaiter.isPending}>
@@ -379,7 +379,7 @@ function OrdersPanel({ unitId, mesa, onClose }: { unitId: string; mesa: string; 
     pending: { label: 'Pendente', color: 'bg-amber-500/15 text-amber-500' },
     confirmed: { label: 'Confirmado', color: 'bg-blue-500/15 text-blue-500' },
     preparing: { label: 'Preparando', color: 'bg-orange-500/15 text-orange-500' },
-    ready: { label: 'Pronto', color: 'bg-emerald-500/15 text-emerald-500' },
+    ready: { label: 'Pronto', color: 'bg-success/15 text-success' },
   };
 
   return (
