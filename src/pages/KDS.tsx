@@ -300,7 +300,7 @@ export default function KDS() {
 
   const { data: orders = [], isPending, isError, error, refetch } = useQuery({
     queryKey: ['kds-orders', unitId],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!unitId) return [];
       const { data, error } = await supabase
         .from('tablet_orders')
@@ -309,6 +309,7 @@ export default function KDS() {
         .in('status', ACTIVE_STATUSES)
         .order('created_at', { ascending: true })
         .limit(50);
+      if (signal?.aborted) throw new DOMException('Query cancelled', 'AbortError');
       if (error) throw error;
       return (data as unknown as KDSOrder[]) || [];
     },
@@ -316,8 +317,14 @@ export default function KDS() {
     staleTime: 5_000,
     refetchInterval: 10_000,
     refetchOnWindowFocus: false,
-    retry: 1,
+    retry: (failureCount, err) => {
+      if (err instanceof DOMException && err.name === 'AbortError') return false;
+      return failureCount < 1;
+    },
   });
+
+  // Filter out AbortError from display
+  const showError = isError && !(error instanceof DOMException && error.name === 'AbortError') && !String(error?.message).toLowerCase().includes('abort');
 
   // Realtime
   useEffect(() => {
@@ -449,7 +456,7 @@ export default function KDS() {
       </header>
 
       {/* Error bar */}
-      {isError && (
+      {showError && (
         <div className="mx-2 mt-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 flex items-center justify-between gap-2 shrink-0">
           <p className="text-[11px] text-red-400 font-medium truncate">{(error as Error)?.message || 'Falha ao carregar'}</p>
           <button onClick={() => refetch()} className="h-6 px-2.5 rounded-md bg-red-500 text-white text-[10px] font-bold shrink-0 active:scale-95">
