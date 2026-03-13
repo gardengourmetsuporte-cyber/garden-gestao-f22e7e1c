@@ -13,7 +13,7 @@ import { DashboardSection } from './DashboardSection';
 
 
 const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
-import { SmartScannerWidget } from './SmartScannerWidget';
+
 import { UpgradeBanner } from './UpgradeBanner';
 import { AppIcon } from '@/components/ui/app-icon';
 import { PageSkeleton } from '@/components/ui/page-skeleton';
@@ -179,8 +179,7 @@ export function AdminDashboard() {
 
   return (
     <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-8">
-      {/* Smart Scanner — top */}
-      {view === 'operational' && <SmartScannerWidget />}
+
 
       {/* Greeting + Refresh */}
       <DashboardContextBar firstName={firstName} stats={stats} />
