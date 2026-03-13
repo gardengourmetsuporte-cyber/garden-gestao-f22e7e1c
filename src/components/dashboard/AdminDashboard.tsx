@@ -196,16 +196,16 @@ export function AdminDashboard() {
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-xl text-[11px] font-semibold transition-all duration-200 touch-manipulation border",
+              "flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-xl text-[11px] font-semibold transition-all duration-300 touch-manipulation border",
               view === tab.key
-                ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 border-primary/50"
-                : "bg-card/80 text-muted-foreground hover:text-foreground hover:bg-card border-border/40"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 border-primary/50 scale-[1.03]"
+                : "bg-card/80 text-muted-foreground hover:text-foreground hover:bg-card hover:scale-[1.02] border-border/40 active:scale-[0.95]"
             )}
           >
             <div className={cn(
-              "flex items-center justify-center w-8 h-8 rounded-lg transition-colors",
+              "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300",
               view === tab.key
-                ? "bg-primary-foreground/20"
+                ? "bg-primary-foreground/20 rotate-0"
                 : "bg-muted/60"
             )}>
               <AppIcon name={tab.icon} size={16} className="shrink-0" />
