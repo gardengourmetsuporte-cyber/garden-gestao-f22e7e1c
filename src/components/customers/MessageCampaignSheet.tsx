@@ -114,7 +114,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
                   navigate('/whatsapp/settings');
                 }}
               >
-                <span className="material-symbols-rounded" style={{ fontSize: 16 }}>settings</span>
+                <AppIcon name="settings" size={16} />
                 Ir para Configurações
               </Button>
             </div>
