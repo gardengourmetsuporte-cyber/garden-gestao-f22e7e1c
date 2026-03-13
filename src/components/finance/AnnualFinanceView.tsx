@@ -21,17 +21,20 @@ const formatCompact = (value: number) => {
   return value.toFixed(0);
 };
 
+const INCOME_COLOR = '#1DB954';
+const EXPENSE_COLOR = '#ef4444';
+
 function AnnualTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   const inc = payload.find((p: any) => p.dataKey === 'income')?.value as number || 0;
   const exp = payload.find((p: any) => p.dataKey === 'expense')?.value as number || 0;
   const bal = inc - exp;
   return (
-    <div className="rounded-xl border border-border/50 bg-background/95 backdrop-blur-xl px-3.5 py-2.5 shadow-2xl space-y-1">
+    <div className="rounded-lg bg-background/95 backdrop-blur-xl px-3.5 py-2.5 space-y-1">
       <p className="text-xs font-semibold text-foreground">{label}</p>
-      <p className="text-xs" style={{ color: '#22c55e' }}>Receita: {formatCurrency(inc)}</p>
-      <p className="text-xs" style={{ color: '#ef4444' }}>Despesa: {formatCurrency(exp)}</p>
-      <p className={cn("text-xs font-bold", bal >= 0 ? "text-emerald-500" : "text-red-500")}>
+      <p className="text-xs" style={{ color: INCOME_COLOR }}>Receita: {formatCurrency(inc)}</p>
+      <p className="text-xs" style={{ color: EXPENSE_COLOR }}>Despesa: {formatCurrency(exp)}</p>
+      <p className={cn("text-xs font-bold", bal >= 0 ? "text-primary" : "text-destructive")}>
         Saldo: {bal >= 0 ? '+' : ''}{formatCurrency(bal)}
       </p>
     </div>
@@ -66,10 +69,10 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
     return (
       <div className="space-y-4 px-4 pb-32">
         <div className="grid grid-cols-3 gap-2">
-          {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-2xl" />)}
+          {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-lg" />)}
         </div>
-        <Skeleton className="h-64 rounded-2xl" />
-        <Skeleton className="h-48 rounded-2xl" />
+        <Skeleton className="h-64 rounded-lg" />
+        <Skeleton className="h-48 rounded-lg" />
       </div>
     );
   }
@@ -94,24 +97,24 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
       <div className="grid grid-cols-3 gap-2">
         <div className="card-base p-3 text-center">
           <div className="flex items-center justify-center gap-1 mb-1">
-            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <div className="w-2 h-2 rounded-full bg-primary" />
             <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Receita</p>
           </div>
-          <p className="text-sm font-bold tabular-nums text-emerald-500">{formatCurrency(totalIncome)}</p>
+          <p className="text-sm font-bold tabular-nums text-primary">{formatCurrency(totalIncome)}</p>
         </div>
         <div className="card-base p-3 text-center">
           <div className="flex items-center justify-center gap-1 mb-1">
-            <div className="w-2 h-2 rounded-full bg-red-500" />
+            <div className="w-2 h-2 rounded-full bg-destructive" />
             <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Despesa</p>
           </div>
-          <p className="text-sm font-bold tabular-nums text-red-500">{formatCurrency(totalExpense)}</p>
+          <p className="text-sm font-bold tabular-nums text-destructive">{formatCurrency(totalExpense)}</p>
         </div>
         <div className="card-base p-3 text-center">
           <div className="flex items-center justify-center gap-1 mb-1">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: totalBalance >= 0 ? '#22c55e' : '#ef4444' }} />
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: totalBalance >= 0 ? INCOME_COLOR : EXPENSE_COLOR }} />
             <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Resultado</p>
           </div>
-          <p className={cn("text-sm font-bold tabular-nums", totalBalance >= 0 ? "text-emerald-500" : "text-red-500")}>
+          <p className={cn("text-sm font-bold tabular-nums", totalBalance >= 0 ? "text-primary" : "text-destructive")}>
             {totalBalance >= 0 ? '+' : ''}{formatCurrency(totalBalance)}
           </p>
         </div>
@@ -125,12 +128,12 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
             <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
               <defs>
                 <linearGradient id="annualIncomeBar" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0.6} />
+                  <stop offset="0%" stopColor={INCOME_COLOR} stopOpacity={0.9} />
+                  <stop offset="100%" stopColor={INCOME_COLOR} stopOpacity={0.6} />
                 </linearGradient>
                 <linearGradient id="annualExpenseBar" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.6} />
+                  <stop offset="0%" stopColor={EXPENSE_COLOR} stopOpacity={0.9} />
+                  <stop offset="100%" stopColor={EXPENSE_COLOR} stopOpacity={0.6} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.2} vertical={false} />
@@ -158,7 +161,7 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
                 onClick={() => onMonthClick?.(i)}
                 disabled={!hasData}
                 className={cn(
-                  "rounded-xl p-2.5 text-center transition-all active:scale-95",
+                  "rounded-lg p-2.5 text-center transition-all active:scale-95",
                   hasData ? "hover:ring-1 hover:ring-primary/30" : "opacity-40",
                 )}
                 style={{
@@ -175,7 +178,7 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
                   {hasData ? formatCompact(m.expense) : '—'}
                 </p>
                 {hasData && m.balance !== 0 && (
-                  <p className={cn("text-[9px] tabular-nums font-medium", m.balance >= 0 ? "text-emerald-500" : "text-red-400")}>
+                  <p className={cn("text-[9px] tabular-nums font-medium", m.balance >= 0 ? "text-primary" : "text-destructive")}>
                     {m.balance >= 0 ? '+' : ''}{formatCompact(m.balance)}
                   </p>
                 )}
@@ -193,12 +196,12 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
             <AreaChart data={cumulativeData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
               <defs>
                 <linearGradient id="annCumIncome" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#22c55e" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor={INCOME_COLOR} stopOpacity={0.25} />
+                  <stop offset="95%" stopColor={INCOME_COLOR} stopOpacity={0.02} />
                 </linearGradient>
                 <linearGradient id="annCumExpense" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor={EXPENSE_COLOR} stopOpacity={0.25} />
+                  <stop offset="95%" stopColor={EXPENSE_COLOR} stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.2} vertical={false} />
@@ -211,19 +214,19 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
                   const exp = payload.find((p: any) => p.dataKey === 'cumulativeExpense')?.value as number || 0;
                   const bal = inc - exp;
                   return (
-                    <div className="rounded-xl border border-border/50 bg-background/95 backdrop-blur-xl px-3.5 py-2.5 shadow-2xl space-y-1">
+                    <div className="rounded-lg bg-background/95 backdrop-blur-xl px-3.5 py-2.5 space-y-1">
                       <p className="text-xs font-semibold text-foreground">{label}</p>
-                      <p className="text-xs" style={{ color: '#22c55e' }}>Receita: {formatCurrency(inc)}</p>
-                      <p className="text-xs" style={{ color: '#ef4444' }}>Despesa: {formatCurrency(exp)}</p>
-                      <p className={cn("text-xs font-bold", bal >= 0 ? "text-emerald-500" : "text-red-500")}>
+                      <p className="text-xs" style={{ color: INCOME_COLOR }}>Receita: {formatCurrency(inc)}</p>
+                      <p className="text-xs" style={{ color: EXPENSE_COLOR }}>Despesa: {formatCurrency(exp)}</p>
+                      <p className={cn("text-xs font-bold", bal >= 0 ? "text-primary" : "text-destructive")}>
                         Saldo: {bal >= 0 ? '+' : ''}{formatCurrency(bal)}
                       </p>
                     </div>
                   );
                 }}
               />
-              <Area type="monotone" dataKey="cumulativeIncome" stroke="#22c55e" strokeWidth={2.5} fill="url(#annCumIncome)" dot={false} activeDot={{ r: 4, fill: '#22c55e', stroke: 'hsl(var(--background))', strokeWidth: 2 }} />
-              <Area type="monotone" dataKey="cumulativeExpense" stroke="#ef4444" strokeWidth={2.5} fill="url(#annCumExpense)" dot={false} activeDot={{ r: 4, fill: '#ef4444', stroke: 'hsl(var(--background))', strokeWidth: 2 }} />
+              <Area type="monotone" dataKey="cumulativeIncome" stroke={INCOME_COLOR} strokeWidth={2.5} fill="url(#annCumIncome)" dot={false} activeDot={{ r: 4, fill: INCOME_COLOR, stroke: 'hsl(var(--background))', strokeWidth: 2 }} />
+              <Area type="monotone" dataKey="cumulativeExpense" stroke={EXPENSE_COLOR} strokeWidth={2.5} fill="url(#annCumExpense)" dot={false} activeDot={{ r: 4, fill: EXPENSE_COLOR, stroke: 'hsl(var(--background))', strokeWidth: 2 }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -253,21 +256,21 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
           {bestMonth && (
             <div className="card-base p-3">
               <div className="flex items-center gap-1.5 mb-1.5">
-                <AppIcon name="TrendingUp" size={14} className="text-emerald-500" />
+                <AppIcon name="TrendingUp" size={14} className="text-primary" />
                 <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Melhor mês</p>
               </div>
               <p className="text-sm font-bold text-foreground">{bestMonth.label}</p>
-              <p className="text-xs tabular-nums text-emerald-500 font-semibold">+{formatCurrency(bestMonth.balance)}</p>
+              <p className="text-xs tabular-nums text-primary font-semibold">+{formatCurrency(bestMonth.balance)}</p>
             </div>
           )}
           {worstMonth && (
             <div className="card-base p-3">
               <div className="flex items-center gap-1.5 mb-1.5">
-                <AppIcon name="TrendingDown" size={14} className="text-red-500" />
+                <AppIcon name="TrendingDown" size={14} className="text-destructive" />
                 <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Pior mês</p>
               </div>
               <p className="text-sm font-bold text-foreground">{worstMonth.label}</p>
-              <p className="text-xs tabular-nums text-red-500 font-semibold">{formatCurrency(worstMonth.balance)}</p>
+              <p className="text-xs tabular-nums text-destructive font-semibold">{formatCurrency(worstMonth.balance)}</p>
             </div>
           )}
         </div>
@@ -275,12 +278,12 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
 
       {/* ═══ MONTHLY TABLE ═══ */}
       <div className="card-base overflow-hidden">
-        <div className="px-3 py-2.5 border-b border-border/30">
+        <div className="px-3 py-2.5">
           <p className="text-xs font-semibold text-foreground">Resumo mensal</p>
         </div>
 
         {/* Header */}
-        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_50px] gap-1 px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/20">
+        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_50px] gap-1 px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
           <span>Mês</span>
           <span className="text-right">Receita</span>
           <span className="text-right">Despesa</span>
@@ -303,9 +306,9 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
                 )}
               >
                 <span className="text-xs font-medium text-foreground">{m.shortLabel}</span>
-                <span className="text-xs tabular-nums text-right text-emerald-500">{hasData ? formatCurrency(m.income) : '—'}</span>
-                <span className="text-xs tabular-nums text-right text-red-500">{hasData ? formatCurrency(m.expense) : '—'}</span>
-                <span className={cn("text-xs tabular-nums text-right font-semibold", m.balance >= 0 ? "text-emerald-500" : "text-red-500")}>
+                <span className="text-xs tabular-nums text-right text-primary">{hasData ? formatCurrency(m.income) : '—'}</span>
+                <span className="text-xs tabular-nums text-right text-destructive">{hasData ? formatCurrency(m.expense) : '—'}</span>
+                <span className={cn("text-xs tabular-nums text-right font-semibold", m.balance >= 0 ? "text-primary" : "text-destructive")}>
                   {hasData ? formatCurrency(m.balance) : '—'}
                 </span>
                 <span className="text-[10px] tabular-nums text-right flex items-center justify-end gap-0.5">
@@ -314,9 +317,9 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
                       <AppIcon
                         name={m.variationPct >= 0 ? 'TrendingUp' : 'TrendingDown'}
                         size={10}
-                        className={m.variationPct >= 0 ? 'text-red-400' : 'text-emerald-400'}
+                        className={m.variationPct >= 0 ? 'text-destructive' : 'text-primary'}
                       />
-                      <span className={m.variationPct >= 0 ? 'text-red-400' : 'text-emerald-400'}>
+                      <span className={m.variationPct >= 0 ? 'text-destructive' : 'text-primary'}>
                         {Math.abs(m.variationPct).toFixed(0)}%
                       </span>
                     </>
@@ -328,11 +331,11 @@ export function AnnualFinanceView({ stats, onMonthClick }: AnnualFinanceViewProp
         </div>
 
         {/* Footer totals */}
-        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_50px] gap-1 px-3 py-2.5 border-t border-border/40 bg-secondary/20">
+        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_50px] gap-1 px-3 py-2.5 bg-secondary/20">
           <span className="text-xs font-bold text-foreground">Total</span>
-          <span className="text-xs font-bold tabular-nums text-right text-emerald-500">{formatCurrency(totalIncome)}</span>
-          <span className="text-xs font-bold tabular-nums text-right text-red-500">{formatCurrency(totalExpense)}</span>
-          <span className={cn("text-xs font-bold tabular-nums text-right", totalBalance >= 0 ? "text-emerald-500" : "text-red-500")}>
+          <span className="text-xs font-bold tabular-nums text-right text-primary">{formatCurrency(totalIncome)}</span>
+          <span className="text-xs font-bold tabular-nums text-right text-destructive">{formatCurrency(totalExpense)}</span>
+          <span className={cn("text-xs font-bold tabular-nums text-right", totalBalance >= 0 ? "text-primary" : "text-destructive")}>
             {formatCurrency(totalBalance)}
           </span>
           <span />

@@ -117,7 +117,7 @@ export function FinanceHome({
                 </span>
                 <span className={cn(
                   "text-[9px] font-bold px-1.5 py-0.5 rounded-full",
-                  profit >= 0 ? "bg-emerald-500/15" : "bg-red-500/15"
+                  profit >= 0 ? "bg-primary/15" : "bg-destructive/15"
                 )} style={{ color: profit >= 0 ? 'var(--gp-positive)' : 'var(--gp-negative)' }}>
                   {profit >= 0 ? '+' : ''}{profitPercent}%
                 </span>
