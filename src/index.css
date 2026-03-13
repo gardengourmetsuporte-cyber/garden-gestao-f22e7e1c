@@ -178,12 +178,12 @@ html {
     /* Sidebar tokens */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 10% 10%;
-    --sidebar-primary: 156 72% 38%;
+    --sidebar-primary: 270 70% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 5% 94%;
     --sidebar-accent-foreground: 240 10% 10%;
     --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 156 72% 38%;
+    --sidebar-ring: 270 70% 48%;
   }
 
 }
