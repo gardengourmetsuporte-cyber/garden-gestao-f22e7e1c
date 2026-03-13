@@ -17,20 +17,12 @@ function AnimatedValue({ value }: { value: number }) {
 }
 
 const items = [
-  { key: 'criticalItems', title: 'Itens Críticos', icon: 'AlertTriangle', route: '/inventory', activeVariant: 'warning' },
-  { key: 'pendingOrders', title: 'Pedidos', icon: 'ShoppingCart', route: '/orders', activeVariant: 'primary' },
-  { key: 'pendingClosings', title: 'Fechamentos', icon: 'FileText', route: '/cash-closing', activeVariant: 'destructive' },
-  { key: 'pendingRedemptions', title: 'Resgates', icon: 'Gift', route: '/rewards', activeVariant: 'success' },
-  { key: 'pendingQuotations', title: 'Cotações', icon: 'Scale', route: '/orders', activeVariant: 'primary' },
+  { key: 'criticalItems', title: 'itens críticos', icon: 'AlertTriangle', iconBg: 'bg-warning/15', iconColor: 'text-warning', route: '/inventory' },
+  { key: 'pendingOrders', title: 'pedidos', icon: 'ShoppingCart', iconBg: 'bg-primary/15', iconColor: 'text-primary', route: '/orders' },
+  { key: 'pendingClosings', title: 'fechamentos', icon: 'FileText', iconBg: 'bg-destructive/15', iconColor: 'text-destructive', route: '/cash-closing' },
+  { key: 'pendingRedemptions', title: 'resgates', icon: 'Gift', iconBg: 'bg-success/15', iconColor: 'text-success', route: '/rewards' },
+  { key: 'pendingQuotations', title: 'cotações', icon: 'Scale', iconBg: 'bg-primary/15', iconColor: 'text-primary', route: '/orders' },
 ] as const;
-
-const variantIcon: Record<string, string> = {
-  warning: 'bg-warning/12 text-warning',
-  primary: 'bg-primary/12 text-primary',
-  destructive: 'bg-destructive/12 text-destructive',
-  success: 'bg-success/12 text-success',
-  default: 'bg-muted text-muted-foreground',
-};
 
 export function QuickStatsWidget() {
   const navigate = useNavigate();
@@ -95,47 +87,46 @@ export function QuickStatsWidget() {
   const allCards = [
     ...items.map((item) => {
       const value = allStats[item.key as keyof typeof allStats] as number;
-      const isActive = value > 0;
-      const variant = isActive ? item.activeVariant : 'default';
-      return { ...item, value, isActive, variant, isChecklist: false };
+      return { ...item, value, isChecklist: false };
     }),
     {
       key: 'checklist',
-      title: activeType === 'abertura' ? 'Abertura' : 'Fechamento',
+      title: activeType === 'abertura' ? 'abertura' : 'fechamento',
       icon: 'checklist',
+      iconBg: checklistProgress.percent === 100 ? 'bg-success/15' : 'bg-primary/15',
+      iconColor: checklistProgress.percent === 100 ? 'text-success' : 'text-primary',
       route: '/checklists',
       value: checklistProgress.percent,
-      isActive: checklistProgress.percent > 0,
-      variant: checklistProgress.percent === 100 ? 'success' : checklistProgress.percent > 0 ? 'primary' : 'default',
       isChecklist: true,
       checklistProgress,
     },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2 lg:grid-cols-6">
+    <div className="grid grid-cols-3 gap-2.5 lg:grid-cols-6">
       {allCards.map((card, i) => (
         <button
           key={card.key}
           onClick={() => navigate(card.route)}
           className={cn(
-            "flex items-center gap-2.5 rounded-xl px-3 py-2.5 transition-all duration-200 active:scale-[0.96]",
-            "bg-card border border-border/40 hover:border-border/70 hover:shadow-sm",
+            "flex flex-col items-start gap-2 rounded-2xl p-3 transition-all duration-200",
+            "bg-card border border-border/40 hover:border-border/60",
+            "active:scale-[0.96] touch-manipulation",
             "animate-card-reveal",
             `dash-stagger-${i + 1}`,
           )}
         >
-          <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", variantIcon[card.variant])}>
-            <AppIcon name={card.icon} size={15} />
+          <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", card.iconBg)}>
+            <AppIcon name={card.icon} size={16} className={card.iconColor} />
           </div>
-          <div className="text-left min-w-0">
-            <p className="text-sm font-bold font-display leading-tight tabular-nums" style={{ letterSpacing: '-0.02em' }}>
+          <div className="text-left min-w-0 w-full">
+            <p className="text-lg font-bold leading-none tabular-nums tracking-tight">
               {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
             </p>
-            <p className="text-[11px] text-muted-foreground leading-tight">
+            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">
               {card.isChecklist
                 ? `${(card as any).checklistProgress.completed}/${(card as any).checklistProgress.total}`
-                : card.title.toLowerCase()}
+                : card.title}
             </p>
           </div>
         </button>
