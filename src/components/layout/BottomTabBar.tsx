@@ -432,7 +432,7 @@ const TabButton = forwardRef<
           <AppIcon
             name={tab.icon}
             size={22}
-            fill={active ? 1 : 0}
+            fill={1}
             weight={active ? 600 : 400}
             className={cn(
               "relative z-10 transition-colors duration-300",
