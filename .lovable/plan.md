@@ -1,85 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-# Redesign Completo: Tema e Layout Profissional
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-## Diagnóstico dos Problemas
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-1. **Excesso de variantes de card** — 12+ classes diferentes (card-base, card-holographic, card-stat-holo, card-command, dash-kpi-card, etc.) criam visual fragmentado sem padrão
-2. **Estética "gamer"** — efeitos neon, aurora, holographic, shimmer sweep são excessivos para um SaaS de gestão. Parece um app de jogos, não um sistema profissional
-3. **Bordas cyan inconsistentes** — `dash-kpi-card` e `dash-section-body` usam `hsl(200 60% 50%)` (azul) enquanto a primary é verde, criando conflito visual
-4. **Tipografia fragmentada** — tamanhos como `9px`, `10px`, `11px` espalhados sem sistema. Labels truncados no QuickStats
-5. **View Selector pesado** — botões quadrados grandes com ícone + texto ocupam muito espaço vertical
-6. **Animações demais** — aurora drift, card shine swipe, neon pulse, holographic shimmer sobrecarregam a GPU e distraem
+---
 
-## Direção Visual: "Clean SaaS"
+## Bloco de Relatórios Avançados ✅
 
-Inspiração: Linear, Vercel Dashboard, Mobills — fundos neutros, hierarquia clara, sem efeitos decorativos desnecessários.
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-```text
-┌─────────────────────────┐
-│  Header (compacto)      │
-├─────────────────────────┤
-│  Greeting + Date        │
-│  ┌─┐ ┌─┐ ┌─┐ ┌─┐      │  ← Tab pills (inline, compactos)
-│  └─┘ └─┘ └─┘ └─┘      │
-│                         │
-│  ┌─────┐ ┌─────┐ ┌───┐ │  ← Stats grid (padronizado)
-│  └─────┘ └─────┘ └───┘ │
-│  ┌─────┐ ┌─────┐ ┌───┐ │
-│  └─────┘ └─────┘ └───┘ │
-│                         │
-│  ┌─────────────────────┐│  ← Widgets (cards uniformes)
-│  │ Calendário          ││
-│  └─────────────────────┘│
-└─────────────────────────┘
-```
+## Dashboard Analytics ✅
 
-## Mudanças Propostas
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-### 1. Paleta de Cores — Mais Neutra e Profissional
-- Background: `220 14% 8%` (cinza-azulado neutro, não quase-preto)
-- Card: `220 13% 12%` (contraste sutil mas visível)
-- Muted-foreground: `220 8% 55%` → `220 8% 62%` (mais legível)
-- Bordas: cor única `border` em todo lugar, sem cores especiais (remover cyan borders)
-- Primary mantém verde `156 72% 40%` mas sem glows exagerados
+## Operacional ✅
 
-### 2. Cards Unificados — Uma Regra para Todos
-- Consolidar para 2 variantes: `.card-surface` (padrão) e `.card-elevated` (destaque)
-- Border-radius: `16px` consistente
-- Borda: `1px solid hsl(var(--border) / 0.5)` — sem gradientes, sem neon
-- Background sólido (sem backdrop-blur excessivo, sem `::after` shine)
-- Remover: `card-holographic`, `card-stat-holo`, `card-glow`, `card-glass`
-- `dash-section-body` e `dash-kpi-card`: usar mesma base sem bordas cyan
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-### 3. View Selector — Tab Pills Compactos
-- Trocar botões quadrados por pills horizontais em linha
-- Altura reduzida: `h-9` com `px-4`
-- Sem ícones grandes em blocos — ícone 14px + texto na mesma linha
-- `rounded-full` estilo pill, fundo translúcido quando ativo
+## CRM / Clientes ✅
 
-### 4. Tipografia Consistente
-- Sistema de 4 tamanhos: `12px` (labels), `13px` (body), `14px` (emphasis), `16px+` (títulos)
-- Eliminar `9px` e `10px` — mínimo `11px` para acessibilidade
-- QuickStats: labels completos sem truncar, subir para `text-[11px]`
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-### 5. Limpeza de Efeitos
-- Remover: aurora mesh no finance-hero, holographic shimmer, card shine sweep, neon border pulse
-- Manter apenas: fade-in simples, slide-up sutil, spring-in para entrada
-- Glows reduzidos a 0 (sem box-shadow colorido — apenas sombras neutras)
-- Finance hero: gradiente estático sutil ao invés de aurora animada
+## Funcionários ✅
 
-### 6. QuickStats Redesign
-- Cards com padding aumentado, texto visível
-- Ícone + número lado a lado, label embaixo sem truncar
-- Border mais sutil, sem variantes de cor exageradas
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
-### Arquivos Modificados
-- `src/index.css` — tokens, remoção de efeitos, unificação de cards
-- `src/components/dashboard/AdminDashboard.tsx` — view selector como pills
-- `src/components/dashboard/QuickStatsWidget.tsx` — layout mais respirado
-- `src/components/dashboard/DashboardHeroFinance.tsx` — simplificar visual
-- `src/components/dashboard/DashboardContextBar.tsx` — tipografia
-- `src/components/dashboard/SalesGoalWidget.tsx` — usar card unificado
-- `src/components/dashboard/SetupChecklistWidget.tsx` — ajustes de espaçamento
-- `src/components/dashboard/UnifiedCalendarWidget.tsx` — remover classes inconsistentes
+## Cardápio Digital ✅
 
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)

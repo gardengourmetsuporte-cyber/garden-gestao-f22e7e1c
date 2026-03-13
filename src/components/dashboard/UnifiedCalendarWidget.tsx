@@ -37,7 +37,7 @@ export function UnifiedCalendarWidget() {
   };
 
   return (
-    <div className="col-span-2 animate-slide-up stagger-4">
+    <div className="col-span-2 animate-card-reveal stagger-4">
       <div className="space-y-2">
         {/* Header */}
         <button
@@ -51,7 +51,7 @@ export function UnifiedCalendarWidget() {
             <span className="text-xs font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Calendário</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-[10px] text-muted-foreground mr-1">Ver completo</span>
+            <span className="text-[11px] text-muted-foreground mr-1">Ver completo</span>
             <AppIcon name="ChevronRight" size={14} className="text-muted-foreground" />
           </div>
         </button>
@@ -83,48 +83,44 @@ export function UnifiedCalendarWidget() {
           ].map(s => (
             <div key={s.label} className="flex items-center gap-1">
               <div className={cn('w-2 h-2 rounded-full', s.color)} />
-              <span className="text-[9px] text-muted-foreground">{s.label}</span>
+              <span className="text-[10px] text-muted-foreground">{s.label}</span>
             </div>
           ))}
         </div>
 
         {/* Inline detail panel */}
         {selectedDate && selectedEvents && (
-          <div className="calendar-card-brand p-3 space-y-3 animate-slide-up">
+          <div className="card-surface p-3 space-y-3 animate-card-reveal">
             <p className="text-xs font-semibold text-foreground capitalize">
               {format(new Date(selectedDate + 'T12:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}
             </p>
 
-            {/* Tasks */}
             {selectedEvents.tasks.length > 0 && (
-              <EventSection icon={<AppIcon name="CheckCircle2" size={14} className="text-emerald-500" />} title="Tarefas">
+              <EventSection icon={<AppIcon name="CheckCircle2" size={14} className="text-success" />} title="Tarefas">
                 {selectedEvents.tasks.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}
               </EventSection>
             )}
 
-            {/* Finance */}
             {selectedEvents.finance.length > 0 && (
-              <EventSection icon={<AppIcon name="DollarSign" size={14} className="text-orange-500" />} title="Financeiro">
+              <EventSection icon={<AppIcon name="DollarSign" size={14} className="text-warning" />} title="Financeiro">
                 {selectedEvents.finance.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}
               </EventSection>
             )}
 
-            {/* Marketing */}
             {selectedEvents.marketing.length > 0 && (
-              <EventSection icon={<AppIcon name="Megaphone" size={14} className="text-accent" />} title="Marketing">
+              <EventSection icon={<AppIcon name="Megaphone" size={14} className="text-primary" />} title="Marketing">
                 {selectedEvents.marketing.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}
               </EventSection>
             )}
 
-            {/* Schedules */}
             {selectedEvents.schedules.length > 0 && (
-              <EventSection icon={<AppIcon name="Coffee" size={14} className="text-amber-500" />} title="Folgas">
+              <EventSection icon={<AppIcon name="Coffee" size={14} className="text-warning" />} title="Folgas">
                 {selectedEvents.schedules.map(ev => (
                   <EventRow key={ev.id} event={ev} />
                 ))}
@@ -146,7 +142,7 @@ function EventSection({ icon, title, children }: { icon: React.ReactNode; title:
     <div>
       <div className="flex items-center gap-1.5 mb-1.5">
         {icon}
-        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">{title}</span>
+        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">{title}</span>
       </div>
       <div className="space-y-1 pl-5">{children}</div>
     </div>
@@ -161,10 +157,10 @@ function EventRow({ event }: { event: CalendarEvent }) {
         <span className="text-xs text-foreground truncate">{event.title}</span>
       </div>
       {event.subtitle && (
-        <span className="text-[10px] text-muted-foreground ml-2 flex-shrink-0">{event.subtitle}</span>
+        <span className="text-[11px] text-muted-foreground ml-2 flex-shrink-0">{event.subtitle}</span>
       )}
       {event.time && (
-        <span className="text-[10px] text-muted-foreground ml-2 flex-shrink-0">{event.time}</span>
+        <span className="text-[11px] text-muted-foreground ml-2 flex-shrink-0">{event.time}</span>
       )}
     </div>
   );

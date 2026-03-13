@@ -25,11 +25,11 @@ const items = [
 ] as const;
 
 const variantIcon: Record<string, string> = {
-  warning: 'bg-warning/15 text-warning',
-  primary: 'bg-primary/15 text-primary',
-  destructive: 'bg-destructive/15 text-destructive',
-  success: 'bg-success/15 text-success',
-  default: 'bg-secondary text-secondary-foreground',
+  warning: 'bg-warning/12 text-warning',
+  primary: 'bg-primary/12 text-primary',
+  destructive: 'bg-destructive/12 text-destructive',
+  success: 'bg-success/12 text-success',
+  default: 'bg-muted text-muted-foreground',
 };
 
 export function QuickStatsWidget() {
@@ -119,20 +119,20 @@ export function QuickStatsWidget() {
           key={card.key}
           onClick={() => navigate(card.route)}
           className={cn(
-            "flex items-center gap-2 rounded-xl px-2.5 py-2 transition-all duration-300 active:scale-[0.95]",
-            "bg-card/70 border border-border/30 hover:border-border/60 hover:bg-card/90 hover:shadow-lg hover:shadow-black/10",
-            "animate-slide-up",
+            "flex items-center gap-2.5 rounded-xl px-3 py-2.5 transition-all duration-200 active:scale-[0.96]",
+            "bg-card border border-border/40 hover:border-border/70 hover:shadow-sm",
+            "animate-card-reveal",
             `dash-stagger-${i + 1}`,
           )}
         >
-          <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", variantIcon[card.variant])}>
-            <AppIcon name={card.icon} size={16} />
+          <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", variantIcon[card.variant])}>
+            <AppIcon name={card.icon} size={15} />
           </div>
           <div className="text-left min-w-0">
-            <p className="text-base font-extrabold font-display leading-tight tabular-nums" style={{ letterSpacing: '-0.02em' }}>
+            <p className="text-sm font-bold font-display leading-tight tabular-nums" style={{ letterSpacing: '-0.02em' }}>
               {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
             </p>
-            <p className="text-[9px] text-muted-foreground truncate leading-tight">
+            <p className="text-[11px] text-muted-foreground leading-tight">
               {card.isChecklist
                 ? `${(card as any).checklistProgress.completed}/${(card as any).checklistProgress.total}`
                 : card.title.toLowerCase()}

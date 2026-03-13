@@ -11,7 +11,6 @@ import { DashboardContextBar } from './DashboardContextBar';
 import { DashboardHeroFinance } from './DashboardHeroFinance';
 import { DashboardSection } from './DashboardSection';
 
-
 const BillsDueWidget = lazy(() => import('./BillsDueWidget').then(m => ({ default: m.BillsDueWidget })));
 
 import { UpgradeBanner } from './UpgradeBanner';
@@ -54,13 +53,12 @@ const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'calendar', 'mu
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
 const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
-function SectionHeader({ title }: { title: string }) {
-  return (
-    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 px-0.5">
-      {title}
-    </h3>
-  );
-}
+const VIEW_TABS = [
+  { key: 'operational' as const, icon: 'LayoutGrid', label: 'Operacional' },
+  { key: 'financial' as const, icon: 'Landmark', label: 'Financeiro' },
+  { key: 'service' as const, icon: 'Store', label: 'Serviço' },
+  { key: 'team' as const, icon: 'Users', label: 'Equipe' },
+] as const;
 
 export function AdminDashboard() {
   const navigate = useNavigate();
@@ -180,41 +178,27 @@ export function AdminDashboard() {
   return (
     <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-[1400px] mx-auto flex flex-col gap-5">
 
-
-      {/* Greeting + Refresh */}
+      {/* Greeting */}
       <DashboardContextBar firstName={firstName} stats={stats} />
 
-      {/* View Selector */}
-      <div className="grid grid-cols-4 gap-2.5">
-        {([
-          { key: 'operational' as const, icon: 'LayoutGrid', label: 'Operacional' },
-          { key: 'financial' as const, icon: 'Landmark', label: 'Financeiro' },
-          { key: 'service' as const, icon: 'Store', label: 'Serviço' },
-          { key: 'team' as const, icon: 'Users', label: 'Equipe' },
-        ] as const).map(tab => (
+      {/* View Selector — Tab Pills */}
+      <div className="flex gap-1.5 bg-muted/50 p-1 rounded-xl border border-border/30">
+        {VIEW_TABS.map(tab => (
           <button
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl text-xs font-semibold transition-all duration-300 touch-manipulation border",
+              "flex-1 flex items-center justify-center gap-1.5 h-9 rounded-lg text-xs font-semibold transition-all duration-200 touch-manipulation",
               view === tab.key
-                ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 border-primary/50 scale-[1.03]"
-                : "bg-card/80 text-muted-foreground hover:text-foreground hover:bg-card hover:scale-[1.02] border-border/30 active:scale-[0.95]"
+                ? "bg-card text-foreground shadow-sm border border-border/40"
+                : "text-muted-foreground hover:text-foreground active:scale-[0.97]"
             )}
           >
-            <div className={cn(
-              "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300",
-              view === tab.key
-                ? "bg-primary-foreground/20"
-                : "bg-muted/50"
-            )}>
-              <AppIcon name={tab.icon} size={16} className="shrink-0" />
-            </div>
+            <AppIcon name={tab.icon} size={14} className="shrink-0" />
             <span>{tab.label}</span>
           </button>
         ))}
       </div>
-
 
       {/* Quick Stats — operational only */}
       {view === 'operational' && (
@@ -249,7 +233,7 @@ export function AdminDashboard() {
 
       {/* Widgets Grid */}
       {view !== 'team' && view !== 'service' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {widgets.map((widget) => {
               const stagger = nextStagger();
               return renderWidget(widget, stagger);
