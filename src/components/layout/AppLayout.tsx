@@ -78,7 +78,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="flex-1 flex flex-col min-w-0">
           {/* ======= Mobile Header ======= */}
           <header
-            className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-border/30"
+            className="lg:hidden fixed top-0 left-0 right-0 z-50"
             style={{
               paddingTop: 'env(safe-area-inset-top)',
               background: 'hsl(var(--background))',
@@ -93,7 +93,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     className={cn(
                       "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
                       !isScrolled
-                        ? "h-8 bg-card border border-border/50 shadow-sm pl-1.5 pr-3 gap-2"
+                        ? "h-8 bg-secondary pl-1.5 pr-3 gap-2"
                         : "h-7 w-7 bg-transparent p-0 justify-center"
                     )}
                   >
@@ -105,7 +105,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     </div>
                     <span
                       className={cn(
-                        "text-xs font-semibold text-foreground whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
+                        "text-xs font-bold text-foreground whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
                         !isScrolled ? "max-w-[10rem] opacity-100" : "max-w-0 opacity-0"
                       )}
                       style={{ letterSpacing: '-0.01em' }}
