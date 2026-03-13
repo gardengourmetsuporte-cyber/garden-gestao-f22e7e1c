@@ -426,8 +426,14 @@ const TabButton = forwardRef<
             background: active ? 'radial-gradient(circle, hsl(var(--primary) / 0.12) 0%, transparent 70%)' : 'none',
           }}
         />
-        {tab.customIcon ? (
-          <img src={tab.customIcon} alt="" className={cn("w-[22px] h-[22px] relative z-10", active ? "icon-tint-primary" : "icon-tint-muted")} />
+        {tab.customIcon && tab.key !== 'checklists' ? (
+          <img
+            src={tab.customIcon}
+            alt=""
+            loading="eager"
+            decoding="async"
+            className={cn("w-[22px] h-[22px] relative z-10", active ? "icon-tint-primary" : "icon-tint-muted")}
+          />
         ) : (
           <AppIcon
             name={tab.icon}
