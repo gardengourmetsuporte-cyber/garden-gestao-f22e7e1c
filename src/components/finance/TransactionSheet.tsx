@@ -469,7 +469,7 @@ export function TransactionSheet({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={onOpenChange}>
+      <Sheet open={open} onOpenChange={onOpenChange} mobileHandleOnly>
         <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl overflow-hidden flex flex-col">
           <SheetHeader className="pb-4">
             <SheetTitle>
