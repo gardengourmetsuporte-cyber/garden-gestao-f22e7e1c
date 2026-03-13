@@ -91,7 +91,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
       </div>
 
       {/* Utilization Progress */}
-      <div className="card-base p-4">
+      <div className="card-base p-4 animate-slide-up dash-stagger-4">
         <div className="flex items-center gap-2 mb-2.5">
           <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
             <AppIcon name="speed" size={14} className="text-primary" />
