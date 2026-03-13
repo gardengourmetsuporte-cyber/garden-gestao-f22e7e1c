@@ -1,14 +1,15 @@
 import { AppIcon } from '@/components/ui/app-icon';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 interface KPICard {
   key: string;
   label: string;
   value: number;
   icon: string;
-  color: string;
-  bgColor: string;
+  iconBg: string;
+  iconColor: string;
   route: string;
   visible: boolean;
 }
@@ -36,8 +37,8 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
       label: 'Pedidos',
       value: stats.pendingOrders,
       icon: 'ShoppingCart',
-      color: 'text-orange-400',
-      bgColor: 'bg-orange-400/10',
+      iconBg: 'bg-primary/15',
+      iconColor: 'text-primary',
       route: '/orders',
       visible: hasAccess('orders') && isVisible('pending-orders'),
     },
@@ -46,8 +47,8 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
       label: 'Contas',
       value: billsCount,
       icon: 'AlertTriangle',
-      color: 'text-amber-400',
-      bgColor: 'bg-amber-400/10',
+      iconBg: 'bg-warning/15',
+      iconColor: 'text-warning',
       route: '/finance',
       visible: hasAccess('finance') && isVisible('bills-due'),
     },
@@ -56,8 +57,8 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
       label: 'Resgates',
       value: stats.pendingRedemptions,
       icon: 'Gift',
-      color: 'text-rose-400',
-      bgColor: 'bg-rose-400/10',
+      iconBg: 'bg-destructive/15',
+      iconColor: 'text-destructive',
       route: '/rewards',
       visible: hasAccess('rewards') && isVisible('pending-actions'),
     },
@@ -67,27 +68,30 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
   if (visibleCards.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
       {visibleCards.map((card, i) => (
         <button
           key={card.key}
           onClick={() => navigate(card.route)}
-          className={`card-stat-holo group animate-card-reveal dash-stagger-${i + 2}`}
+          className={cn(
+            "flex items-center gap-3 rounded-2xl p-3.5",
+            "bg-card border border-border/40 hover:border-border/60",
+            "active:scale-[0.97] transition-all duration-200 touch-manipulation",
+            `animate-card-reveal dash-stagger-${i + 2}`,
+          )}
         >
-          <div className="flex items-center gap-3">
-            <div className={`stat-holo-icon ${card.bgColor} ${card.color}`}>
-              <AppIcon name={card.icon} size={20} />
-            </div>
-            <div className="flex-1 min-w-0 text-left">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{card.label}</p>
-              {isLoading ? (
-                <Skeleton className="h-7 w-10 rounded-lg mt-0.5" />
-              ) : (
-                <span className={`text-2xl font-extrabold tracking-tight animate-number-reveal block ${card.value > 0 ? 'text-foreground' : 'text-muted-foreground/40'}`} style={{ animationDelay: `${200 + i * 100}ms` }}>
-                  {card.value}
-                </span>
-              )}
-            </div>
+          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", card.iconBg)}>
+            <AppIcon name={card.icon} size={18} className={card.iconColor} />
+          </div>
+          <div className="flex-1 min-w-0 text-left">
+            {isLoading ? (
+              <Skeleton className="h-5 w-8 rounded mt-0.5" />
+            ) : (
+              <span className={cn("text-lg font-bold tracking-tight tabular-nums block leading-none", card.value > 0 ? 'text-foreground' : 'text-muted-foreground/40')}>
+                {card.value}
+              </span>
+            )}
+            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{card.label}</p>
           </div>
         </button>
       ))}

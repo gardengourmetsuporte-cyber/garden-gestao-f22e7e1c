@@ -15,12 +15,12 @@ interface QuickStatsProps {
   columns?: 2 | 3 | 4;
 }
 
-const variantStyles = {
-  default: 'bg-secondary text-secondary-foreground',
-  warning: 'bg-warning/10 text-warning',
-  destructive: 'bg-destructive/10 text-destructive',
-  success: 'bg-success/10 text-success',
-  primary: 'bg-primary/10 text-primary',
+const variantIcon: Record<string, { bg: string; color: string }> = {
+  default: { bg: 'bg-muted', color: 'text-muted-foreground' },
+  warning: { bg: 'bg-warning/15', color: 'text-warning' },
+  destructive: { bg: 'bg-destructive/15', color: 'text-destructive' },
+  success: { bg: 'bg-success/15', color: 'text-success' },
+  primary: { bg: 'bg-primary/15', color: 'text-primary' },
 };
 
 function AnimatedStatValue({ value }: { value: number | string }) {
@@ -32,31 +32,31 @@ function AnimatedStatValue({ value }: { value: number | string }) {
 export function QuickStats({ stats, columns = 2 }: QuickStatsProps) {
   return (
     <div className={cn(
-      "grid gap-3",
+      "grid gap-2.5",
       columns === 2 && "grid-cols-2",
       columns === 3 && "grid-cols-2 lg:grid-cols-3",
       columns === 4 && "grid-cols-2 lg:grid-cols-4"
     )}>
       {stats.map((stat, index) => {
         const variant = stat.variant || 'default';
+        const style = variantIcon[variant];
 
         return (
-          <div key={index} className="card-stat-holo">
-              <div className="flex items-center gap-3">
-                <div className={cn(
-                  "stat-holo-icon",
-                  variantStyles[variant]
-                )}>
-                  <AppIcon name={stat.icon} size={20} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{stat.title}</p>
-                  <p className="text-2xl font-extrabold font-display" style={{ letterSpacing: '-0.03em' }}><AnimatedStatValue value={stat.value} /></p>
-                  {stat.subtitle && (
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{stat.subtitle}</p>
-                  )}
-                </div>
+          <div key={index} className="bg-card rounded-2xl p-3.5 border border-border/40">
+            <div className="flex items-center gap-3">
+              <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", style.bg)}>
+                <AppIcon name={stat.icon} size={18} className={style.color} />
               </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-lg font-bold tabular-nums leading-none tracking-tight">
+                  <AnimatedStatValue value={stat.value} />
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{stat.title}</p>
+                {stat.subtitle && (
+                  <p className="text-[10px] text-muted-foreground/70 mt-0.5">{stat.subtitle}</p>
+                )}
+              </div>
+            </div>
           </div>
         );
       })}
