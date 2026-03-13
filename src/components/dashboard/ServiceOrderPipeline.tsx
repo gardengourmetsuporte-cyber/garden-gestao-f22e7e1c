@@ -6,7 +6,7 @@ import type { ActiveOrder, PipelineGroups } from '@/hooks/useServiceDashboard';
 const COLUMNS = [
   { key: 'pending' as const, label: 'Pendente', icon: 'schedule', color: 'text-amber-400', bg: 'bg-amber-500/15' },
   { key: 'preparing' as const, label: 'Preparando', icon: 'skillet', color: 'text-blue-400', bg: 'bg-blue-500/15' },
-  { key: 'ready' as const, label: 'Pronto', icon: 'check_circle', color: 'text-emerald-400', bg: 'bg-emerald-500/15' },
+  { key: 'ready' as const, label: 'Pronto', icon: 'check_circle', color: 'text-success', bg: 'bg-success/15' },
 ];
 
 function OrderCard({ order }: { order: ActiveOrder }) {
