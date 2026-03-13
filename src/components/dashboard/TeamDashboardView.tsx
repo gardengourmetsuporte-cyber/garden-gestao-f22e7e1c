@@ -79,7 +79,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
             { value: pendingToday, label: 'Pendentes', icon: 'pending_actions', color: pendingToday > 10 ? 'text-destructive' : 'text-amber-400', bg: pendingToday > 10 ? 'bg-destructive/10' : 'bg-amber-500/10' },
             { value: `${utilizationPct}%`, label: 'Eficiência', icon: 'speed', color: pulseCfg.color, bg: pulseCfg.bg },
           ].map(stat => (
-            <div key={stat.label} className={cn('flex flex-col items-center gap-1.5 py-3 rounded-xl', stat.bg)}>
+            <div key={stat.label} className={cn('flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all duration-300 hover:scale-[1.03]', stat.bg, 'animate-slide-up', `dash-stagger-${[77,78,79,80].indexOf(stat as any) + 2}`)}>
               <div className="w-7 h-7 flex items-center justify-center shrink-0 overflow-hidden">
                 <AppIcon name={stat.icon} size={16} className={stat.color} />
               </div>
