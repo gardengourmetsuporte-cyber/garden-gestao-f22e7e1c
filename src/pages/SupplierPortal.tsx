@@ -274,7 +274,7 @@ export default function SupplierPortal() {
               icon="DollarSign"
               label="Vendas do mês"
               value={formatCurrency(summary.total_sold_month)}
-              accent="text-green-400"
+              accent="text-primary"
             />
             <SummaryCard
               icon="Package"
