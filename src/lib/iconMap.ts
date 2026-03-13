@@ -173,6 +173,7 @@ export const ICON_MAP: Record<string, string> = {
   MessageSquare: 'forum',
   Mail: 'mail',
   Bell: 'notifications',
+  BellOff: 'notifications_off',
   BellRing: 'notifications_active',
   Phone: 'call',
   Send2: 'send',
