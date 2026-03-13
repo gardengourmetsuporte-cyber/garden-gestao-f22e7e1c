@@ -29,19 +29,19 @@ export default function Employees() {
   );
 
   const adminTabs = [
-    { key: 'employees', label: 'Funcionários', icon: 'Users', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { key: 'deliveries', label: 'Entregas', icon: 'Package', color: 'text-violet-400', bg: 'bg-violet-500/10' },
-    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10', iconFill: 0 },
-    { key: 'hour-bank', label: 'Banco Horas', icon: 'Timer', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
+    { key: 'employees', label: 'Funcionários', icon: 'Users', iconFill: 1 },
+    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', iconFill: 1 },
+    { key: 'schedules', label: 'Folgas', icon: 'Calendar', iconFill: 1 },
+    { key: 'deliveries', label: 'Entregas', icon: 'Package', iconFill: 1 },
+    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', iconFill: 0 },
+    { key: 'hour-bank', label: 'Banco Horas', icon: 'Timer', iconFill: 1 },
   ];
 
   const employeeTabs = [
-    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { key: 'payslips', label: 'Holerites', icon: 'FileText', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { key: 'schedules', label: 'Folgas', icon: 'Calendar', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', color: 'text-red-400', bg: 'bg-red-500/10', iconFill: 0 },
+    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', iconFill: 1 },
+    { key: 'payslips', label: 'Holerites', icon: 'FileText', iconFill: 1 },
+    { key: 'schedules', label: 'Folgas', icon: 'Calendar', iconFill: 1 },
+    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', iconFill: 0 },
   ];
 
   const tabs = isAdmin ? adminTabs : employeeTabs;
