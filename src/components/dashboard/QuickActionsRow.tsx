@@ -6,7 +6,7 @@ import { hapticLight } from '@/lib/native';
 const actions = [
   { icon: 'point_of_sale', label: 'Fechar Caixa', route: '/cash-closing' },
   { icon: 'receipt_long', label: 'Novo Pedido', route: '/orders' },
-  { icon: 'checklist', label: 'Checklist', route: '/checklists' },
+  { icon: 'task_alt', label: 'Checklist', route: '/checklists' },
   { icon: 'qr_code_scanner', label: 'Escanear', route: '/scanner' },
 ] as const;
 
