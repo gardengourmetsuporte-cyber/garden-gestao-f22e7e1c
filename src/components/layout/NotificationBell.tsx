@@ -24,7 +24,7 @@ export function NotificationBell() {
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 max-h-[70vh] overflow-y-auto p-3">
+      <DropdownMenuContent align="end" className="w-80 max-h-[70vh] overflow-y-auto p-3 rounded-2xl">
         <div className="text-sm font-semibold text-foreground mb-2">Notificações</div>
         {open && <NotificationCard />}
       </DropdownMenuContent>
