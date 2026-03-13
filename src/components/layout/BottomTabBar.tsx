@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback, forwardRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
+import { StableNavIcon } from '@/components/ui/stable-nav-icon';
 import { cn } from '@/lib/utils';
 import { useUserModules } from '@/hooks/useAccessLevels';
 import { useBottomBarTabs } from '@/hooks/useBottomBarTabs';

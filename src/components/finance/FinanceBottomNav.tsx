@@ -4,6 +4,7 @@ import scannerHero from '@/assets/scanner-hero.png';
 import { useNavigate } from 'react-router-dom';
 
 import { AppIcon } from '@/components/ui/app-icon';
+import { StableNavIcon } from '@/components/ui/stable-nav-icon';
 import { cn } from '@/lib/utils';
 import { FinanceTab, TransactionType } from '@/types/finance';
 
