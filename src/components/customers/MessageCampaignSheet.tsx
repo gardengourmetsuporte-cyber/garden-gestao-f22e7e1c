@@ -163,7 +163,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
           >
             {sending ? (
               <>
-                <span className="material-symbols-rounded animate-spin mr-2" style={{ fontSize: 18 }}>progress_activity</span>
+                <AppIcon name="progress_activity" size={18} className="animate-spin mr-2" />
                 Enviando...
               </>
             ) : (
