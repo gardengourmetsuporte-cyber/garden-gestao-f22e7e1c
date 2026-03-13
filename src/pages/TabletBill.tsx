@@ -244,8 +244,8 @@ export default function TabletBill() {
                     : 'border-border/30 bg-card hover:border-primary/30'
                 }`}
               >
-                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                  <AppIcon name="HandCoins" size={24} className="text-blue-500" />
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <AppIcon name="HandCoins" size={24} className="text-primary" />
                 </div>
                 <span className="text-sm font-bold text-foreground">Garçom</span>
                 <span className="text-[10px] text-muted-foreground leading-tight text-center">Receber na mesa</span>
