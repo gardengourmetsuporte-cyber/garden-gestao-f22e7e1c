@@ -94,7 +94,7 @@ export function SolutionSection() {
                   }}
                 >
                   {/* Ambient Glow */}
-                  <div className="absolute -inset-8 bg-gradient-to-tr from-emerald-500/10 via-transparent to-teal-500/10 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
+                  <div className="absolute -inset-8 bg-gradient-to-tr from-primary/10 via-transparent to-primary/10 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
 
                   {/* Animated Phone Mockup placed natively */}
                   <div className="relative overflow-hidden pt-4 pb-2 px-6 sm:px-10 flex justify-center bg-[#050505]">
