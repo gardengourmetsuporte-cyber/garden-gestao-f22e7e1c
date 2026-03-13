@@ -229,8 +229,8 @@ export default function TabletBill() {
                     : 'border-border/30 bg-card hover:border-primary/30'
                 }`}
               >
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                  <AppIcon name="QrCode" size={24} className="text-emerald-500" />
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <AppIcon name="QrCode" size={24} className="text-primary" />
                 </div>
                 <span className="text-sm font-bold text-foreground">Pix</span>
                 <span className="text-[10px] text-muted-foreground leading-tight text-center">QR Code na tela</span>
