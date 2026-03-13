@@ -221,7 +221,7 @@ export default function Customers() {
             onClick={() => setCsvOpen(true)}
             title="Importar clientes"
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>upload_file</span>
+            <AppIcon name="upload_file" size={18} />
           </Button>
         </div>
 
