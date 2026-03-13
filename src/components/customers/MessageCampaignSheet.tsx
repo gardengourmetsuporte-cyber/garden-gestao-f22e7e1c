@@ -85,7 +85,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
           {/* Recipient summary */}
           <div className="card-surface rounded-xl p-4 space-y-1">
             <div className="flex items-center gap-2 text-sm font-medium">
-              <span className="material-symbols-rounded text-primary" style={{ fontSize: 18 }}>group</span>
+              <AppIcon name="group" size={18} className="text-primary" />
               {recipients.length} destinatário{recipients.length !== 1 ? 's' : ''} ({segLabel})
             </div>
             {withoutPhone > 0 && (
