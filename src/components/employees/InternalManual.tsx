@@ -72,8 +72,8 @@ const MANUAL_SECTIONS = [
   {
     title: '5. Cuidado com Patrimônio e Estoque',
     icon: 'inventory_2',
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-500/10',
+    color: 'text-primary',
+    bg: 'bg-primary/10',
     rules: [
       'Zelar pelos equipamentos, utensílios e instalações da empresa.',
       'Danos causados por negligência ou mau uso serão de responsabilidade do funcionário.',
