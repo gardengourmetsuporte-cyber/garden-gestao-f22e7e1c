@@ -21,44 +21,43 @@ function hashColor(name: string): string {
 
 interface Props {
   member: TeamMemberStats;
+  compact?: boolean;
 }
 
-export function TeamMemberRow({ member }: Props) {
+export function TeamMemberRow({ member, compact }: Props) {
   const initials = getInitials(member.full_name);
   const color = hashColor(member.full_name);
   const firstName = member.full_name.split(' ')[0];
   const lastInitial = member.full_name.split(' ')[1]?.[0];
   const shortName = lastInitial ? `${firstName} ${lastInitial}.` : firstName;
 
+  const pctColor = member.utilizationPct >= 80 ? 'text-emerald-400' :
+    member.utilizationPct >= 50 ? 'text-amber-400' : 'text-muted-foreground';
+
   return (
-    <div className="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-muted/20 transition-colors">
+    <div className={cn('flex items-center gap-2.5 rounded-xl hover:bg-muted/20 transition-colors', compact ? 'px-1.5 py-1.5' : 'px-2.5 py-2')}>
       {/* Avatar */}
       {member.avatar_url ? (
         <img
           src={member.avatar_url}
           alt={member.full_name}
-          className="w-8 h-8 rounded-full object-cover shrink-0"
+          className={cn('rounded-full object-cover shrink-0', compact ? 'w-6 h-6' : 'w-8 h-8')}
         />
       ) : (
-        <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0', color)}>
+        <div className={cn('rounded-full flex items-center justify-center text-white font-bold shrink-0', color, compact ? 'w-6 h-6 text-[9px]' : 'w-8 h-8 text-xs')}>
           {initials}
         </div>
       )}
 
       {/* Name + Progress */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-medium text-foreground truncate">{shortName}</span>
-          <span className={cn(
-            'text-[10px] font-bold tabular-nums ml-2',
-            member.utilizationPct >= 80 ? 'text-emerald-400' :
-            member.utilizationPct >= 50 ? 'text-amber-400' :
-            'text-muted-foreground'
-          )}>
+        <div className="flex items-center justify-between mb-0.5">
+          <span className={cn('font-medium text-foreground truncate', compact ? 'text-[11px]' : 'text-xs')}>{shortName}</span>
+          <span className={cn('font-bold tabular-nums ml-2', pctColor, compact ? 'text-[10px]' : 'text-[10px]')}>
             {member.utilizationPct}%
           </span>
         </div>
-        <Progress value={member.utilizationPct} className="h-1.5" />
+        {!compact && <Progress value={member.utilizationPct} className="h-1.5" />}
       </div>
     </div>
   );
