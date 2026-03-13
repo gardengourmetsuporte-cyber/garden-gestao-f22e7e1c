@@ -473,7 +473,7 @@ export default function KDS() {
         onDragEnd={handleDragEndFn}
         onDragCancel={handleDragCancel}
       >
-        <div className="flex-1 grid grid-cols-4 overflow-hidden">
+        <div className="flex-1 flex overflow-x-auto overflow-y-hidden snap-x snap-mandatory" style={{ scrollbarWidth: 'none' }}>
           {COLUMNS.map(col => (
             <KDSColumn
               key={col.key}
