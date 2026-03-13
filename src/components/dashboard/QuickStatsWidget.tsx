@@ -127,12 +127,12 @@ export function QuickStatsWidget() {
             <AppIcon name={card.icon} size={16} />
           </div>
           <div className="text-left min-w-0">
-            <p className="text-lg font-extrabold font-display leading-tight" style={{ letterSpacing: '-0.02em' }}>
+            <p className="text-base font-extrabold font-display leading-tight tabular-nums" style={{ letterSpacing: '-0.02em' }}>
               {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
             </p>
-            <p className="text-[10px] text-muted-foreground truncate leading-tight">
+            <p className="text-[9px] text-muted-foreground truncate leading-tight">
               {card.isChecklist
-                ? `${(card as any).checklistProgress.completed}/${(card as any).checklistProgress.total} itens`
+                ? `${(card as any).checklistProgress.completed}/${(card as any).checklistProgress.total}`
                 : card.title.toLowerCase()}
             </p>
           </div>
