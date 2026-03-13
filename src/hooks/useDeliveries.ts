@@ -245,11 +245,12 @@ export function useDeliveries() {
     const cleaned = cleanAddress(address);
     const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 
+    const cityPart = fallbackCity ? `${fallbackCity}, ` : '';
     const queries = Array.from(new Set([
-      `${cleaned}, ${fallbackCity}, SP, Brasil`,
-      `${streetOnly}, ${fallbackCity}, SP, Brasil`,
-      `${cleaned}, ${fallbackCity}, Brasil`,
-      `${streetOnly}, ${fallbackCity}, Brasil`,
+      `${cleaned}, ${cityPart}SP, Brasil`,
+      `${streetOnly}, ${cityPart}SP, Brasil`,
+      `${cleaned}, ${cityPart}Brasil`,
+      `${streetOnly}, ${cityPart}Brasil`,
       `${cleaned}, Brasil`,
     ].filter((q) => q.replace(/[,\s]/g, '').length > 0)));
 
