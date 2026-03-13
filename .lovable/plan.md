@@ -1,79 +1,85 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Redesign da Tela de Serviço — Visão Operacional Moderna
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+### Problema
+A tela de Serviço atual é uma lista simples de cards empilhados (KPIs horizontais + pedidos + gráfico + entregas). Não transmite a "situação da operação" de forma visual e imediata.
 
----
+### Nova Arquitetura Visual
 
-## Bloco de Relatórios Avançados ✅
+```text
+┌─────────────────────────────────────┐
+│  STATUS GERAL DA OPERAÇÃO (Hero)    │
+│  ┌──────┐ ┌──────┐ ┌──────┐        │
+│  │ 🟢   │ │ 🟡   │ │ 🔴   │        │
+│  │Salão │ │Cozin.│ │Deliv.│        │
+│  │Tranq.│ │Moder.│ │Atenc.│        │
+│  └──────┘ └──────┘ └──────┘        │
+│  "Operação moderada — 21 pedidos"   │
+└─────────────────────────────────────┘
+┌──────────┐ ┌──────────┐
+│ R$ 421   │ │ 21 ped.  │
+│ Vendas   │ │ Ativos   │
+└──────────┘ └──────────┘
+┌──────────┐ ┌──────────┐
+│ 3 entreg │ │ 2 hub    │
+│ Em rota  │ │ Platafor │
+└──────────┘ └──────────┘
+┌─────────────────────────────────────┐
+│  PIPELINE DE PEDIDOS (Kanban horiz) │
+│  Pendente → Preparando → Pronto    │
+│  [cards]    [cards]      [cards]    │
+└─────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│  VENDAS POR HORA (gráfico compacto) │
+└─────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│  ENTREGAS & HUB (mantido/polido)    │
+└─────────────────────────────────────┘
+```
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+### Componentes a Criar/Alterar
 
-## Dashboard Analytics ✅
+1. **`ServiceDashboardView.tsx`** — Reestruturar layout completo com os novos blocos
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+2. **Novo: `ServiceOperationStatus.tsx`** — Card hero que calcula o "pulso" da operação:
+   - Analisa pedidos ativos, tempo médio de espera, entregas pendentes
+   - Classifica em 3 níveis: Tranquilo (verde), Moderado (amarelo), Intenso (vermelho)
+   - Mostra 3 indicadores visuais: Salão, Cozinha, Delivery — cada um com seu semáforo
+   - Frase resumo gerada automaticamente ("Operação tranquila", "Cozinha sob pressão — 5 pedidos acima de 30min")
 
-## Operacional ✅
+3. **Novo: `ServiceOrderPipeline.tsx`** — Substitui o `ServiceActiveOrders` com visão Kanban horizontal:
+   - 3 colunas com scroll horizontal: Pendente | Preparando | Pronto
+   - Cada card mostra: mesa/número, tempo (com cor), valor
+   - Contador por coluna
+   - Cards com borda colorida por status (vermelho se > 30min)
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+4. **KPIs** — Grid 2x2 ao invés de scroll horizontal, cards mais visuais com ícones grandes
 
-## CRM / Clientes ✅
+5. **`ServiceHourlySales.tsx`** — Mantido, apenas ajuste de espaçamento
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+6. **`ServiceDeliveryStatus.tsx`** — Mantido com polish visual
 
-## Funcionários ✅
+### Lógica do "Pulso" (ServiceOperationStatus)
 
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
+```typescript
+// Salão: baseado em pedidos mesa/qrcode ativos e tempo médio
+// Cozinha: baseado em pedidos "preparing" e quantos > 15min
+// Delivery: baseado em entregas "out" e pedidos hub ativos
 
-## Cardápio Digital ✅
+type Pulse = 'calm' | 'moderate' | 'intense';
 
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
+// calm: < 5 pedidos, tempo médio < 10min
+// moderate: 5-15 pedidos ou tempo médio 10-25min
+// intense: > 15 pedidos ou qualquer > 30min
+```
 
-## Sistema / UX ✅
+### Arquivos Afetados
+- `src/components/dashboard/ServiceDashboardView.tsx` — reescrita
+- `src/components/dashboard/ServiceOperationStatus.tsx` — novo
+- `src/components/dashboard/ServiceOrderPipeline.tsx` — novo
+- `src/components/dashboard/ServiceActiveOrders.tsx` — removido (substituído pelo Pipeline)
+- `src/components/dashboard/ServiceHourlySales.tsx` — ajuste menor
+- `src/components/dashboard/ServiceDeliveryStatus.tsx` — polish
+- `src/hooks/useServiceDashboard.ts` — adicionar cálculo de pulso e agrupamento por status
 
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
