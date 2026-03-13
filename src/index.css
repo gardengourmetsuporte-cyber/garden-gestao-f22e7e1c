@@ -275,16 +275,16 @@ html {
   .dark .gradient-primary {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(145deg, hsl(0 0% 98%), hsl(156 20% 93%));
-    color: hsl(160 30% 15%);
+    background: linear-gradient(145deg, hsl(0 0% 98%), hsl(270 20% 93%));
+    color: hsl(270 30% 15%);
     box-shadow: var(--shadow-elevated);
-    border-color: hsl(156 20% 80% / 0.3);
-    --foreground: 160 30% 15%;
-    --muted-foreground: 160 15% 45%;
-    --gp-label: hsl(160 15% 50%);
-    --gp-sublabel: hsl(160 10% 55%);
-    --gp-value: hsl(160 30% 15%);
-    --gp-icon: hsl(160 15% 45%);
+    border-color: hsl(270 20% 80% / 0.3);
+    --foreground: 270 30% 15%;
+    --muted-foreground: 270 15% 45%;
+    --gp-label: hsl(270 15% 50%);
+    --gp-sublabel: hsl(270 10% 55%);
+    --gp-value: hsl(270 30% 15%);
+    --gp-icon: hsl(270 15% 45%);
     --gp-positive: hsl(142 60% 38%);
     --gp-negative: hsl(0 70% 50%);
   }
