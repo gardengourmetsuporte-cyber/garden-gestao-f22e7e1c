@@ -73,7 +73,7 @@ type OpGroup = 'novos' | 'emPreparo' | 'prontos' | 'entregues' | 'cancelados';
 const OP_GROUPS: { id: OpGroup; label: string; icon: string; color: string; dotColor: string; pulse?: boolean }[] = [
   { id: 'novos', label: 'Novos', icon: 'Bell', color: 'text-amber-400', dotColor: 'bg-amber-400', pulse: true },
   { id: 'emPreparo', label: 'Em Preparo', icon: 'Flame', color: 'text-orange-400', dotColor: 'bg-orange-400', pulse: true },
-  { id: 'prontos', label: 'Prontos', icon: 'PackageCheck', color: 'text-emerald-400', dotColor: 'bg-emerald-400' },
+  { id: 'prontos', label: 'Prontos', icon: 'PackageCheck', color: 'text-success', dotColor: 'bg-success' },
   { id: 'entregues', label: 'Entregues', icon: 'CircleCheckBig', color: 'text-muted-foreground', dotColor: 'bg-muted-foreground' },
   { id: 'cancelados', label: 'Cancelados', icon: 'XCircle', color: 'text-red-400/60', dotColor: 'bg-red-400/60' },
 ];
