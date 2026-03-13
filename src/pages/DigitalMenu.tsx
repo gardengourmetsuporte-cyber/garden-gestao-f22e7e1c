@@ -31,6 +31,10 @@ export default function DigitalMenu() {
   const { unitId } = useParams<{ unitId: string }>();
   const [searchParams] = useSearchParams();
   const initialTab = (searchParams.get('tab') as MenuTab) || 'home';
+  const { setTheme } = useTheme();
+
+  // Force dark theme on digital menu
+  useLayoutEffect(() => { setTheme('dark'); }, [setTheme]);
 
   const {
     unit, categories, groups, products, loading, hasVisibleProducts,
