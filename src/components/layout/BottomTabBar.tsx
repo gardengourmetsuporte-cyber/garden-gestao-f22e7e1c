@@ -427,26 +427,15 @@ const TabButton = forwardRef<
             background: active ? 'radial-gradient(circle, hsl(var(--primary) / 0.12) 0%, transparent 70%)' : 'none',
           }}
         />
-        {tab.customIcon && tab.key !== 'checklists' ? (
-          <img
-            src={tab.customIcon}
-            alt=""
-            loading="eager"
-            decoding="async"
-            className={cn("w-[22px] h-[22px] relative z-10", active ? "icon-tint-primary" : "icon-tint-muted")}
-          />
-        ) : (
-          <AppIcon
-            name={tab.icon}
-            size={22}
-            fill={1}
-            weight={active ? 600 : 400}
-            className={cn(
-              "relative z-10 transition-colors duration-300",
-              active ? 'text-primary' : 'text-muted-foreground'
-            )}
-          />
-        )}
+        <StableNavIcon
+          name={tab.icon}
+          customIcon={tab.key !== 'checklists' ? tab.customIcon : undefined}
+          active={active}
+          size={22}
+          fill={1}
+          weight={active ? 600 : 400}
+          className="relative z-10"
+        />
         {locked && (
           <AppIcon name="Gem" size={9} className="absolute -top-1 -right-2 z-10" style={{ color: 'hsl(45 90% 55%)' }} />
         )}
