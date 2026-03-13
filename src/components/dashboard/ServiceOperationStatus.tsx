@@ -53,7 +53,7 @@ export function ServiceOperationStatus({ pulse }: { pulse: OperationPulse }) {
               key={sector.key}
               className={cn('flex flex-col items-center gap-1.5 py-3 rounded-xl', style.bg)}
             >
-              <div className={cn('w-3 h-3 rounded-full', style.dot)} />
+              <div className={cn('w-2 h-2 rounded-full shrink-0 aspect-square', style.dot)} />
               <AppIcon name={sector.icon} size={18} className={style.text} />
               <span className="text-[11px] font-bold text-foreground">{sector.label}</span>
               <span className={cn('text-[10px] font-semibold', style.text)}>{style.label}</span>
