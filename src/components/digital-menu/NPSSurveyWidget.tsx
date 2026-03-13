@@ -73,7 +73,7 @@ export function NPSSurveyWidget({ unitId, orderId, customerName, onSubmit, onDis
                   ? 'bg-red-500 text-white scale-110'
                   : i <= 8
                   ? 'bg-amber-500 text-white scale-110'
-                  : 'bg-emerald-500 text-white scale-110'
+                  : 'bg-success text-white scale-110'
                 : 'bg-secondary/50 text-foreground hover:bg-secondary'
             }`}
           >

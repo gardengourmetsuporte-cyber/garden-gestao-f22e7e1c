@@ -349,10 +349,10 @@ export function InternalManual() {
             {/* Signed */}
             {acknowledgments.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">✅ Assinaram</p>
+                <p className="text-xs font-semibold text-success uppercase tracking-wider">✅ Assinaram</p>
                 {acknowledgments.map((a: any) => (
-                  <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/15">
-                    <AppIcon name="check_circle" size={16} className="text-emerald-400 shrink-0" />
+                  <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-success/5 border border-success/15">
+                    <AppIcon name="check_circle" size={16} className="text-success shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{a.employee?.full_name || 'Funcionário'}</p>
                       <p className="text-[10px] text-muted-foreground">

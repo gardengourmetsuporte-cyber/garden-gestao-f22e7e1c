@@ -54,7 +54,7 @@ export function DeliveryCard({ delivery, selected, compact, onStatusChange, onCa
         <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0',
           delivery.status === 'pending' && 'bg-amber-500/10',
           delivery.status === 'out' && 'bg-blue-500/10',
-          delivery.status === 'delivered' && 'bg-emerald-500/10',
+          delivery.status === 'delivered' && 'bg-success/10',
           delivery.status === 'cancelled' && 'bg-destructive/10',
         )}>
           <AppIcon name={cfg.icon} size={18} className={cfg.color} />
