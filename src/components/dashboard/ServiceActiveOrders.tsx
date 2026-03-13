@@ -8,7 +8,7 @@ const SOURCE_CONFIG: Record<string, { label: string; icon: string; variant: stri
   mesa_levar: { label: 'Mesa (levar)', icon: 'takeout_dining', variant: 'bg-cyan-500/15 text-cyan-400' },
   qrcode: { label: 'QR Code', icon: 'qr_code_2', variant: 'bg-violet-500/15 text-violet-400' },
   balcao: { label: 'Balcão', icon: 'storefront', variant: 'bg-amber-500/15 text-amber-400' },
-  delivery: { label: 'Delivery', icon: 'delivery_dining', variant: 'bg-emerald-500/15 text-emerald-400' },
+  delivery: { label: 'Delivery', icon: 'delivery_dining', variant: 'bg-primary/15 text-primary' },
 };
 
 const STATUS_LABELS: Record<string, string> = {
