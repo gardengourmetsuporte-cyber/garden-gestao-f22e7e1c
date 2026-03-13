@@ -249,7 +249,7 @@ export function AdminDashboard() {
 
       {/* Widgets Grid */}
       {view !== 'team' && view !== 'service' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {widgets.map((widget) => {
               const stagger = nextStagger();
               return renderWidget(widget, stagger);
