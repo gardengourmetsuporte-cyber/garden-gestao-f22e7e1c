@@ -80,8 +80,8 @@ export function TeamDashboardView({ currentUserId }: Props) {
             { value: `${utilizationPct}%`, label: 'Eficiência', icon: 'speed', color: pulseCfg.color, bg: pulseCfg.bg },
           ].map(stat => (
             <div key={stat.label} className={cn('flex flex-col items-center gap-1.5 py-3 rounded-xl', stat.bg)}>
-              <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                <AppIcon name={stat.icon} size={18} className={stat.color} />
+              <div className="w-7 h-7 flex items-center justify-center shrink-0 overflow-hidden">
+                <AppIcon name={stat.icon} size={16} className={stat.color} />
               </div>
               <span className="text-lg font-extrabold font-display leading-tight tabular-nums">{stat.value}</span>
               <span className="text-[9px] text-muted-foreground font-medium">{stat.label}</span>
