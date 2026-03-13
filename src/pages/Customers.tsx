@@ -212,7 +212,7 @@ export default function Customers() {
             }}
             title="Enviar mensagem"
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>campaign</span>
+            <AppIcon name="campaign" size={18} />
           </Button>
           <Button
             size="icon"
