@@ -206,8 +206,6 @@ export function AdminDashboard() {
         ))}
       </div>
 
-      {/* Quick Actions — operational only */}
-      {view === 'operational' && <QuickActionsRow />}
 
       {/* Quick Stats — operational only */}
       {view === 'operational' && (
