@@ -300,8 +300,8 @@ function BillPanel({ unitId, mesa, storeInfo, storeName, onClose }: {
                     selectedPayment === 'pix' ? 'border-primary bg-primary/10' : 'border-border/20 bg-card hover:border-primary/30'
                   )}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                    <AppIcon name="QrCode" size={20} className="text-emerald-500" />
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <AppIcon name="QrCode" size={20} className="text-primary" />
                   </div>
                   <span className="text-xs font-bold text-foreground">Pix</span>
                 </button>
