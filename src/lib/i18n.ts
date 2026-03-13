@@ -71,6 +71,10 @@ const translations: Record<string, Record<MenuLocale, string>> = {
   // Landing
   'landing.explore': { pt: 'Explorar Cardápio', en: 'Explore Menu', es: 'Explorar Menú' },
   'landing.welcome': { pt: 'Bem-vindo ao nosso cardápio', en: 'Welcome to our menu', es: 'Bienvenido a nuestro menú' },
+  'landing.open_now': { pt: 'Aberto agora', en: 'Open now', es: 'Abierto ahora' },
+  'landing.closed': { pt: 'Fechado', en: 'Closed', es: 'Cerrado' },
+  'landing.my_account': { pt: 'Minha conta', en: 'My account', es: 'Mi cuenta' },
+  'landing.sign_in': { pt: 'Entrar', en: 'Sign In', es: 'Iniciar Sesión' },
   
   // NPS
   'nps.how_was': { pt: 'Como foi sua experiência?', en: 'How was your experience?', es: '¿Cómo fue tu experiencia?' },

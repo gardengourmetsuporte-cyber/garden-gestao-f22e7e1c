@@ -2,6 +2,7 @@ import { DMUnit } from '@/hooks/useDigitalMenu';
 import { AppIcon } from '@/components/ui/app-icon';
 import gardenLogo from '@/assets/logo.png';
 import type { User } from '@supabase/supabase-js';
+import { t } from '@/lib/i18n';
 
 interface Props {
   unit: DMUnit | null;
