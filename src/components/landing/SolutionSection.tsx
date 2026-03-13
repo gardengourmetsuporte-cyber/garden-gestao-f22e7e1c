@@ -48,7 +48,7 @@ export function SolutionSection() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-20 md:mb-28">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/70">
               Como funciona
             </span>
