@@ -45,7 +45,7 @@ export default function Profile() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
+      <div className="min-h-screen bg-background pb-28 lg:pb-12">
 
         <div className="p-4 space-y-4 max-w-lg mx-auto">
           {/* Profile Header - Avatar + Name + Rank Progress */}

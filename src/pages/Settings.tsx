@@ -197,7 +197,7 @@ export default function SettingsPage() {
 
   // Mobile with active section — full screen content
   const mobileActiveView = activeSection ? (
-    <div className="lg:hidden min-h-screen bg-background pb-24">
+    <div className="lg:hidden min-h-screen bg-background pb-28 lg:pb-12">
       <header className="page-header-bar">
         <div className="page-header-content flex items-center gap-3">
           <button onClick={() => setActiveSection(null)} className="text-muted-foreground hover:text-foreground transition-colors">
@@ -206,7 +206,7 @@ export default function SettingsPage() {
           <h1 className="text-lg font-bold">{menuItems.find(i => i.value === activeSection)?.label}</h1>
         </div>
       </header>
-      <div className="px-4 py-3 pb-24">
+      <div className="px-4 py-3 pb-28 lg:pb-12">
         {settingsContent}
       </div>
     </div>
@@ -219,7 +219,7 @@ export default function SettingsPage() {
         <aside className="w-[300px] shrink-0 border-r border-border/40 overflow-y-auto py-3 px-4">
           {menuList}
         </aside>
-        <main className="flex-1 overflow-y-auto py-3 px-6 pb-24">
+        <main className="flex-1 overflow-y-auto py-3 px-6 pb-28 lg:pb-12">
           {settingsContent || (
             <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">
               Selecione uma opção ao lado
@@ -231,7 +231,7 @@ export default function SettingsPage() {
       {/* Mobile: original behavior */}
       <div className="lg:hidden">
         {activeSection ? mobileActiveView : (
-          <div className="min-h-screen bg-background pb-24">
+          <div className="min-h-screen bg-background pb-28 lg:pb-12">
             <div className="px-4 py-3 space-y-6">
               {menuList}
             </div>
