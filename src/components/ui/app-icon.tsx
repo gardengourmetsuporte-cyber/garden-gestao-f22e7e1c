@@ -30,7 +30,9 @@ export const AppIcon = memo(forwardRef<HTMLSpanElement, AppIconProps>(
           style={{
             width: size,
             height: size,
-            display: 'inline-block',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             color: hasGalaxyClass ? 'hsl(var(--primary))' : undefined,
             ...style,
           }}
