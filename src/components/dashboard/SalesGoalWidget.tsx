@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
 
 function GoalRing({ pct, size = 56, stroke = 5 }: { pct: number; size?: number; stroke?: number }) {
   const r = (size - stroke) / 2;
@@ -61,7 +60,7 @@ export function SalesGoalWidget() {
   const settingsSheet = isAdmin && (
     <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (v) { setDailyInput(String(dailyGoal || '')); setMonthlyInput(String(monthlyGoal || '')); } }}>
       <SheetTrigger asChild>
-        <button className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+        <button className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors">
           <AppIcon name="Settings" size={13} className="text-muted-foreground" />
         </button>
       </SheetTrigger>
@@ -90,7 +89,7 @@ export function SalesGoalWidget() {
 
   if (!hasGoals) {
     return (
-      <div className="card-base p-5">
+      <div className="card-surface p-5">
         <div className="flex flex-col items-center py-4 gap-2">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
             <AppIcon name="Target" size={24} className="text-primary/50" />
@@ -111,7 +110,7 @@ export function SalesGoalWidget() {
   }
 
   return (
-    <div className="card-base p-4 space-y-3">
+    <div className="card-surface p-4 space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -124,7 +123,7 @@ export function SalesGoalWidget() {
       {/* Goal rows */}
       <div className="flex gap-3">
         {dailyGoal > 0 && (
-          <div className="flex-1 flex items-center gap-3 rounded-xl bg-muted/30 border border-border/20 p-3">
+          <div className="flex-1 flex items-center gap-3 rounded-xl bg-muted/40 border border-border/30 p-3">
             <div className="relative">
               <GoalRing pct={dailyPct} size={48} stroke={4} />
               <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-foreground tabular-nums">
@@ -132,11 +131,11 @@ export function SalesGoalWidget() {
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">Hoje</p>
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-0.5">Hoje</p>
               <p className="text-sm font-bold text-foreground tabular-nums leading-tight truncate">
                 {formatCurrency(todayRevenue)}
               </p>
-              <p className="text-[10px] text-muted-foreground tabular-nums truncate">
+              <p className="text-[11px] text-muted-foreground tabular-nums truncate">
                 de {formatCurrency(dailyGoal)}
               </p>
             </div>
@@ -144,7 +143,7 @@ export function SalesGoalWidget() {
         )}
 
         {monthlyGoal > 0 && (
-          <div className="flex-1 flex items-center gap-3 rounded-xl bg-muted/30 border border-border/20 p-3">
+          <div className="flex-1 flex items-center gap-3 rounded-xl bg-muted/40 border border-border/30 p-3">
             <div className="relative">
               <GoalRing pct={monthlyPct} size={48} stroke={4} />
               <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-foreground tabular-nums">
@@ -152,13 +151,13 @@ export function SalesGoalWidget() {
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-0.5">
                 {format(new Date(), 'MMM', { locale: ptBR })}
               </p>
               <p className="text-sm font-bold text-foreground tabular-nums leading-tight truncate">
                 {formatCurrency(monthRevenue)}
               </p>
-              <p className="text-[10px] text-muted-foreground tabular-nums truncate">
+              <p className="text-[11px] text-muted-foreground tabular-nums truncate">
                 de {formatCurrency(monthlyGoal)}
               </p>
             </div>
