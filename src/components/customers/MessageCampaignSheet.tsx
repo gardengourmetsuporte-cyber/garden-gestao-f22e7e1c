@@ -76,7 +76,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
       <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <span className="material-symbols-rounded text-primary" style={{ fontSize: 22 }}>campaign</span>
+            <AppIcon name="campaign" size={22} className="text-primary" />
             Enviar mensagem em massa
           </SheetTitle>
         </SheetHeader>
@@ -85,7 +85,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
           {/* Recipient summary */}
           <div className="card-surface rounded-xl p-4 space-y-1">
             <div className="flex items-center gap-2 text-sm font-medium">
-              <span className="material-symbols-rounded text-primary" style={{ fontSize: 18 }}>group</span>
+              <AppIcon name="group" size={18} className="text-primary" />
               {recipients.length} destinatário{recipients.length !== 1 ? 's' : ''} ({segLabel})
             </div>
             {withoutPhone > 0 && (
@@ -99,7 +99,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
           {configError && (
             <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 space-y-2">
               <p className="text-sm font-medium text-destructive flex items-center gap-2">
-                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>error</span>
+                <AppIcon name="error" size={18} />
                 Canal WhatsApp não configurado
               </p>
               <p className="text-xs text-muted-foreground">
@@ -114,7 +114,7 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
                   navigate('/whatsapp/settings');
                 }}
               >
-                <span className="material-symbols-rounded" style={{ fontSize: 16 }}>settings</span>
+                <AppIcon name="settings" size={16} />
                 Ir para Configurações
               </Button>
             </div>
@@ -163,12 +163,12 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
           >
             {sending ? (
               <>
-                <span className="material-symbols-rounded animate-spin mr-2" style={{ fontSize: 18 }}>progress_activity</span>
+                <AppIcon name="progress_activity" size={18} className="animate-spin mr-2" />
                 Enviando...
               </>
             ) : (
               <>
-                <span className="material-symbols-rounded mr-2" style={{ fontSize: 18 }}>send</span>
+                <AppIcon name="send" size={18} className="mr-2" />
                 Enviar para {recipients.length} cliente{recipients.length !== 1 ? 's' : ''}
               </>
             )}

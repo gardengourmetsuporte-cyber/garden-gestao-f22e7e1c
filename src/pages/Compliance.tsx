@@ -169,7 +169,7 @@ export default function Compliance() {
       </div>
 
       {/* Checklist cards */}
-      <div className="px-4 space-y-5 pb-24">
+      <div className="px-4 space-y-5 pb-28 lg:pb-12">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <AppIcon name="Loader2" size={24} className="animate-spin text-muted-foreground" />

@@ -29,7 +29,7 @@ export default function WhatsAppHub() {
 
   return (
     <AppLayout>
-      <div className="p-4 space-y-4 max-w-2xl mx-auto pb-24">
+      <div className="p-4 space-y-4 max-w-2xl mx-auto pb-28 lg:pb-12">
         {/* Connection Status Card */}
         <div
           className={cn(

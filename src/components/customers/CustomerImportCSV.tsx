@@ -191,7 +191,7 @@ export function CustomerImportCSV({ open, onOpenChange, onImport, isImporting: e
             <>
               {isGoomer && (
                 <div className="flex items-center gap-2 p-2.5 rounded-lg bg-primary/10 text-primary text-xs font-medium">
-                  <span className="material-symbols-rounded" style={{ fontSize: 16 }}>verified</span>
+                  <AppIcon name="verified" size={16} />
                   Formato Goomer detectado — histórico de pedidos será importado
                 </div>
               )}

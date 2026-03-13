@@ -1,62 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-# Auditoria de Qualidade — Bugs, Layout e Padrões
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-Após inspeção detalhada do código, identifiquei os seguintes problemas:
-
----
-
-## Problemas Encontrados
-
-### 1. Grid dinâmico no MoreDrawer (Tailwind não gera classes dinâmicas)
-No `MoreDrawer.tsx` (linha 317), há uso de template string para grid:
-```
-`grid-cols-${lastRowItems.length}`
-```
-Tailwind **não gera classes dinâmicas** em runtime. Se `lastRowItems.length` for 1, a classe `grid-cols-1` pode não existir no bundle. Isso causa a última linha de módulos ficando com layout quebrado.
-
-**Fix**: Usar mapa estático de classes (`{1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3'}`).
-
-### 2. Uso direto de `material-symbols-rounded` sem AppIcon (inconsistência)
-Em `Customers.tsx`, `Agenda.tsx`, `MessageCampaignSheet.tsx` e `CustomerImportCSV.tsx` há spans manuais com `material-symbols-rounded` sem `fontVariationSettings`, causando ícones com peso/fill diferente do padrão do sistema.
-
-**Fix**: Substituir por `<AppIcon>` para garantir consistência visual.
-
-### 3. StableNavIcon — checklists hardcoded
-No `BottomTabBar.tsx` (linha 432), a condição `tab.key !== 'checklists'` está hardcoded, impedindo qualquer futuro custom icon para checklists. Isso não é um bug visual, mas uma limitação desnecessária que deveria ser tratada de forma mais limpa.
-
-### 4. Bottom padding inconsistente entre páginas
-Diferentes páginas usam `pb-24`, `pb-28`, `pb-32`, `pb-36` — sem padronização. Em telas com a barra inferior de 64px + safe-area, `pb-24` (96px) pode ser insuficiente, enquanto `pb-36` (144px) desperdiça espaço.
-
-**Fix**: Padronizar para `pb-28 lg:pb-12` (112px mobile, 48px desktop).
-
-### 5. FAB `bg-accent-foreground` pode ter contraste ruim
-No `BottomTabBar.tsx` (linha 224), quando existe `fabAction`, o FAB usa `bg-accent-foreground` que em certos temas pode não ter contraste suficiente com o ícone branco.
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
 ---
 
-## Plano de Correção (por prioridade)
+## Bloco de Relatórios Avançados ✅
 
-### A. Corrigir grid dinâmico no MoreDrawer
-- Substituir `grid-cols-${lastRowItems.length}` por mapa estático
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-### B. Padronizar ícones inline → AppIcon
-- `Customers.tsx`: 3 instâncias
-- `Agenda.tsx`: ~5 instâncias  
-- `MessageCampaignSheet.tsx`: ~5 instâncias
-- `CustomerImportCSV.tsx`: 1 instância
+## Dashboard Analytics ✅
 
-### C. Padronizar bottom padding das páginas
-- Normalizar para `pb-28 lg:pb-12` nas ~15 páginas que usam valores diferentes
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-### D. FAB color safety
-- Substituir `bg-accent-foreground` por gradiente explícito com contraste garantido
+## Operacional ✅
 
----
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-## Detalhes Técnicos
+## CRM / Clientes ✅
 
-- **Grid fix**: `const gridColsMap: Record<number, string> = { 1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3' };`
-- **Ícones**: Cada `<span className="material-symbols-rounded" style={{fontSize: N}}>name</span>` vira `<AppIcon name="name" size={N} />`
-- **Padding**: Todas as páginas com `AppLayout` wrapper terão padding bottom unificado
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
+## Funcionários ✅
+
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)

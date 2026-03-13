@@ -230,7 +230,7 @@ export default function Agenda() {
                       className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border shadow-inner"
                       style={{ backgroundColor: category.color + '15', border: `1px solid ${category.color}30` }}
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: 20, color: category.color, filter: `drop-shadow(0 0 4px ${category.color}60)` }}>{category.icon || 'folder'}</span>
+                      <AppIcon name={category.icon || 'folder'} size={20} style={{ color: category.color, filter: `drop-shadow(0 0 4px ${category.color}60)` }} />
                     </div>
                     <div className="flex flex-col items-start">
                       <span className="font-semibold text-[15px] leading-tight text-foreground">{category.name}</span>
@@ -301,7 +301,7 @@ export default function Agenda() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24 lg:pb-12">
+      <div className="min-h-screen bg-background pb-28 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
           <DesktopActionBar label="Nova Tarefa" onClick={() => { setEditingTask(null); setTaskSheetOpen(true); }} />
 

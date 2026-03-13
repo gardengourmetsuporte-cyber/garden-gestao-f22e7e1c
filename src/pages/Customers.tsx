@@ -118,7 +118,7 @@ export default function Customers() {
 
   return (
     <AppLayout>
-      <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4 pb-24 lg:pb-12">
+      <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4 pb-28 lg:pb-12">
         <DesktopActionBar label="Novo Cliente" onClick={openNewSheet} />
 
         {/* Stats cards */}
@@ -178,7 +178,7 @@ export default function Customers() {
             className={cn("h-11 w-11 shrink-0", !searchOpen && "border-border/50 bg-card")}
             onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setSearch(''); }}
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>{searchOpen ? 'close' : 'search'}</span>
+            <AppIcon name={searchOpen ? 'close' : 'search'} size={18} />
           </Button>
           <Select
             value={segmentFilter || 'all'}
@@ -212,7 +212,7 @@ export default function Customers() {
             }}
             title="Enviar mensagem"
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>campaign</span>
+            <AppIcon name="campaign" size={18} />
           </Button>
           <Button
             size="icon"
@@ -221,7 +221,7 @@ export default function Customers() {
             onClick={() => setCsvOpen(true)}
             title="Importar clientes"
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>upload_file</span>
+            <AppIcon name="upload_file" size={18} />
           </Button>
         </div>
 

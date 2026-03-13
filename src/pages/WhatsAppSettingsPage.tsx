@@ -111,7 +111,7 @@ export default function WhatsAppSettingsPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="p-4 space-y-4 max-w-2xl mx-auto pb-24">
+          <div className="p-4 space-y-4 max-w-2xl mx-auto pb-28 lg:pb-12">
             {/* Step Tabs */}
             <div className="flex gap-1 p-1 rounded-xl bg-secondary/50">
               {[
