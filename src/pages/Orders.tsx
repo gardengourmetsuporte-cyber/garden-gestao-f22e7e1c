@@ -356,8 +356,9 @@ export default function OrdersPage() {
                             {!isNoSupplier && supplier && (
                               <Button
                                 size="sm"
+                                variant="outline"
                                 onClick={() => handleOpenOrder(supplier)}
-                                className="gap-1.5 rounded-xl shadow-lg shadow-primary/20 shrink-0"
+                                className="gap-1.5 rounded-xl border-primary/30 text-primary hover:bg-primary/10 shrink-0"
                               >
                                 <AppIcon name="Plus" size={16} />
                                 Pedir
