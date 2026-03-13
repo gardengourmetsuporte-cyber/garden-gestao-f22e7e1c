@@ -75,7 +75,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
         <div className="grid grid-cols-4 gap-2">
           {[
             { value: activeEmployees, label: 'Ativos', icon: 'groups', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-            { value: completionsToday, label: 'Concluídos', icon: 'task_alt', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+            { value: completionsToday, label: 'Concluídos', icon: 'task_alt', color: 'text-primary', bg: 'bg-primary/10' },
             { value: pendingToday, label: 'Pendentes', icon: 'pending_actions', color: pendingToday > 10 ? 'text-destructive' : 'text-amber-400', bg: pendingToday > 10 ? 'bg-destructive/10' : 'bg-amber-500/10' },
             { value: `${utilizationPct}%`, label: 'Eficiência', icon: 'speed', color: pulseCfg.color, bg: pulseCfg.bg },
           ].map((stat, i) => (
