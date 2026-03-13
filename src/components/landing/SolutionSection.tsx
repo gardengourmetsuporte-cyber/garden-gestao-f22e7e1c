@@ -126,11 +126,11 @@ export function SolutionSection() {
                 className="group relative rounded-2xl p-[1px] overflow-hidden transition-all duration-300 hover:-translate-y-1"
               >
                 {/* Border effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/0 group-hover:from-emerald-500/40 group-hover:to-transparent transition-colors duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/0 group-hover:from-primary/40 group-hover:to-transparent transition-colors duration-500" />
 
                 <div className="relative h-full bg-[#0a0a0a] rounded-[15px] p-5 text-center flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/30 transition-all duration-300 shadow-inner">
-                    <AppIcon name={m.icon} size={22} className="text-white/60 group-hover:text-emerald-400 transition-colors" />
+                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:border-primary/30 transition-all duration-300 shadow-inner">
+                    <AppIcon name={m.icon} size={22} className="text-white/60 group-hover:text-primary transition-colors" />
                   </div>
                   <h4 className="font-bold text-white text-sm mb-2">{m.title}</h4>
                   <p className="text-white/40 text-[11px] leading-relaxed hidden sm:block">

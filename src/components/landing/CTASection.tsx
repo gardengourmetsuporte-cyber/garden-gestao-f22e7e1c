@@ -44,7 +44,7 @@ export function CTASection() {
 
             <div className="mt-7 flex items-center justify-center gap-4 sm:gap-5 text-xs text-white/35 flex-wrap">
               <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                 14 dias grátis
               </span>
               <span className="text-white/15">·</span>
