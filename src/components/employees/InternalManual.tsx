@@ -325,9 +325,9 @@ export function InternalManual() {
 
           {myEmployee && myAcknowledged && (
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent pt-8">
-              <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <AppIcon name="check_circle" size={18} className="text-emerald-400" />
-                <span className="text-sm text-emerald-400 font-semibold">Manual assinado</span>
+              <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-success/10 border border-success/20">
+                <AppIcon name="check_circle" size={18} className="text-success" />
+                <span className="text-sm text-success font-semibold">Manual assinado</span>
               </div>
             </div>
           )}
