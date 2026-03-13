@@ -215,7 +215,7 @@ export function FinanceCharts({
         <div className="grid grid-cols-2 gap-2">
           {[
             { value: 'expense' as const, label: 'Despesas', icon: 'ArrowDownCircle', color: 'text-red-500' },
-            { value: 'income' as const, label: 'Receitas', icon: 'ArrowUpCircle', color: 'text-emerald-500' },
+            { value: 'income' as const, label: 'Receitas', icon: 'ArrowUpCircle', color: 'text-primary' },
           ].map(tab => {
             const isActive = viewType === 'categories' && dataType === tab.value;
             return (
