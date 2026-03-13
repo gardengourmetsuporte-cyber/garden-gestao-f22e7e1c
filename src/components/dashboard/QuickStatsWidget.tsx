@@ -113,26 +113,26 @@ export function QuickStatsWidget() {
   ];
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-4 px-4 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-6">
+    <div className="grid grid-cols-3 gap-2 lg:grid-cols-6">
       {allCards.map((card) => (
         <button
           key={card.key}
           onClick={() => navigate(card.route)}
           className={cn(
-            "flex items-center gap-2.5 shrink-0 rounded-xl px-3 py-2 transition-all duration-200 active:scale-[0.97]",
-            "bg-card/70 border border-border/30 min-w-[120px] lg:min-w-0",
+            "flex items-center gap-2 rounded-xl px-2.5 py-2 transition-all duration-200 active:scale-[0.97]",
+            "bg-card/70 border border-border/30",
           )}
         >
           <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", variantIcon[card.variant])}>
             <AppIcon name={card.icon} size={16} />
           </div>
           <div className="text-left min-w-0">
-            <p className="text-lg font-extrabold font-display leading-tight" style={{ letterSpacing: '-0.02em' }}>
+            <p className="text-base font-extrabold font-display leading-tight tabular-nums" style={{ letterSpacing: '-0.02em' }}>
               {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
             </p>
-            <p className="text-[10px] text-muted-foreground truncate leading-tight">
+            <p className="text-[9px] text-muted-foreground truncate leading-tight">
               {card.isChecklist
-                ? `${(card as any).checklistProgress.completed}/${(card as any).checklistProgress.total} itens`
+                ? `${(card as any).checklistProgress.completed}/${(card as any).checklistProgress.total}`
                 : card.title.toLowerCase()}
             </p>
           </div>
