@@ -260,56 +260,44 @@ export default function OrdersPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
-          {/* Navigation Cards — Fornecedores large + 2x2 grid */}
+          {/* Navigation Pills */}
           {(() => {
-            const supplierTab = { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: suppliers.length || undefined, color: 'text-primary', bg: 'bg-primary/10' };
-            const smallTabs = [
-              { key: 'to-order' as const, label: 'Sugestões', icon: 'Package', badge: lowStockItems.length, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-              { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-              { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-              { key: 'orders' as const, label: 'Histórico', icon: 'Clock', badge: pendingOrders.length || undefined, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-              { key: 'production' as const, label: 'Produção', icon: 'ChefHat', badge: undefined, color: 'text-orange-400', bg: 'bg-orange-500/10' },
+            const tabs = [
+              { key: 'to-order' as const, label: 'Sugestões', icon: 'Package', badge: lowStockItems.length || undefined },
+              { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined },
+              { key: 'orders' as const, label: 'Pedidos', icon: 'ClipboardList', badge: pendingOrders.length || undefined },
+              { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined },
+              { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: undefined },
+              { key: 'production' as const, label: 'Produção', icon: 'ChefHat', badge: undefined },
             ];
 
-            const renderCard = (tab: { key: string; label: string; icon: string; badge: number | undefined; color: string; bg: string }, large = false) => (
-              <button
-                key={tab.key}
-                onClick={() => setOrderTab(tab.key as any)}
-                className={cn(
-                  "relative flex flex-col items-center justify-center gap-2 rounded-2xl border transition-all duration-200 active:scale-[0.97]",
-                  large ? "p-5 min-h-0" : "p-4",
-                  orderTab === tab.key
-                    ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
-                    : "bg-card border-border hover:border-primary/20"
-                )}
-              >
-                <div className={cn(
-                  "rounded-xl flex items-center justify-center",
-                  large ? "w-12 h-12" : "w-10 h-10",
-                  orderTab === tab.key ? "bg-primary/20" : tab.bg
-                )}>
-                  <AppIcon name={tab.icon} size={large ? 24 : 20} className={orderTab === tab.key ? "text-primary" : tab.color} />
-                </div>
-                <span className={cn("font-semibold", large ? "text-base" : "text-sm", orderTab === tab.key ? "text-primary" : "text-foreground")}>{tab.label}</span>
-                {tab.badge != null && tab.badge > 0 && (
-                  <span className="absolute top-2 right-2 min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
-                    {tab.badge > 99 ? '99+' : tab.badge}
-                  </span>
-                )}
-              </button>
-            );
-
             return (
-              <div className="space-y-2">
-                {/* Top row: Fornecedores + Sugestões side by side */}
-                <div className="grid grid-cols-2 gap-2 lg:grid-cols-5 lg:gap-3">
-                  {renderCard(supplierTab, true)}
-                  {renderCard(smallTabs[0], true)}
-                </div>
-                {/* Bottom row: Lista, Cotações, Histórico, Produção */}
-                <div className="grid grid-cols-4 gap-2 lg:grid-cols-5 lg:gap-3">
-                  {smallTabs.slice(1).map(tab => renderCard(tab))}
-                </div>
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setOrderTab(tab.key as any)}
+                    className={cn(
+                      "relative flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0",
+                      orderTab === tab.key
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+                    )}
+                  >
+                    <AppIcon name={tab.icon} size={15} />
+                    <span>{tab.label}</span>
+                    {tab.badge != null && tab.badge > 0 && (
+                      <span className={cn(
+                        "min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold",
+                        orderTab === tab.key
+                          ? "bg-primary-foreground/20 text-primary-foreground"
+                          : "bg-primary/15 text-primary"
+                      )}>
+                        {tab.badge > 99 ? '99+' : tab.badge}
+                      </span>
+                    )}
+                  </button>
+                ))}
               </div>
             );
           })()}
