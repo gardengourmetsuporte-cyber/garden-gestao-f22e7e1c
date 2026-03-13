@@ -141,7 +141,7 @@ export function BatchMovementSheet({ open, onOpenChange, items, categories, onCo
               className={cn(
                 'flex-1 py-2 rounded-xl text-sm font-medium transition-all',
                 type === 'entrada'
-                  ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30'
+                  ? 'bg-success/15 text-success ring-1 ring-success/30'
                   : 'bg-secondary text-muted-foreground'
               )}
             >
