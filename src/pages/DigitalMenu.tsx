@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useDigitalMenu, DMProduct } from '@/hooks/useDigitalMenu';
 import { useGamification } from '@/hooks/useGamification';
