@@ -25,8 +25,8 @@ export function NPSSurveyWidget({ unitId, orderId, customerName, onSubmit, onDis
   if (submitted) {
     return (
       <div className="text-center py-8 space-y-3">
-        <div className="w-16 h-16 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto">
-          <AppIcon name="Heart" size={32} className="text-emerald-500" />
+        <div className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center mx-auto">
+          <AppIcon name="Heart" size={32} className="text-success" />
         </div>
         <h3 className="text-lg font-bold text-foreground">Obrigado!</h3>
         <p className="text-sm text-muted-foreground">Sua opinião é muito importante para nós.</p>
