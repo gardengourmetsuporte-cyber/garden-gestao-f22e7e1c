@@ -46,7 +46,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
     >
       {/* Animated slider indicator */}
       <div
-        className="absolute top-1 bottom-1 rounded-xl bg-emerald-500/10 shadow-sm shadow-emerald-500/10 border border-emerald-500/20 will-change-transform"
+        className="absolute top-1 bottom-1 rounded-xl bg-primary/10 shadow-sm shadow-primary/10 border border-primary/20 will-change-transform"
         style={{
           left: indicator.left,
           width: indicator.width,
