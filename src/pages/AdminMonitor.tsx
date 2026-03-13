@@ -38,7 +38,7 @@ function ActionTimeline({ userId }: { userId: string }) {
               {items.map(item => (
                 <div key={item.id} className="flex items-center gap-3 py-1.5 px-2 rounded-md hover:bg-muted/50 transition-colors">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${
-                    item.action === 'user_login' ? 'bg-green-500' :
+                    item.action === 'user_login' ? 'bg-success' :
                     item.action.includes('created') ? 'bg-blue-500' :
                     item.action.includes('deleted') ? 'bg-red-500' :
                     'bg-muted-foreground'
