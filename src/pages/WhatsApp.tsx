@@ -42,10 +42,10 @@ export default function WhatsAppHub() {
         >
           <div className={cn(
             "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0",
-            isConnected ? "bg-emerald-500/15" : "bg-secondary"
+            isConnected ? "bg-success/15" : "bg-secondary"
           )}>
             {isConnected ? (
-              <AppIcon name="Wifi" size={22} className="text-emerald-500" />
+              <AppIcon name="Wifi" size={22} className="text-success" />
             ) : (
               <AppIcon name="WifiOff" size={22} className="text-muted-foreground" />
             )}

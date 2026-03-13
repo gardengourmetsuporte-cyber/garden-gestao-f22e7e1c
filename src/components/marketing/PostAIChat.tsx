@@ -32,7 +32,7 @@ const QUICK_PROMPTS = [
   { icon: 'Camera', label: 'Post de produto', color: 'text-pink-400', bg: 'bg-pink-500/10', prompt: 'Crie um post destacando um produto do cardápio. Escolha o mais atrativo e gere a legenda completa.' },
   { icon: 'Flame', label: 'Promoção', color: 'text-amber-400', bg: 'bg-amber-500/10', prompt: 'Crie um post de promoção especial para hoje, baseado nos produtos reais do cardápio.' },
   { icon: 'BookOpen', label: 'Storytelling', color: 'text-blue-400', bg: 'bg-blue-500/10', prompt: 'Crie um post de storytelling contando um pouco sobre o negócio, bastidores ou a equipe.' },
-  { icon: 'BarChart3', label: 'Engajamento', color: 'text-emerald-400', bg: 'bg-emerald-500/10', prompt: 'Crie um post interativo para engajar o público — pode ser enquete, pergunta, ou "isso ou aquilo".' },
+  { icon: 'BarChart3', label: 'Engajamento', color: 'text-primary', bg: 'bg-primary/10', prompt: 'Crie um post interativo para engajar o público — pode ser enquete, pergunta, ou "isso ou aquilo".' },
 ];
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/marketing-post-chat`;

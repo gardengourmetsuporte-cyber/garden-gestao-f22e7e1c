@@ -133,7 +133,7 @@ export function HourBankManager() {
           <div className="space-y-1.5">
             {entries.slice(0, 20).map(e => (
               <div key={e.id} className="flex items-center gap-3 p-2 rounded-lg bg-secondary/20 text-xs">
-                <AppIcon name={e.type === 'overtime' ? 'TrendingUp' : e.type === 'compensation' ? 'TrendingDown' : 'Settings'} size={14} className={e.type === 'overtime' ? 'text-emerald-500' : 'text-amber-500'} />
+                <AppIcon name={e.type === 'overtime' ? 'TrendingUp' : e.type === 'compensation' ? 'TrendingDown' : 'Settings'} size={14} className={e.type === 'overtime' ? 'text-success' : 'text-warning'} />
                 <span className="flex-1">{empName(e.employee_id)}</span>
                 <span className="font-medium">{e.type === 'compensation' ? '-' : '+'}{e.hours}h</span>
                 <span className="text-muted-foreground">{format(new Date(e.date), 'dd/MM', { locale: ptBR })}</span>
