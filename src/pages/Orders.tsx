@@ -260,7 +260,7 @@ export default function OrdersPage() {
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
         <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
-          {/* Navigation Pills */}
+          {/* Navigation Grid 2x3 */}
           {(() => {
             const tabs = [
               { key: 'to-order' as const, label: 'Sugestões', icon: 'Package', badge: lowStockItems.length || undefined },
@@ -272,32 +272,39 @@ export default function OrdersPage() {
             ];
 
             return (
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
-                {tabs.map(tab => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setOrderTab(tab.key as any)}
-                    className={cn(
-                      "relative flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0",
-                      orderTab === tab.key
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
-                    )}
-                  >
-                    <AppIcon name={tab.icon} size={15} />
-                    <span>{tab.label}</span>
-                    {tab.badge != null && tab.badge > 0 && (
+              <div className="grid grid-cols-3 gap-2 lg:grid-cols-6 lg:gap-3">
+                {tabs.map(tab => {
+                  const isActive = orderTab === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => setOrderTab(tab.key as any)}
+                      className={cn(
+                        "relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl transition-all duration-200 active:scale-[0.96] touch-manipulation",
+                        isActive
+                          ? "bg-primary/10 border border-primary/30"
+                          : "bg-card border border-border hover:border-muted-foreground/20"
+                      )}
+                    >
+                      <AppIcon
+                        name={tab.icon}
+                        size={20}
+                        className={isActive ? "text-primary" : "text-muted-foreground"}
+                      />
                       <span className={cn(
-                        "min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold",
-                        orderTab === tab.key
-                          ? "bg-primary-foreground/20 text-primary-foreground"
-                          : "bg-primary/15 text-primary"
+                        "text-[11px] font-semibold leading-tight text-center",
+                        isActive ? "text-primary" : "text-muted-foreground"
                       )}>
-                        {tab.badge > 99 ? '99+' : tab.badge}
+                        {tab.label}
                       </span>
-                    )}
-                  </button>
-                ))}
+                      {tab.badge != null && tab.badge > 0 && (
+                        <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                          {tab.badge > 99 ? '99+' : tab.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             );
           })()}
