@@ -62,7 +62,7 @@ export function MonthComparisonWidget() {
           </div>
         </div>
         {data.lastTotal > 0 && (
-          <div className={`mt-3 flex items-center gap-1.5 text-sm font-semibold ${isUp ? 'text-emerald-500' : 'text-destructive'}`}>
+          <div className={`mt-3 flex items-center gap-1.5 text-sm font-semibold ${isUp ? 'text-primary' : 'text-destructive'}`}>
             <AppIcon name={isUp ? 'TrendingUp' : 'TrendingDown'} size={16} />
             {isUp ? '+' : ''}{data.variation.toFixed(1)}%
           </div>

@@ -8,7 +8,7 @@ import { formatCurrency } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 const KPI_ITEMS = [
-  { key: 'sales', icon: 'payments', label: 'Vendas Hoje', variant: 'bg-emerald-500/15 text-emerald-400' },
+  { key: 'sales', icon: 'payments', label: 'Vendas Hoje', variant: 'bg-primary/15 text-primary' },
   { key: 'orders', icon: 'receipt_long', label: 'Pedidos Ativos', variant: 'bg-blue-500/15 text-blue-400' },
   { key: 'deliveries', icon: 'two_wheeler', label: 'Entregas', variant: 'bg-amber-500/15 text-amber-400' },
   { key: 'hub', icon: 'hub', label: 'Delivery Hub', variant: 'bg-red-500/15 text-red-400' },

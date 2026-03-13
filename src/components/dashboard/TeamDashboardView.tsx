@@ -17,7 +17,7 @@ interface Props {
 type TeamPulse = 'excellent' | 'good' | 'attention' | 'critical';
 
 const PULSE_CONFIG: Record<TeamPulse, { label: string; icon: string; color: string; bg: string; dot: string; ring: string }> = {
-  excellent: { label: 'Excelente', icon: 'rocket_launch', color: 'text-emerald-400', bg: 'bg-emerald-500/10', dot: 'bg-emerald-400', ring: 'ring-emerald-500/30' },
+  excellent: { label: 'Excelente', icon: 'rocket_launch', color: 'text-primary', bg: 'bg-primary/10', dot: 'bg-primary', ring: 'ring-primary/30' },
   good: { label: 'Bom', icon: 'thumb_up', color: 'text-blue-400', bg: 'bg-blue-500/10', dot: 'bg-blue-400', ring: 'ring-blue-500/30' },
   attention: { label: 'Atenção', icon: 'warning', color: 'text-amber-400', bg: 'bg-amber-500/10', dot: 'bg-amber-400', ring: 'ring-amber-500/30' },
   critical: { label: 'Crítico', icon: 'error', color: 'text-destructive', bg: 'bg-destructive/10', dot: 'bg-destructive', ring: 'ring-destructive/30' },

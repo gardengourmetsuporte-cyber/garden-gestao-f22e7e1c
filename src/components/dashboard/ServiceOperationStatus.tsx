@@ -4,10 +4,10 @@ import type { OperationPulse, Pulse } from '@/hooks/useServiceDashboard';
 
 const PULSE_STYLE: Record<Pulse, { bg: string; ring: string; dot: string; text: string; label: string }> = {
   calm: {
-    bg: 'bg-emerald-500/10',
-    ring: 'ring-emerald-500/30',
-    dot: 'bg-emerald-400',
-    text: 'text-emerald-400',
+    bg: 'bg-primary/10',
+    ring: 'ring-primary/30',
+    dot: 'bg-primary',
+    text: 'text-primary',
     label: 'Tranquilo',
   },
   moderate: {
