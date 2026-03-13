@@ -187,10 +187,10 @@ export function AdminDashboard() {
       {/* View Selector */}
       <div className="grid grid-cols-4 gap-2">
         {([
-          { key: 'operational' as const, icon: 'dashboard', label: 'Operacional' },
-          { key: 'financial' as const, icon: 'account_balance', label: 'Financeiro' },
-          { key: 'service' as const, icon: 'storefront', label: 'Serviço' },
-          { key: 'team' as const, icon: 'groups', label: 'Equipe' },
+          { key: 'operational' as const, icon: 'LayoutGrid', label: 'Operacional' },
+          { key: 'financial' as const, icon: 'Landmark', label: 'Financeiro' },
+          { key: 'service' as const, icon: 'Store', label: 'Serviço' },
+          { key: 'team' as const, icon: 'UsersThree', label: 'Equipe' },
         ] as const).map(tab => (
           <button
             key={tab.key}
