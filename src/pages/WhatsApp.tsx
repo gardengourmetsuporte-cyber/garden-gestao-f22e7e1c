@@ -35,17 +35,17 @@ export default function WhatsAppHub() {
           className={cn(
             "rounded-2xl border p-4 flex items-center gap-4 cursor-pointer active:scale-[0.98] transition-all",
             isConnected
-              ? "border-emerald-500/30 bg-emerald-500/5"
+              ? "border-success/30 bg-success/5"
               : "border-border/30 bg-card"
           )}
           onClick={() => navigate('/whatsapp/settings')}
         >
           <div className={cn(
             "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0",
-            isConnected ? "bg-emerald-500/15" : "bg-secondary"
+            isConnected ? "bg-success/15" : "bg-secondary"
           )}>
             {isConnected ? (
-              <AppIcon name="Wifi" size={22} className="text-emerald-500" />
+              <AppIcon name="Wifi" size={22} className="text-success" />
             ) : (
               <AppIcon name="WifiOff" size={22} className="text-muted-foreground" />
             )}

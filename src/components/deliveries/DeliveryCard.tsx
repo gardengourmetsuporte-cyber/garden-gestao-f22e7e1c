@@ -8,7 +8,7 @@ import type { Delivery, DeliveryStatus } from '@/hooks/useDeliveries';
 const STATUS_CONFIG: Record<DeliveryStatus, { label: string; color: string; icon: string }> = {
   pending: { label: 'Pendente', color: 'text-amber-500', icon: 'schedule' },
   out: { label: 'Em rota', color: 'text-blue-400', icon: 'local_shipping' },
-  delivered: { label: 'Entregue', color: 'text-emerald-500', icon: 'check_circle' },
+  delivered: { label: 'Entregue', color: 'text-success', icon: 'check_circle' },
   cancelled: { label: 'Cancelada', color: 'text-destructive', icon: 'cancel' },
 };
 
@@ -54,7 +54,7 @@ export function DeliveryCard({ delivery, selected, compact, onStatusChange, onCa
         <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0',
           delivery.status === 'pending' && 'bg-amber-500/10',
           delivery.status === 'out' && 'bg-blue-500/10',
-          delivery.status === 'delivered' && 'bg-emerald-500/10',
+          delivery.status === 'delivered' && 'bg-success/10',
           delivery.status === 'cancelled' && 'bg-destructive/10',
         )}>
           <AppIcon name={cfg.icon} size={18} className={cfg.color} />

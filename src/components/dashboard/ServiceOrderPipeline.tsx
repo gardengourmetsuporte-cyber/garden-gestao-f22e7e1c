@@ -6,7 +6,7 @@ import type { ActiveOrder, PipelineGroups } from '@/hooks/useServiceDashboard';
 const COLUMNS = [
   { key: 'pending' as const, label: 'Pendente', icon: 'schedule', color: 'text-amber-400', bg: 'bg-amber-500/15' },
   { key: 'preparing' as const, label: 'Preparando', icon: 'skillet', color: 'text-blue-400', bg: 'bg-blue-500/15' },
-  { key: 'ready' as const, label: 'Pronto', icon: 'check_circle', color: 'text-emerald-400', bg: 'bg-emerald-500/15' },
+  { key: 'ready' as const, label: 'Pronto', icon: 'check_circle', color: 'text-success', bg: 'bg-success/15' },
 ];
 
 function OrderCard({ order }: { order: ActiveOrder }) {
@@ -58,8 +58,8 @@ export function ServiceOrderPipeline({ pipeline }: { pipeline: PipelineGroups })
 
       {total === 0 ? (
         <div className="flex flex-col items-center py-6 gap-1.5">
-          <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-            <AppIcon name="check_circle" size={20} className="text-emerald-400" />
+          <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+            <AppIcon name="check_circle" size={20} className="text-success" />
           </div>
           <p className="text-xs text-muted-foreground">Nenhum pedido ativo</p>
         </div>

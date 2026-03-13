@@ -229,14 +229,14 @@ export function CashRegisterCloseSheet({ open, onOpenChange, register, saving, o
                 {finalCash && (
                   <div className={cn(
                     'rounded-lg p-3 flex items-center justify-between',
-                    difference === 0 ? 'bg-green-500/10' : difference > 0 ? 'bg-amber-500/10' : 'bg-destructive/10'
+                    difference === 0 ? 'bg-success/10' : difference > 0 ? 'bg-amber-500/10' : 'bg-destructive/10'
                   )}>
                     <span className="text-xs font-medium">
                       {difference === 0 ? 'Caixa bateu!' : difference > 0 ? 'Sobra' : 'Falta'}
                     </span>
                     <span className={cn(
                       'text-sm font-bold',
-                      difference === 0 ? 'text-green-600' : difference > 0 ? 'text-amber-600' : 'text-destructive'
+                      difference === 0 ? 'text-success' : difference > 0 ? 'text-amber-600' : 'text-destructive'
                     )}>
                       {difference > 0 ? '+' : ''}{formatCurrency(difference)}
                     </span>

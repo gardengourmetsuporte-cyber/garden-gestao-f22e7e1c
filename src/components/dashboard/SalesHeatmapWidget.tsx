@@ -48,10 +48,10 @@ export function SalesHeatmapWidget() {
   const getIntensity = (val: number) => {
     if (val === 0) return 'bg-muted/30';
     const pct = val / data.maxVal;
-    if (pct < 0.25) return 'bg-emerald-500/20';
-    if (pct < 0.5) return 'bg-emerald-500/40';
-    if (pct < 0.75) return 'bg-emerald-500/60';
-    return 'bg-emerald-500/90';
+    if (pct < 0.25) return 'bg-primary/20';
+    if (pct < 0.5) return 'bg-primary/40';
+    if (pct < 0.75) return 'bg-primary/60';
+    return 'bg-primary/90';
   };
 
   return (

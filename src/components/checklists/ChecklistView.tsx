@@ -463,7 +463,7 @@ export function ChecklistView({
                 {configuredPoints > 0 && (
                   <div className={cn(
                     "px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-0.5 shrink-0",
-                    completed ? "bg-success/10 text-success" : "bg-emerald-500/10 text-emerald-500"
+                    completed ? "bg-success/10 text-success" : "bg-primary/10 text-primary"
                   )}>
                     <AppIcon name="bolt" size={12} />
                     {configuredPoints}

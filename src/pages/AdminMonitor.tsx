@@ -38,7 +38,7 @@ function ActionTimeline({ userId }: { userId: string }) {
               {items.map(item => (
                 <div key={item.id} className="flex items-center gap-3 py-1.5 px-2 rounded-md hover:bg-muted/50 transition-colors">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${
-                    item.action === 'user_login' ? 'bg-green-500' :
+                    item.action === 'user_login' ? 'bg-success' :
                     item.action.includes('created') ? 'bg-blue-500' :
                     item.action.includes('deleted') ? 'bg-red-500' :
                     'bg-muted-foreground'
@@ -72,7 +72,7 @@ function ClientCard({ client, onSelect }: { client: MonitoredClient; onSelect: (
         </div>
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="rounded-md bg-muted/50 p-2">
-            <LogIn className="w-3.5 h-3.5 mx-auto mb-1 text-green-500" />
+            <LogIn className="w-3.5 h-3.5 mx-auto mb-1 text-success" />
             <p className="text-lg font-bold">{client.login_count}</p>
             <p className="text-[10px] text-muted-foreground">Logins</p>
           </div>

@@ -51,7 +51,7 @@ const ACCENT_STYLES: Record<string, { text: string; bg: string; ring: string; bt
   amber:   { text: 'text-amber-400',   bg: 'bg-amber-500/10',   ring: 'ring-amber-500/30', btn: 'bg-amber-400 hover:bg-amber-300' },
   sky:     { text: 'text-sky-400',     bg: 'bg-sky-500/10',     ring: 'ring-sky-500/30',   btn: 'bg-sky-400 hover:bg-sky-300' },
   violet:  { text: 'text-violet-400',  bg: 'bg-violet-500/10',  ring: 'ring-violet-500/30', btn: 'bg-violet-400 hover:bg-violet-300' },
-  emerald: { text: 'text-emerald-400', bg: 'bg-emerald-500/10', ring: 'ring-emerald-500/30', btn: 'bg-emerald-400 hover:bg-emerald-300' },
+  emerald: { text: 'text-success', bg: 'bg-success/10', ring: 'ring-success/30', btn: 'bg-success hover:bg-success/80' },
 };
 
 // ─── Sector grouping logic ─────────────────────────────────────────
@@ -127,7 +127,7 @@ export function KDSOrderDetail({
       {/* ── Info bar ── */}
       <div className="flex items-center gap-4 px-5 py-2.5 border-b border-white/[0.06] bg-white/[0.015] shrink-0 text-sm">
         <div className="flex items-center gap-1.5">
-          {source === 'delivery' ? <Truck className="w-4 h-4 text-blue-400" /> : source === 'qrcode' ? <Hash className="w-4 h-4 text-purple-400" /> : <UtensilsCrossed className="w-4 h-4 text-emerald-400" />}
+          {source === 'delivery' ? <Truck className="w-4 h-4 text-blue-400" /> : source === 'qrcode' ? <Hash className="w-4 h-4 text-purple-400" /> : <UtensilsCrossed className="w-4 h-4 text-primary" />}
           <span className="font-bold text-white/80">
             {source === 'delivery' ? 'Delivery' : source === 'qrcode' ? `QR Code · Mesa ${order.table_number}` : `Mesa ${order.table_number}`}
           </span>

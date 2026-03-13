@@ -48,7 +48,7 @@ export function SolutionSection() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-20 md:mb-28">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/70">
               Como funciona
             </span>
@@ -71,12 +71,12 @@ export function SolutionSection() {
               <div className="lg:[direction:ltr] space-y-6">
                 <div className="inline-flex items-center gap-4">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-emerald-500 blur-xl opacity-30" />
-                    <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-lg text-white bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] border border-emerald-400/30">
+                    <div className="absolute inset-0 bg-primary blur-xl opacity-30" />
+                    <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-lg text-white bg-gradient-to-br from-primary to-primary/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] border border-primary/30">
                       {step.number}
                     </div>
                   </div>
-                  <div className="h-px flex-1 min-w-[60px] max-w-[100px] bg-gradient-to-r from-emerald-500/50 to-transparent" />
+                  <div className="h-px flex-1 min-w-[60px] max-w-[100px] bg-gradient-to-r from-primary/50 to-transparent" />
                 </div>
                 <div>
                   <h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-4 tracking-tight">{step.title}</h3>
@@ -94,7 +94,7 @@ export function SolutionSection() {
                   }}
                 >
                   {/* Ambient Glow */}
-                  <div className="absolute -inset-8 bg-gradient-to-tr from-emerald-500/10 via-transparent to-teal-500/10 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
+                  <div className="absolute -inset-8 bg-gradient-to-tr from-primary/10 via-transparent to-primary/10 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
 
                   {/* Animated Phone Mockup placed natively */}
                   <div className="relative overflow-hidden pt-4 pb-2 px-6 sm:px-10 flex justify-center bg-[#050505]">
@@ -108,7 +108,7 @@ export function SolutionSection() {
 
         {/* Modules Grid */}
         <div className="mt-32 md:mt-40 relative">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
           <div className="text-center mb-16 relative z-10">
             <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight font-display">
@@ -126,11 +126,11 @@ export function SolutionSection() {
                 className="group relative rounded-2xl p-[1px] overflow-hidden transition-all duration-300 hover:-translate-y-1"
               >
                 {/* Border effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/0 group-hover:from-emerald-500/40 group-hover:to-transparent transition-colors duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/0 group-hover:from-primary/40 group-hover:to-transparent transition-colors duration-500" />
 
                 <div className="relative h-full bg-[#0a0a0a] rounded-[15px] p-5 text-center flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/10 group-hover:border-emerald-500/30 transition-all duration-300 shadow-inner">
-                    <AppIcon name={m.icon} size={22} className="text-white/60 group-hover:text-emerald-400 transition-colors" />
+                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:border-primary/30 transition-all duration-300 shadow-inner">
+                    <AppIcon name={m.icon} size={22} className="text-white/60 group-hover:text-primary transition-colors" />
                   </div>
                   <h4 className="font-bold text-white text-sm mb-2">{m.title}</h4>
                   <p className="text-white/40 text-[11px] leading-relaxed hidden sm:block">

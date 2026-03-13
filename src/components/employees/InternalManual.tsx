@@ -72,8 +72,8 @@ const MANUAL_SECTIONS = [
   {
     title: '5. Cuidado com Patrimônio e Estoque',
     icon: 'inventory_2',
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-500/10',
+    color: 'text-primary',
+    bg: 'bg-primary/10',
     rules: [
       'Zelar pelos equipamentos, utensílios e instalações da empresa.',
       'Danos causados por negligência ou mau uso serão de responsabilidade do funcionário.',
@@ -190,9 +190,9 @@ export function InternalManual() {
           {/* Sign status for employee */}
           {!isAdmin && myEmployee && (
             myAcknowledged ? (
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <AppIcon name="check_circle" size={16} className="text-emerald-400" />
-                <span className="text-xs text-emerald-400 font-medium">Você já assinou este manual</span>
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-success/10 border border-success/20">
+                <AppIcon name="check_circle" size={16} className="text-success" />
+                <span className="text-xs text-success font-medium">Você já assinou este manual</span>
               </div>
             ) : (
               <div className="flex items-center gap-2 p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
@@ -325,9 +325,9 @@ export function InternalManual() {
 
           {myEmployee && myAcknowledged && (
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent pt-8">
-              <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <AppIcon name="check_circle" size={18} className="text-emerald-400" />
-                <span className="text-sm text-emerald-400 font-semibold">Manual assinado</span>
+              <div className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-success/10 border border-success/20">
+                <AppIcon name="check_circle" size={18} className="text-success" />
+                <span className="text-sm text-success font-semibold">Manual assinado</span>
               </div>
             </div>
           )}
@@ -349,10 +349,10 @@ export function InternalManual() {
             {/* Signed */}
             {acknowledgments.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">✅ Assinaram</p>
+                <p className="text-xs font-semibold text-success uppercase tracking-wider">✅ Assinaram</p>
                 {acknowledgments.map((a: any) => (
-                  <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/15">
-                    <AppIcon name="check_circle" size={16} className="text-emerald-400 shrink-0" />
+                  <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-success/5 border border-success/15">
+                    <AppIcon name="check_circle" size={16} className="text-success shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{a.employee?.full_name || 'Funcionário'}</p>
                       <p className="text-[10px] text-muted-foreground">

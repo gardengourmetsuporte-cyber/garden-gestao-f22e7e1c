@@ -87,8 +87,8 @@ export function HourBankManager() {
 
   const statusColors: Record<string, string> = {
     pending: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
-    approved: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',
-    rejected: 'bg-red-500/15 text-red-700 dark:text-red-400',
+    approved: 'bg-success/15 text-success',
+    rejected: 'bg-destructive/15 text-destructive',
   };
 
   const empName = (id: string) => employees.find(e => e.id === id)?.full_name || 'Funcionário';
@@ -121,7 +121,7 @@ export function HourBankManager() {
               return (
                 <div key={emp.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/30">
                   <span className="text-sm font-medium">{emp.full_name}</span>
-                  <span className={cn("text-sm font-bold", balance > 0 ? "text-emerald-600 dark:text-emerald-400" : balance < 0 ? "text-red-600 dark:text-red-400" : "text-muted-foreground")}>
+                  <span className={cn("text-sm font-bold", balance > 0 ? "text-success" : balance < 0 ? "text-destructive" : "text-muted-foreground")}>
                     {balance > 0 ? '+' : ''}{balance.toFixed(1)}h
                   </span>
                 </div>
@@ -133,7 +133,7 @@ export function HourBankManager() {
           <div className="space-y-1.5">
             {entries.slice(0, 20).map(e => (
               <div key={e.id} className="flex items-center gap-3 p-2 rounded-lg bg-secondary/20 text-xs">
-                <AppIcon name={e.type === 'overtime' ? 'TrendingUp' : e.type === 'compensation' ? 'TrendingDown' : 'Settings'} size={14} className={e.type === 'overtime' ? 'text-emerald-500' : 'text-amber-500'} />
+                <AppIcon name={e.type === 'overtime' ? 'TrendingUp' : e.type === 'compensation' ? 'TrendingDown' : 'Settings'} size={14} className={e.type === 'overtime' ? 'text-success' : 'text-warning'} />
                 <span className="flex-1">{empName(e.employee_id)}</span>
                 <span className="font-medium">{e.type === 'compensation' ? '-' : '+'}{e.hours}h</span>
                 <span className="text-muted-foreground">{format(new Date(e.date), 'dd/MM', { locale: ptBR })}</span>

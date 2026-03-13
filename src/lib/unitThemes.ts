@@ -8,11 +8,11 @@ export interface UnitTheme {
 }
 
 const STANDARD_THEME_COLORS: Omit<UnitTheme, 'label'> = {
-  primary: '156 72% 40%',
-  neonCyan: '156 72% 40%',
-  ring: '156 72% 40%',
-  glowPrimary: '0 0 24px hsl(156 72% 40% / 0.25), 0 0 48px hsl(156 72% 40% / 0.12)',
-  glowCyan: '0 0 24px hsl(156 72% 40% / 0.25), 0 0 48px hsl(156 72% 40% / 0.12)',
+  primary: '270 70% 55%',
+  neonCyan: '270 70% 55%',
+  ring: '270 70% 55%',
+  glowPrimary: '0 0 24px hsl(270 70% 55% / 0.25), 0 0 48px hsl(270 70% 55% / 0.12)',
+  glowCyan: '0 0 24px hsl(270 70% 55% / 0.25), 0 0 48px hsl(270 70% 55% / 0.12)',
 };
 
 const UNIT_THEMES: Record<string, UnitTheme> = {

@@ -22,8 +22,8 @@ export function TeamPendingItems({ items, total }: Props) {
       </div>
       {items.length === 0 ? (
         <div className="flex flex-col items-center py-6 gap-1.5">
-          <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-            <AppIcon name="check_circle" size={20} className="text-emerald-400" />
+          <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+            <AppIcon name="check_circle" size={20} className="text-success" />
           </div>
           <p className="text-xs text-muted-foreground">Tudo concluído hoje!</p>
         </div>

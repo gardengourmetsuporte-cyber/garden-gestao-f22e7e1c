@@ -8,7 +8,7 @@ const SOURCE_CONFIG: Record<string, { label: string; icon: string; variant: stri
   mesa_levar: { label: 'Mesa (levar)', icon: 'takeout_dining', variant: 'bg-cyan-500/15 text-cyan-400' },
   qrcode: { label: 'QR Code', icon: 'qr_code_2', variant: 'bg-violet-500/15 text-violet-400' },
   balcao: { label: 'Balcão', icon: 'storefront', variant: 'bg-amber-500/15 text-amber-400' },
-  delivery: { label: 'Delivery', icon: 'delivery_dining', variant: 'bg-emerald-500/15 text-emerald-400' },
+  delivery: { label: 'Delivery', icon: 'delivery_dining', variant: 'bg-primary/15 text-primary' },
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -58,8 +58,8 @@ export function ServiceActiveOrders({ orders }: { orders: ActiveOrder[] }) {
 
       {orders.length === 0 ? (
         <div className="flex flex-col items-center py-6 gap-1.5">
-          <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-            <AppIcon name="check_circle" size={20} className="text-emerald-400" />
+          <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+            <AppIcon name="check_circle" size={20} className="text-success" />
           </div>
           <p className="text-xs text-muted-foreground">Nenhum pedido ativo no momento</p>
         </div>

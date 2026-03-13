@@ -526,7 +526,7 @@ export function FinanceCharts({
                                 <p className="text-xs font-medium text-foreground">Dia {label}</p>
                                 <p className="text-xs" style={{ color: '#22c55e' }}>Receita acum.: {formatCurrency(inc)}</p>
                                 <p className="text-xs" style={{ color: '#ef4444' }}>Despesa acum.: {formatCurrency(exp)}</p>
-                                <p className={cn("text-xs font-bold", bal >= 0 ? "text-green-500" : "text-red-500")}>
+                                <p className={cn("text-xs font-bold", bal >= 0 ? "text-success" : "text-destructive")}>
                                   Saldo: {bal >= 0 ? '+' : ''}{formatCurrency(bal)}
                                 </p>
                               </div>
@@ -555,7 +555,7 @@ export function FinanceCharts({
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground mb-0.5">Saldo</p>
-                      <p className={cn("text-sm font-bold tabular-nums", finalBalance >= 0 ? "text-green-500" : "text-red-500")}>
+                      <p className={cn("text-sm font-bold tabular-nums", finalBalance >= 0 ? "text-success" : "text-destructive")}>
                         {finalBalance >= 0 ? '+' : ''}{formatCurrency(finalBalance)}
                       </p>
                     </div>

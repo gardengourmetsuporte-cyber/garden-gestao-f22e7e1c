@@ -25,8 +25,8 @@ export function NPSSurveyWidget({ unitId, orderId, customerName, onSubmit, onDis
   if (submitted) {
     return (
       <div className="text-center py-8 space-y-3">
-        <div className="w-16 h-16 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto">
-          <AppIcon name="Heart" size={32} className="text-emerald-500" />
+        <div className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center mx-auto">
+          <AppIcon name="Heart" size={32} className="text-success" />
         </div>
         <h3 className="text-lg font-bold text-foreground">Obrigado!</h3>
         <p className="text-sm text-muted-foreground">Sua opinião é muito importante para nós.</p>
@@ -51,7 +51,7 @@ export function NPSSurveyWidget({ unitId, orderId, customerName, onSubmit, onDis
   const getLabelColor = (val: number) => {
     if (val <= 6) return 'text-red-500';
     if (val <= 8) return 'text-amber-500';
-    return 'text-emerald-500';
+    return 'text-success';
   };
 
   return (
@@ -73,7 +73,7 @@ export function NPSSurveyWidget({ unitId, orderId, customerName, onSubmit, onDis
                   ? 'bg-red-500 text-white scale-110'
                   : i <= 8
                   ? 'bg-amber-500 text-white scale-110'
-                  : 'bg-emerald-500 text-white scale-110'
+                  : 'bg-success text-white scale-110'
                 : 'bg-secondary/50 text-foreground hover:bg-secondary'
             }`}
           >

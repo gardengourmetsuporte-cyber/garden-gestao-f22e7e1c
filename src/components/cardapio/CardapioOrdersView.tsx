@@ -38,10 +38,10 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
   new: { label: 'Novo', color: 'text-amber-400', bg: 'bg-amber-500/15', icon: 'Bell', pulse: true },
   accepted: { label: 'Aceito', color: 'text-sky-400', bg: 'bg-sky-500/15', icon: 'CheckCircle2' },
   preparing: { label: 'Preparando', color: 'text-orange-400', bg: 'bg-orange-500/15', icon: 'Flame', pulse: true },
-  ready: { label: 'Pronto', color: 'text-emerald-400', bg: 'bg-emerald-500/15', icon: 'PackageCheck' },
+  ready: { label: 'Pronto', color: 'text-success', bg: 'bg-success/15', icon: 'PackageCheck' },
   dispatched: { label: 'Despachado', color: 'text-blue-400', bg: 'bg-blue-500/15', icon: 'Truck' },
-  delivered: { label: 'Entregue', color: 'text-emerald-400', bg: 'bg-emerald-500/15', icon: 'CircleCheckBig' },
-  sent_to_pdv: { label: 'Enviado PDV', color: 'text-emerald-400', bg: 'bg-emerald-500/15', icon: 'CircleCheckBig' },
+  delivered: { label: 'Entregue', color: 'text-success', bg: 'bg-success/15', icon: 'CircleCheckBig' },
+  sent_to_pdv: { label: 'Enviado PDV', color: 'text-success', bg: 'bg-success/15', icon: 'CircleCheckBig' },
   cancelled: { label: 'Cancelado', color: 'text-red-400', bg: 'bg-red-500/12', icon: 'XCircle' },
   error: { label: 'Erro', color: 'text-red-400', bg: 'bg-red-500/12', icon: 'AlertTriangle' },
 };
@@ -73,7 +73,7 @@ type OpGroup = 'novos' | 'emPreparo' | 'prontos' | 'entregues' | 'cancelados';
 const OP_GROUPS: { id: OpGroup; label: string; icon: string; color: string; dotColor: string; pulse?: boolean }[] = [
   { id: 'novos', label: 'Novos', icon: 'Bell', color: 'text-amber-400', dotColor: 'bg-amber-400', pulse: true },
   { id: 'emPreparo', label: 'Em Preparo', icon: 'Flame', color: 'text-orange-400', dotColor: 'bg-orange-400', pulse: true },
-  { id: 'prontos', label: 'Prontos', icon: 'PackageCheck', color: 'text-emerald-400', dotColor: 'bg-emerald-400' },
+  { id: 'prontos', label: 'Prontos', icon: 'PackageCheck', color: 'text-success', dotColor: 'bg-success' },
   { id: 'entregues', label: 'Entregues', icon: 'CircleCheckBig', color: 'text-muted-foreground', dotColor: 'bg-muted-foreground' },
   { id: 'cancelados', label: 'Cancelados', icon: 'XCircle', color: 'text-red-400/60', dotColor: 'bg-red-400/60' },
 ];
@@ -133,7 +133,7 @@ const CHANNEL_ACCENT: Record<Channel, string> = {
   todos: 'border-l-primary',
   delivery: 'border-l-blue-500',
   mesa: 'border-l-amber-500',
-  balcao: 'border-l-emerald-500',
+  balcao: 'border-l-primary',
   qrcode: 'border-l-purple-500',
   ifood: 'border-l-red-500',
 };
@@ -327,9 +327,9 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
           <p className="text-2xl font-black tabular-nums text-amber-400">{stats.active}</p>
           <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400/70 mt-0.5">Ativos</p>
         </div>
-        <div className="rounded-2xl bg-gradient-to-br from-emerald-500/15 to-emerald-600/5 border border-emerald-500/20 p-3 text-center">
-          <p className="text-2xl font-black tabular-nums text-emerald-400">{stats.done}</p>
-          <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-400/70 mt-0.5">Entregues</p>
+        <div className="rounded-2xl bg-gradient-to-br from-success/15 to-success/5 border border-success/20 p-3 text-center">
+          <p className="text-2xl font-black tabular-nums text-success">{stats.done}</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-success/70 mt-0.5">Entregues</p>
         </div>
         <div className="rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 p-3 text-center min-w-0">
           <p className="text-base sm:text-lg font-black tabular-nums text-primary truncate">{formatPrice(stats.revenue)}</p>
