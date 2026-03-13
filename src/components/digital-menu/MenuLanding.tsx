@@ -46,7 +46,7 @@ export function MenuLanding({ unit, unitInitials = '?', customerUser, onProfileC
     <div className="relative">
       {/* Profile button - top right */}
       {onProfileClick && (
-        <div className="absolute top-3 right-3 z-20">
+        <div className="absolute top-3 left-3 z-20">
           <button
             onClick={onProfileClick}
             className="flex items-center gap-2 h-10 rounded-full bg-card/80 backdrop-blur-xl border border-border/40 shadow-lg px-3 active:scale-95 transition-transform"
@@ -56,12 +56,12 @@ export function MenuLanding({ unit, unitInitials = '?', customerUser, onProfileC
                 <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
                   <span className="text-[11px] font-bold text-primary">{userInitials}</span>
                 </div>
-                <span className="text-xs font-semibold text-foreground pr-0.5">Minha conta</span>
+                <span className="text-xs font-semibold text-foreground pr-0.5">{t('landing.my_account')}</span>
               </>
             ) : (
               <>
                 <AppIcon name="Person" size={18} className="text-foreground" />
-                <span className="text-xs font-semibold text-foreground pr-0.5">Entrar</span>
+                <span className="text-xs font-semibold text-foreground pr-0.5">{t('landing.sign_in')}</span>
               </>
             )}
           </button>
