@@ -170,9 +170,9 @@ html {
     --shadow-elevated: 0 6px 20px hsl(234 20% 30% / 0.08), 0 12px 40px hsl(234 20% 30% / 0.04);
     --shadow-floating: 0 8px 32px hsl(234 20% 30% / 0.08), 0 2px 8px hsl(234 20% 30% / 0.04);
 
-    --gradient-brand: linear-gradient(135deg, hsl(160 30% 15%), hsl(156 50% 22%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(156 50% 25% / 0.06), hsl(156 60% 30% / 0.03));
-    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(156 5% 97%));
+    --gradient-brand: linear-gradient(135deg, hsl(270 50% 30%), hsl(270 60% 40%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(270 60% 45% / 0.06), hsl(280 60% 50% / 0.03));
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(270 5% 97%));
     --shadow-glow: none;
 
     /* Sidebar tokens */
