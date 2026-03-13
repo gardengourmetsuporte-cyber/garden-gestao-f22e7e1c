@@ -69,11 +69,11 @@ export function BreakEvenWidget() {
         </div>
         <div className="mt-3 w-full bg-muted/50 rounded-full h-3 overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all ${reached ? 'bg-emerald-500' : 'bg-amber-500'}`}
+            className={`h-full rounded-full transition-all ${reached ? 'bg-primary' : 'bg-amber-500'}`}
             style={{ width: `${Math.min(data.reachedPct, 100)}%` }}
           />
         </div>
-        <p className={`text-xs font-medium mt-1 ${reached ? 'text-emerald-500' : 'text-amber-500'}`}>
+        <p className={`text-xs font-medium mt-1 ${reached ? 'text-primary' : 'text-amber-500'}`}>
           {reached ? '✅ Meta atingida!' : `${data.reachedPct.toFixed(0)}% do break-even`}
         </p>
       </CardContent>

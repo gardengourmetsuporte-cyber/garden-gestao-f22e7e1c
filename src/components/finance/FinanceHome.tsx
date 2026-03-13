@@ -104,7 +104,7 @@ export function FinanceHome({
           <div className="flex gap-2.5 mt-5">
             <div className="finance-hero-chip">
               <div className="flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center">
+                <div className="w-5 h-5 rounded-full bg-primary/15 flex items-center justify-center">
                   <AppIcon name="TrendingUp" size={11} style={{ color: 'var(--gp-positive)' }} />
                 </div>
                 <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>
@@ -117,7 +117,7 @@ export function FinanceHome({
                 </span>
                 <span className={cn(
                   "text-[9px] font-bold px-1.5 py-0.5 rounded-full",
-                  profit >= 0 ? "bg-emerald-500/15" : "bg-red-500/15"
+                  profit >= 0 ? "bg-primary/15" : "bg-destructive/15"
                 )} style={{ color: profit >= 0 ? 'var(--gp-positive)' : 'var(--gp-negative)' }}>
                   {profit >= 0 ? '+' : ''}{profitPercent}%
                 </span>

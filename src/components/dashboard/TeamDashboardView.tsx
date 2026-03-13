@@ -17,7 +17,7 @@ interface Props {
 type TeamPulse = 'excellent' | 'good' | 'attention' | 'critical';
 
 const PULSE_CONFIG: Record<TeamPulse, { label: string; icon: string; color: string; bg: string; dot: string; ring: string }> = {
-  excellent: { label: 'Excelente', icon: 'rocket_launch', color: 'text-emerald-400', bg: 'bg-emerald-500/10', dot: 'bg-emerald-400', ring: 'ring-emerald-500/30' },
+  excellent: { label: 'Excelente', icon: 'rocket_launch', color: 'text-primary', bg: 'bg-primary/10', dot: 'bg-primary', ring: 'ring-primary/30' },
   good: { label: 'Bom', icon: 'thumb_up', color: 'text-blue-400', bg: 'bg-blue-500/10', dot: 'bg-blue-400', ring: 'ring-blue-500/30' },
   attention: { label: 'Atenção', icon: 'warning', color: 'text-amber-400', bg: 'bg-amber-500/10', dot: 'bg-amber-400', ring: 'ring-amber-500/30' },
   critical: { label: 'Crítico', icon: 'error', color: 'text-destructive', bg: 'bg-destructive/10', dot: 'bg-destructive', ring: 'ring-destructive/30' },
@@ -75,7 +75,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
         <div className="grid grid-cols-4 gap-2">
           {[
             { value: activeEmployees, label: 'Ativos', icon: 'groups', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-            { value: completionsToday, label: 'Concluídos', icon: 'task_alt', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+            { value: completionsToday, label: 'Concluídos', icon: 'task_alt', color: 'text-primary', bg: 'bg-primary/10' },
             { value: pendingToday, label: 'Pendentes', icon: 'pending_actions', color: pendingToday > 10 ? 'text-destructive' : 'text-amber-400', bg: pendingToday > 10 ? 'bg-destructive/10' : 'bg-amber-500/10' },
             { value: `${utilizationPct}%`, label: 'Eficiência', icon: 'speed', color: pulseCfg.color, bg: pulseCfg.bg },
           ].map((stat, i) => (
@@ -99,7 +99,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
           <h3 className="text-sm font-semibold text-foreground flex-1">Aproveitamento Geral</h3>
           <span className={cn(
             'text-sm font-bold tabular-nums',
-            utilizationPct >= 80 ? 'text-emerald-400' :
+            utilizationPct >= 80 ? 'text-primary' :
             utilizationPct >= 50 ? 'text-amber-400' :
             'text-destructive'
           )}>

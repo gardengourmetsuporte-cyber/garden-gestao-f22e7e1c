@@ -215,7 +215,7 @@ export function FinanceCharts({
         <div className="grid grid-cols-2 gap-2">
           {[
             { value: 'expense' as const, label: 'Despesas', icon: 'ArrowDownCircle', color: 'text-red-500' },
-            { value: 'income' as const, label: 'Receitas', icon: 'ArrowUpCircle', color: 'text-emerald-500' },
+            { value: 'income' as const, label: 'Receitas', icon: 'ArrowUpCircle', color: 'text-primary' },
           ].map(tab => {
             const isActive = viewType === 'categories' && dataType === tab.value;
             return (
@@ -590,16 +590,16 @@ export function FinanceCharts({
                           return (
                             <div className="rounded-lg border border-border/50 bg-background/95 backdrop-blur-sm px-3 py-2 shadow-xl space-y-0.5">
                               <p className="text-xs font-medium text-foreground">{label}</p>
-                              <p className="text-xs" style={{ color: '#22c55e' }}>Receita: {formatCurrency(inc)}</p>
+                              <p className="text-xs" style={{ color: '#1DB954' }}>Receita: {formatCurrency(inc)}</p>
                               <p className="text-xs" style={{ color: '#ef4444' }}>Despesa: {formatCurrency(exp)}</p>
-                              <p className={cn("text-xs font-bold", inc - exp >= 0 ? "text-green-500" : "text-red-500")}>
+                              <p className={cn("text-xs font-bold", inc - exp >= 0 ? "text-primary" : "text-destructive")}>
                                 Saldo: {formatCurrency(inc - exp)}
                               </p>
                             </div>
                           );
                         }}
                       />
-                      <Bar dataKey="income" name="Receita" fill="#22c55e" radius={[4, 4, 0, 0]} barSize={28} />
+                      <Bar dataKey="income" name="Receita" fill="#1DB954" radius={[4, 4, 0, 0]} barSize={28} />
                       <Bar dataKey="expense" name="Despesa" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={28} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -611,9 +611,9 @@ export function FinanceCharts({
                     <div key={w.name} className="card-base p-3 flex items-center justify-between">
                       <span className="text-sm font-medium text-foreground">{w.name}</span>
                       <div className="flex items-center gap-4 text-xs tabular-nums">
-                        <span style={{ color: '#22c55e' }}>{formatCurrency(w.income)}</span>
+                        <span style={{ color: '#1DB954' }}>{formatCurrency(w.income)}</span>
                         <span style={{ color: '#ef4444' }}>{formatCurrency(w.expense)}</span>
-                        <span className={cn("font-bold", w.balance >= 0 ? "text-green-500" : "text-red-500")}>
+                        <span className={cn("font-bold", w.balance >= 0 ? "text-primary" : "text-destructive")}>
                           {w.balance >= 0 ? '+' : ''}{formatCurrency(w.balance)}
                         </span>
                       </div>
@@ -625,7 +625,7 @@ export function FinanceCharts({
                 <div className="card-base p-4 grid grid-cols-3 gap-2 text-center">
                   <div>
                     <p className="text-xs text-muted-foreground mb-0.5">Receita total</p>
-                    <p className="text-sm font-bold tabular-nums" style={{ color: '#22c55e' }}>
+                    <p className="text-sm font-bold tabular-nums" style={{ color: '#1DB954' }}>
                       {formatCurrency(weeklyData.reduce((s, w) => s + w.income, 0))}
                     </p>
                   </div>
@@ -640,7 +640,7 @@ export function FinanceCharts({
                     {(() => {
                       const total = weeklyData.reduce((s, w) => s + w.balance, 0);
                       return (
-                        <p className={cn("text-sm font-bold tabular-nums", total >= 0 ? "text-green-500" : "text-red-500")}>
+                        <p className={cn("text-sm font-bold tabular-nums", total >= 0 ? "text-primary" : "text-destructive")}>
                           {total >= 0 ? '+' : ''}{formatCurrency(total)}
                         </p>
                       );
