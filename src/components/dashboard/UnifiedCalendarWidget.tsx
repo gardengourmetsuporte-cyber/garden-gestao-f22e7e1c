@@ -45,7 +45,9 @@ export function UnifiedCalendarWidget() {
           className="flex items-center justify-between px-1 w-full hover:opacity-80 transition-opacity"
         >
           <div className="flex items-center gap-2">
-            <AppIcon name="CalendarDays" size={16} className="text-primary" />
+            <div className="w-5 h-5 flex items-center justify-center shrink-0">
+              <AppIcon name="CalendarDays" size={16} className="text-primary" />
+            </div>
             <span className="text-xs font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Calendário</span>
           </div>
           <div className="flex items-center gap-1">
