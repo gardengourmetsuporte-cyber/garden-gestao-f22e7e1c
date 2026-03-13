@@ -52,7 +52,7 @@ export default function ChecklistsPage() {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-background pb-28 lg:pb-12">
+        <div className="min-h-screen bg-background pb-24">
           <div className="px-4 py-4 space-y-4">
             <Skeleton className="h-12 rounded-xl" />
             <div className="grid grid-cols-2 gap-3">

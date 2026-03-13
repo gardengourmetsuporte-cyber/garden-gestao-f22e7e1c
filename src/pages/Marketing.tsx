@@ -31,7 +31,7 @@ export default function Marketing() {
   if (!hasPlan('business')) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-background pb-28 lg:pb-12">
+        <div className="min-h-screen bg-background pb-24">
           <UpgradeWall moduleKey="marketing" moduleLabel="Marketing" />
         </div>
       </AppLayout>

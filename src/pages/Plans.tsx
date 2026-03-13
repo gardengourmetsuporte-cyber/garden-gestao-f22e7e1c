@@ -86,7 +86,7 @@ export default function Plans() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-28 lg:pb-12">
+      <div className="min-h-screen bg-background pb-24">
         <header className="page-header-bar">
           <div className="page-header-content flex items-center gap-3">
             <button onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground transition-colors">

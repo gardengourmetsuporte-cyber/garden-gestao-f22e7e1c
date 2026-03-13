@@ -15,7 +15,7 @@ const Notifications = () => {
 
   return (
     <AppLayout>
-      <div className="p-4 space-y-5 pb-28 lg:pb-12">
+      <div className="p-4 space-y-5 pb-24">
         {/* Tab switcher */}
         <div className="flex gap-2 bg-secondary/30 p-1 rounded-2xl">
           {tabs.map(t => (

@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen pb-28 lg:pb-12">
+      <div className="min-h-screen pb-36 lg:pb-12">
         {isAdmin ? <AdminDashboard /> : <EmployeeDashboard />}
       </div>
     </AppLayout>

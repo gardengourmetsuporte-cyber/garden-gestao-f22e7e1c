@@ -314,7 +314,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                   <div className={cn("grid gap-2", useCols3 ? 'grid-cols-3' : 'grid-cols-2')}>
                     {fullRowItems.map(renderItem)}
                     {lastRowItems.length > 0 && (
-                      <div className={cn("grid gap-2 col-span-full", { 'grid-cols-1': lastRowItems.length === 1, 'grid-cols-2': lastRowItems.length === 2, 'grid-cols-3': lastRowItems.length === 3 }[lastRowItems.length] || 'grid-cols-3')}>
+                      <div className={cn("grid gap-2 col-span-full", `grid-cols-${lastRowItems.length}`)}>
                         {lastRowItems.map(renderItem)}
                       </div>
                     )}
