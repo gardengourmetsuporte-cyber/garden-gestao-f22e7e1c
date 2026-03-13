@@ -153,23 +153,45 @@ export function useDeliveries() {
       .filter((w) => w.length > 2 && !['de', 'da', 'do', 'das', 'dos'].includes(w));
   }, [normalizeText]);
 
+  // Common business-name words that indicate a unit name, not a city
+  const BUSINESS_KEYWORDS = ['restaurante', 'pizzaria', 'lanchonete', 'padaria', 'bar', 'cafe', 'empresa', 'loja', 'hamburgueria', 'garden', 'demo', 'teste', 'minha', 'pizza', 'beni', 'grill', 'bistro', 'cantina', 'churrascaria', 'sorveteria', 'acaiteria', 'doceria', 'confeitaria', 'sushi', 'poke', 'food', 'burguer', 'burger', 'delivery'];
+
+  const looksLikeBusinessName = useCallback((value: string): boolean => {
+    if (!value?.trim()) return true;
+    const words = normalizeText(value).split(/\s+/);
+    return words.some(w => BUSINESS_KEYWORDS.includes(w));
+  }, [normalizeText]);
+
   const resolveGeocodeCity = useCallback((city: string, unitName: string): string => {
     const cityTrimmed = city?.trim() || '';
     const unitTrimmed = unitName?.trim() || '';
+
+    // If city looks like a business name, discard it
+    if (looksLikeBusinessName(cityTrimmed)) {
+      if (!looksLikeBusinessName(unitTrimmed)) return unitTrimmed;
+      return '';
+    }
+
     const cityWords = getSignificantCityWords(cityTrimmed);
     const unitWords = getSignificantCityWords(unitTrimmed);
 
-    if (!cityTrimmed) return unitTrimmed;
+    if (!cityTrimmed) {
+      if (!looksLikeBusinessName(unitTrimmed)) return unitTrimmed;
+      return '';
+    }
     if (!unitTrimmed) return cityTrimmed;
 
-    if (cityWords.length < 3 && unitWords.length >= cityWords.length) return unitTrimmed;
+    if (cityWords.length < 3 && unitWords.length >= cityWords.length && !looksLikeBusinessName(unitTrimmed)) return unitTrimmed;
 
     const cityBase = normalizeText(cityTrimmed);
     const unitBase = normalizeText(unitTrimmed);
-    if (unitBase.includes(cityBase) || cityBase.includes(unitBase)) return unitTrimmed;
+    if (unitBase.includes(cityBase) || cityBase.includes(unitBase)) {
+      if (!looksLikeBusinessName(unitTrimmed)) return unitTrimmed;
+      return cityTrimmed;
+    }
 
     return cityTrimmed;
-  }, [getSignificantCityWords, normalizeText]);
+  }, [getSignificantCityWords, normalizeText, looksLikeBusinessName]);
 
   const distanceKm = useCallback((a: { lat: number; lng: number }, b: { lat: number; lng: number }): number => {
     const toRad = (deg: number) => (deg * Math.PI) / 180;
