@@ -236,7 +236,7 @@ export function CashRegisterCloseSheet({ open, onOpenChange, register, saving, o
                     </span>
                     <span className={cn(
                       'text-sm font-bold',
-                      difference === 0 ? 'text-green-600' : difference > 0 ? 'text-amber-600' : 'text-destructive'
+                      difference === 0 ? 'text-success' : difference > 0 ? 'text-amber-600' : 'text-destructive'
                     )}>
                       {difference > 0 ? '+' : ''}{formatCurrency(difference)}
                     </span>
