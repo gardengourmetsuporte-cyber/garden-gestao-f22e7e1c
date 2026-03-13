@@ -56,7 +56,7 @@ const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 px-0.5">
+    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 px-0.5">
       {title}
     </h3>
   );
