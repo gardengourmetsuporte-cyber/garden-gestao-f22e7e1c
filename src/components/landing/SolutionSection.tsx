@@ -108,7 +108,7 @@ export function SolutionSection() {
 
         {/* Modules Grid */}
         <div className="mt-32 md:mt-40 relative">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
           <div className="text-center mb-16 relative z-10">
             <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight font-display">
