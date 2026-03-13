@@ -625,7 +625,7 @@ export function FinanceCharts({
                 <div className="card-base p-4 grid grid-cols-3 gap-2 text-center">
                   <div>
                     <p className="text-xs text-muted-foreground mb-0.5">Receita total</p>
-                    <p className="text-sm font-bold tabular-nums" style={{ color: '#22c55e' }}>
+                    <p className="text-sm font-bold tabular-nums" style={{ color: '#1DB954' }}>
                       {formatCurrency(weeklyData.reduce((s, w) => s + w.income, 0))}
                     </p>
                   </div>
@@ -640,7 +640,7 @@ export function FinanceCharts({
                     {(() => {
                       const total = weeklyData.reduce((s, w) => s + w.balance, 0);
                       return (
-                        <p className={cn("text-sm font-bold tabular-nums", total >= 0 ? "text-green-500" : "text-red-500")}>
+                        <p className={cn("text-sm font-bold tabular-nums", total >= 0 ? "text-primary" : "text-destructive")}>
                           {total >= 0 ? '+' : ''}{formatCurrency(total)}
                         </p>
                       );
