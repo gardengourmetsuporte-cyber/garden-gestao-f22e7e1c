@@ -429,7 +429,7 @@ const TabButton = forwardRef<
         />
         <StableNavIcon
           name={tab.icon}
-          customIcon={tab.key !== 'checklists' ? tab.customIcon : undefined}
+          customIcon={tab.customIcon}
           active={active}
           size={22}
           fill={1}
