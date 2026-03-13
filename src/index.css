@@ -427,39 +427,7 @@ html {
     }
   }
 
-  /* Sweep reflection for premium dark cards */
-  :is(.dark) .card-base::after,
-  :is(.dark) .card-surface::after,
-  :is(.dark) .card-elevated::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(105deg, transparent 40%, hsl(0 0% 100% / 0.02) 45%, hsl(0 0% 100% / 0.04) 50%, transparent 55%);
-    background-size: 200% 200%;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-
-  @media (hover: hover) {
-    :is(.dark) .card-base:hover::after,
-    :is(.dark) .card-surface:hover::after,
-    :is(.dark) .card-elevated:hover::after {
-      opacity: 1;
-      animation: premiumShine 2.5s ease-out;
-    }
-  }
-
-  @keyframes premiumShine {
-    0% {
-      background-position: 200% 50%;
-    }
-
-    100% {
-      background-position: -200% 50%;
-    }
-  }
+  /* Removed: sweep reflection / premiumShine on base cards for cleaner look */
 
   .card-press {
     @apply card-surface active:scale-[0.985] transition-all duration-300;
