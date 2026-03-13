@@ -80,6 +80,13 @@ html {
     --input: 0 0% 16%;
     --ring: 141 73% 42%;
 
+    /* Neon accent colors */
+    --neon-green: 141 73% 42%;
+    --neon-red: 0 72% 51%;
+    --neon-cyan: 187 85% 53%;
+    --neon-amber: 43 96% 56%;
+    --neon-purple: 260 60% 55%;
+
     /* No glows — Spotify is flat */
     --glow-primary: none;
     --glow-accent: none;
