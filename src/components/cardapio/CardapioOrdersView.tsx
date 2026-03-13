@@ -38,10 +38,10 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
   new: { label: 'Novo', color: 'text-amber-400', bg: 'bg-amber-500/15', icon: 'Bell', pulse: true },
   accepted: { label: 'Aceito', color: 'text-sky-400', bg: 'bg-sky-500/15', icon: 'CheckCircle2' },
   preparing: { label: 'Preparando', color: 'text-orange-400', bg: 'bg-orange-500/15', icon: 'Flame', pulse: true },
-  ready: { label: 'Pronto', color: 'text-emerald-400', bg: 'bg-emerald-500/15', icon: 'PackageCheck' },
+  ready: { label: 'Pronto', color: 'text-success', bg: 'bg-success/15', icon: 'PackageCheck' },
   dispatched: { label: 'Despachado', color: 'text-blue-400', bg: 'bg-blue-500/15', icon: 'Truck' },
-  delivered: { label: 'Entregue', color: 'text-emerald-400', bg: 'bg-emerald-500/15', icon: 'CircleCheckBig' },
-  sent_to_pdv: { label: 'Enviado PDV', color: 'text-emerald-400', bg: 'bg-emerald-500/15', icon: 'CircleCheckBig' },
+  delivered: { label: 'Entregue', color: 'text-success', bg: 'bg-success/15', icon: 'CircleCheckBig' },
+  sent_to_pdv: { label: 'Enviado PDV', color: 'text-success', bg: 'bg-success/15', icon: 'CircleCheckBig' },
   cancelled: { label: 'Cancelado', color: 'text-red-400', bg: 'bg-red-500/12', icon: 'XCircle' },
   error: { label: 'Erro', color: 'text-red-400', bg: 'bg-red-500/12', icon: 'AlertTriangle' },
 };
