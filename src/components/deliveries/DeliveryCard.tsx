@@ -8,7 +8,7 @@ import type { Delivery, DeliveryStatus } from '@/hooks/useDeliveries';
 const STATUS_CONFIG: Record<DeliveryStatus, { label: string; color: string; icon: string }> = {
   pending: { label: 'Pendente', color: 'text-amber-500', icon: 'schedule' },
   out: { label: 'Em rota', color: 'text-blue-400', icon: 'local_shipping' },
-  delivered: { label: 'Entregue', color: 'text-emerald-500', icon: 'check_circle' },
+  delivered: { label: 'Entregue', color: 'text-success', icon: 'check_circle' },
   cancelled: { label: 'Cancelada', color: 'text-destructive', icon: 'cancel' },
 };
 
