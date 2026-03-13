@@ -190,7 +190,7 @@ export function AdminDashboard() {
           { key: 'operational' as const, icon: 'LayoutGrid', label: 'Operacional' },
           { key: 'financial' as const, icon: 'Landmark', label: 'Financeiro' },
           { key: 'service' as const, icon: 'Store', label: 'Serviço' },
-          { key: 'team' as const, icon: 'UsersThree', label: 'Equipe' },
+          { key: 'team' as const, icon: 'Users', label: 'Equipe' },
         ] as const).map(tab => (
           <button
             key={tab.key}
