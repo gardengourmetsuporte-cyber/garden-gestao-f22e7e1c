@@ -1277,7 +1277,7 @@ html {
     filter: brightness(0) saturate(100%) invert(0%);
   }
   .dark .icon-tint-muted {
-    filter: brightness(0) saturate(100%) invert(100%);
+    filter: brightness(0) saturate(100%) invert(60%);
   }
   .animate-slide-up {
     animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
