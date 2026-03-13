@@ -179,8 +179,7 @@ export function AdminDashboard() {
 
   return (
     <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-8">
-      {/* Smart Scanner — top */}
-      {view === 'operational' && <SmartScannerWidget />}
+
 
       {/* Greeting + Refresh */}
       <DashboardContextBar firstName={firstName} stats={stats} />
