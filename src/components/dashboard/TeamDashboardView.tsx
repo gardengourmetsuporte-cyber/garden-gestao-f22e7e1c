@@ -65,7 +65,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
   return (
     <div className="space-y-4">
       {/* Operation Pulse Hero */}
-      <div className={cn('card-base p-4 border ring-1', pulseCfg.ring)}>
+      <div className={cn('card-base p-4 border ring-1 animate-slide-up', pulseCfg.ring)}>
         <div className="flex items-center gap-2 mb-4">
           <div className={cn('w-2.5 h-2.5 rounded-full animate-pulse', pulseCfg.dot)} />
           <p className={cn('text-xs font-semibold', pulseCfg.color)}>{summary}</p>
@@ -78,8 +78,8 @@ export function TeamDashboardView({ currentUserId }: Props) {
             { value: completionsToday, label: 'Concluídos', icon: 'task_alt', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
             { value: pendingToday, label: 'Pendentes', icon: 'pending_actions', color: pendingToday > 10 ? 'text-destructive' : 'text-amber-400', bg: pendingToday > 10 ? 'bg-destructive/10' : 'bg-amber-500/10' },
             { value: `${utilizationPct}%`, label: 'Eficiência', icon: 'speed', color: pulseCfg.color, bg: pulseCfg.bg },
-          ].map(stat => (
-            <div key={stat.label} className={cn('flex flex-col items-center gap-1.5 py-3 rounded-xl', stat.bg)}>
+          ].map((stat, i) => (
+            <div key={stat.label} className={cn('flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all duration-300 hover:scale-[1.03]', stat.bg, 'animate-slide-up', `dash-stagger-${i + 2}`)}>
               <div className="w-7 h-7 flex items-center justify-center shrink-0 overflow-hidden">
                 <AppIcon name={stat.icon} size={16} className={stat.color} />
               </div>
@@ -91,7 +91,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
       </div>
 
       {/* Utilization Progress */}
-      <div className="card-base p-4">
+      <div className="card-base p-4 animate-slide-up dash-stagger-4">
         <div className="flex items-center gap-2 mb-2.5">
           <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
             <AppIcon name="speed" size={14} className="text-primary" />

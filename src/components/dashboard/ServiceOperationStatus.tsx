@@ -36,7 +36,7 @@ export function ServiceOperationStatus({ pulse }: { pulse: OperationPulse }) {
   const overall = PULSE_STYLE[pulse.overall];
 
   return (
-    <div className={cn('card-base p-4 border', overall.ring, 'ring-1')}>
+    <div className={cn('card-base p-4 border animate-slide-up', overall.ring, 'ring-1')}>
       {/* Summary line */}
       <div className="flex items-center gap-2 mb-3">
         <div className={cn('w-2 h-2 rounded-full animate-pulse shrink-0 aspect-square', overall.dot)} />
@@ -45,16 +45,21 @@ export function ServiceOperationStatus({ pulse }: { pulse: OperationPulse }) {
 
       {/* 3 sector indicators */}
       <div className="grid grid-cols-3 gap-2">
-        {SECTORS.map(sector => {
+        {SECTORS.map((sector, i) => {
           const p = pulse[sector.key];
           const style = PULSE_STYLE[p];
           return (
             <div
               key={sector.key}
-              className={cn('flex flex-col items-center gap-1.5 py-3 rounded-xl', style.bg)}
+              className={cn(
+                'flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all duration-300 hover:scale-[1.03]',
+                style.bg,
+                'animate-slide-up',
+                `dash-stagger-${i + 2}`,
+              )}
             >
-              <div className={cn('w-2 h-2 rounded-full shrink-0 aspect-square', style.dot)} />
-              <AppIcon name={sector.icon} size={18} className={style.text} />
+              <div className={cn('w-2 h-2 rounded-full shrink-0 aspect-square animate-pulse', style.dot)} />
+              <AppIcon name={sector.icon} size={18} className={cn(style.text, 'transition-transform duration-300')} />
               <span className="text-[11px] font-bold text-foreground">{sector.label}</span>
               <span className={cn('text-[10px] font-semibold', style.text)}>{style.label}</span>
             </div>

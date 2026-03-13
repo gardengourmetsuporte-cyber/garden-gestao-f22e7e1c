@@ -31,12 +31,17 @@ export function ServiceDashboardView() {
 
       {/* KPI Grid 2x2 */}
       <div className="grid grid-cols-2 gap-2">
-        {KPI_ITEMS.map(kpi => (
+        {KPI_ITEMS.map((kpi, i) => (
           <div
             key={kpi.key}
-            className="flex items-center gap-2.5 rounded-xl px-3.5 py-3 bg-card/70 border border-border/30"
+            className={cn(
+              "flex items-center gap-2.5 rounded-xl px-3.5 py-3 bg-card/70 border border-border/30",
+              "transition-all duration-300 hover:border-border/60 hover:bg-card/90 hover:shadow-lg hover:shadow-black/10 hover:scale-[1.02] active:scale-[0.97]",
+              "animate-slide-up",
+              `dash-stagger-${i + 2}`,
+            )}
           >
-            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", kpi.variant)}>
+            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110", kpi.variant)}>
               <AppIcon name={kpi.icon} size={18} />
             </div>
             <div className="text-left min-w-0">

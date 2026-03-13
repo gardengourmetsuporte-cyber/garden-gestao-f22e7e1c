@@ -114,13 +114,15 @@ export function QuickStatsWidget() {
 
   return (
     <div className="grid grid-cols-3 gap-2 lg:grid-cols-6">
-      {allCards.map((card) => (
+      {allCards.map((card, i) => (
         <button
           key={card.key}
           onClick={() => navigate(card.route)}
           className={cn(
-            "flex items-center gap-2 rounded-xl px-2.5 py-2 transition-all duration-200 active:scale-[0.97]",
-            "bg-card/70 border border-border/30",
+            "flex items-center gap-2 rounded-xl px-2.5 py-2 transition-all duration-300 active:scale-[0.95]",
+            "bg-card/70 border border-border/30 hover:border-border/60 hover:bg-card/90 hover:shadow-lg hover:shadow-black/10",
+            "animate-slide-up",
+            `dash-stagger-${i + 1}`,
           )}
         >
           <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", variantIcon[card.variant])}>
