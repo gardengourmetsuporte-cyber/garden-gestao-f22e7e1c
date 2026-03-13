@@ -56,7 +56,7 @@ const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 px-0.5">
+    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70 px-0.5">
       {title}
     </h3>
   );
@@ -178,14 +178,14 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="px-4 py-3 lg:px-8 lg:py-4 max-w-[1400px] mx-auto flex flex-col gap-4">
+    <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-[1400px] mx-auto flex flex-col gap-5">
 
 
       {/* Greeting + Refresh */}
       <DashboardContextBar firstName={firstName} stats={stats} />
 
       {/* View Selector */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-2.5">
         {([
           { key: 'operational' as const, icon: 'LayoutGrid', label: 'Operacional' },
           { key: 'financial' as const, icon: 'Landmark', label: 'Financeiro' },
@@ -196,17 +196,17 @@ export function AdminDashboard() {
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-xl text-[11px] font-semibold transition-all duration-300 touch-manipulation border",
+              "flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl text-xs font-semibold transition-all duration-300 touch-manipulation border",
               view === tab.key
                 ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 border-primary/50 scale-[1.03]"
-                : "bg-card/80 text-muted-foreground hover:text-foreground hover:bg-card hover:scale-[1.02] border-border/40 active:scale-[0.95]"
+                : "bg-card/80 text-muted-foreground hover:text-foreground hover:bg-card hover:scale-[1.02] border-border/30 active:scale-[0.95]"
             )}
           >
             <div className={cn(
               "flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300",
               view === tab.key
-                ? "bg-primary-foreground/20 rotate-0"
-                : "bg-muted/60"
+                ? "bg-primary-foreground/20"
+                : "bg-muted/50"
             )}>
               <AppIcon name={tab.icon} size={16} className="shrink-0" />
             </div>
@@ -249,7 +249,7 @@ export function AdminDashboard() {
 
       {/* Widgets Grid */}
       {view !== 'team' && view !== 'service' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {widgets.map((widget) => {
               const stagger = nextStagger();
               return renderWidget(widget, stagger);

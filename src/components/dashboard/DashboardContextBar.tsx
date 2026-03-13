@@ -24,12 +24,11 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
   return (
     <div>
       <h2
-        className="text-base font-extrabold text-foreground font-display"
-        style={{ letterSpacing: '-0.03em' }}
+        className="text-lg font-extrabold text-foreground font-display tracking-tight"
       >
         {greeting}, {firstName} <span className="animate-wave-hand">👋</span>
       </h2>
-      <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">
+      <p className="text-xs text-muted-foreground mt-0.5 leading-tight">
         {capitalizedDate}
         {activeUnit?.name && (
           <> · <span className="text-foreground/70">{activeUnit.name}</span></>
