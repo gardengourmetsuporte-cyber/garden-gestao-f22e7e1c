@@ -27,7 +27,7 @@ export function LanguageSwitcher({ onChange }: Props) {
         {LOCALE_LABELS[locale]}
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border z-50 overflow-hidden min-w-[80px]">
+        <div className="absolute right-0 top-full mt-1 bg-popover rounded-lg shadow-lg border border-border z-50 overflow-hidden min-w-[80px]">
           {(Object.keys(LOCALE_LABELS) as MenuLocale[]).map((l) => (
             <button
               key={l}
