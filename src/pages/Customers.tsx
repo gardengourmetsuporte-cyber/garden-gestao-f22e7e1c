@@ -178,7 +178,7 @@ export default function Customers() {
             className={cn("h-11 w-11 shrink-0", !searchOpen && "border-border/50 bg-card")}
             onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setSearch(''); }}
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>{searchOpen ? 'close' : 'search'}</span>
+            <AppIcon name={searchOpen ? 'close' : 'search'} size={18} />
           </Button>
           <Select
             value={segmentFilter || 'all'}
