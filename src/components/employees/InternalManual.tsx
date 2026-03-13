@@ -190,9 +190,9 @@ export function InternalManual() {
           {/* Sign status for employee */}
           {!isAdmin && myEmployee && (
             myAcknowledged ? (
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <AppIcon name="check_circle" size={16} className="text-emerald-400" />
-                <span className="text-xs text-emerald-400 font-medium">Você já assinou este manual</span>
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-success/10 border border-success/20">
+                <AppIcon name="check_circle" size={16} className="text-success" />
+                <span className="text-xs text-success font-medium">Você já assinou este manual</span>
               </div>
             ) : (
               <div className="flex items-center gap-2 p-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
