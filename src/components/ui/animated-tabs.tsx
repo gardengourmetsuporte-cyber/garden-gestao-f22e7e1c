@@ -63,7 +63,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             "relative flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
             isCompact ? "min-w-0 shrink-0 px-3 flex-1" : "flex-1 px-1",
             "min-h-[44px]",
-            activeTab === tab.key ? 'text-emerald-400' : 'text-muted-foreground'
+            activeTab === tab.key ? 'text-primary' : 'text-muted-foreground'
           )}
         >
           {tab.icon}
