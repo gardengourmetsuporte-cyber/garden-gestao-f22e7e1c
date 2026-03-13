@@ -427,7 +427,7 @@ const TabButton = forwardRef<
           }}
         />
         {tab.customIcon ? (
-          <img src={tab.customIcon} alt="" className={cn("w-[22px] h-[22px] relative z-10 transition-all", active ? "icon-tint-primary" : "icon-tint-muted")} />
+          <img src={tab.customIcon} alt="" className={cn("w-[22px] h-[22px] relative z-10", active ? "icon-tint-primary" : "icon-tint-muted")} />
         ) : (
           <AppIcon
             name={tab.icon}
