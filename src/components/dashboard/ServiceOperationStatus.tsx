@@ -39,7 +39,7 @@ export function ServiceOperationStatus({ pulse }: { pulse: OperationPulse }) {
     <div className={cn('card-base p-4 border', overall.ring, 'ring-1')}>
       {/* Summary line */}
       <div className="flex items-center gap-2 mb-3">
-        <div className={cn('w-2.5 h-2.5 rounded-full animate-pulse', overall.dot)} />
+        <div className={cn('w-2 h-2 rounded-full animate-pulse shrink-0 aspect-square', overall.dot)} />
         <p className={cn('text-xs font-semibold', overall.text)}>{pulse.summary}</p>
       </div>
 
