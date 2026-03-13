@@ -73,7 +73,7 @@ export default function Employees() {
                       )}
                     >
                       <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", isActive ? "bg-primary/20" : "bg-primary/10")}>
-                        <AppIcon name={tab.icon} size={20} fill={tab.iconFill ?? 1} className={isActive ? "text-primary" : "text-muted-foreground"} />
+                        <AppIcon name={tab.icon} size={20} fill={(tab.iconFill ?? 1) as 0 | 1} className={isActive ? "text-primary" : "text-muted-foreground"} />
                       </div>
                       <span className={cn("text-[10px] font-semibold truncate w-full text-center", isActive ? "text-primary" : "text-muted-foreground")}>{tab.label}</span>
                     </button>
