@@ -24,66 +24,63 @@ html {
 }
 
 /* =========================================================
-   DESIGN SYSTEM - Garden Gestão (Clean SaaS)
+   DESIGN SYSTEM - Garden Gestão (Spotify Dark)
    ========================================================= */
 
 @layer base {
 
   :root {
-    --radius: 1rem;
-
-    /* Brand base */
-    --garden-green: 270 70% 55%;
+    --radius: 0.5rem;
 
     /* Semantic finance tokens */
-    --color-income: 156 72% 45%;
-    --color-expense: 348 83% 53%;
-    --color-transfer: 220 80% 65%;
+    --color-income: 141 73% 42%;
+    --color-expense: 0 72% 51%;
+    --color-transfer: 210 60% 55%;
     --color-pending: 43 96% 56%;
-    --color-credit-card: 260 70% 60%;
+    --color-credit-card: 260 60% 55%;
 
-    /* Premium surface */
-    --surface-elevated: 240 5% 15%;
-    --surface-sunken: 240 10% 4%;
+    /* Surface layers */
+    --surface-elevated: 0 0% 16%;
+    --surface-sunken: 0 0% 5%;
   }
 
-  /* ===== DARK THEME (Clean Slate) ===== */
+  /* ===== DARK THEME (Spotify) ===== */
   .dark {
-    --background: 220 14% 8%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 7%;
+    --foreground: 0 0% 100%;
 
-    --card: 220 13% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 220 13% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 13%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 270 70% 55%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 141 73% 42%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 220 12% 15%;
-    --secondary-foreground: 220 5% 85%;
+    --secondary: 0 0% 16%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 220 12% 15%;
-    --muted-foreground: 220 8% 62%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 220 12% 18%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 348 83% 53%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 156 72% 45%;
-    --success-foreground: 0 0% 100%;
+    --success: 141 73% 42%;
+    --success-foreground: 0 0% 0%;
 
     --warning: 43 96% 56%;
-    --warning-foreground: 0 0% 100%;
+    --warning-foreground: 0 0% 0%;
 
-    --border: 220 12% 18%;
-    --input: 220 12% 15%;
-    --ring: 270 70% 55%;
+    --border: 0 0% 15%;
+    --input: 0 0% 16%;
+    --ring: 141 73% 42%;
 
-    /* No colored glows — neutral shadows only */
+    /* No glows — Spotify is flat */
     --glow-primary: none;
     --glow-accent: none;
     --glow-success: none;
@@ -91,99 +88,100 @@ html {
     --glow-warning: none;
     --glow-cyan: none;
 
-    /* Subtle Gradients */
-    --gradient-brand: linear-gradient(135deg, hsl(270 70% 50%), hsl(280 80% 60%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(270 70% 55% / 0.15), hsl(280 80% 60% / 0.05));
-    --gradient-surface: linear-gradient(180deg, hsl(220 13% 13%), hsl(220 14% 8%));
+    /* Gradients */
+    --gradient-brand: linear-gradient(135deg, hsl(141 73% 42%), hsl(141 73% 48%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(141 73% 42% / 0.15), hsl(141 73% 48% / 0.05));
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 11%), hsl(0 0% 7%));
 
-    /* Neutral shadows */
-    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.2), 0 4px 12px hsl(0 0% 0% / 0.12);
-    --shadow-card-hover: 0 4px 12px hsl(0 0% 0% / 0.25), 0 8px 24px hsl(0 0% 0% / 0.15);
-    --shadow-elevated: 0 6px 20px hsl(0 0% 0% / 0.3), 0 12px 40px hsl(0 0% 0% / 0.18);
-    --shadow-floating: 0 8px 28px hsl(0 0% 0% / 0.25);
+    /* Zero shadows */
+    --shadow-card: none;
+    --shadow-card-hover: none;
+    --shadow-elevated: none;
+    --shadow-floating: none;
     --shadow-glow: none;
 
-    /* Sidebar tokens */
-    --sidebar-background: 220 14% 9%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 270 70% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 12% 16%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 12% 18%;
-    --sidebar-ring: 270 70% 55%;
+    /* Sidebar = same as background */
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 141 73% 42%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 141 73% 42%;
   }
 
-  /* ===== LIGHT THEME ===== */
+  /* ===== LIGHT THEME (Spotify Light) ===== */
   :root:not(.dark) {
-    --color-income: 156 72% 38%;
-    --color-expense: 348 83% 45%;
-    --color-transfer: 220 80% 50%;
+    --color-income: 141 73% 35%;
+    --color-expense: 0 72% 45%;
+    --color-transfer: 210 60% 45%;
     --color-pending: 43 96% 45%;
-    --color-credit-card: 260 70% 50%;
+    --color-credit-card: 260 60% 45%;
 
     --surface-elevated: 0 0% 100%;
-    --surface-sunken: 240 5% 96%;
-    --background: 240 5% 98%;
-    --foreground: 240 10% 10%;
+    --surface-sunken: 0 0% 96%;
+
+    --background: 0 0% 98%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 10%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 10%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 270 70% 48%;
+    --primary: 141 73% 37%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 94%;
-    --secondary-foreground: 240 10% 20%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 5% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 240 5% 92%;
-    --accent-foreground: 240 10% 10%;
+    --accent: 0 0% 92%;
+    --accent-foreground: 0 0% 9%;
 
-    --destructive: 348 83% 50%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 156 72% 40%;
+    --success: 141 73% 35%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 43 96% 45%;
+    --warning: 43 96% 42%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%;
-    --input: 240 5% 94%;
-    --ring: 270 70% 48%;
+    --border: 0 0% 92%;
+    --input: 0 0% 94%;
+    --ring: 141 73% 37%;
 
-    /* No glows in light */
+    /* No glows */
     --glow-primary: none;
     --glow-success: none;
     --glow-destructive: none;
     --glow-warning: none;
     --glow-cyan: none;
 
-    --shadow-card: 0 1px 3px hsl(234 20% 30% / 0.06), 0 4px 12px hsl(234 20% 30% / 0.04);
-    --shadow-card-hover: 0 4px 16px hsl(234 20% 30% / 0.08), 0 8px 28px hsl(234 20% 30% / 0.04);
-    --shadow-elevated: 0 6px 20px hsl(234 20% 30% / 0.08), 0 12px 40px hsl(234 20% 30% / 0.04);
-    --shadow-floating: 0 8px 32px hsl(234 20% 30% / 0.08), 0 2px 8px hsl(234 20% 30% / 0.04);
-
-    --gradient-brand: linear-gradient(135deg, hsl(270 50% 30%), hsl(270 60% 40%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(270 60% 45% / 0.06), hsl(280 60% 50% / 0.03));
-    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(270 5% 97%));
+    --shadow-card: none;
+    --shadow-card-hover: none;
+    --shadow-elevated: none;
+    --shadow-floating: none;
     --shadow-glow: none;
+
+    --gradient-brand: linear-gradient(135deg, hsl(141 73% 37%), hsl(141 73% 42%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(141 73% 37% / 0.06), hsl(141 73% 42% / 0.03));
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 97%));
 
     /* Sidebar tokens */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 10%;
-    --sidebar-primary: 270 70% 48%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 141 73% 37%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 94%;
-    --sidebar-accent-foreground: 240 10% 10%;
-    --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 270 70% 48%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 92%;
+    --sidebar-ring: 141 73% 37%;
   }
 
 }
