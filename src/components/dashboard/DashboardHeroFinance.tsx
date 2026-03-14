@@ -25,7 +25,7 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
   return (
     <div className="animate-card-reveal space-y-3">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-0">
         <span className="text-sm font-bold text-foreground">Finanças</span>
         <div className="flex items-center gap-1">
           <button
