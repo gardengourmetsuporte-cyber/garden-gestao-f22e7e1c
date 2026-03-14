@@ -141,43 +141,33 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
   return (
     <>
       <div className="space-y-3">
-        {/* Folhinha Mascot Card — slim */}
-        <div className="relative overflow-hidden rounded-2xl" style={{ minHeight: 64 }}>
-          <img
-            src="/images/folhinha-mascot.png"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
-
-          <div className="relative flex items-center justify-between p-3 h-full" style={{ minHeight: 64 }}>
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Copilot IA</span>
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                </div>
-                <p className="text-sm font-semibold text-white leading-tight mt-0.5">Organizar agenda</p>
-              </div>
+        {/* Copilot IA Card — clean */}
+        <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-secondary/50">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+              <AppIcon name="Sparkles" size={18} className="text-primary" />
             </div>
-
-            <button
-              onClick={handleOrganize}
-              disabled={isOrganizing || stats.pending.length === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 active:scale-95 transition-all backdrop-blur-md disabled:opacity-40 shrink-0"
-            >
-              {isOrganizing ? (
-                <svg className="animate-spin h-3.5 w-3.5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-              ) : (
-                <AppIcon name="Sparkles" size={13} className="text-primary" />
-              )}
-              <span className="text-xs font-semibold text-white">{isOrganizing ? '...' : 'IA'}</span>
-            </button>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Copilot IA</span>
+              <p className="text-sm font-semibold text-foreground leading-tight">Organizar agenda</p>
+            </div>
           </div>
+
+          <button
+            onClick={handleOrganize}
+            disabled={isOrganizing || stats.pending.length === 0}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 active:scale-95 transition-all disabled:opacity-40 shrink-0"
+          >
+            {isOrganizing ? (
+              <svg className="animate-spin h-3.5 w-3.5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            ) : (
+              <AppIcon name="Sparkles" size={13} className="text-primary" />
+            )}
+            <span className="text-xs font-semibold text-primary">{isOrganizing ? '...' : 'IA'}</span>
+          </button>
         </div>
 
         {/* Overdue alerts */}
