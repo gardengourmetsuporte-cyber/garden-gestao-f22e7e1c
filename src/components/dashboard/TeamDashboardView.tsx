@@ -65,40 +65,49 @@ export function TeamDashboardView({ currentUserId }: Props) {
   return (
     <div className="space-y-4">
       {/* Operation Pulse Hero */}
-      <div className={cn('card-base p-4 border ring-1 animate-slide-up', pulseCfg.ring)}>
-        <div className="flex items-center gap-2 mb-4">
-          <div className={cn('w-2.5 h-2.5 rounded-full animate-pulse', pulseCfg.dot)} />
-          <p className={cn('text-xs font-semibold', pulseCfg.color)}>{summary}</p>
+      <div className="card-surface p-5 space-y-4 animate-slide-up">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className={cn('w-2 h-2 rounded-full animate-pulse', pulseCfg.dot)} />
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Equipe</h3>
+          </div>
+          <span className={cn('text-[10px] font-bold px-2 py-0.5 rounded-full', pulseCfg.bg, pulseCfg.color)}>
+            {pulseCfg.label}
+          </span>
         </div>
 
+        {/* Summary */}
+        <p className={cn('text-sm font-semibold', pulseCfg.color)}>{summary}</p>
+
         {/* Status indicators */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-2.5">
           {[
-            { value: activeEmployees, label: 'Ativos', icon: 'groups', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-            { value: completionsToday, label: 'Concluídos', icon: 'task_alt', color: 'text-primary', bg: 'bg-primary/10' },
-            { value: pendingToday, label: 'Pendentes', icon: 'pending_actions', color: pendingToday > 10 ? 'text-destructive' : 'text-amber-400', bg: pendingToday > 10 ? 'bg-destructive/10' : 'bg-amber-500/10' },
+            { value: activeEmployees, label: 'Ativos', icon: 'groups', color: 'text-blue-400', bg: 'bg-blue-500/8' },
+            { value: completionsToday, label: 'Concluídos', icon: 'task_alt', color: 'text-primary', bg: 'bg-primary/8' },
+            { value: pendingToday, label: 'Pendentes', icon: 'pending_actions', color: pendingToday > 10 ? 'text-destructive' : 'text-amber-400', bg: pendingToday > 10 ? 'bg-destructive/8' : 'bg-amber-500/8' },
             { value: `${utilizationPct}%`, label: 'Eficiência', icon: 'speed', color: pulseCfg.color, bg: pulseCfg.bg },
           ].map((stat, i) => (
-            <div key={stat.label} className={cn('flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all duration-300 hover:scale-[1.03]', stat.bg, 'animate-slide-up', `dash-stagger-${i + 2}`)}>
-              <div className="w-8 h-8 flex items-center justify-center shrink-0">
+            <div key={stat.label} className={cn('flex flex-col items-center gap-2 py-4 rounded-2xl transition-all duration-300', stat.bg, 'animate-slide-up', `dash-stagger-${i + 2}`)}>
+              <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', stat.bg)}>
                 <AppIcon name={stat.icon} size={18} className={stat.color} />
               </div>
               <span className="text-lg font-extrabold font-display leading-tight tabular-nums">{stat.value}</span>
-              <span className="text-[9px] text-muted-foreground font-medium">{stat.label}</span>
+              <span className="text-[10px] text-muted-foreground font-medium">{stat.label}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Utilization Progress */}
-      <div className="card-base p-4 animate-slide-up dash-stagger-4">
-        <div className="flex items-center gap-2 mb-2.5">
-          <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
-            <AppIcon name="speed" size={14} className="text-primary" />
+      <div className="card-surface p-5 animate-slide-up dash-stagger-4">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+            <AppIcon name="speed" size={15} className="text-primary" />
           </div>
           <h3 className="text-sm font-semibold text-foreground flex-1">Aproveitamento Geral</h3>
           <span className={cn(
-            'text-sm font-bold tabular-nums',
+            'text-base font-bold tabular-nums',
             utilizationPct >= 80 ? 'text-primary' :
             utilizationPct >= 50 ? 'text-amber-400' :
             'text-destructive'
@@ -107,9 +116,9 @@ export function TeamDashboardView({ currentUserId }: Props) {
           </span>
         </div>
         <Progress value={utilizationPct} className="h-2.5" />
-        <div className="flex justify-between mt-2">
+        <div className="flex justify-between mt-2.5">
           <span className="text-[10px] text-muted-foreground">{completionsToday} de {totalAvailableToday} tarefas</span>
-          <span className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded-full', pulseCfg.bg, pulseCfg.color)}>
+          <span className={cn('text-[10px] font-semibold px-2 py-0.5 rounded-full', pulseCfg.bg, pulseCfg.color)}>
             {pulseCfg.label}
           </span>
         </div>
