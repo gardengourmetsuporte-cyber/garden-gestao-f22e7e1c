@@ -148,7 +148,7 @@ export const ICON_MAP: Record<string, string> = {
   Wallet: 'wallet',
   Landmark: 'account_balance',
   CreditCard: 'credit_card',
-  Receipt: 'receipt',
+  Receipt: 'receipt_long',
   ArrowUpCircle: 'arrow_circle_up',
   ArrowDownCircle: 'arrow_circle_down',
   ArrowLeftRight: 'swap_horiz',
