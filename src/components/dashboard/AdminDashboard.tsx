@@ -181,21 +181,21 @@ export function AdminDashboard() {
       {/* Greeting */}
       <DashboardContextBar firstName={firstName} stats={stats} />
 
-      {/* View Selector — Spotify Pill Tabs */}
+      {/* View Selector — Liquid Glass Pill Tabs */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar">
         {VIEW_TABS.map(tab => (
           <button
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-200 touch-manipulation",
+              "relative flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 touch-manipulation overflow-hidden",
               view === tab.key
                 ? "bg-foreground text-background"
-                : "bg-secondary text-muted-foreground hover:text-foreground active:scale-[0.97]"
+                : "liquid-glass-pill text-muted-foreground hover:text-foreground active:scale-[0.97]"
             )}
           >
-            <AppIcon name={tab.icon} size={14} className="shrink-0" />
-            <span>{tab.label}</span>
+            <AppIcon name={tab.icon} size={14} className="shrink-0 relative z-10" />
+            <span className="relative z-10">{tab.label}</span>
           </button>
         ))}
       </div>
