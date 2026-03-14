@@ -87,6 +87,26 @@ html {
     --neon-amber: 43 96% 56%;
     --neon-purple: 260 60% 55%;
 
+    /* Coin/Points colors (1-4 stars) */
+    --coin-1: 187 85% 53%;
+    --coin-1-glow: 187 85% 60%;
+    --coin-2: 43 96% 56%;
+    --coin-2-glow: 43 96% 63%;
+    --coin-3: 330 80% 60%;
+    --coin-3-glow: 330 80% 67%;
+    --coin-4: 260 60% 60%;
+    --coin-4-glow: 260 60% 67%;
+
+    /* Bonus tiers */
+    --bonus-5: 43 96% 56%;
+    --bonus-5-glow: 43 96% 63%;
+    --bonus-10: 330 80% 60%;
+    --bonus-10-glow: 330 80% 67%;
+    --bonus-15: 260 60% 60%;
+    --bonus-15-glow: 260 60% 67%;
+    --bonus-20: 0 72% 55%;
+    --bonus-20-glow: 0 72% 62%;
+
     /* No glows — Spotify is flat */
     --glow-primary: none;
     --glow-accent: none;
