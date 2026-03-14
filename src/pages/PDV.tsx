@@ -297,7 +297,7 @@ export default function PDV() {
                 <button
                   key={product.id}
                   onClick={() => setSelectedProduct(product)}
-                  className="bg-card border border-border/30 rounded-2xl p-3 text-left hover:border-primary/30 transition-all active:scale-[0.97] flex flex-col gap-0.5"
+                  className="bg-card rounded-2xl p-3 text-left hover:bg-secondary/50 transition-all active:scale-[0.97] flex flex-col gap-0.5"
                 >
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.name} className="w-full aspect-[4/3] object-cover rounded-xl mb-1" />
