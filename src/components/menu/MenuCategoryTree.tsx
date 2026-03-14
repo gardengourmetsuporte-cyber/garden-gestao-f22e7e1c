@@ -185,7 +185,7 @@ export function MenuCategoryTree({
           : '';
 
         return (
-          <div key={cat.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+          <div key={cat.id} className="bg-card rounded-2xl overflow-hidden relative">
             {/* Vertical accent bar */}
             <div
               className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
@@ -193,19 +193,19 @@ export function MenuCategoryTree({
             />
 
             {/* Category header */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center">
               <button
                 onClick={() => toggleCat(cat.id)}
                 className="flex-1 flex items-center gap-3 pl-5 pr-3 py-3.5 text-sm transition-all"
               >
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: `${cat.color || 'hsl(var(--primary))'}15` }}
                 >
-                  <AppIcon name={cat.icon || 'Package'} size={20} style={{ color: cat.color || 'hsl(var(--primary))' }} />
+                  <AppIcon name={cat.icon || 'Package'} size={18} style={{ color: cat.color || 'hsl(var(--primary))' }} />
                 </div>
                 <div className="flex-1 text-left min-w-0">
-                  <p className="font-semibold text-foreground truncate">{cat.name}</p>
+                  <p className="font-semibold text-foreground truncate text-[14px]">{cat.name}</p>
                   {viewMode === 'ficha' && catStats ? (
                     <p className="text-[11px] text-muted-foreground">
                       {catStats.linked}/{catStats.total} com ficha · CMV {catStats.avgCMV.toFixed(0)}%
@@ -221,14 +221,17 @@ export function MenuCategoryTree({
                     {catStats.avgMargin.toFixed(0)}%
                   </span>
                 ) : (
-                  <AppIcon
-                    name="ChevronDown"
-                    size={16}
-                    className={cn(
-                      "text-muted-foreground/50 transition-transform duration-200",
-                      !expanded && "-rotate-90"
-                    )}
-                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-muted-foreground font-medium">{totalProducts}</span>
+                    <AppIcon
+                      name="ChevronDown"
+                      size={16}
+                      className={cn(
+                        "text-muted-foreground/50 transition-transform duration-200",
+                        !expanded && "-rotate-90"
+                      )}
+                    />
+                  </div>
                 )}
               </button>
               {viewMode !== 'ficha' && (
