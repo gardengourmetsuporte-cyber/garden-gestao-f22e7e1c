@@ -27,7 +27,7 @@ interface InviteData {
 export default function Invite() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshUserData, refreshSubscription } = useAuth();
   const { refetchUnits } = useUnit();
   const token = searchParams.get('token');
 
@@ -127,6 +127,10 @@ export default function Invite() {
 
       // Refresh units so ProtectedRoute won't redirect to onboarding
       await refetchUnits();
+
+      // Sync plan + role immediately after accepting invite
+      await refreshUserData();
+      refreshSubscription();
 
       toast.success(`Bem-vindo ao ${invite!.unit_name}!`);
       navigate('/', { replace: true });

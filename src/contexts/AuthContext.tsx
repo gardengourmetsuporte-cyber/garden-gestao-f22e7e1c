@@ -67,14 +67,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Track the effective plan set by UnitContext so refreshSubscription doesn't overwrite it
   const effectivePlanRef = useRef<PlanTier | null>(null);
 
-  const resolveInheritedUnitPlan = useCallback(async (userId: string): Promise<PlanTier | null> => {
+  const resolveInheritedUnitPlan = useCallback(async (userId: string, retryCount = 0): Promise<PlanTier | null> => {
     try {
       const { data: userUnits, error: userUnitsError } = await supabase
         .from('user_units')
         .select('unit_id, is_default')
         .eq('user_id', userId);
 
-      if (userUnitsError || !userUnits?.length) return null;
+      if (userUnitsError || !userUnits?.length) {
+        // Retry once after 1.5s to handle race condition on first login after email confirm
+        if (retryCount < 1) {
+          await new Promise(r => setTimeout(r, 1500));
+          return resolveInheritedUnitPlan(userId, retryCount + 1);
+        }
+        return null;
+      }
 
       const preferredUnitId = userUnits.find((u) => u.is_default)?.unit_id ?? userUnits[0].unit_id;
       if (!preferredUnitId) return null;
@@ -376,6 +383,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUserData = useCallback(async () => {
     if (user) {
+      effectivePlanRef.current = null; // clear stale plan so it re-resolves
       fetchingRef.current = false; // allow re-fetch
       await fetchUserDataRef.current?.(user.id);
     }
