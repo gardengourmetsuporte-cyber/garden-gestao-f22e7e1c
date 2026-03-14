@@ -39,17 +39,26 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
         `,
       }}
     >
-      {/* Top row: logo + greeting */}
+      {/* Top row: logo + greeting + edit button */}
       <div className="flex items-center gap-3.5 mb-5">
         <img
           src={gardenLogo}
           alt="Garden"
           className="w-12 h-12 rounded-full object-contain bg-primary/10 p-0.5"
         />
-        <div>
+        <div className="flex-1">
           <p className="text-xs text-muted-foreground font-medium">{greeting},</p>
           <p className="text-base font-bold text-foreground tracking-tight">{firstName}</p>
         </div>
+        {(isAdmin || isSuperAdmin) && (
+          <button
+            onClick={() => navigate('/settings?tab=units')}
+            className="w-9 h-9 rounded-xl bg-foreground/10 backdrop-blur-sm flex items-center justify-center hover:bg-foreground/20 active:scale-95 transition-all"
+            title="Editar empresa"
+          >
+            <AppIcon name="Pencil" size={16} className="text-foreground/70" />
+          </button>
+        )}
       </div>
 
       {/* Hero text — Spotify style */}
