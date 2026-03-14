@@ -33,11 +33,11 @@ html {
     --radius: 0.5rem;
 
     /* Semantic finance tokens */
-    --color-income: 152 44% 42%;
-    --color-expense: 4 40% 48%;
-    --color-transfer: 215 35% 50%;
-    --color-pending: 38 40% 50%;
-    --color-credit-card: 255 25% 52%;
+    --color-income: 160 60% 44%;
+    --color-expense: 0 55% 55%;
+    --color-transfer: 215 50% 55%;
+    --color-pending: 40 65% 55%;
+    --color-credit-card: 260 40% 58%;
 
     /* Surface layers */
     --surface-elevated: 0 0% 16%;
