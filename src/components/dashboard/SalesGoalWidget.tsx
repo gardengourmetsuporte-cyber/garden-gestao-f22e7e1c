@@ -110,7 +110,7 @@ export function SalesGoalWidget() {
   }
 
   return (
-    <div className="card-surface p-4 space-y-3">
+    <div className="card-surface p-5 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -120,22 +120,22 @@ export function SalesGoalWidget() {
         {settingsSheet}
       </div>
 
-      {/* Goal rows */}
-      <div className="flex gap-3">
+      {/* Goal cards */}
+      <div className="grid grid-cols-2 gap-3">
         {dailyGoal > 0 && (
-          <div className="flex-1 flex items-center gap-3 rounded-xl bg-muted/40 border border-border/30 p-3">
-            <div className="relative">
-              <GoalRing pct={dailyPct} size={48} stroke={4} />
-              <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-foreground tabular-nums">
+          <div className="flex items-center gap-3 rounded-2xl bg-secondary/50 p-4">
+            <div className="relative shrink-0">
+              <GoalRing pct={dailyPct} size={52} stroke={4} />
+              <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-foreground tabular-nums">
                 {dailyPct.toFixed(0)}%
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-0.5">Hoje</p>
-              <p className="text-sm font-bold text-foreground tabular-nums leading-tight truncate">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1">Hoje</p>
+              <p className="text-base font-bold text-foreground tabular-nums leading-tight truncate">
                 {formatCurrency(todayRevenue)}
               </p>
-              <p className="text-[11px] text-muted-foreground tabular-nums truncate">
+              <p className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
                 de {formatCurrency(dailyGoal)}
               </p>
             </div>
@@ -143,21 +143,21 @@ export function SalesGoalWidget() {
         )}
 
         {monthlyGoal > 0 && (
-          <div className="flex-1 flex items-center gap-3 rounded-xl bg-muted/40 border border-border/30 p-3">
-            <div className="relative">
-              <GoalRing pct={monthlyPct} size={48} stroke={4} />
-              <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-foreground tabular-nums">
+          <div className="flex items-center gap-3 rounded-2xl bg-secondary/50 p-4">
+            <div className="relative shrink-0">
+              <GoalRing pct={monthlyPct} size={52} stroke={4} />
+              <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-foreground tabular-nums">
                 {monthlyPct.toFixed(0)}%
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-0.5">
-                {format(new Date(), 'MMM', { locale: ptBR })}
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold mb-1">
+                {format(new Date(), 'MMM', { locale: ptBR }).toUpperCase()}
               </p>
-              <p className="text-sm font-bold text-foreground tabular-nums leading-tight truncate">
+              <p className="text-base font-bold text-foreground tabular-nums leading-tight truncate">
                 {formatCurrency(monthRevenue)}
               </p>
-              <p className="text-[11px] text-muted-foreground tabular-nums truncate">
+              <p className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
                 de {formatCurrency(monthlyGoal)}
               </p>
             </div>
