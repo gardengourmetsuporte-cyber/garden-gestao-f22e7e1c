@@ -39,16 +39,6 @@ export function UnifiedCalendarWidget() {
   return (
     <div className="col-span-2 animate-card-reveal stagger-4">
       <div className="space-y-2">
-        {/* Header */}
-        <div className="flex items-center justify-between px-1">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Calendário</h3>
-          <button
-            onClick={() => navigate('/calendar')}
-            className="text-[11px] text-primary font-medium hover:opacity-80 transition-opacity"
-          >
-            Ver completo
-          </button>
-        </div>
 
         {/* Month nav */}
         <UnifiedMonthNav
