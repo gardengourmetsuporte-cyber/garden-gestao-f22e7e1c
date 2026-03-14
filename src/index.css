@@ -78,10 +78,10 @@ html {
 
     --border: 0 0% 15%;
     --input: 0 0% 16%;
-    --ring: 141 73% 42%;
+    --ring: 142 71% 45%;
 
     /* Neon accent colors */
-    --neon-green: 141 73% 42%;
+    --neon-green: 142 71% 45%;
     --neon-red: 0 72% 51%;
     --neon-cyan: 187 85% 53%;
     --neon-amber: 43 96% 56%;
@@ -96,8 +96,8 @@ html {
     --glow-cyan: none;
 
     /* Gradients */
-    --gradient-brand: linear-gradient(135deg, hsl(141 73% 42%), hsl(141 73% 48%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(141 73% 42% / 0.15), hsl(141 73% 48% / 0.05));
+    --gradient-brand: linear-gradient(135deg, hsl(142 71% 45%), hsl(142 71% 50%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(142 71% 45% / 0.15), hsl(142 71% 50% / 0.05));
     --gradient-surface: linear-gradient(180deg, hsl(0 0% 11%), hsl(0 0% 7%));
 
     /* Zero shadows */
@@ -110,12 +110,12 @@ html {
     /* Sidebar = same as background */
     --sidebar-background: 0 0% 7%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 141 73% 42%;
+    --sidebar-primary: 142 71% 45%;
     --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 0 0% 16%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 141 73% 42%;
+    --sidebar-ring: 142 71% 45%;
   }
 
   /* ===== LIGHT THEME (Spotify Light) ===== */
