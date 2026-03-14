@@ -24,30 +24,29 @@ function BrandPanel() {
     <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-background">
       {/* Subtle grid pattern overlay */}
       <div
-        className="absolute inset-0 opacity-[0.05]"
+        className="absolute inset-0 opacity-[0.04] dark:opacity-[0.05]"
         style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(hsl(var(--foreground) / 0.15) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground) / 0.15) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
 
       {/* Glow orbs - Emerald theme */}
       <div
-        className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20 pointer-events-none"
+        className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20 dark:opacity-20 pointer-events-none"
         style={{ background: 'hsl(var(--primary))' }}
       />
       <div
-        className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-[120px] opacity-15 pointer-events-none"
+        className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-[120px] opacity-10 dark:opacity-15 pointer-events-none"
         style={{ background: 'hsl(var(--primary))' }}
       />
 
       <div className="relative z-10 flex flex-col items-center gap-8 px-12 max-w-lg">
         {/* Logo */}
         <div
-          className="relative w-36 h-36 rounded-full overflow-hidden flex items-center justify-center"
+          className="relative w-36 h-36 rounded-full overflow-hidden flex items-center justify-center bg-card dark:bg-foreground"
           style={{
-            background: 'hsl(var(--foreground))',
-            boxShadow: '0 0 100px hsl(var(--primary) / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
+            boxShadow: '0 0 100px hsl(var(--primary) / 0.15), 0 25px 70px rgba(0,0,0,0.15)',
           }}
         >
           <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
@@ -58,7 +57,7 @@ function BrandPanel() {
           <h1 className="text-5xl font-extrabold tracking-tight text-foreground font-display">
             Garden
           </h1>
-          <p className="text-[11px] text-foreground/35 tracking-[0.3em] uppercase font-semibold">
+          <p className="text-[11px] text-muted-foreground/60 tracking-[0.3em] uppercase font-semibold">
             Gestão Inteligente
           </p>
         </div>
@@ -74,12 +73,7 @@ function BrandPanel() {
           ].map(({ icon, label }) => (
             <div
               key={label}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium"
-              style={{
-                background: 'hsl(var(--primary) / 0.1)',
-                color: 'hsl(var(--primary))',
-                border: '1px solid hsl(var(--primary) / 0.15)',
-              }}
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/15"
             >
               <AppIcon name={icon} size={14} />
               {label}
@@ -89,15 +83,15 @@ function BrandPanel() {
 
         {/* Social proof */}
         <div className="text-center space-y-4 mt-4">
-          <p className="text-sm text-foreground/40 leading-relaxed max-w-xs mx-auto">
+          <p className="text-sm text-muted-foreground/60 leading-relaxed max-w-xs mx-auto">
             Simplifique a gestão do seu negócio com a plataforma mais veloz do mercado.
           </p>
-          <div className="flex items-center justify-center gap-6 text-foreground/20 text-xs">
+          <div className="flex items-center justify-center gap-6 text-muted-foreground/40 text-xs">
             <div className="flex items-center gap-1.5">
               <AppIcon name="Shield" size={14} />
               <span>Dados seguros</span>
             </div>
-            <div className="w-px h-3 bg-foreground/10" />
+            <div className="w-px h-3 bg-border" />
             <div className="flex items-center gap-1.5">
               <AppIcon name="Zap" size={14} />
               <span>Setup rápido</span>
