@@ -7,7 +7,7 @@ const actions = [
   { icon: 'point_of_sale', label: 'Fechar Caixa', route: '/cash-closing' },
   { icon: 'receipt_long', label: 'Novo Pedido', route: '/orders' },
   { icon: 'checklist', label: 'Checklist', route: '/checklists' },
-  { icon: 'qr_code_scanner', label: 'Escanear', route: '/scanner' },
+  { icon: 'storefront', label: 'Minha Loja', route: '/settings?tab=units' },
 ] as const;
 
 export function QuickActionsRow() {
