@@ -190,22 +190,21 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
                         <DropdownMenuItem onClick={() => setPayDialog({ open: true, paymentId: payment.id })}>
                           <AppIcon name="Receipt" size={16} className="mr-2" />Confirmar pagamento
                         </DropdownMenuItem>
-                        )}
-                        {payment.receipt_url && (
-                          <DropdownMenuItem onClick={() => setReceiptUrl(payment.receipt_url)}>
-                            <AppIcon name="Image" size={16} className="mr-2" />Ver Holerite
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onClick={() => handleEdit(payment)}>
-                          <AppIcon name="Pencil" size={16} className="mr-2" />Editar
+                      )}
+                      {payment.receipt_url && (
+                        <DropdownMenuItem onClick={() => setReceiptUrl(payment.receipt_url)}>
+                          <AppIcon name="Image" size={16} className="mr-2" />Ver Holerite
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setDeleteId(payment.id)} className="text-destructive">
-                          <AppIcon name="Trash2" size={16} className="mr-2" />Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
+                      )}
+                      <DropdownMenuItem onClick={() => handleEdit(payment)}>
+                        <AppIcon name="Pencil" size={16} className="mr-2" />Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setDeleteId(payment.id)} className="text-destructive">
+                        <AppIcon name="Trash2" size={16} className="mr-2" />Excluir
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                 </DropdownMenu>
+               </div>
             </div>
           ))}
         </div>
