@@ -119,7 +119,7 @@ function MobileBrandHeader() {
       }}
     >
       {/* Subtle border top separator indicating header */}
-      <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-foreground/5 to-transparent" />
 
       {/* Animated glow orbs - Emerald Theme */}
       <div
