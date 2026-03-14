@@ -134,26 +134,26 @@ export function BillsDueWidget({ bills, onNavigate }: Props) {
   const total = bills.reduce((s, b) => s + b.amount, 0);
 
   return (
-    <div className="card-command p-4 space-y-3">
-      <div className="flex items-center justify-between">
+    <div className="card-surface p-5 space-y-4">
+      {/* Header row */}
+      <div className="flex items-start justify-between">
         <button
           onClick={onNavigate}
-          className={cn("flex items-center gap-2", onNavigate ? 'cursor-pointer' : 'cursor-default')}
+          className={cn("flex items-center gap-2.5", onNavigate ? 'cursor-pointer' : 'cursor-default')}
           disabled={!onNavigate}
           type="button"
         >
-          <div className="w-8 h-8 rounded-xl bg-warning/10 flex items-center justify-center">
-            <AppIcon name="AlertTriangle" size={16} className="text-warning" />
+          <div className="w-9 h-9 rounded-xl bg-warning/10 flex items-center justify-center shrink-0">
+            <AppIcon name="AlertTriangle" size={17} className="text-warning" />
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>
-              Contas a Vencer
-            </h3>
+            <h3 className="text-sm font-bold text-foreground">Contas a Vencer</h3>
             <span className="text-[10px] text-muted-foreground">Próximos 7 dias</span>
           </div>
-          {onNavigate && <AppIcon name="ChevronRight" size={12} className="ml-1 text-muted-foreground/40" />}
+          {onNavigate && <AppIcon name="ChevronRight" size={12} className="ml-1 text-muted-foreground/40 mt-1" />}
         </button>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-end gap-2">
+          <span className="text-base font-bold text-warning tabular-nums">{formatCurrency(total)}</span>
           <div className="inline-flex items-center rounded-lg bg-secondary/60 p-0.5">
             <button
               onClick={() => setMode('grouped')}
@@ -178,7 +178,6 @@ export function BillsDueWidget({ bills, onNavigate }: Props) {
               <AppIcon name="List" size={14} />
             </button>
           </div>
-          <span className="text-sm font-bold text-warning">{formatCurrency(total)}</span>
         </div>
       </div>
 
