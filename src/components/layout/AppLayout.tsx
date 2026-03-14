@@ -123,9 +123,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </button>
                 </div>
 
-                {/* Right: Notifications only */}
+                {/* Right: Notifications + Profile */}
                 <div className="flex items-center gap-0.5">
                   <NotificationBell />
+                  <ProfileDropdown />
                 </div>
               </div>
             </div>
