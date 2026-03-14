@@ -57,26 +57,35 @@ export default function Employees() {
             />
           ) : (
             <>
-              {/* Navigation Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-                {tabs.map((tab) => {
-                  const isActive = activeTab === tab.key;
-                  return (
-                    <button
-                      key={tab.key}
-                      onClick={() => setActiveTab(tab.key)}
-                      className={cn(
-                        "flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-all shrink-0",
-                        isActive
-                          ? "bg-foreground text-background"
-                          : "bg-foreground/[0.07] text-muted-foreground backdrop-blur-sm"
-                      )}
-                    >
-                      {tab.label}
-                    </button>
-                  );
-                })}
-              </div>
+               {/* Navigation Cards */}
+               <div className={cn(
+                 "grid gap-2",
+                 tabs.length <= 4 ? "grid-cols-4" : tabs.length <= 6 ? "grid-cols-3" : "grid-cols-4"
+               )}>
+                 {tabs.map((tab) => {
+                   const isActive = activeTab === tab.key;
+                   return (
+                     <button
+                       key={tab.key}
+                       onClick={() => setActiveTab(tab.key)}
+                       className={cn(
+                         "flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl text-[11px] font-medium transition-all active:scale-[0.95]",
+                         isActive
+                           ? "bg-primary/15 text-primary"
+                           : "bg-secondary/50 text-muted-foreground"
+                       )}
+                     >
+                       <div className={cn(
+                         "w-9 h-9 rounded-xl flex items-center justify-center transition-colors",
+                         isActive ? "bg-primary/20" : "bg-foreground/[0.05]"
+                       )}>
+                         <AppIcon name={tab.icon} size={18} fill={tab.iconFill as 0 | 1} className={isActive ? "text-primary" : "text-muted-foreground"} />
+                       </div>
+                       <span className="truncate w-full text-center">{tab.label}</span>
+                     </button>
+                   );
+                 })}
+               </div>
 
               <div className="animate-fade-in" key={activeTab}>
                 {activeTab === 'employees' && isAdmin && <EmployeeList onSelectEmployee={setSelectedEmployee} />}
