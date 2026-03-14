@@ -125,14 +125,14 @@ function MobileBrandHeader() {
       <div
         className="absolute top-[15%] left-[20%] w-[250px] h-[250px] rounded-full blur-[100px] opacity-20 pointer-events-none"
         style={{
-          background: 'hsl(142 71% 45%)',
+          background: 'hsl(var(--primary))',
           animation: 'float-orb-1 8s ease-in-out infinite',
         }}
       />
       <div
         className="absolute bottom-[20%] right-[15%] w-[200px] h-[200px] rounded-full blur-[80px] opacity-15 pointer-events-none"
         style={{
-          background: 'hsl(142 76% 36%)',
+          background: 'hsl(var(--primary))',
           animation: 'float-orb-2 10s ease-in-out infinite',
         }}
       />
