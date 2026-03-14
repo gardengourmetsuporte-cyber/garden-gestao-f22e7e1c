@@ -184,10 +184,10 @@ export function AdminDashboard() {
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "px-3.5 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all duration-150 touch-manipulation shrink-0",
+              "px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all duration-200 touch-manipulation shrink-0",
               view === tab.key
-                ? "bg-foreground/90 text-background backdrop-blur-md"
-                : "bg-foreground/[0.07] backdrop-blur-sm text-foreground/60 hover:bg-foreground/[0.12] hover:text-foreground/80 active:scale-[0.96]"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-[0.96]"
             )}
           >
             {tab.label}
