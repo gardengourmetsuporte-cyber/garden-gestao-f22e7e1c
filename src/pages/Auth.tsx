@@ -190,12 +190,12 @@ function MobileBrandHeader() {
         </div>
 
         {/* Social proof */}
-        <div className="flex items-center justify-center gap-5 text-white/20 text-[10px] mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
+        <div className="flex items-center justify-center gap-5 text-foreground/20 text-[10px] mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
           <div className="flex items-center gap-1">
             <AppIcon name="Shield" size={12} />
             <span>Dados seguros</span>
           </div>
-          <div className="w-px h-3 bg-white/10" />
+          <div className="w-px h-3 bg-foreground/10" />
           <div className="flex items-center gap-1">
             <AppIcon name="Zap" size={12} />
             <span>Setup rápido</span>
