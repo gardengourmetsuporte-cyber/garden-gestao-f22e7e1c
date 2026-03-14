@@ -97,26 +97,28 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   <button
                     onClick={() => navigate('/')}
                     className={cn(
-                      "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                      "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
                       !isScrolled
-                        ? "h-9 bg-secondary/80 border border-border/40 pl-1.5 pr-3 gap-2"
+                        ? "h-9 bg-foreground/[0.08] backdrop-blur-xl pl-1.5 pr-3 gap-2"
                         : "h-8 w-8 bg-transparent p-0 justify-center"
                     )}
                   >
                     <div className={cn(
-                      "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-300",
-                      !isScrolled ? "w-7 h-7" : "w-8 h-8"
+                      "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-500",
+                      !isScrolled ? "w-6 h-6" : "w-8 h-8"
                     )}>
-                      <img alt="Garden Gestão" className="w-full h-full object-contain" src={customLogo || gardenLogo} fetchPriority="high" decoding="async" />
+                      <div className="w-full h-full rounded-full overflow-hidden bg-foreground flex items-center justify-center">
+                        <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={customLogo || gardenLogo} fetchPriority="high" decoding="async" />
+                      </div>
                     </div>
                     <span
                       className={cn(
-                        "text-xs font-bold text-foreground whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
+                        "text-[13px] font-bold text-foreground whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
                         !isScrolled ? "max-w-[10rem] opacity-100" : "max-w-0 opacity-0"
                       )}
                       style={{ letterSpacing: '-0.01em' }}
                     >
-                      {isDashboard ? 'Garden Gestão' : (moduleTitle || 'Garden Gestão')}
+                      {isDashboard ? 'Garden' : (moduleTitle || 'Garden')}
                     </span>
                   </button>
                 </div>
