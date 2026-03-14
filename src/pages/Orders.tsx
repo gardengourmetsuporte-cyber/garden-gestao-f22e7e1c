@@ -843,8 +843,8 @@ export default function OrdersPage() {
                         className={cn(
                           "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all border",
                            isSelected
-                             ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
-                             : "bg-emerald-500/5 border-emerald-500/10 text-foreground hover:border-emerald-500/20"
+                             ? "bg-primary/15 border-primary/30 text-primary"
+                             : "bg-primary/5 border-primary/10 text-foreground hover:border-primary/20"
                         )}
                       >
                         {isSelected && <AppIcon name="Check" size={14} />}
