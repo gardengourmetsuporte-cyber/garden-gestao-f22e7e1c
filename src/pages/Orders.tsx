@@ -489,7 +489,7 @@ export default function OrdersPage() {
                         return (
                           <Collapsible key={order.id}>
                             <div
-                               className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/25 animate-fade-in"
+                               className="bg-card rounded-2xl overflow-hidden transition-all animate-fade-in"
                                style={{ animationDelay: `${index * 50}ms` }}
                              >
                                <CollapsibleTrigger className="w-full text-left">
