@@ -92,12 +92,12 @@ function BrandPanel() {
           <p className="text-sm text-foreground/40 leading-relaxed max-w-xs mx-auto">
             Simplifique a gestão do seu negócio com a plataforma mais veloz do mercado.
           </p>
-          <div className="flex items-center justify-center gap-6 text-white/20 text-xs">
+          <div className="flex items-center justify-center gap-6 text-foreground/20 text-xs">
             <div className="flex items-center gap-1.5">
               <AppIcon name="Shield" size={14} />
               <span>Dados seguros</span>
             </div>
-            <div className="w-px h-3 bg-white/10" />
+            <div className="w-px h-3 bg-foreground/10" />
             <div className="flex items-center gap-1.5">
               <AppIcon name="Zap" size={14} />
               <span>Setup rápido</span>
