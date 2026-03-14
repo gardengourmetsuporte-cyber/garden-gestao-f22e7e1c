@@ -3,8 +3,65 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { formatCurrency } from '@/lib/format';
 import { Card, CardContent } from '@/components/ui/card';
-import { AppIcon } from '@/components/ui/app-icon';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { useMemo } from 'react';
+
+const UNIT_COLORS = [
+  'hsl(var(--primary))',
+  'hsl(45 93% 58%)',
+  'hsl(200 80% 55%)',
+  'hsl(280 65% 60%)',
+  'hsl(15 80% 55%)',
+  'hsl(170 65% 50%)',
+];
+
+function PieChart({ data, total, size = 160 }: { data: { value: number; color: string }[]; total: number; size?: number }) {
+  const radius = size / 2;
+  const innerRadius = radius * 0.62;
+
+  const segments = useMemo(() => {
+    if (total === 0) return [];
+    let cumulative = 0;
+    return data.map((d) => {
+      const pct = d.value / total;
+      const startAngle = cumulative * 2 * Math.PI - Math.PI / 2;
+      cumulative += pct;
+      const endAngle = cumulative * 2 * Math.PI - Math.PI / 2;
+      const largeArc = pct > 0.5 ? 1 : 0;
+
+      const x1 = radius + radius * Math.cos(startAngle);
+      const y1 = radius + radius * Math.sin(startAngle);
+      const x2 = radius + radius * Math.cos(endAngle);
+      const y2 = radius + radius * Math.sin(endAngle);
+      const ix1 = radius + innerRadius * Math.cos(startAngle);
+      const iy1 = radius + innerRadius * Math.sin(startAngle);
+      const ix2 = radius + innerRadius * Math.cos(endAngle);
+      const iy2 = radius + innerRadius * Math.sin(endAngle);
+
+      const path = [
+        `M ${x1} ${y1}`,
+        `A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`,
+        `L ${ix2} ${iy2}`,
+        `A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix1} ${iy1}`,
+        'Z',
+      ].join(' ');
+
+      return { path, color: d.color };
+    });
+  }, [data, total, radius, innerRadius]);
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="drop-shadow-sm">
+      {total === 0 ? (
+        <circle cx={radius} cy={radius} r={radius} fill="hsl(var(--muted))" />
+      ) : (
+        segments.map((s, i) => (
+          <path key={i} d={s.path} fill={s.color} className="transition-all duration-500" />
+        ))
+      )}
+    </svg>
+  );
+}
 
 export function MultiUnitOverview() {
   const { units } = useUnit();
@@ -44,37 +101,46 @@ export function MultiUnitOverview() {
 
   const totalRevenue = data.reduce((s, u) => s + u.monthlyRevenue, 0);
 
+  const pieData = data.map((u, i) => ({
+    value: u.monthlyRevenue,
+    color: UNIT_COLORS[i % UNIT_COLORS.length],
+  }));
+
   return (
-    <Card className="border-border/50">
-      <CardContent className="pt-4 pb-3">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold">Visão Consolidada</h3>
-          <span className="text-xs text-muted-foreground">{units.length} unidades</span>
+    <Card className="card-surface">
+      <CardContent className="pt-5 pb-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Visão Consolidada</h3>
+          <span className="text-[11px] text-muted-foreground bg-secondary/60 px-2 py-0.5 rounded-full">{units.length} unidades</span>
         </div>
 
-        <div className="mb-3 p-3 rounded-xl bg-primary/5">
-          <p className="text-xs text-muted-foreground">Receita Total do Mês</p>
-          <p className="text-xl font-bold">{formatCurrency(totalRevenue)}</p>
-        </div>
+        {/* Pie + Total */}
+        <div className="flex items-center gap-5 mb-5">
+          <div className="relative shrink-0">
+            <PieChart data={pieData} total={totalRevenue} size={120} />
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-[10px] text-muted-foreground">Total</span>
+              <span className="text-sm font-bold text-foreground">{formatCurrency(totalRevenue)}</span>
+            </div>
+          </div>
 
-        <div className="space-y-2">
-          {data.map((unit, index) => {
-            const pct = totalRevenue > 0 ? (unit.monthlyRevenue / totalRevenue) * 100 : 0;
-            return (
-              <div key={unit.unitId} className="flex items-center gap-3">
-                <span className="text-xs font-bold text-muted-foreground w-5">{index + 1}º</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium truncate">{unit.unitName}</span>
-                    <span className="text-xs font-bold">{formatCurrency(unit.monthlyRevenue)}</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-muted mt-1 overflow-hidden">
-                    <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+          {/* Legend */}
+          <div className="flex-1 space-y-2.5 min-w-0">
+            {data.map((unit, index) => {
+              const pct = totalRevenue > 0 ? ((unit.monthlyRevenue / totalRevenue) * 100).toFixed(0) : '0';
+              return (
+                <div key={unit.unitId} className="flex items-center gap-2.5">
+                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: UNIT_COLORS[index % UNIT_COLORS.length] }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-foreground truncate">{unit.unitName}</p>
+                    <p className="text-[11px] text-muted-foreground tabular-nums">
+                      {formatCurrency(unit.monthlyRevenue)} · {pct}%
+                    </p>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </CardContent>
     </Card>
