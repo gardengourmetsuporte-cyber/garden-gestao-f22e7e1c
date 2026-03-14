@@ -268,48 +268,48 @@ export default function CardapioHub() {
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2">
             {activeUnit && <MenuPublishBar unitId={activeUnit.id} products={products} groups={groups} />}
             <div className="flex items-center gap-2">
-              <div className="flex gap-1 p-1 rounded-full bg-foreground/[0.07] backdrop-blur-sm flex-1 min-w-0">
-                {([
-                  { id: 'produtos' as CardapioTab, label: 'Produtos', count: products.length },
-                  { id: 'opcionais' as CardapioTab, label: 'Opcionais', count: optionGroups.length },
-                  { id: 'replicar' as CardapioTab, label: 'Replicar', count: undefined },
-                ]).map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setCardapioTab(tab.id)}
-                    className={cn(
-                      "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-medium transition-all",
-                      cardapioTab === tab.id
-                        ? "bg-foreground text-background backdrop-blur-md"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <span className="truncate">{tab.label}</span>
-                    {tab.count !== undefined && (
-                      <span className={cn(
-                        "text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0",
-                        cardapioTab === tab.id ? "bg-background/20 text-background" : "bg-primary/10 text-primary"
-                      )}>
-                        {tab.count}
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
+               <div className="flex gap-1 p-1 rounded-full bg-foreground/[0.07] backdrop-blur-sm flex-1 min-w-0">
+                 {([
+                   { id: 'produtos' as CardapioTab, label: 'Produtos', count: products.length },
+                   { id: 'opcionais' as CardapioTab, label: 'Opcionais', count: optionGroups.length },
+                 ]).map(tab => (
+                   <button
+                     key={tab.id}
+                     onClick={() => setCardapioTab(tab.id)}
+                     className={cn(
+                       "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-medium transition-all",
+                       cardapioTab === tab.id
+                         ? "bg-foreground text-background backdrop-blur-md"
+                         : "text-muted-foreground hover:text-foreground"
+                     )}
+                   >
+                     <span className="truncate">{tab.label}</span>
+                     {tab.count !== undefined && (
+                       <span className={cn(
+                         "text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0",
+                         cardapioTab === tab.id ? "bg-background/20 text-background" : "bg-primary/10 text-primary"
+                       )}>
+                         {tab.count}
+                       </span>
+                     )}
+                   </button>
+                 ))}
+               </div>
 
-              {/* Inline action button — only for produtos view toggle */}
-              {cardapioTab === 'produtos' && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="shrink-0 gap-1.5 rounded-xl h-9"
-                  onClick={() => setViewMode(v => v === 'menu' ? 'ficha' : 'menu')}
-                >
-                  <AppIcon name={viewMode === 'menu' ? 'RecipeBook' : 'Eye'} size={16} />
-                  <span className="hidden sm:inline">{viewMode === 'menu' ? 'Ficha Técnica' : 'Cardápio'}</span>
-                </Button>
-              )}
-            </div>
+               {/* Replicar icon button */}
+               <button
+                 onClick={() => setCardapioTab('replicar')}
+                 className={cn(
+                   "shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all",
+                   cardapioTab === 'replicar'
+                     ? "bg-foreground text-background"
+                     : "bg-foreground/[0.07] text-muted-foreground hover:text-foreground"
+                 )}
+                 title="Replicar Cardápio"
+               >
+                 <AppIcon name="Copy" size={16} />
+               </button>
+             </div>
           </div>
         )}
 
