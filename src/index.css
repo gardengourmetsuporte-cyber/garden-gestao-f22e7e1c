@@ -150,13 +150,13 @@ html {
     --accent: 0 0% 92%;
     --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 72% 48%;
+    --destructive: 0 45% 42%;
     --destructive-foreground: 0 0% 100%;
 
     --success: 141 73% 35%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 43 96% 42%;
+    --warning: 35 55% 42%;
     --warning-foreground: 0 0% 100%;
 
     --border: 0 0% 92%;
