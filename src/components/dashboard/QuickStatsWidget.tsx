@@ -135,7 +135,6 @@ export function QuickStatsWidget() {
     {
       key: 'checklist',
       title: activeType === 'abertura' ? 'abertura' : 'fechamento',
-      icon: 'ClipboardCheck',
       route: '/checklists',
       value: checklistProgress.percent,
       isChecklist: true,
