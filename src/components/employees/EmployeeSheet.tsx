@@ -33,7 +33,7 @@ interface EmployeeSheetProps {
 }
 
 interface FormData {
-  full_name: string; cpf: string; role: string; department: string;
+  full_name: string; cpf: string; phone: string; role: string; department: string;
   admission_date: string; base_salary: number; is_active: boolean; notes: string; user_id: string;
   quick_pin: string; shift_start: string; shift_end: string;
 }
@@ -47,7 +47,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
   const [usePerDay, setUsePerDay] = useState(false);
 
   const { register, handleSubmit, reset, setValue, watch, formState: { isSubmitting } } = useForm<FormData>({
-    defaultValues: { full_name: '', cpf: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '', shift_start: '08:00', shift_end: '17:00' },
+    defaultValues: { full_name: '', cpf: '', phone: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '', shift_start: '08:00', shift_end: '17:00' },
   });
 
   const selectedUserId = watch('user_id');
@@ -55,7 +55,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
   // Load per-day schedules when editing
   useEffect(() => {
     if (employee) {
-      reset({ full_name: employee.full_name, cpf: employee.cpf || '', role: employee.role || '', department: employee.department || '', admission_date: employee.admission_date || '', base_salary: employee.base_salary, is_active: employee.is_active, notes: employee.notes || '', user_id: employee.user_id || '', quick_pin: (employee as any).quick_pin || '', shift_start: employee.shift_start || '08:00', shift_end: employee.shift_end || '17:00' });
+      reset({ full_name: employee.full_name, cpf: employee.cpf || '', phone: (employee as any).phone || '', role: employee.role || '', department: employee.department || '', admission_date: employee.admission_date || '', base_salary: employee.base_salary, is_active: employee.is_active, notes: employee.notes || '', user_id: employee.user_id || '', quick_pin: (employee as any).quick_pin || '', shift_start: employee.shift_start || '08:00', shift_end: employee.shift_end || '17:00' });
 
       // Fetch per-day schedules
       supabase
@@ -84,7 +84,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
           }
         });
     } else {
-      reset({ full_name: '', cpf: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '', shift_start: '08:00', shift_end: '17:00' });
+      reset({ full_name: '', cpf: '', phone: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '', shift_start: '08:00', shift_end: '17:00' });
       setUsePerDay(false);
       setWeekSchedule(Array.from({ length: 7 }, () => ({ ...DEFAULT_DAY })));
     }
@@ -107,7 +107,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
 
   const onSubmit = async (data: FormData) => {
     try {
-      const payload = { full_name: data.full_name, cpf: data.cpf || null, role: data.role || null, department: data.department || null, admission_date: data.admission_date || null, base_salary: data.base_salary, is_active: data.is_active, notes: data.notes || null, user_id: data.user_id || null, unit_id: activeUnitId || null, quick_pin: data.quick_pin || null, shift_start: data.shift_start || '08:00', shift_end: data.shift_end || '17:00' };
+      const payload = { full_name: data.full_name, cpf: data.cpf || null, phone: data.phone || null, role: data.role || null, department: data.department || null, admission_date: data.admission_date || null, base_salary: data.base_salary, is_active: data.is_active, notes: data.notes || null, user_id: data.user_id || null, unit_id: activeUnitId || null, quick_pin: data.quick_pin || null, shift_start: data.shift_start || '08:00', shift_end: data.shift_end || '17:00' };
 
       let empId: string;
       if (employee) {
@@ -169,6 +169,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
           </div>
           <div className="space-y-2"><Label htmlFor="full_name">Nome completo *</Label><Input id="full_name" {...register('full_name', { required: true })} placeholder="Nome do funcionário" /></div>
           <div className="space-y-2"><Label htmlFor="cpf">CPF</Label><Input id="cpf" {...register('cpf')} placeholder="000.000.000-00" /></div>
+          <div className="space-y-2"><Label htmlFor="phone" className="flex items-center gap-1.5"><img src="/icons/whatsapp.png" alt="" className="w-3.5 h-3.5" />WhatsApp</Label><Input id="phone" {...register('phone')} placeholder="(11) 99999-9999" type="tel" /></div>
           <div className="space-y-2"><Label htmlFor="role">Cargo</Label><Input id="role" {...register('role')} placeholder="Ex: Atendente, Cozinheiro" /></div>
           <div className="space-y-2"><Label htmlFor="department">Departamento</Label><Input id="department" {...register('department')} placeholder="Ex: Cozinha, Salão" /></div>
           <div className="space-y-2"><Label htmlFor="admission_date">Data de admissão</Label><Input id="admission_date" type="date" {...register('admission_date')} /></div>

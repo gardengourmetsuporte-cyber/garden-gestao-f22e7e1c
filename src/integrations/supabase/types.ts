@@ -2165,6 +2165,7 @@ export type Database = {
           id: string
           is_active: boolean
           notes: string | null
+          phone: string | null
           quick_pin: string | null
           role: string | null
           shift_end: string
@@ -2184,6 +2185,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           notes?: string | null
+          phone?: string | null
           quick_pin?: string | null
           role?: string | null
           shift_end?: string
@@ -2203,6 +2205,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           notes?: string | null
+          phone?: string | null
           quick_pin?: string | null
           role?: string | null
           shift_end?: string
