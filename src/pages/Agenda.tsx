@@ -28,8 +28,8 @@ import { CSS } from '@dnd-kit/utilities';
 import type { ManagerTask, TaskCategory } from '@/types/agenda';
 
 const CATEGORY_COLORS = [
-  '#5b8a72', '#b07d6a', '#7a8fa6', '#a89860', '#6a9b8a',
-  '#7a9aab', '#6b82a8', '#8b7da6', '#a6788a', '#7a8080',
+  '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e',
+  '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280',
 ];
 
 function SortableTaskItem({ id, children }: { id: string; children: React.ReactNode; key?: React.Key }) {
@@ -315,6 +315,9 @@ export default function Agenda() {
         </div>
       ) : (
         <>
+
+          {listMode === 'grouped' ? <GroupedListContent /> : <FlatListContent />}
+
           {listMode === 'grouped' ? <GroupedListContent /> : <FlatListContent />}
         </>
       )}
