@@ -870,7 +870,7 @@ export default function OrdersPage() {
                   <Button
                     onClick={handleStartQuotation}
                     disabled={extraSuppliers.length === 0 || isCreatingQuotation}
-                    className="flex-1 h-12 rounded-xl shadow-lg shadow-emerald-500/20 gap-2"
+                    className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20 gap-2"
                   >
                     <AppIcon name="Scale" size={16} />
                     {isCreatingQuotation ? 'Criando...' : 'Iniciar Cotação'}
