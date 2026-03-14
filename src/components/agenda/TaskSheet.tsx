@@ -34,7 +34,7 @@ interface TaskSheetProps {
   onAddCategory: (category: { name: string; color: string }) => void;
 }
 
-const CATEGORY_COLORS = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280'];
+const CATEGORY_COLORS = ['#5b8a72', '#b07d6a', '#7a8fa6', '#a89860', '#6a9b8a', '#7a9aab', '#6b82a8', '#8b7da6', '#a6788a', '#7a8080'];
 
 export function TaskSheet({ open, onOpenChange, onSubmit, onUpdate, onDelete, isSubmitting, editingTask, categories, onAddCategory }: TaskSheetProps) {
   const [title, setTitle] = useState('');
