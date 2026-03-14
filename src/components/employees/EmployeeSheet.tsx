@@ -33,7 +33,7 @@ interface EmployeeSheetProps {
 }
 
 interface FormData {
-  full_name: string; cpf: string; role: string; department: string;
+  full_name: string; cpf: string; phone: string; role: string; department: string;
   admission_date: string; base_salary: number; is_active: boolean; notes: string; user_id: string;
   quick_pin: string; shift_start: string; shift_end: string;
 }
