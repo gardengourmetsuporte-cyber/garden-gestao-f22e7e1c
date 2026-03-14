@@ -33,11 +33,11 @@ html {
     --radius: 0.5rem;
 
     /* Semantic finance tokens */
-    --color-income: 141 73% 42%;
-    --color-expense: 0 72% 51%;
-    --color-transfer: 210 60% 55%;
-    --color-pending: 43 96% 56%;
-    --color-credit-card: 260 60% 55%;
+    --color-income: 152 44% 42%;
+    --color-expense: 4 40% 48%;
+    --color-transfer: 215 35% 50%;
+    --color-pending: 38 40% 50%;
+    --color-credit-card: 255 25% 52%;
 
     /* Surface layers */
     --surface-elevated: 0 0% 16%;
@@ -55,7 +55,7 @@ html {
     --popover: 0 0% 13%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 142 71% 45%;
+    --primary: 152 44% 45%;
     --primary-foreground: 0 0% 0%;
 
     --secondary: 0 0% 16%;
@@ -67,25 +67,25 @@ html {
     --accent: 0 0% 20%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 45% 45%;
+    --destructive: 4 40% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 141 73% 42%;
+    --success: 152 44% 42%;
     --success-foreground: 0 0% 0%;
 
-    --warning: 35 55% 50%;
+    --warning: 38 40% 50%;
     --warning-foreground: 0 0% 0%;
 
     --border: 0 0% 15%;
     --input: 0 0% 16%;
-    --ring: 141 73% 42%;
+    --ring: 152 44% 42%;
 
-    /* Neon accent colors */
-    --neon-green: 141 73% 42%;
-    --neon-red: 0 45% 45%;
-    --neon-cyan: 170 40% 45%;
-    --neon-amber: 35 55% 50%;
-    --neon-purple: 250 30% 50%;
+    /* Accent colors — muted professional */
+    --neon-green: 152 44% 42%;
+    --neon-red: 4 40% 48%;
+    --neon-cyan: 190 30% 45%;
+    --neon-amber: 38 40% 50%;
+    --neon-purple: 255 25% 52%;
 
     /* No glows — Spotify is flat */
     --glow-primary: none;
@@ -96,8 +96,8 @@ html {
     --glow-cyan: none;
 
     /* Gradients */
-    --gradient-brand: linear-gradient(135deg, hsl(141 73% 42%), hsl(141 73% 48%));
-    --gradient-brand-subtle: linear-gradient(135deg, hsl(141 73% 42% / 0.15), hsl(141 73% 48% / 0.05));
+    --gradient-brand: linear-gradient(135deg, hsl(152 44% 45%), hsl(152 44% 50%));
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(152 44% 45% / 0.15), hsl(152 44% 50% / 0.05));
     --gradient-surface: linear-gradient(180deg, hsl(0 0% 11%), hsl(0 0% 7%));
 
     /* Zero shadows */
@@ -110,21 +110,21 @@ html {
     /* Sidebar = same as background */
     --sidebar-background: 0 0% 7%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 141 73% 42%;
+    --sidebar-primary: 152 44% 45%;
     --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 0 0% 16%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 141 73% 42%;
+    --sidebar-ring: 152 44% 45%;
   }
 
   /* ===== LIGHT THEME (Spotify Light) ===== */
   :root:not(.dark) {
-    --color-income: 141 73% 35%;
-    --color-expense: 0 72% 45%;
-    --color-transfer: 210 60% 45%;
-    --color-pending: 43 96% 45%;
-    --color-credit-card: 260 60% 45%;
+    --color-income: 152 40% 35%;
+    --color-expense: 4 38% 42%;
+    --color-transfer: 215 32% 45%;
+    --color-pending: 38 38% 45%;
+    --color-credit-card: 255 22% 48%;
 
     --surface-elevated: 0 0% 100%;
     --surface-sunken: 0 0% 96%;
@@ -138,7 +138,7 @@ html {
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
 
-    --primary: 142 71% 40%;
+    --primary: 152 44% 40%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 94%;
@@ -150,18 +150,18 @@ html {
     --accent: 0 0% 92%;
     --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 45% 42%;
+    --destructive: 4 38% 42%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 141 73% 35%;
+    --success: 152 40% 35%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 35 55% 42%;
+    --warning: 38 38% 42%;
     --warning-foreground: 0 0% 100%;
 
     --border: 0 0% 92%;
     --input: 0 0% 94%;
-    --ring: 141 73% 37%;
+    --ring: 152 44% 37%;
 
     /* No glows */
     --glow-primary: none;
