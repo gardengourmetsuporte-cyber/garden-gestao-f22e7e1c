@@ -18,46 +18,51 @@ const UNIT_COLORS = [
 function PieChart({ data, total, size = 160 }: { data: { value: number; color: string }[]; total: number; size?: number }) {
   const radius = size / 2;
   const innerRadius = radius * 0.62;
+  const stroke = radius - innerRadius;
+  const mid = (radius + innerRadius) / 2;
 
   const segments = useMemo(() => {
     if (total === 0) return [];
+    const filtered = data.filter(d => d.value > 0);
+    
+    // Single segment = full circle
+    if (filtered.length === 1) {
+      return [{ type: 'circle' as const, color: filtered[0].color }];
+    }
+
     let cumulative = 0;
-    return data.map((d) => {
+    return filtered.map((d) => {
       const pct = d.value / total;
       const startAngle = cumulative * 2 * Math.PI - Math.PI / 2;
       cumulative += pct;
       const endAngle = cumulative * 2 * Math.PI - Math.PI / 2;
       const largeArc = pct > 0.5 ? 1 : 0;
 
-      const x1 = radius + radius * Math.cos(startAngle);
-      const y1 = radius + radius * Math.sin(startAngle);
-      const x2 = radius + radius * Math.cos(endAngle);
-      const y2 = radius + radius * Math.sin(endAngle);
-      const ix1 = radius + innerRadius * Math.cos(startAngle);
-      const iy1 = radius + innerRadius * Math.sin(startAngle);
-      const ix2 = radius + innerRadius * Math.cos(endAngle);
-      const iy2 = radius + innerRadius * Math.sin(endAngle);
+      const x1 = radius + mid * Math.cos(startAngle);
+      const y1 = radius + mid * Math.sin(startAngle);
+      const x2 = radius + mid * Math.cos(endAngle);
+      const y2 = radius + mid * Math.sin(endAngle);
 
-      const path = [
-        `M ${x1} ${y1}`,
-        `A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`,
-        `L ${ix2} ${iy2}`,
-        `A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix1} ${iy1}`,
-        'Z',
-      ].join(' ');
-
-      return { path, color: d.color };
+      return {
+        type: 'arc' as const,
+        d: `M ${x1} ${y1} A ${mid} ${mid} 0 ${largeArc} 1 ${x2} ${y2}`,
+        color: d.color,
+      };
     });
-  }, [data, total, radius, innerRadius]);
+  }, [data, total, mid, radius]);
 
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="drop-shadow-sm">
-      {total === 0 ? (
-        <circle cx={radius} cy={radius} r={radius} fill="hsl(var(--muted))" />
-      ) : (
-        segments.map((s, i) => (
-          <path key={i} d={s.path} fill={s.color} className="transition-all duration-500" />
-        ))
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {/* Background track */}
+      <circle cx={radius} cy={radius} r={mid} fill="none" stroke="hsl(var(--muted))" strokeWidth={stroke} />
+      {total === 0 ? null : (
+        segments.map((s, i) =>
+          s.type === 'circle' ? (
+            <circle key={i} cx={radius} cy={radius} r={mid} fill="none" stroke={s.color} strokeWidth={stroke} />
+          ) : (
+            <path key={i} d={s.d} fill="none" stroke={s.color} strokeWidth={stroke} strokeLinecap="round" />
+          )
+        )
       )}
     </svg>
   );
