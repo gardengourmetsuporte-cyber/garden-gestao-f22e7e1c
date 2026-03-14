@@ -189,6 +189,7 @@ export const ICON_MAP: Record<string, string> = {
   FileText: 'description',
   StickyNote: 'sticky_note_2',
   ListChecks: 'checklist',
+  FileSpreadsheet: 'table_view',
 
   // Settings & System
   Settings: 'settings',
