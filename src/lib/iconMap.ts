@@ -317,6 +317,7 @@ export const ICON_MAP: Record<string, string> = {
 
   // Tech
   Smartphone: 'smartphone',
+  Tablet: 'tablet_android',
   Shirt: 'checkroom',
   Flame: 'local_fire_department',
   Laptop: 'laptop',
@@ -365,6 +366,7 @@ export const ICON_MAP: Record<string, string> = {
   Ruler: 'straighten',
   FileImage: 'image',
   ImageIcon: 'image',
+  ImageOff: 'hide_image',
   Play: 'play_arrow',
   Pause: 'pause',
   Power: 'power_settings_new',
