@@ -301,7 +301,14 @@ export default function ChecklistsPage() {
                   sectors={(() => {
                     const base = sectors.filter((s: any) => checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus');
                     if (viewMode === 'sector' && selectedSectorId && checklistType !== 'bonus') {
-                      return base.filter((s: any) => s.id === selectedSectorId);
+                      let filtered = base.filter((s: any) => s.id === selectedSectorId);
+                      if (selectedSubcategoryId && filtered.length > 0) {
+                        filtered = filtered.map((s: any) => ({
+                          ...s,
+                          subcategories: (s.subcategories || []).filter((sub: any) => sub.id === selectedSubcategoryId),
+                        }));
+                      }
+                      return filtered;
                     }
                     return base;
                   })()}
