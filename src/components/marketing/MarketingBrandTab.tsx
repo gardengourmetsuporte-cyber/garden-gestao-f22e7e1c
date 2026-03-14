@@ -127,116 +127,136 @@ export function MarketingBrandTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Section 1: Links */}
-      <Card className="border-border/40">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
+      <div className="card-surface rounded-2xl px-4 py-4 space-y-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
             <AppIcon name="Link" size={16} className="text-primary" />
-            Links da Marca
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs flex items-center gap-1">
-                <AppIcon name="Camera" size={12} /> Instagram
-              </Label>
-              <Input
-                value={instagramUrl}
-                onChange={e => setInstagramUrl(e.target.value)}
-                placeholder="https://instagram.com/seurestaurante"
-                className="text-xs"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs flex items-center gap-1">
-                <AppIcon name="Globe" size={12} /> Website
-              </Label>
-              <Input
-                value={websiteUrl}
-                onChange={e => setWebsiteUrl(e.target.value)}
-                placeholder="https://seurestaurante.com.br"
-                className="text-xs"
-              />
-            </div>
           </div>
-        </CardContent>
-      </Card>
+          <span className="text-sm font-semibold text-foreground">Links da Marca</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+              <AppIcon name="Camera" size={11} /> Instagram
+            </Label>
+            <Input
+              value={instagramUrl}
+              onChange={e => setInstagramUrl(e.target.value)}
+              placeholder="https://instagram.com/seurestaurante"
+              className="text-xs h-9"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+              <AppIcon name="Globe" size={11} /> Website
+            </Label>
+            <Input
+              value={websiteUrl}
+              onChange={e => setWebsiteUrl(e.target.value)}
+              placeholder="https://seurestaurante.com.br"
+              className="text-xs h-9"
+            />
+          </div>
+        </div>
+      </div>
 
-      {/* Section 2: Identity (compact) */}
-      <Card className="border-border/40">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
+      {/* Section 2: Identity */}
+      <div className="card-surface rounded-2xl px-4 py-4 space-y-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
             <AppIcon name="Palette" size={16} className="text-primary" />
-            Identidade Visual
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Colors */}
-          <div className="grid grid-cols-4 gap-2">
-            {Object.entries(colors).map(([key, value]) => (
-              <div key={key} className="space-y-1">
-                <Label className="text-[10px] capitalize">
-                  {key === 'background' ? 'Fundo' : key === 'primary' ? 'Primária' : key === 'secondary' ? 'Secundária' : 'Destaque'}
-                </Label>
-                <div className="flex gap-1 items-center">
-                  <input
-                    type="color"
-                    value={value}
-                    onChange={e => setColors(prev => ({ ...prev, [key]: e.target.value }))}
-                    className="w-8 h-8 rounded-md border border-border/40 cursor-pointer"
-                  />
-                  <span className="text-[9px] text-muted-foreground">{value}</span>
+          </div>
+          <span className="text-sm font-semibold text-foreground">Identidade Visual</span>
+        </div>
+
+        {/* Colors - compact grid */}
+        <div>
+          <p className="text-[11px] font-medium text-muted-foreground mb-2">Paleta de Cores</p>
+          <div className="grid grid-cols-4 gap-3">
+            {Object.entries(colors).map(([key, value]) => {
+              const label = key === 'background' ? 'Fundo' : key === 'primary' ? 'Primária' : key === 'secondary' ? 'Secundária' : 'Destaque';
+              return (
+                <div key={key} className="flex flex-col items-center gap-1.5">
+                  <label className="relative cursor-pointer">
+                    <input
+                      type="color"
+                      value={value}
+                      onChange={e => setColors(prev => ({ ...prev, [key]: e.target.value }))}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                    <div
+                      className="w-10 h-10 rounded-xl ring-2 ring-border/20 hover:ring-primary/40 transition-all"
+                      style={{ backgroundColor: value }}
+                    />
+                  </label>
+                  <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
+                  <span className="text-[9px] text-muted-foreground/60 font-mono">{value}</span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+        </div>
 
-          {/* Typography */}
+        {/* Typography */}
+        <div>
+          <p className="text-[11px] font-medium text-muted-foreground mb-2">Tipografia</p>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs">Fonte títulos</Label>
-              <Input value={typography.headings} onChange={e => setTypography(prev => ({ ...prev, headings: e.target.value }))} className="text-xs h-8" />
+            <div className="bg-secondary/40 rounded-xl p-3 space-y-1">
+              <span className="text-[10px] text-muted-foreground">Títulos</span>
+              <Input value={typography.headings} onChange={e => setTypography(prev => ({ ...prev, headings: e.target.value }))} className="text-xs h-8 bg-transparent border-0 px-0 focus-visible:ring-0" />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Fonte corpo</Label>
-              <Input value={typography.body} onChange={e => setTypography(prev => ({ ...prev, body: e.target.value }))} className="text-xs h-8" />
+            <div className="bg-secondary/40 rounded-xl p-3 space-y-1">
+              <span className="text-[10px] text-muted-foreground">Corpo</span>
+              <Input value={typography.body} onChange={e => setTypography(prev => ({ ...prev, body: e.target.value }))} className="text-xs h-8 bg-transparent border-0 px-0 focus-visible:ring-0" />
             </div>
           </div>
+        </div>
 
-          {/* Tone */}
-          <div className="space-y-1">
-            <Label className="text-xs">Tagline</Label>
-            <Input value={tagline} onChange={e => setTagline(e.target.value)} placeholder="O sabor que conecta" className="text-xs h-8" />
+        {/* Tagline & Tone */}
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label className="text-[11px] text-muted-foreground">Tagline</Label>
+            <Input value={tagline} onChange={e => setTagline(e.target.value)} placeholder="O sabor que conecta" className="text-xs h-9" />
           </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Tom de voz</Label>
-            <Textarea value={toneOfVoice} onChange={e => setToneOfVoice(e.target.value)} placeholder="Informal, acolhedor..." rows={2} className="text-xs" />
+          <div className="space-y-1.5">
+            <Label className="text-[11px] text-muted-foreground">Tom de voz</Label>
+            <Textarea value={toneOfVoice} onChange={e => setToneOfVoice(e.target.value)} placeholder="Informal, acolhedor..." rows={2} className="text-xs resize-none" />
           </div>
+        </div>
 
-          {/* Phrases */}
-          <div className="space-y-2">
-            <Label className="text-xs">Frases institucionais</Label>
-            <div className="flex gap-2">
-              <Input value={newPhrase} onChange={e => setNewPhrase(e.target.value)} placeholder="Adicionar frase..." className="text-xs h-8" onKeyDown={e => e.key === 'Enter' && addPhrase()} />
-              <Button size="icon" variant="outline" onClick={addPhrase} className="h-8 w-8"><AppIcon name="Plus" size={14} /></Button>
-            </div>
+        {/* Phrases */}
+        <div className="space-y-2">
+          <Label className="text-[11px] text-muted-foreground">Frases institucionais</Label>
+          <div className="flex gap-2">
+            <Input value={newPhrase} onChange={e => setNewPhrase(e.target.value)} placeholder="Adicionar frase..." className="text-xs h-9" onKeyDown={e => e.key === 'Enter' && addPhrase()} />
+            <button onClick={addPhrase} className="h-9 w-9 shrink-0 rounded-xl bg-primary/10 hover:bg-primary/15 flex items-center justify-center transition-colors">
+              <AppIcon name="Plus" size={14} className="text-primary" />
+            </button>
+          </div>
+          {phrases.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {phrases.map((phrase, i) => (
-                <Badge key={i} variant="secondary" className="gap-1 cursor-pointer text-[10px]" onClick={() => setPhrases(prev => prev.filter((_, idx) => idx !== i))}>
-                  {phrase} <AppIcon name="X" size={10} />
-                </Badge>
+                <span
+                  key={i}
+                  onClick={() => setPhrases(prev => prev.filter((_, idx) => idx !== i))}
+                  className="inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-full bg-secondary/60 text-foreground/80 cursor-pointer hover:bg-destructive/15 hover:text-destructive transition-colors"
+                >
+                  {phrase}
+                  <AppIcon name="X" size={8} />
+                </span>
               ))}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          )}
+        </div>
 
-      <Button onClick={handleSaveIdentity} disabled={upsertIdentity.isPending} className="w-full">
-        {upsertIdentity.isPending ? <AppIcon name="Loader2" size={16} className="animate-spin mr-2" /> : <AppIcon name="Save" size={16} className="mr-2" />}
-        Salvar Identidade
-      </Button>
+        {/* Save button inside card */}
+        <Button onClick={handleSaveIdentity} disabled={upsertIdentity.isPending} className="w-full">
+          {upsertIdentity.isPending ? <AppIcon name="Loader2" size={16} className="animate-spin mr-2" /> : <AppIcon name="Save" size={16} className="mr-2" />}
+          Salvar Identidade
+        </Button>
+      </div>
 
       {/* Section 3: Gallery */}
       <div className="card-surface rounded-2xl overflow-hidden">
