@@ -1413,10 +1413,10 @@ select:focus {
 
 /* ===== Liquid Glass Pill ===== */
 .liquid-glass-pill {
-  background: hsl(var(--foreground) / 0.08);
-  border: 1px solid hsl(var(--foreground) / 0.1);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: hsl(var(--foreground) / 0.06);
+  border: 1px solid hsl(var(--foreground) / 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .liquid-glass-pill::before {
@@ -1425,22 +1425,23 @@ select:focus {
   inset: 0;
   border-radius: inherit;
   background: linear-gradient(
-    105deg,
-    transparent 30%,
-    hsl(var(--foreground) / 0.08) 45%,
-    hsl(var(--foreground) / 0.14) 50%,
-    hsl(var(--foreground) / 0.08) 55%,
-    transparent 70%
+    110deg,
+    transparent 20%,
+    hsl(var(--foreground) / 0.06) 40%,
+    hsl(var(--foreground) / 0.12) 50%,
+    hsl(var(--foreground) / 0.06) 60%,
+    transparent 80%
   );
-  background-size: 250% 100%;
-  animation: liquid-shimmer 4s ease-in-out infinite;
+  background-size: 300% 100%;
+  animation: liquid-shimmer 5s ease-in-out infinite;
 }
 
 .liquid-glass-pill:hover::before {
-  animation-duration: 1.5s;
+  animation-duration: 2s;
 }
 
 @keyframes liquid-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% { background-position: 250% 0; }
+  50% { background-position: -50% 0; }
+  100% { background-position: -250% 0; }
 }
