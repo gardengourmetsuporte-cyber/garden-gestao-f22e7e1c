@@ -84,26 +84,27 @@ export function QuickActionSheet({ open, onOpenChange }: QuickActionSheetProps) 
           Ação rápida
         </h3>
         <div className="space-y-2">
-          {visibleActions.map(action => (
+          {visibleActions.map((action, i) => (
             <button
               key={action.label}
               onClick={() => { navigator.vibrate?.(10); action.action(); }}
-              className="flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl bg-secondary/50 hover:bg-secondary active:scale-[0.98] transition-all group"
+              className="flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl bg-secondary/50 hover:bg-secondary active:scale-[0.98] transition-all group opacity-0 animate-[slideUpFade_0.35s_ease-out_forwards]"
+              style={{ animationDelay: `${i * 70}ms` }}
             >
               <div
-                className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-shadow duration-200"
+                className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-active:scale-95"
                 style={{
                   background: `linear-gradient(135deg, ${action.glow}, transparent)`,
                   border: `1px solid ${action.color}25`,
                   boxShadow: `0 0 0 0 ${action.color}00`,
                 }}
-                onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 16px ${action.color}20`)}
+                onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 20px ${action.color}30`)}
                 onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 0 0 ${action.color}00`)}
               >
                 <AppIcon name={action.icon} size={22} style={{ color: action.color }} />
               </div>
               <div className="text-left">
-                <p className="text-sm font-semibold text-foreground">{action.label}</p>
+                <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors duration-200">{action.label}</p>
                 <p className="text-xs text-muted-foreground">{action.description}</p>
               </div>
             </button>
