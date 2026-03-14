@@ -121,7 +121,7 @@ export function MultiUnitOverview() {
 
         {/* Pie + Total */}
         <div className="flex items-center gap-5 mb-5">
-          <div className="relative shrink-0">
+          <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
             <PieChart data={pieData} total={totalRevenue} size={120} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-[10px] text-muted-foreground">Total</span>
