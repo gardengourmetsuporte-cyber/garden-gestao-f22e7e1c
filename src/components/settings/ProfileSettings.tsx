@@ -94,17 +94,12 @@ export function ProfileSettings() {
         })
         .eq('user_id', user.id);
 
-      if (error) {
-        console.error('Profile update error:', error);
-        throw error;
-      }
+      if (error) throw error;
       
       setAvatarUrl(newAvatarUrl);
       setAvatarFile(null);
       setAvatarPreview(null);
-      toast.success('Perfil atualizado com sucesso!');
-    } catch (err) {
-      console.error('Profile save failed:', err);
+    } catch {
       toast.error('Erro ao atualizar perfil');
     } finally {
       setIsSaving(false);
