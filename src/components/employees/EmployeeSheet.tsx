@@ -47,7 +47,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
   const [usePerDay, setUsePerDay] = useState(false);
 
   const { register, handleSubmit, reset, setValue, watch, formState: { isSubmitting } } = useForm<FormData>({
-    defaultValues: { full_name: '', cpf: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '', shift_start: '08:00', shift_end: '17:00' },
+    defaultValues: { full_name: '', cpf: '', phone: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '', shift_start: '08:00', shift_end: '17:00' },
   });
 
   const selectedUserId = watch('user_id');
