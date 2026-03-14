@@ -24,30 +24,29 @@ function BrandPanel() {
     <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-background">
       {/* Subtle grid pattern overlay */}
       <div
-        className="absolute inset-0 opacity-[0.05]"
+        className="absolute inset-0 opacity-[0.04] dark:opacity-[0.05]"
         style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(hsl(var(--foreground) / 0.15) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground) / 0.15) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
 
       {/* Glow orbs - Emerald theme */}
       <div
-        className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20 pointer-events-none"
+        className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20 dark:opacity-20 pointer-events-none"
         style={{ background: 'hsl(var(--primary))' }}
       />
       <div
-        className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-[120px] opacity-15 pointer-events-none"
+        className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-[120px] opacity-10 dark:opacity-15 pointer-events-none"
         style={{ background: 'hsl(var(--primary))' }}
       />
 
       <div className="relative z-10 flex flex-col items-center gap-8 px-12 max-w-lg">
         {/* Logo */}
         <div
-          className="relative w-36 h-36 rounded-full overflow-hidden flex items-center justify-center"
+          className="relative w-36 h-36 rounded-full overflow-hidden flex items-center justify-center bg-card dark:bg-foreground"
           style={{
-            background: 'hsl(var(--foreground))',
-            boxShadow: '0 0 100px hsl(var(--primary) / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
+            boxShadow: '0 0 100px hsl(var(--primary) / 0.15), 0 25px 70px rgba(0,0,0,0.15)',
           }}
         >
           <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
@@ -58,7 +57,7 @@ function BrandPanel() {
           <h1 className="text-5xl font-extrabold tracking-tight text-foreground font-display">
             Garden
           </h1>
-          <p className="text-[11px] text-foreground/35 tracking-[0.3em] uppercase font-semibold">
+          <p className="text-[11px] text-muted-foreground/60 tracking-[0.3em] uppercase font-semibold">
             Gestão Inteligente
           </p>
         </div>
@@ -74,12 +73,7 @@ function BrandPanel() {
           ].map(({ icon, label }) => (
             <div
               key={label}
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium"
-              style={{
-                background: 'hsl(var(--primary) / 0.1)',
-                color: 'hsl(var(--primary))',
-                border: '1px solid hsl(var(--primary) / 0.15)',
-              }}
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/15"
             >
               <AppIcon name={icon} size={14} />
               {label}
@@ -89,15 +83,15 @@ function BrandPanel() {
 
         {/* Social proof */}
         <div className="text-center space-y-4 mt-4">
-          <p className="text-sm text-foreground/40 leading-relaxed max-w-xs mx-auto">
+          <p className="text-sm text-muted-foreground/60 leading-relaxed max-w-xs mx-auto">
             Simplifique a gestão do seu negócio com a plataforma mais veloz do mercado.
           </p>
-          <div className="flex items-center justify-center gap-6 text-foreground/20 text-xs">
+          <div className="flex items-center justify-center gap-6 text-muted-foreground/40 text-xs">
             <div className="flex items-center gap-1.5">
               <AppIcon name="Shield" size={14} />
               <span>Dados seguros</span>
             </div>
-            <div className="w-px h-3 bg-foreground/10" />
+            <div className="w-px h-3 bg-border" />
             <div className="flex items-center gap-1.5">
               <AppIcon name="Zap" size={14} />
               <span>Setup rápido</span>
@@ -113,35 +107,23 @@ function BrandPanel() {
 function MobileBrandHeader() {
   return (
     <div
-      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full bg-background"
+      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full"
       style={{
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
+        background: `
+          radial-gradient(circle 300px at 50% 30%, hsl(var(--primary) / 0.12) 0%, transparent 100%),
+          hsl(var(--background))
+        `,
       }}
     >
-      {/* Subtle border top separator indicating header */}
-      <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-foreground/5 to-transparent" />
-
-      {/* Animated glow orbs - Emerald Theme */}
-      <div
-        className="absolute top-[15%] left-[20%] w-[250px] h-[250px] rounded-full blur-[100px] opacity-20 pointer-events-none"
-        style={{
-          background: 'hsl(var(--primary))',
-          animation: 'float-orb-1 8s ease-in-out infinite',
-        }}
-      />
-      <div
-        className="absolute bottom-[20%] right-[15%] w-[200px] h-[200px] rounded-full blur-[80px] opacity-15 pointer-events-none"
-        style={{
-          background: 'hsl(var(--primary))',
-          animation: 'float-orb-2 10s ease-in-out infinite',
-        }}
-      />
+      {/* Subtle border top separator */}
+      <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent" />
 
       {/* Grid pattern */}
       <div
-        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
         style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(hsl(var(--foreground) / 0.15) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground) / 0.15) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
@@ -150,10 +132,9 @@ function MobileBrandHeader() {
       <div className="relative z-10 flex flex-col items-center gap-6 pt-16 pb-12">
         {/* Logo with entrance animation */}
         <div
-          className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]"
+          className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-card dark:bg-foreground animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]"
           style={{
-            background: 'hsl(var(--foreground))',
-            boxShadow: '0 0 80px hsl(var(--primary) / 0.15), 0 16px 50px rgba(0,0,0,0.8)',
+            boxShadow: '0 0 60px hsl(var(--primary) / 0.1), 0 12px 40px rgba(0,0,0,0.1)',
           }}
         >
           <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
@@ -162,7 +143,7 @@ function MobileBrandHeader() {
         {/* Title with staggered entrance */}
         <div className="text-center space-y-1.5 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.25s_both]">
           <h1 className="text-4xl font-extrabold text-foreground tracking-tight font-display">Garden</h1>
-          <p className="text-[10px] text-foreground/35 tracking-[0.25em] uppercase font-semibold">Gestão Inteligente</p>
+          <p className="text-[10px] text-muted-foreground/60 tracking-[0.25em] uppercase font-semibold">Gestão Inteligente</p>
         </div>
 
         {/* Feature pills with stagger */}
@@ -176,12 +157,7 @@ function MobileBrandHeader() {
           ].map(({ icon, label }) => (
             <div
               key={label}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium"
-              style={{
-                background: 'hsl(var(--primary) / 0.1)',
-                color: 'hsl(var(--primary))',
-                border: '1px solid hsl(var(--primary) / 0.15)',
-              }}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-primary/10 text-primary border border-primary/15"
             >
               <AppIcon name={icon} size={12} />
               {label}
@@ -190,12 +166,12 @@ function MobileBrandHeader() {
         </div>
 
         {/* Social proof */}
-        <div className="flex items-center justify-center gap-5 text-foreground/20 text-[10px] mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
+        <div className="flex items-center justify-center gap-5 text-muted-foreground/40 text-[10px] mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
           <div className="flex items-center gap-1">
             <AppIcon name="Shield" size={12} />
             <span>Dados seguros</span>
           </div>
-          <div className="w-px h-3 bg-foreground/10" />
+          <div className="w-px h-3 bg-border" />
           <div className="flex items-center gap-1">
             <AppIcon name="Zap" size={12} />
             <span>Setup rápido</span>
