@@ -182,41 +182,51 @@ async function geocodeAddress(
     }
   }
 
+  // First pass: with viewbox preference (not bounded)
   for (const q of queries) {
     try {
-      const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
+      const params = new URLSearchParams({ q, format: 'json', limit: '3', countrycodes: 'br', addressdetails: '1' });
       if (anchor) {
-        params.set('viewbox', `${anchor.lng - 0.35},${anchor.lat + 0.35},${anchor.lng + 0.35},${anchor.lat - 0.35}`);
-        params.set('bounded', '1');
+        params.set('viewbox', `${anchor.lng - 0.5},${anchor.lat + 0.5},${anchor.lng + 0.5},${anchor.lat - 0.5}`);
+        // bounded=0 means prefer within viewbox but don't exclude outside
+        params.set('bounded', '0');
       }
 
       const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
         headers: { 'User-Agent': 'GardenGestao/1.0' },
       });
       const results = await res.json();
-      const parsed = pickValidResult(results?.[0], anchor, normalizedCity);
-      if (parsed) return parsed;
+      
+      // Try all results, not just first
+      for (const result of (results || [])) {
+        const parsed = pickValidResult(result, anchor, normalizedCity);
+        if (parsed) return parsed;
+      }
     } catch (error) {
       console.warn('Falha ao geocodificar endereço', error);
     }
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    // Nominatim requires 1 req/sec - respect rate limit
+    await new Promise((resolve) => setTimeout(resolve, 1100));
   }
 
-  if (anchor) {
-    for (const q of queries) {
-      try {
-        const params = new URLSearchParams({ q, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
-          headers: { 'User-Agent': 'GardenGestao/1.0' },
-        });
-        const results = await res.json();
-        const parsed = pickValidResult(results?.[0], anchor, normalizedCity);
-        if (parsed) return parsed;
-      } catch (error) {
-        console.warn('Falha ao geocodificar endereço (fallback)', error);
+  // Second pass: without anchor constraint at all
+  for (const q of queries) {
+    try {
+      const params = new URLSearchParams({ q, format: 'json', limit: '3', countrycodes: 'br', addressdetails: '1' });
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+        headers: { 'User-Agent': 'GardenGestao/1.0' },
+      });
+      const results = await res.json();
+      for (const result of (results || [])) {
+        // Accept any result without anchor/city validation as last resort
+        const lat = Number.parseFloat(result?.lat);
+        const lng = Number.parseFloat(result?.lon);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
       }
-      await new Promise((resolve) => setTimeout(resolve, 600));
+    } catch (error) {
+      console.warn('Falha ao geocodificar endereço (fallback)', error);
     }
+    await new Promise((resolve) => setTimeout(resolve, 1100));
   }
 
   return null;
