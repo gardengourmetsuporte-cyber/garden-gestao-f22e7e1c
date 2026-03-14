@@ -41,6 +41,7 @@ export default function ChecklistsPage() {
   const [selectedSectorId, setSelectedSectorId] = useState<string | null>(() => {
     try { return localStorage.getItem('checklist-selected-sector') || null; } catch { return null; }
   });
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(null);
 
   useEffect(() => {
     try { localStorage.setItem('checklist-view-mode', viewMode); } catch {}
@@ -208,25 +209,64 @@ export default function ChecklistsPage() {
                     </button>
                   </div>
 
-                  {viewMode === 'sector' && availableSectors.length > 0 && (
-                    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-                      {availableSectors.map((sector: any) => {
-                        const isSelected = selectedSectorId === sector.id;
-                        return (
-                          <button
-                            key={sector.id}
-                            onClick={() => setSelectedSectorId(sector.id)}
-                            className={cn(
-                              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0 border",
-                              isSelected
-                                ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                                : "bg-secondary/50 text-muted-foreground border-border hover:bg-secondary"
-                            )}
-                          >
-                            <span className="text-sm">{sector.name}</span>
-                          </button>
+                   {viewMode === 'sector' && availableSectors.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                        {availableSectors.map((sector: any) => {
+                          const isSelected = selectedSectorId === sector.id;
+                          return (
+                            <button
+                              key={sector.id}
+                              onClick={() => { setSelectedSectorId(sector.id); setSelectedSubcategoryId(null); }}
+                              className={cn(
+                                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0",
+                                isSelected
+                                  ? "bg-foreground text-background backdrop-blur-md"
+                                  : "bg-foreground/[0.07] text-muted-foreground backdrop-blur-sm hover:bg-foreground/[0.12]"
+                              )}
+                            >
+                              <span className="text-[13px]">{sector.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {/* Subcategory pills */}
+                      {(() => {
+                        const activeSector = availableSectors.find((s: any) => s.id === selectedSectorId);
+                        const subs = (activeSector?.subcategories || []).filter((sub: any) =>
+                          sub.items?.some((i: any) => i.is_active && (i as any).checklist_type === checklistType)
                         );
-                      })}
+                        if (subs.length <= 1) return null;
+                        return (
+                          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                            <button
+                              onClick={() => setSelectedSubcategoryId(null)}
+                              className={cn(
+                                "px-2.5 py-1 rounded-full text-[11px] font-medium whitespace-nowrap transition-all shrink-0",
+                                !selectedSubcategoryId
+                                  ? "bg-primary/15 text-primary"
+                                  : "bg-foreground/[0.05] text-muted-foreground hover:bg-foreground/[0.08]"
+                              )}
+                            >
+                              Todos
+                            </button>
+                            {subs.map((sub: any) => (
+                              <button
+                                key={sub.id}
+                                onClick={() => setSelectedSubcategoryId(sub.id)}
+                                className={cn(
+                                  "px-2.5 py-1 rounded-full text-[11px] font-medium whitespace-nowrap transition-all shrink-0",
+                                  selectedSubcategoryId === sub.id
+                                    ? "bg-primary/15 text-primary"
+                                    : "bg-foreground/[0.05] text-muted-foreground hover:bg-foreground/[0.08]"
+                                )}
+                              >
+                                {sub.name}
+                              </button>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
@@ -261,7 +301,14 @@ export default function ChecklistsPage() {
                   sectors={(() => {
                     const base = sectors.filter((s: any) => checklistType === 'bonus' ? s.scope === 'bonus' : s.scope !== 'bonus');
                     if (viewMode === 'sector' && selectedSectorId && checklistType !== 'bonus') {
-                      return base.filter((s: any) => s.id === selectedSectorId);
+                      let filtered = base.filter((s: any) => s.id === selectedSectorId);
+                      if (selectedSubcategoryId && filtered.length > 0) {
+                        filtered = filtered.map((s: any) => ({
+                          ...s,
+                          subcategories: (s.subcategories || []).filter((sub: any) => sub.id === selectedSubcategoryId),
+                        }));
+                      }
+                      return filtered;
                     }
                     return base;
                   })()}
