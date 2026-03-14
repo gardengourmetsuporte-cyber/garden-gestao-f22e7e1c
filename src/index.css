@@ -67,25 +67,25 @@ html {
     --accent: 0 0% 20%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 4 40% 48%;
+    --destructive: 0 55% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 152 44% 42%;
+    --success: 160 60% 44%;
     --success-foreground: 0 0% 0%;
 
-    --warning: 38 40% 50%;
+    --warning: 40 65% 55%;
     --warning-foreground: 0 0% 0%;
 
     --border: 0 0% 15%;
     --input: 0 0% 16%;
-    --ring: 152 44% 42%;
+    --ring: 160 60% 44%;
 
-    /* Accent colors — muted professional */
-    --neon-green: 152 44% 42%;
-    --neon-red: 4 40% 48%;
-    --neon-cyan: 190 30% 45%;
-    --neon-amber: 38 40% 50%;
-    --neon-purple: 255 25% 52%;
+    /* Accent colors — rich professional */
+    --neon-green: 160 60% 44%;
+    --neon-red: 0 55% 55%;
+    --neon-cyan: 190 45% 50%;
+    --neon-amber: 40 65% 55%;
+    --neon-purple: 260 40% 58%;
 
     /* No glows — Spotify is flat */
     --glow-primary: none;
