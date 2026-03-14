@@ -380,7 +380,7 @@ export default function Auth() {
           </Button>
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-white/60 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground lg:hover:bg-secondary"
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground hover:bg-secondary/50"
             aria-label="Alternar tema"
           >
             <AppIcon name={theme === 'dark' ? 'Sun' : 'Moon'} size={18} />
