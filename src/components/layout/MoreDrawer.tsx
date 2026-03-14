@@ -138,7 +138,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
 
             {/* Store selector — collapsible menu */}
             {units.length > 1 && (
-              <div className="rounded-2xl border border-border/30 bg-card overflow-hidden">
+              <div className="rounded-2xl bg-card overflow-hidden">
                 {/* Active unit header — click to expand */}
                 <button
                   onClick={() => setUnitSelectorOpen(!unitSelectorOpen)}
@@ -252,7 +252,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                     className={cn(
                       "flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-2xl transition-all active:scale-95 relative overflow-hidden",
                       active
-                        ? "bg-primary/10 border border-primary/20"
+                        ? "bg-primary/10"
                         : "card-stat-holo"
                     )}
                     style={{

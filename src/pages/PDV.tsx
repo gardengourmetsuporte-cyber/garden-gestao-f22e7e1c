@@ -235,13 +235,13 @@ export default function PDV() {
                 placeholder="Buscar produto ou código..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="pl-8 h-9 text-sm rounded-xl bg-secondary/50 border-border/30"
+                className="pl-8 h-9 text-sm rounded-xl bg-secondary/50"
               />
             </div>
-            <button onClick={() => setHistoryOpen(true)} className="w-9 h-9 rounded-xl bg-secondary/50 border border-border/30 flex items-center justify-center shrink-0">
+            <button onClick={() => setHistoryOpen(true)} className="w-9 h-9 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0">
               <AppIcon name="Receipt" size={16} className="text-muted-foreground" />
             </button>
-            <button onClick={() => setOrdersOpen(true)} className="relative w-9 h-9 rounded-xl bg-secondary/50 border border-border/30 flex items-center justify-center shrink-0">
+            <button onClick={() => setOrdersOpen(true)} className="relative w-9 h-9 rounded-xl bg-secondary/50 flex items-center justify-center shrink-0">
               <AppIcon name="ClipboardList" size={16} className="text-muted-foreground" />
               {pos.pendingOrders.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-[9px] rounded-full flex items-center justify-center font-bold">
@@ -249,7 +249,7 @@ export default function PDV() {
                 </span>
               )}
             </button>
-            <button onClick={() => setCloseRegisterSheet(true)} className="w-9 h-9 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center shrink-0">
+            <button onClick={() => setCloseRegisterSheet(true)} className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
               <AppIcon name="LockKeyhole" size={15} className="text-destructive" />
             </button>
            <SyncStatusIndicator />
@@ -297,7 +297,7 @@ export default function PDV() {
                 <button
                   key={product.id}
                   onClick={() => setSelectedProduct(product)}
-                  className="bg-card border border-border/30 rounded-2xl p-3 text-left hover:border-primary/30 transition-all active:scale-[0.97] flex flex-col gap-0.5"
+                  className="bg-card rounded-2xl p-3 text-left hover:bg-secondary/50 transition-all active:scale-[0.97] flex flex-col gap-0.5"
                 >
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.name} className="w-full aspect-[4/3] object-cover rounded-xl mb-1" />
