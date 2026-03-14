@@ -9,23 +9,27 @@ interface Props {
   onNavigate?: () => void;
 }
 
+function getBillUrgencyColor(daysUntilDue: number) {
+  if (daysUntilDue <= 0) return 'text-destructive';
+  if (daysUntilDue <= 2) return 'text-warning';
+  return 'text-muted-foreground';
+}
+
 function BillRow({ bill }: { bill: BillDueSoon }) {
+  const urgency = getBillUrgencyColor(bill.daysUntilDue);
   return (
-    <div className="flex items-center justify-between p-2.5 rounded-lg bg-secondary/40">
+    <div className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-secondary/30">
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium text-foreground truncate">{bill.description}</p>
-        <p className="text-[10px] text-muted-foreground">
+        <p className="text-[13px] font-medium text-foreground truncate">{bill.description}</p>
+        <p className={cn("text-[10px] font-medium mt-0.5", urgency)}>
           {bill.daysUntilDue <= 0
-            ? 'Vence hoje'
+            ? '⚠ Vence hoje'
             : bill.daysUntilDue === 1
               ? 'Vence amanhã'
               : `Vence em ${bill.daysUntilDue} dias`}
         </p>
       </div>
-      <span className={cn(
-        "text-xs font-bold ml-2 shrink-0",
-        bill.daysUntilDue <= 1 ? 'text-destructive' : 'text-warning'
-      )}>
+      <span className={cn("text-[13px] font-bold ml-3 shrink-0 tabular-nums", urgency)}>
         {formatCurrency(bill.amount)}
       </span>
     </div>
@@ -60,41 +64,45 @@ function GroupedView({ bills }: { bills: BillDueSoon[] }) {
   };
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {groups.map(group => {
         const subtotal = group.items.reduce((s, b) => s + b.amount, 0);
+        const hasUrgent = group.items.some(b => b.daysUntilDue <= 1);
         const isOpen = openGroups.has(group.name);
         return (
           <div key={group.name}>
             <button
               onClick={() => toggleGroup(group.name)}
-              className="flex items-center justify-between w-full p-2.5 rounded-lg bg-secondary/40 hover:bg-secondary/60 transition-colors touch-manipulation"
+              className="flex items-center w-full py-3 px-3 rounded-xl hover:bg-secondary/40 transition-colors touch-manipulation"
               type="button"
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: group.color + '20' }}
-                >
-                  <AppIcon name={group.icon} size={14} style={{ color: group.color }} />
-                </div>
-                <span className="text-xs font-medium text-foreground truncate">{group.name}</span>
-                <span className="text-[10px] text-muted-foreground shrink-0">({group.items.length})</span>
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                style={{ backgroundColor: group.color + '18' }}
+              >
+                <AppIcon name={group.icon} size={15} style={{ color: group.color }} />
               </div>
-              <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                {group.items.some(b => b.daysUntilDue <= 0) && (
-                  <span className="w-2 h-2 rounded-full bg-warning shrink-0" />
-                )}
-                <span className="text-xs font-bold text-destructive">{formatCurrency(subtotal)}</span>
+              <div className="flex-1 min-w-0 ml-3 text-left">
+                <span className="text-[13px] font-semibold text-foreground truncate block">{group.name}</span>
+              </div>
+              <span className="text-[11px] text-muted-foreground/60 mr-2 shrink-0">({group.items.length})</span>
+              <div className="flex items-center gap-2 shrink-0">
+                {hasUrgent && <span className="w-1.5 h-1.5 rounded-full bg-destructive shrink-0" />}
+                <span className={cn(
+                  "text-[13px] font-bold tabular-nums",
+                  hasUrgent ? 'text-destructive' : 'text-warning'
+                )}>
+                  {formatCurrency(subtotal)}
+                </span>
                 <AppIcon
                   name="ChevronDown"
                   size={12}
-                  className={cn("text-muted-foreground transition-transform", isOpen && "rotate-180")}
+                  className={cn("text-muted-foreground/50 transition-transform duration-200", isOpen && "rotate-180")}
                 />
               </div>
             </button>
             {isOpen && (
-              <div className="space-y-1 mt-1 ml-3 border-l-2 border-border/30 pl-2">
+              <div className="space-y-1.5 mt-1 ml-4 pl-3 border-l-2 border-border/20">
                 {group.items.map(bill => (
                   <BillRow key={bill.id} bill={bill} />
                 ))}
@@ -110,7 +118,7 @@ function GroupedView({ bills }: { bills: BillDueSoon[] }) {
 function ListView({ bills }: { bills: BillDueSoon[] }) {
   const sorted = [...bills].sort((a, b) => a.daysUntilDue - b.daysUntilDue);
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       {sorted.map(bill => (
         <BillRow key={bill.id} bill={bill} />
       ))}
@@ -132,53 +140,70 @@ export function BillsDueWidget({ bills, onNavigate }: Props) {
   if (bills.length === 0) return null;
 
   const total = bills.reduce((s, b) => s + b.amount, 0);
+  const hasUrgent = bills.some(b => b.daysUntilDue <= 1);
 
   return (
     <div className="card-surface p-5 space-y-4">
-      {/* Header row */}
-      <div className="flex items-start justify-between">
-        <button
-          onClick={onNavigate}
-          className={cn("flex items-center gap-2.5", onNavigate ? 'cursor-pointer' : 'cursor-default')}
-          disabled={!onNavigate}
-          type="button"
-        >
-          <div className="w-9 h-9 rounded-xl bg-warning/10 flex items-center justify-center shrink-0">
-            <AppIcon name="AlertTriangle" size={17} className="text-warning" />
-          </div>
-          <div className="text-left">
-            <h3 className="text-sm font-bold text-foreground">Contas a Vencer</h3>
-            <span className="text-[10px] text-muted-foreground">Próximos 7 dias</span>
-          </div>
-          {onNavigate && <AppIcon name="ChevronRight" size={12} className="ml-1 text-muted-foreground/40 mt-1" />}
-        </button>
-        <div className="flex flex-col items-end gap-2">
-          <span className="text-base font-bold text-warning tabular-nums">{formatCurrency(total)}</span>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <AppIcon name="AlertTriangle" size={15} className={hasUrgent ? 'text-destructive' : 'text-warning'} />
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Contas a Vencer</h3>
+        </div>
+        <div className="flex items-center gap-2">
           <div className="inline-flex items-center rounded-lg bg-secondary/60 p-0.5">
             <button
               onClick={() => setMode('grouped')}
               className={cn(
-                'px-2 py-1 rounded-md transition-colors touch-manipulation',
+                'px-1.5 py-1 rounded-md transition-colors touch-manipulation',
                 viewMode === 'grouped' ? 'bg-card text-foreground' : 'text-muted-foreground hover:text-foreground'
               )}
-              title="Agrupado"
-              type="button"
+              title="Agrupado" type="button"
             >
-              <AppIcon name="LayoutGrid" size={14} />
+              <AppIcon name="LayoutGrid" size={13} />
             </button>
             <button
               onClick={() => setMode('list')}
               className={cn(
-                'px-2 py-1 rounded-md transition-colors touch-manipulation',
+                'px-1.5 py-1 rounded-md transition-colors touch-manipulation',
                 viewMode === 'list' ? 'bg-card text-foreground' : 'text-muted-foreground hover:text-foreground'
               )}
-              title="Lista"
-              type="button"
+              title="Lista" type="button"
             >
-              <AppIcon name="List" size={14} />
+              <AppIcon name="List" size={13} />
             </button>
           </div>
+          {onNavigate && (
+            <button onClick={onNavigate} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors">
+              <AppIcon name="ArrowRight" size={14} className="text-muted-foreground" />
+            </button>
+          )}
         </div>
+      </div>
+
+      {/* Total banner */}
+      <div className={cn(
+        "flex items-center justify-between rounded-2xl p-4",
+        hasUrgent ? "bg-destructive/8" : "bg-warning/8"
+      )}>
+        <div className="flex items-center gap-2.5">
+          <div className={cn(
+            "w-9 h-9 rounded-xl flex items-center justify-center",
+            hasUrgent ? "bg-destructive/15" : "bg-warning/15"
+          )}>
+            <AppIcon name="Receipt" size={17} className={hasUrgent ? "text-destructive" : "text-warning"} />
+          </div>
+          <div>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Total próximos 7 dias</p>
+            <p className="text-[11px] text-muted-foreground">{bills.length} conta{bills.length !== 1 ? 's' : ''} pendente{bills.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
+        <span className={cn(
+          "text-xl font-black tabular-nums",
+          hasUrgent ? "text-destructive" : "text-warning"
+        )}>
+          {formatCurrency(total)}
+        </span>
       </div>
 
       {viewMode === 'grouped' ? (
