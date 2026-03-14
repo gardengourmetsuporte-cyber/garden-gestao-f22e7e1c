@@ -80,15 +80,9 @@ export function MaterialDeliveries({ employeeId, compact = false, onRegisterRef 
     <div className="space-y-3">
       {/* Header */}
       {!compact && (
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-foreground">Entregas de Materiais</h2>
-            <p className="text-xs text-muted-foreground">Uniformes, EPIs, equipamentos</p>
-          </div>
-          <Button size="sm" className="gap-1.5 rounded-xl" onClick={() => setSheetOpen(true)}>
-            <AppIcon name="Plus" size={14} />
-            Registrar
-          </Button>
+        <div>
+          <h2 className="text-base font-bold text-foreground">Entregas de Materiais</h2>
+          <p className="text-xs text-muted-foreground">Uniformes, EPIs, equipamentos</p>
         </div>
       )}
 
