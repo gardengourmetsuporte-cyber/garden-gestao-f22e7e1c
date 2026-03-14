@@ -13,6 +13,8 @@ interface DashboardContextBarProps {
 }
 
 export function DashboardContextBar({ firstName, stats }: DashboardContextBarProps) {
+  const { isAdmin, isSuperAdmin } = useAuth();
+  const navigate = useNavigate();
   const { activeUnit } = useUnit();
 
   const greeting = (() => {
