@@ -123,23 +123,23 @@ export function EmployeeWarnings() {
   const totalPending = warnings.filter(w => !w.employee_acknowledged).length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Manual Card */}
       <InternalManual />
 
-      {/* Stats Summary */}
-      <div className="grid grid-cols-4 gap-2">
+      {/* Stats + Infractions in same row concept */}
+      <div className="grid grid-cols-4 gap-1.5">
         {[
-          { label: 'Verbais', value: totalVerbal },
-          { label: 'Escritas', value: totalWritten },
-          { label: 'Suspensões', value: totalSuspension },
-          { label: 'Pendentes', value: totalPending },
+          { label: 'Verbais', value: totalVerbal, color: 'text-foreground' },
+          { label: 'Escritas', value: totalWritten, color: 'text-foreground' },
+          { label: 'Suspensões', value: totalSuspension, color: 'text-foreground' },
+          { label: 'Pendentes', value: totalPending, color: totalPending > 0 ? 'text-warning' : 'text-foreground' },
         ].map(s => (
-          <div key={s.label} className="bg-secondary/50 rounded-xl p-3 text-center">
-            <p className="text-xl font-extrabold text-foreground tabular-nums" style={{ letterSpacing: '-0.03em' }}>
+          <div key={s.label} className="bg-secondary/50 rounded-xl py-2.5 px-2 text-center">
+            <p className={cn("text-lg font-extrabold tabular-nums", s.color)} style={{ letterSpacing: '-0.03em' }}>
               {s.value}
             </p>
-            <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">
+            <p className="text-[8px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">
               {s.label}
             </p>
           </div>
@@ -149,29 +149,29 @@ export function EmployeeWarnings() {
       {/* Infractions Guide — Collapsible */}
       <Collapsible className="group">
         <CollapsibleTrigger className="w-full">
-          <div className="flex items-center justify-between bg-secondary/50 rounded-xl p-3">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between bg-secondary/50 rounded-xl px-3 py-2.5">
+            <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
-                <AppIcon name="gavel" size={16} className="text-primary" />
+                <AppIcon name="gavel" size={15} className="text-primary" />
               </div>
               <div className="text-left">
-                <p className="text-[13px] font-semibold text-foreground">Guia de Infrações</p>
+                <p className="text-[12px] font-semibold text-foreground">Guia de Infrações</p>
                 <p className="text-[10px] text-muted-foreground">CLT & Acordo Coletivo — {INFRACTIONS.length} tipos</p>
               </div>
             </div>
-            <AppIcon name="ChevronDown" size={16} className="text-muted-foreground/40 transition-transform group-data-[state=open]:rotate-180" />
+            <AppIcon name="ChevronDown" size={14} className="text-muted-foreground/40 transition-transform group-data-[state=open]:rotate-180" />
           </div>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="mt-2 space-y-1.5">
+          <div className="mt-1.5 space-y-1">
             {INFRACTIONS.map((inf, i) => (
-              <div key={i} className="flex items-center gap-3 bg-card rounded-xl p-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
-                  <AppIcon name={inf.icon} size={16} className="text-primary" />
+              <div key={i} className="flex items-center gap-2.5 bg-secondary/30 rounded-xl px-3 py-2.5">
+                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <AppIcon name={inf.icon} size={14} className="text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-foreground">{inf.title}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{inf.progression}</p>
+                  <p className="text-[12px] font-semibold text-foreground">{inf.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{inf.progression}</p>
                 </div>
               </div>
             ))}
