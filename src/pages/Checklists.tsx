@@ -41,6 +41,7 @@ export default function ChecklistsPage() {
   const [selectedSectorId, setSelectedSectorId] = useState<string | null>(() => {
     try { return localStorage.getItem('checklist-selected-sector') || null; } catch { return null; }
   });
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(null);
 
   useEffect(() => {
     try { localStorage.setItem('checklist-view-mode', viewMode); } catch {}
