@@ -78,14 +78,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="flex-1 flex flex-col min-w-0">
           {/* ======= Mobile Header ======= */}
           <header
-            className="lg:hidden fixed top-0 left-0 right-0 z-50 transition-[background] duration-700 ease-out"
+            className="lg:hidden fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out"
             style={{
               paddingTop: 'env(safe-area-inset-top)',
               background: isDashboard && !isScrolled
-                ? 'linear-gradient(180deg, hsl(var(--primary) / 0.25) 0%, hsl(var(--background) / 0.85) 100%)'
+                ? 'transparent'
                 : 'hsl(var(--background))',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
+              backdropFilter: isScrolled || !isDashboard ? 'blur(16px)' : 'none',
+              WebkitBackdropFilter: isScrolled || !isDashboard ? 'blur(16px)' : 'none',
             }}
           >
             <div className="relative overflow-hidden">
