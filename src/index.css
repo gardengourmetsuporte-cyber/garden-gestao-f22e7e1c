@@ -110,12 +110,12 @@ html {
     /* Sidebar = same as background */
     --sidebar-background: 0 0% 7%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 141 73% 42%;
+    --sidebar-primary: 152 44% 45%;
     --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 0 0% 16%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 141 73% 42%;
+    --sidebar-ring: 152 44% 45%;
   }
 
   /* ===== LIGHT THEME (Spotify Light) ===== */
