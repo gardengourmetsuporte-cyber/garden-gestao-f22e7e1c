@@ -532,9 +532,9 @@ export default function OrdersPage() {
                                          <Button
                                           size="sm"
                                           onClick={(e) => { e.stopPropagation(); handleSendWhatsApp(order); }}
-                                          className="gap-1.5 rounded-xl bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)] shadow-lg"
+                                          className="gap-1.5 rounded-xl bg-[#25D366] hover:bg-[#1da851] text-white shadow-lg"
                                         >
-                                          <AppIcon name="MessageCircle" className="w-4 h-4" />
+                                          <img src="/icons/whatsapp.png" alt="" className="w-4 h-4" />
                                           WhatsApp
                                         </Button>
                                       ) : (
