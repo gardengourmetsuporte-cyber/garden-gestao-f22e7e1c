@@ -40,21 +40,15 @@ export function UnifiedCalendarWidget() {
     <div className="col-span-2 animate-card-reveal stagger-4">
       <div className="space-y-2">
         {/* Header */}
-        <button
-          onClick={() => navigate('/calendar')}
-          className="flex items-center justify-between px-1 w-full hover:opacity-80 transition-opacity"
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <AppIcon name="CalendarDays" size={16} className="text-primary" />
-            </div>
-            <span className="text-xs font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Calendário</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-[11px] text-muted-foreground mr-1">Ver completo</span>
-            <AppIcon name="ChevronRight" size={14} className="text-muted-foreground" />
-          </div>
-        </button>
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Calendário</h3>
+          <button
+            onClick={() => navigate('/calendar')}
+            className="text-[11px] text-primary font-medium hover:opacity-80 transition-opacity"
+          >
+            Ver completo
+          </button>
+        </div>
 
         {/* Month nav */}
         <UnifiedMonthNav
