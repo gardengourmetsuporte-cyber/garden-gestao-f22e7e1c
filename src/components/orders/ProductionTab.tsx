@@ -134,8 +134,7 @@ export function ProductionTab() {
                 <div
                   key={item.id}
                   className={cn(
-                    "bg-card rounded-2xl border overflow-hidden transition-all animate-fade-in",
-                    isBelowMin ? "border-amber-500/30" : "border-border"
+                    "bg-card rounded-2xl overflow-hidden transition-all animate-fade-in"
                   )}
                   style={{ animationDelay: `${i * 40}ms` }}
                 >
