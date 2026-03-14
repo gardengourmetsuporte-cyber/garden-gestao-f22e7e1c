@@ -46,8 +46,8 @@ function BrandPanel() {
         <div
           className="relative w-36 h-36 rounded-full overflow-hidden flex items-center justify-center"
           style={{
-            background: 'white',
-            boxShadow: '0 0 100px hsl(142 71% 45% / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
+            background: 'hsl(var(--foreground))',
+            boxShadow: '0 0 100px hsl(var(--primary) / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
           }}
         >
           <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
