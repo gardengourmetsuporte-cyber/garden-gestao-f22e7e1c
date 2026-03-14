@@ -31,9 +31,8 @@ export function CategoryGroup({ category, isTransfer, transactions, children }: 
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="w-full bg-card border border-border/40 rounded-2xl overflow-hidden relative hover:bg-secondary/30 transition-colors">
-        <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{ backgroundColor: color }} />
-        <div className="flex items-center w-full pl-5 pr-4 py-3.5">
+      <CollapsibleTrigger className="w-full bg-card rounded-2xl overflow-hidden relative hover:bg-secondary/50 transition-colors">
+        <div className="flex items-center w-full px-4 py-3.5">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <div
               className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
