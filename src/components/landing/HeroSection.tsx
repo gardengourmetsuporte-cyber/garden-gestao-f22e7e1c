@@ -14,39 +14,28 @@ const features = [
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-background">
-      {/* Core Background Mesh/Glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 15% 50%, hsl(var(--primary) / 0.15), transparent 25%),
-              radial-gradient(circle at 85% 30%, hsl(var(--primary) / 0.12), transparent 25%)
-            `
-          }}
-        />
-        <div
-          className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px] mix-blend-screen opacity-30 animate-pulse"
-          style={{ background: 'hsl(var(--primary))', animationDuration: '8s' }}
-        />
-        <div
-          className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[150px] mix-blend-screen opacity-20"
-          style={{ background: 'hsl(var(--primary))', animation: 'float-orb-2 15s ease-in-out infinite' }}
-        />
-        <div
-          className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[800px] h-[400px] rounded-[100%] blur-[120px] mix-blend-screen opacity-10 pointer-events-none"
-          style={{ background: 'hsl(var(--primary) / 0.6)', animation: 'float-orb-3 10s ease-in-out infinite' }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
-            WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)'
-          }}
-        />
-      </div>
+      {/* Background — matches dashboard context bar */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse 120% 80% at 100% 0%, hsl(var(--primary) / 0.7) 0%, transparent 60%),
+            radial-gradient(ellipse 80% 100% at 0% 100%, hsl(var(--primary) / 0.35) 0%, transparent 60%),
+            linear-gradient(165deg, hsl(var(--primary) / 0.28) 0%, hsl(var(--primary) / 0.12) 50%, hsl(var(--background)) 100%)
+          `,
+        }}
+      />
+      {/* Subtle grid pattern overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)
+          `,
+          backgroundSize: '32px 32px',
+        }}
+      />
 
       {/* Content Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 md:pt-48 pb-24 md:pb-32">
