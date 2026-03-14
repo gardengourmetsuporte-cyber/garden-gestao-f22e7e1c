@@ -89,7 +89,7 @@ function BrandPanel() {
 
         {/* Social proof */}
         <div className="text-center space-y-4 mt-4">
-          <p className="text-sm text-white/40 leading-relaxed max-w-xs mx-auto">
+          <p className="text-sm text-foreground/40 leading-relaxed max-w-xs mx-auto">
             Simplifique a gestão do seu negócio com a plataforma mais veloz do mercado.
           </p>
           <div className="flex items-center justify-center gap-6 text-white/20 text-xs">
