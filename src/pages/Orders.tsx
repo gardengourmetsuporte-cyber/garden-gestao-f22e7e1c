@@ -327,7 +327,7 @@ export default function OrdersPage() {
                     return (
                       <div
                         key={supplierId}
-                        className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/25 animate-fade-in"
+                        className="bg-card rounded-2xl overflow-hidden transition-all animate-fade-in"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
                         <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, [supplierId]: open }))}>
@@ -356,9 +356,8 @@ export default function OrdersPage() {
                             {!isNoSupplier && supplier && (
                               <Button
                                 size="sm"
-                                variant="outline"
                                 onClick={() => handleOpenOrder(supplier)}
-                                className="gap-1.5 rounded-xl border-primary/30 text-primary hover:bg-primary/10 shrink-0"
+                                className="gap-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
                               >
                                 <AppIcon name="Plus" size={16} />
                                 Pedir
@@ -431,7 +430,7 @@ export default function OrdersPage() {
                     return (
                       <div
                         key={sli.id}
-                        className="bg-card rounded-2xl border border-border p-4 flex items-center justify-between animate-fade-in"
+                        className="bg-card rounded-2xl p-4 flex items-center justify-between animate-fade-in"
                         style={{ animationDelay: `${index * 30}ms` }}
                       >
                         <div className="min-w-0 flex-1">
@@ -789,7 +788,7 @@ export default function OrdersPage() {
             {!cotationStep ? (
               <div className="space-y-3">
                 {selectedSupplier && itemsBySupplier[selectedSupplier.id]?.map(item => (
-                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/50 border border-border">
+                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/50">
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.name}</p>
                       <p className="text-xs text-muted-foreground">
@@ -844,8 +843,8 @@ export default function OrdersPage() {
                         className={cn(
                           "flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all border",
                            isSelected
-                             ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
-                             : "bg-emerald-500/5 border-emerald-500/10 text-foreground hover:border-emerald-500/20"
+                             ? "bg-primary/15 border-primary/30 text-primary"
+                             : "bg-primary/5 border-primary/10 text-foreground hover:border-primary/20"
                         )}
                       >
                         {isSelected && <AppIcon name="Check" size={14} />}
@@ -871,7 +870,7 @@ export default function OrdersPage() {
                   <Button
                     onClick={handleStartQuotation}
                     disabled={extraSuppliers.length === 0 || isCreatingQuotation}
-                    className="flex-1 h-12 rounded-xl shadow-lg shadow-emerald-500/20 gap-2"
+                    className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20 gap-2"
                   >
                     <AppIcon name="Scale" size={16} />
                     {isCreatingQuotation ? 'Criando...' : 'Iniciar Cotação'}
