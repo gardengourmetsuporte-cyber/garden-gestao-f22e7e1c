@@ -16,6 +16,41 @@ function AnimatedValue({ value }: { value: number }) {
   return <>{animated}</>;
 }
 
+// Deterministic sparkline data per key
+const SPARKLINES: Record<string, number[]> = {
+  criticalItems: [8, 12, 7, 15, 10, 6, 9],
+  pendingOrders: [2, 5, 3, 7, 4, 6, 3],
+  pendingClosings: [1, 0, 2, 1, 3, 1, 2],
+  pendingRedemptions: [0, 2, 1, 3, 2, 4, 1],
+  pendingQuotations: [1, 3, 2, 4, 1, 5, 2],
+  checklist: [30, 50, 65, 45, 80, 70, 90],
+};
+
+function Sparkline({ points, color, className }: { points: number[]; color: string; className?: string }) {
+  const max = Math.max(...points, 1);
+  const w = 48;
+  const h = 20;
+  const coords = points.map((p, i) => {
+    const x = (i / (points.length - 1)) * w;
+    const y = h - (p / max) * h;
+    return `${x},${y}`;
+  }).join(' ');
+
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className={className}>
+      <polyline
+        points={coords}
+        fill="none"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.5"
+      />
+    </svg>
+  );
+}
+
 const items = [
   { key: 'criticalItems', title: 'itens críticos', icon: 'AlertTriangle', route: '/inventory' },
   { key: 'pendingOrders', title: 'pedidos', icon: 'ShoppingCart', route: '/orders' },
@@ -25,29 +60,29 @@ const items = [
 ] as const;
 
 function getSmartColor(key: string, value: number) {
-  if (value === 0) return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-muted-foreground/60', iconBg: 'bg-muted/30' };
+  if (value === 0) return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-muted-foreground/60', iconBg: 'bg-muted/30', sparkline: 'hsl(var(--muted-foreground))' };
 
   switch (key) {
     case 'criticalItems':
-      if (value >= 50) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' };
-      if (value >= 20) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
-      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+      if (value >= 50) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15', sparkline: 'hsl(var(--destructive))' };
+      if (value >= 20) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15', sparkline: 'hsl(var(--warning))' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15', sparkline: 'hsl(var(--primary))' };
     case 'pendingOrders':
-      if (value >= 10) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' };
-      if (value >= 3) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
-      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+      if (value >= 10) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15', sparkline: 'hsl(var(--destructive))' };
+      if (value >= 3) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15', sparkline: 'hsl(var(--warning))' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15', sparkline: 'hsl(var(--primary))' };
     case 'pendingClosings':
-      if (value >= 3) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' };
-      if (value >= 1) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
-      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+      if (value >= 3) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15', sparkline: 'hsl(var(--destructive))' };
+      if (value >= 1) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15', sparkline: 'hsl(var(--warning))' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15', sparkline: 'hsl(var(--primary))' };
     case 'pendingRedemptions':
-      if (value >= 5) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
-      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+      if (value >= 5) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15', sparkline: 'hsl(var(--warning))' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15', sparkline: 'hsl(var(--primary))' };
     case 'pendingQuotations':
-      if (value >= 5) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
-      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+      if (value >= 5) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15', sparkline: 'hsl(var(--warning))' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15', sparkline: 'hsl(var(--primary))' };
     default:
-      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15', sparkline: 'hsl(var(--primary))' };
   }
 }
 
@@ -128,26 +163,27 @@ export function QuickStatsWidget() {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-3">
+    <div className="grid grid-cols-3 gap-2 lg:grid-cols-3">
       {allCards.map((card, i) => {
         const checklistColor = card.isChecklist
           ? checklistProgress.percent === 100
-            ? { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' }
+            ? { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15', sparkline: 'hsl(var(--primary))' }
             : checklistProgress.percent >= 70
-              ? { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' }
+              ? { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15', sparkline: 'hsl(var(--primary))' }
               : checklistProgress.percent >= 40
-                ? { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' }
-                : { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' }
+                ? { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15', sparkline: 'hsl(var(--warning))' }
+                : { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15', sparkline: 'hsl(var(--destructive))' }
           : null;
 
         const colors = checklistColor || getSmartColor(card.key, card.value);
+        const sparkPoints = SPARKLINES[card.key] || [1, 2, 3, 2, 1];
 
         return (
           <button
             key={card.key}
             onClick={() => navigate(card.route)}
             className={cn(
-              "flex items-center gap-3 rounded-2xl p-3.5 transition-all duration-200",
+              "flex flex-col justify-between rounded-[20px] p-3 transition-all duration-200 min-h-[90px]",
               colors.bg,
               "hover:bg-secondary/70",
               "active:scale-[0.97] touch-manipulation",
@@ -155,18 +191,31 @@ export function QuickStatsWidget() {
               `dash-stagger-${i + 1}`,
             )}
           >
-             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", colors.iconBg)}>
-              <AppIcon name={card.icon} size={17} className={colors.icon} />
-            </div>
-            <div className="text-left min-w-0">
-              <p className={cn("text-xl font-extrabold leading-none tabular-nums tracking-tight", colors.value)}>
-                {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
-              </p>
-              <p className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">
-                {card.isChecklist
-                  ? `${card.checklistProgress.completed}/${card.checklistProgress.total}`
-                  : card.title}
-              </p>
+            {/* Top: title */}
+            <p className="text-[10px] text-muted-foreground leading-tight truncate capitalize">
+              {card.isChecklist
+                ? (activeType === 'abertura' ? 'abertura' : 'fechamento')
+                : card.title}
+            </p>
+
+            {/* Bottom: icon + value left, sparkline right */}
+            <div className="flex items-end justify-between mt-auto">
+              <div className="flex items-center gap-1.5">
+                <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", colors.iconBg)}>
+                  <AppIcon name={card.icon} size={14} className={colors.icon} />
+                </div>
+                <div className="min-w-0">
+                  <p className={cn("text-lg font-extrabold leading-none tabular-nums tracking-tight", colors.value)}>
+                    {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
+                  </p>
+                  {card.isChecklist && (
+                    <p className="text-[9px] text-muted-foreground tabular-nums leading-tight">
+                      {card.checklistProgress.completed}/{card.checklistProgress.total}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <Sparkline points={sparkPoints} color={colors.sparkline} className="shrink-0 opacity-60" />
             </div>
           </button>
         );
