@@ -30,8 +30,9 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
   return (
     <div
       className="relative -mx-4 lg:-mx-8 px-5 pb-8 lg:px-8 lg:pb-10 overflow-hidden rounded-b-3xl"
-      style={{ marginTop: 'calc(-1 * env(safe-area-inset-top) - 4rem)', paddingTop: 'calc(env(safe-area-inset-top) + 4rem + 1.75rem)' }}
       style={{
+        marginTop: 'calc(-1 * env(safe-area-inset-top) - 4rem)',
+        paddingTop: 'calc(env(safe-area-inset-top) + 4rem + 1.75rem)',
         background: `
           radial-gradient(circle 400px at 85% -15%, hsl(var(--primary) / 0.6) 0%, transparent 100%),
           radial-gradient(circle 300px at 15% 40%, hsl(var(--primary) / 0.3) 0%, transparent 100%),
