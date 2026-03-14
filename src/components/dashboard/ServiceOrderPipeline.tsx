@@ -15,8 +15,8 @@ function OrderCard({ order }: { order: ActiveOrder }) {
 
   return (
     <div className={cn(
-      'flex flex-col gap-1 p-2.5 rounded-xl bg-muted/20 border text-xs min-w-[130px] shrink-0',
-      isLong ? 'border-destructive/40' : isWarning ? 'border-amber-500/30' : 'border-border/10'
+      'flex flex-col gap-1.5 p-3 rounded-2xl text-xs min-w-[140px] shrink-0',
+      isLong ? 'bg-destructive/8' : isWarning ? 'bg-amber-500/8' : 'bg-secondary/50'
     )}>
       <div className="flex items-center justify-between">
         <span className="font-bold text-foreground tabular-nums">
