@@ -145,7 +145,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
 
           {/* Needs attention */}
           {needsAttention.length > 0 && (
-            <div className="card-base p-3">
+            <div className="card-surface p-4">
               <div className="flex items-center gap-1.5 mb-2">
                 <AppIcon name="warning" size={14} className="text-amber-400" />
                 <span className="text-[11px] font-bold text-foreground">Precisam melhorar</span>
