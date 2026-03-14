@@ -178,9 +178,9 @@ function MobileBrandHeader() {
               key={label}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium"
               style={{
-                background: 'hsl(142 71% 45% / 0.1)',
-                color: 'hsl(142 76% 60%)',
-                border: '1px solid hsl(142 71% 45% / 0.15)',
+                background: 'hsl(var(--primary) / 0.1)',
+                color: 'hsl(var(--primary))',
+                border: '1px solid hsl(var(--primary) / 0.15)',
               }}
             >
               <AppIcon name={icon} size={12} />
