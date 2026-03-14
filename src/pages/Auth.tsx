@@ -152,8 +152,8 @@ function MobileBrandHeader() {
         <div
           className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]"
           style={{
-            background: 'white',
-            boxShadow: '0 0 80px hsl(142 71% 45% / 0.15), 0 16px 50px rgba(0,0,0,0.8)',
+            background: 'hsl(var(--foreground))',
+            boxShadow: '0 0 80px hsl(var(--primary) / 0.15), 0 16px 50px rgba(0,0,0,0.8)',
           }}
         >
           <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
