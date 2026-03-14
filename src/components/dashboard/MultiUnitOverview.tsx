@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 import { formatCurrency } from '@/lib/format';
+import { Card, CardContent } from '@/components/ui/card';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { useMemo } from 'react';
 
@@ -14,16 +15,17 @@ const UNIT_COLORS = [
   'hsl(170 65% 50%)',
 ];
 
-function PieChart({ data, total, size = 200 }: { data: { value: number; color: string }[]; total: number; size?: number }) {
+function PieChart({ data, total, size = 160 }: { data: { value: number; color: string }[]; total: number; size?: number }) {
   const radius = size / 2;
-  const innerRadius = radius * 0.68;
+  const innerRadius = radius * 0.62;
   const stroke = radius - innerRadius;
   const mid = (radius + innerRadius) / 2;
 
   const segments = useMemo(() => {
     if (total === 0) return [];
     const filtered = data.filter(d => d.value > 0);
-
+    
+    // Single segment = full circle
     if (filtered.length === 1) {
       return [{ type: 'circle' as const, color: filtered[0].color }];
     }
@@ -51,6 +53,7 @@ function PieChart({ data, total, size = 200 }: { data: { value: number; color: s
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block' }}>
+      {/* Background track */}
       <circle cx={radius} cy={radius} r={mid} fill="none" stroke="hsl(var(--muted))" strokeWidth={stroke} />
       {total === 0 ? null : (
         segments.map((s, i) =>
@@ -109,41 +112,46 @@ export function MultiUnitOverview() {
   }));
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider self-start">
-        Visão Consolidada
-        <span className="ml-2 text-[11px] font-normal bg-secondary/60 px-2 py-0.5 rounded-full">{units.length} unidades</span>
-      </h3>
-
-      {/* Donut with centered total */}
-      <div className="relative" style={{ width: 200, height: 200 }}>
-        <PieChart data={pieData} total={totalRevenue} size={200} />
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Total</p>
-          <p className="text-lg font-extrabold text-foreground tabular-nums tracking-tight leading-tight">
-            {formatCurrency(totalRevenue)}
-          </p>
+    <Card className="card-surface">
+      <CardContent className="pt-5 pb-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Visão Consolidada</h3>
+          <span className="text-[11px] text-muted-foreground bg-secondary/60 px-2 py-0.5 rounded-full">{units.length} unidades</span>
         </div>
-      </div>
 
-      {/* Legend below */}
-      <div className="w-full space-y-2">
-        {data.map((unit, index) => {
-          const pct = totalRevenue > 0 ? ((unit.monthlyRevenue / totalRevenue) * 100).toFixed(0) : '0';
-          return (
-            <div key={unit.unitId} className="flex items-center gap-2.5">
-              <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: UNIT_COLORS[index % UNIT_COLORS.length] }} />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-foreground truncate">{unit.unitName}</p>
-              </div>
-              <p className="text-[11px] text-muted-foreground tabular-nums shrink-0">
-                {formatCurrency(unit.monthlyRevenue)} · {pct}%
-              </p>
+        {/* Pie + Total */}
+        <div className="flex items-center gap-5 mb-5">
+          <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
+            <PieChart data={pieData} total={totalRevenue} size={120} />
+          </div>
+
+          {/* Legend + Total */}
+          <div className="flex-1 min-w-0">
+            <div className="mb-3">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Total</p>
+              <p className="text-sm font-bold text-foreground tabular-nums">{formatCurrency(totalRevenue)}</p>
             </div>
-          );
-        })}
-      </div>
-    </div>
+
+            <div className="space-y-2.5">
+              {data.map((unit, index) => {
+                const pct = totalRevenue > 0 ? ((unit.monthlyRevenue / totalRevenue) * 100).toFixed(0) : '0';
+                return (
+                  <div key={unit.unitId} className="flex items-center gap-2.5">
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: UNIT_COLORS[index % UNIT_COLORS.length] }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-foreground truncate">{unit.unitName}</p>
+                      <p className="text-[11px] text-muted-foreground tabular-nums">
+                        {formatCurrency(unit.monthlyRevenue)} · {pct}%
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

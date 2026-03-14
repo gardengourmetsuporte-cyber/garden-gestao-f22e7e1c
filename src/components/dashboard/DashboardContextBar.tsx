@@ -4,9 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
-import { RankedAvatar } from '@/components/profile/RankedAvatar';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import gardenLogo from '@/assets/logo.png';
 import type { DashboardStats } from '@/hooks/useDashboardStats';
 
 interface DashboardContextBarProps {
@@ -15,24 +13,9 @@ interface DashboardContextBarProps {
 }
 
 export function DashboardContextBar({ firstName, stats }: DashboardContextBarProps) {
-  const { isAdmin, isSuperAdmin, profile, user } = useAuth();
+  const { isAdmin, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const { activeUnit } = useUnit();
-
-  // Fetch earned points for ranked avatar frame
-  const { data: earnedPoints = 0 } = useQuery({
-    queryKey: ['dashboard-avatar-points', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return 0;
-      const { data } = await supabase
-        .from('bonus_points')
-        .select('points')
-        .eq('user_id', user.id);
-      return data?.reduce((s, r) => s + (r.points || 0), 0) || 0;
-    },
-    enabled: !!user?.id,
-    staleTime: 60000,
-  });
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -56,14 +39,12 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
         `,
       }}
     >
-      {/* Top row: avatar + greeting + edit button */}
+      {/* Top row: logo + greeting + edit button */}
       <div className="flex items-center gap-3.5 mb-5">
-        <RankedAvatar
-          avatarUrl={profile?.avatar_url}
-          earnedPoints={earnedPoints}
-          size={48}
-          userName={profile?.full_name || firstName}
-          userId={user?.id}
+        <img
+          src={gardenLogo}
+          alt="Garden"
+          className="w-12 h-12 rounded-full object-contain bg-primary/10 p-0.5"
         />
         <div className="flex-1">
           <p className="text-xs text-muted-foreground font-medium">{greeting},</p>
