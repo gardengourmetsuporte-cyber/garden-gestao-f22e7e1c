@@ -3,14 +3,12 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AppIcon } from '@/components/ui/app-icon';
-import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-// employees table has user_id and we can cross-reference for phone
 interface TeamMember {
   user_id: string;
   full_name: string;
@@ -25,9 +23,15 @@ interface Props {
   pendingCount: number;
 }
 
+function formatPhoneForWhatsApp(phone: string): string {
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.startsWith('55') && cleaned.length >= 12) return cleaned;
+  return `55${cleaned}`;
+}
+
 export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pendingCount }: Props) {
   const { user } = useAuth();
-  const { activeUnitId } = useUnit();
+  const { activeUnitId, activeUnit } = useUnit();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
@@ -37,45 +41,41 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
     if (!open || !activeUnitId || !user?.id) return;
     setLoading(true);
     (async () => {
-      const { data: unitUsers } = await supabase
-        .from('user_units')
-        .select('user_id')
+      // Get employees for this unit (excluding current user)
+      const { data: employees } = await supabase
+        .from('employees')
+        .select('user_id, full_name, phone')
         .eq('unit_id', activeUnitId)
-        .neq('user_id', user.id);
+        .is('deleted_at', null)
+        .eq('is_active', true);
 
-      if (!unitUsers?.length) {
+      if (!employees?.length) {
         setMembers([]);
         setLoading(false);
         return;
       }
 
-      const userIds = unitUsers.map(u => u.user_id);
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, avatar_url')
-        .in('user_id', userIds);
+      // Get avatar URLs from profiles
+      const userIds = employees.filter(e => e.user_id).map(e => e.user_id!);
+      const { data: profiles } = userIds.length > 0
+        ? await supabase.from('profiles').select('user_id, avatar_url').in('user_id', userIds)
+        : { data: [] as any[] };
 
-      // Get phone from employees table (linked by user_id)
-      const { data: employees } = await supabase
-        .from('employees')
-        .select('user_id, cpf')
-        .in('user_id', userIds)
-        .is('deleted_at', null);
+      const avatarMap = new Map((profiles || []).map(p => [p.user_id, p.avatar_url]));
 
-      const employeePhoneMap = new Map<string, string>();
-      // employees don't have phone field either, so WhatsApp will depend on channel config
-      // For now, we skip phone-based WhatsApp — the bulk-send will use the channel
-
-      const list: TeamMember[] = (profiles || []).map(p => ({
-        user_id: p.user_id,
-        full_name: p.full_name || 'Sem nome',
-        phone: null,
-        avatar_url: p.avatar_url,
-      }));
+      const list: TeamMember[] = employees
+        .filter(e => e.user_id !== user.id)
+        .map(e => ({
+          user_id: e.user_id || e.full_name,
+          full_name: e.full_name,
+          phone: e.phone,
+          avatar_url: e.user_id ? avatarMap.get(e.user_id) || null : null,
+        }));
 
       setMembers(list);
-      // Select all by default
-      setSelected(new Set(list.map(m => m.user_id)));
+      // Select only members with phone by default
+      const withPhone = list.filter(m => m.phone && m.phone.replace(/\D/g, '').length >= 10);
+      setSelected(new Set(withPhone.map(m => m.user_id)));
       setLoading(false);
     })();
   }, [open, activeUnitId, user?.id]);
@@ -90,10 +90,11 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
   };
 
   const toggleAll = () => {
-    if (selected.size === members.length) {
+    const withPhone = members.filter(m => m.phone && m.phone.replace(/\D/g, '').length >= 10);
+    if (selected.size === withPhone.length) {
       setSelected(new Set());
     } else {
-      setSelected(new Set(members.map(m => m.user_id)));
+      setSelected(new Set(withPhone.map(m => m.user_id)));
     }
   };
 
@@ -102,50 +103,49 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
     setSending(true);
 
     const typeLabel = checklistType === 'abertura' ? 'Abertura' : 'Fechamento';
-    const message = `⏰ *Checklist de ${typeLabel}*\n\nFaltam ${pendingCount} tarefa(s) pendentes e o prazo está acabando!\nCorra para completar! 💪`;
+    const unitName = activeUnit?.name || 'a unidade';
+    const message = `⏰ *Checklist de ${typeLabel} — ${unitName}*\n\nOlá! Faltam *${pendingCount} tarefa(s)* pendentes e o prazo está acabando!\nAcesse o app e complete o checklist. 💪\n\n📱 Acesse: app.gardengestao.com.br`;
 
     const selectedMembers = members.filter(m => selected.has(m.user_id));
+    const membersWithPhone = selectedMembers.filter(m => m.phone && m.phone.replace(/\D/g, '').length >= 10);
+
+    if (membersWithPhone.length === 0) {
+      toast.error('Nenhum membro selecionado tem WhatsApp cadastrado');
+      setSending(false);
+      return;
+    }
 
     try {
-      // 1. Send in-app notifications
-      const notifRows = selectedMembers.map(m => ({
-        user_id: m.user_id,
-        type: 'alert' as const,
-        title: `⏰ Finalize o Checklist de ${typeLabel}!`,
-        description: `Faltam ${pendingCount} tarefa(s) e o prazo está acabando. Corra para completar!`,
-        origin: 'checklist' as const,
-        read: false,
-      }));
-      await supabase.from('notifications').insert(notifRows as any);
-
-      // 2. Try WhatsApp for members with phone numbers
-      const phonesForWa = selectedMembers
-        .filter(m => m.phone && m.phone.replace(/\D/g, '').length >= 10)
-        .map(m => m.phone!.replace(/\D/g, ''));
-
-      let waSent = 0;
-      if (phonesForWa.length > 0) {
-        try {
-          const { data, error } = await supabase.functions.invoke('whatsapp-bulk-send', {
-            body: {
-              unit_id: activeUnitId,
-              phones: phonesForWa,
-              message,
-            },
-          });
-          if (!error && data?.sent) {
-            waSent = data.sent;
-          }
-        } catch {
-          // WhatsApp not configured — that's ok, notification still sent
+      // Send WhatsApp to each member via wa.me links
+      let sentCount = 0;
+      for (const member of membersWithPhone) {
+        const phone = formatPhoneForWhatsApp(member.phone!);
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+        window.open(url, '_blank');
+        sentCount++;
+        // Small delay between opens to avoid browser blocking
+        if (sentCount < membersWithPhone.length) {
+          await new Promise(r => setTimeout(r, 500));
         }
       }
 
-      const parts: string[] = [`Notificação enviada para ${selectedMembers.length} pessoa(s)`];
-      if (waSent > 0) parts.push(`${waSent} via WhatsApp`);
-      else if (phonesForWa.length > 0) parts.push('WhatsApp não configurado');
+      // Also send in-app notifications
+      const notifRows = selectedMembers
+        .filter(m => m.user_id && !m.user_id.includes(' ')) // only real user_ids
+        .map(m => ({
+          user_id: m.user_id,
+          type: 'alert' as const,
+          title: `⏰ Finalize o Checklist de ${typeLabel}!`,
+          description: `Faltam ${pendingCount} tarefa(s) e o prazo está acabando. Corra para completar!`,
+          origin: 'checklist' as const,
+          read: false,
+        }));
 
-      toast.success(parts.join(' • '));
+      if (notifRows.length > 0) {
+        await supabase.from('notifications').insert(notifRows as any);
+      }
+
+      toast.success(`WhatsApp aberto para ${sentCount} pessoa(s)`);
       onOpenChange(false);
     } catch (err) {
       console.error('Reminder error:', err);
@@ -155,44 +155,30 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
     }
   };
 
-  const whatsappCount = members.filter(
+  const selectedWithPhone = members.filter(
     m => selected.has(m.user_id) && m.phone && m.phone.replace(/\D/g, '').length >= 10
-  ).length;
+  );
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <AppIcon name="notifications" size={20} className="text-primary" />
+            <img src="/icons/whatsapp.png" alt="" className="w-5 h-5" />
             Lembrar Equipe
           </SheetTitle>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto mt-4 space-y-4">
           {/* Info banner */}
-          <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
+          <div className="p-3 rounded-xl bg-primary/5">
             <p className="text-xs text-muted-foreground">
               <span className="font-semibold text-foreground">
                 {pendingCount} tarefa(s) pendente(s)
               </span>{' '}
               no checklist de {checklistType === 'abertura' ? 'Abertura' : 'Fechamento'}.
-              Selecione quem deve receber o lembrete.
+              O lembrete será enviado via WhatsApp.
             </p>
-          </div>
-
-          {/* Channels info */}
-          <div className="flex gap-2">
-            <Badge variant="secondary" className="gap-1 text-[10px]">
-              <AppIcon name="notifications" size={12} />
-              Notificação
-            </Badge>
-            {whatsappCount > 0 && (
-              <Badge variant="secondary" className="gap-1 text-[10px] bg-emerald-500/10 text-emerald-600">
-                <AppIcon name="Phone" size={12} />
-                WhatsApp ({whatsappCount})
-              </Badge>
-            )}
           </div>
 
           {/* Select all */}
@@ -202,10 +188,10 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
               className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               <Checkbox
-                checked={selected.size === members.length}
+                checked={selectedWithPhone.length === members.filter(m => m.phone && m.phone.replace(/\D/g, '').length >= 10).length && selectedWithPhone.length > 0}
                 className="w-4 h-4 rounded"
               />
-              <span>{selected.size === members.length ? 'Desmarcar todos' : 'Selecionar todos'}</span>
+              <span>{selected.size > 0 ? 'Desmarcar todos' : 'Selecionar todos'}</span>
             </button>
           )}
 
@@ -228,16 +214,19 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
                 return (
                   <button
                     key={m.user_id}
-                    onClick={() => toggleMember(m.user_id)}
+                    onClick={() => hasPhone ? toggleMember(m.user_id) : undefined}
+                    disabled={!hasPhone}
                     className={cn(
                       "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left",
-                      isSelected
-                        ? "bg-primary/[0.06] border border-primary/10"
-                        : "bg-muted/[0.04] border border-border/5 opacity-60"
+                      !hasPhone && "opacity-40 cursor-not-allowed",
+                      hasPhone && isSelected
+                        ? "bg-primary/[0.06]"
+                        : "bg-muted/[0.04]"
                     )}
                   >
                     <Checkbox
-                      checked={isSelected}
+                      checked={isSelected && !!hasPhone}
+                      disabled={!hasPhone}
                       className="w-5 h-5 rounded-full shrink-0"
                     />
 
@@ -254,13 +243,13 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
                       <p className="text-sm font-medium truncate">{m.full_name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         {hasPhone ? (
-                          <span className="text-[10px] text-emerald-500 flex items-center gap-0.5">
-                            <AppIcon name="Phone" size={10} />
-                            WhatsApp
+                          <span className="text-[10px] text-primary flex items-center gap-0.5">
+                            <img src="/icons/whatsapp.png" alt="" className="w-3 h-3" />
+                            {m.phone}
                           </span>
                         ) : (
                           <span className="text-[10px] text-muted-foreground/50">
-                            Sem WhatsApp
+                            Sem telefone cadastrado
                           </span>
                         )}
                       </div>
@@ -275,16 +264,16 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
         {/* Footer */}
         <div className="pt-4 border-t border-border/10">
           <Button
-            className="w-full gap-2"
+            className="w-full gap-2 bg-[#25D366] hover:bg-[#1da851] text-white"
             onClick={handleSend}
-            disabled={sending || selected.size === 0}
+            disabled={sending || selectedWithPhone.length === 0}
           >
             {sending ? (
               <AppIcon name="progress_activity" size={16} className="animate-spin" />
             ) : (
-              <AppIcon name="send" size={16} />
+              <img src="/icons/whatsapp.png" alt="" className="w-4 h-4 brightness-0 invert" />
             )}
-            Enviar Lembrete ({selected.size})
+            Enviar via WhatsApp ({selectedWithPhone.length})
           </Button>
         </div>
       </SheetContent>
