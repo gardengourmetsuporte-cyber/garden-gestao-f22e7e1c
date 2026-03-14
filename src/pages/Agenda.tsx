@@ -61,6 +61,7 @@ export default function Agenda() {
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'blocks'>('list');
+  const [listMode, setListMode] = useState<'grouped' | 'flat'>('grouped');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [showCompleted, setShowCompleted] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
@@ -199,6 +200,101 @@ export default function Agenda() {
     </SortableTaskItem>
   );
 
+  const FlatListContent = () => (
+    <div className="space-y-1">
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, pendingTasks)} autoScroll={false}>
+        <SortableContext items={pendingTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+          {pendingTasks.map(task => renderTaskItem(task))}
+        </SortableContext>
+      </DndContext>
+      {showCompleted && completedTasks.length > 0 && (
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger className="flex items-center gap-2 px-1 py-2 w-full">
+            <AppIcon name="CheckCircle2" size={16} className="text-success" />
+            <span className="text-sm font-semibold text-muted-foreground">Concluídos ({completedTasks.length})</span>
+            <AppIcon name="ChevronDown" size={14} className="text-muted-foreground ml-auto" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1 mt-1">
+            {completedTasks.map(task => (
+              <TaskItem key={task.id} task={task} onToggle={toggleTask} onDelete={deleteTask} onClick={() => handleEditTask(task)} onInlineUpdate={handleInlineUpdate} />
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+    </div>
+  );
+
+  const GroupedListContent = () => (
+    <div className="space-y-1.5">
+      {/* Category sections */}
+      {tasksByCategory.map(({ category, tasks: catTasks }) => {
+        const isExpanded = expandedCategories[category.id] === true;
+        return (
+          <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
+            <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-card border border-border/50 hover:border-primary/25 transition-all duration-300 group">
+              <div className="flex items-center gap-3.5">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border shadow-inner"
+                  style={{ backgroundColor: category.color + '15', border: `1px solid ${category.color}30` }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 20, color: category.color, filter: `drop-shadow(0 0 4px ${category.color}60)` }}>{category.icon || 'folder'}</span>
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="font-semibold text-[15px] leading-tight text-foreground">{category.name}</span>
+                  <span className="text-[11px] text-muted-foreground mt-0.5">{catTasks.length} {catTasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{ backgroundColor: category.color, boxShadow: `0 0 6px ${category.color}60` }}
+                />
+                <AppIcon name="ChevronDown" size={18} className={cn("text-muted-foreground/60 transition-transform duration-300 ease-out", isExpanded && "rotate-180")} />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-2 space-y-1 pl-1">
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, catTasks)} autoScroll={false}>
+                <SortableContext items={catTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+                  {catTasks.map(task => renderTaskItem(task))}
+                </SortableContext>
+              </DndContext>
+            </CollapsibleContent>
+          </Collapsible>
+        );
+      })}
+
+      {/* Uncategorized tasks */}
+      {uncategorizedTasks.length > 0 && (
+        <div className="space-y-1">
+          {tasksByCategory.length > 0 && (
+            <p className="text-xs font-medium text-muted-foreground px-1">Sem categoria</p>
+          )}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, uncategorizedTasks)} autoScroll={false}>
+            <SortableContext items={uncategorizedTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+              {uncategorizedTasks.map(task => renderTaskItem(task))}
+            </SortableContext>
+          </DndContext>
+        </div>
+      )}
+
+      {/* Completed tasks */}
+      {showCompleted && completedTasks.length > 0 && (
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger className="flex items-center gap-2 px-1 py-2 w-full">
+            <AppIcon name="CheckCircle2" size={16} className="text-success" />
+            <span className="text-sm font-semibold text-muted-foreground">Concluídos ({completedTasks.length})</span>
+            <AppIcon name="ChevronDown" size={14} className="text-muted-foreground ml-auto" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1 mt-1">
+            {completedTasks.map(task => (
+              <TaskItem key={task.id} task={task} onToggle={toggleTask} onDelete={deleteTask} onClick={() => handleEditTask(task)} onInlineUpdate={handleInlineUpdate} />
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+    </div>
+  );
+
   const ListContent = () => (
     <div className="space-y-1.5">
       {isLoading ? (
@@ -219,79 +315,28 @@ export default function Agenda() {
         </div>
       ) : (
         <>
-          {/* Category sections */}
-          {tasksByCategory.map(({ category, tasks: catTasks }) => {
-            const isExpanded = expandedCategories[category.id] === true;
-            return (
-              <Collapsible key={category.id} open={isExpanded} onOpenChange={() => toggleCategoryExpanded(category.id)}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-card border border-border/50 hover:border-primary/25 transition-all duration-300 group">
-                  <div className="flex items-center gap-3.5">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border shadow-inner"
-                      style={{ backgroundColor: category.color + '15', border: `1px solid ${category.color}30` }}
-                    >
-                      <span className="material-symbols-rounded" style={{ fontSize: 20, color: category.color, filter: `drop-shadow(0 0 4px ${category.color}60)` }}>{category.icon || 'folder'}</span>
-                    </div>
-                    <div className="flex flex-col items-start">
-                      <span className="font-semibold text-[15px] leading-tight text-foreground">{category.name}</span>
-                      <span className="text-[11px] text-muted-foreground mt-0.5">{catTasks.length} {catTasks.length === 1 ? 'tarefa' : 'tarefas'}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: category.color, boxShadow: `0 0 6px ${category.color}60` }}
-                    />
-                    <AppIcon name="ChevronDown" size={18} className={cn("text-muted-foreground/60 transition-transform duration-300 ease-out", isExpanded && "rotate-180")} />
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-2 space-y-1 pl-1">
-                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, catTasks)} autoScroll={false}>
-                    <SortableContext items={catTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                      {catTasks.map(task => renderTaskItem(task))}
-                    </SortableContext>
-                  </DndContext>
-                </CollapsibleContent>
-              </Collapsible>
-            );
-          })}
+          {/* List mode toggle */}
+          <div className="flex items-center gap-1">
+            {([
+              { key: 'grouped' as const, label: 'Agrupado' },
+              { key: 'flat' as const, label: 'Lista completa' },
+            ]).map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setListMode(tab.key)}
+                className={cn(
+                  "px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-150 active:scale-[0.96]",
+                  listMode === tab.key
+                    ? "bg-foreground text-background backdrop-blur-md"
+                    : "bg-foreground/[0.07] backdrop-blur-sm text-foreground/60 hover:bg-foreground/[0.12] hover:text-foreground/80"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-          {/* Uncategorized tasks */}
-          {uncategorizedTasks.length > 0 && (
-            <div className="space-y-1">
-              {tasksByCategory.length > 0 && (
-                <p className="text-xs font-medium text-muted-foreground px-1">Sem categoria</p>
-              )}
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={(e) => handleDragEnd(e, uncategorizedTasks)} autoScroll={false}>
-                <SortableContext items={uncategorizedTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                  {uncategorizedTasks.map(task => renderTaskItem(task))}
-                </SortableContext>
-              </DndContext>
-            </div>
-          )}
-
-          {/* Completed tasks */}
-          {showCompleted && completedTasks.length > 0 && (
-            <Collapsible defaultOpen>
-              <CollapsibleTrigger className="flex items-center gap-2 px-1 py-2 w-full">
-                <AppIcon name="CheckCircle2" size={16} className="text-success" />
-                <span className="text-sm font-semibold text-muted-foreground">Concluídos ({completedTasks.length})</span>
-                <AppIcon name="ChevronDown" size={14} className="text-muted-foreground ml-auto" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-1 mt-1">
-                {completedTasks.map(task => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggle={toggleTask}
-                    onDelete={deleteTask}
-                    onClick={() => handleEditTask(task)}
-                    onInlineUpdate={handleInlineUpdate}
-                  />
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-          )}
+          {listMode === 'grouped' ? <GroupedListContent /> : <FlatListContent />}
         </>
       )}
     </div>
