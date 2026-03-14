@@ -1410,3 +1410,37 @@ select:focus {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ===== Liquid Glass Pill ===== */
+.liquid-glass-pill {
+  background: hsl(var(--foreground) / 0.08);
+  border: 1px solid hsl(var(--foreground) / 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.liquid-glass-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    hsl(var(--foreground) / 0.08) 45%,
+    hsl(var(--foreground) / 0.14) 50%,
+    hsl(var(--foreground) / 0.08) 55%,
+    transparent 70%
+  );
+  background-size: 250% 100%;
+  animation: liquid-shimmer 4s ease-in-out infinite;
+}
+
+.liquid-glass-pill:hover::before {
+  animation-duration: 1.5s;
+}
+
+@keyframes liquid-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
