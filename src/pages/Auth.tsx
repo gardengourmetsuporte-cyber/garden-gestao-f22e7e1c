@@ -76,9 +76,9 @@ function BrandPanel() {
               key={label}
               className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium"
               style={{
-                background: 'hsl(142 71% 45% / 0.1)',
-                color: 'hsl(142 76% 60%)',
-                border: '1px solid hsl(142 71% 45% / 0.15)',
+                background: 'hsl(var(--primary) / 0.1)',
+                color: 'hsl(var(--primary))',
+                border: '1px solid hsl(var(--primary) / 0.15)',
               }}
             >
               <AppIcon name={icon} size={14} />
