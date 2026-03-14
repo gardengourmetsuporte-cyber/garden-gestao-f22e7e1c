@@ -788,7 +788,7 @@ export default function OrdersPage() {
             {!cotationStep ? (
               <div className="space-y-3">
                 {selectedSupplier && itemsBySupplier[selectedSupplier.id]?.map(item => (
-                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/50 border border-border">
+                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/50">
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{item.name}</p>
                       <p className="text-xs text-muted-foreground">
