@@ -127,7 +127,7 @@ export function QuickStatsWidget() {
               `dash-stagger-${i + 1}`,
             )}
           >
-            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", colors.bg)}>
+             <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
               <AppIcon name={card.icon} size={17} className={colors.icon} />
             </div>
             <div className="text-left min-w-0">
