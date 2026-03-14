@@ -228,6 +228,7 @@ export const ICON_MAP: Record<string, string> = {
   Star: 'star',
   Trophy: 'emoji_events',
   Crown: 'diamond',
+  Diamond: 'diamond',
   Gem: 'diamond',
   Medal: 'military_tech',
   Award: 'workspace_premium',
