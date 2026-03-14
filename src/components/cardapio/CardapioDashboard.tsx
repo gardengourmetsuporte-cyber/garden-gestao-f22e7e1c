@@ -166,14 +166,15 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
       {/* Menu Summary */}
       <div className="bg-secondary/50 rounded-xl p-4">
         <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resumo do Cardápio</p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {[
-            { label: 'Ativos', value: products.filter(p => p.is_active).length },
-            { label: 'Grupos', value: groups.length },
-            { label: 'Destaques', value: products.filter(p => p.is_highlighted).length },
+            { label: 'Ativos', value: products.filter(p => p.is_active).length, warn: false },
+            { label: 'Desativados', value: deactivatedCount, warn: deactivatedCount > 0 },
+            { label: 'Grupos', value: groups.length, warn: false },
+            { label: 'Destaques', value: products.filter(p => p.is_highlighted).length, warn: false },
           ].map(s => (
             <div key={s.label} className="text-center">
-              <p className="text-lg font-extrabold text-foreground" style={{ letterSpacing: '-0.03em' }}>{s.value}</p>
+              <p className={cn("text-lg font-extrabold", s.warn ? "text-warning" : "text-foreground")} style={{ letterSpacing: '-0.03em' }}>{s.value}</p>
               <p className="text-[10px] text-muted-foreground">{s.label}</p>
             </div>
           ))}
