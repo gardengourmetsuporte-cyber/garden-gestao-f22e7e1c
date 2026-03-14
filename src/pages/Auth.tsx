@@ -21,7 +21,7 @@ const nameSchema = z.string().min(2, 'Nome deve ter no mínimo 2 caracteres');
 // ── Brand Panel (left half on desktop) ─────────────────────────────
 function BrandPanel() {
   return (
-    <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-[hsl(220,20%,3%)]">
+    <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-background">
       {/* Subtle grid pattern overlay */}
       <div
         className="absolute inset-0 opacity-[0.05]"
@@ -34,11 +34,11 @@ function BrandPanel() {
       {/* Glow orbs - Emerald theme */}
       <div
         className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20 pointer-events-none"
-        style={{ background: 'hsl(142 71% 45%)' }}
+        style={{ background: 'hsl(var(--primary))' }}
       />
       <div
         className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-[120px] opacity-15 pointer-events-none"
-        style={{ background: 'hsl(142 76% 36%)' }}
+        style={{ background: 'hsl(var(--primary))' }}
       />
 
       <div className="relative z-10 flex flex-col items-center gap-8 px-12 max-w-lg">
@@ -46,8 +46,8 @@ function BrandPanel() {
         <div
           className="relative w-36 h-36 rounded-full overflow-hidden flex items-center justify-center"
           style={{
-            background: 'white',
-            boxShadow: '0 0 100px hsl(142 71% 45% / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
+            background: 'hsl(var(--foreground))',
+            boxShadow: '0 0 100px hsl(var(--primary) / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
           }}
         >
           <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
@@ -55,10 +55,10 @@ function BrandPanel() {
 
         {/* Headline */}
         <div className="text-center space-y-2">
-          <h1 className="text-5xl font-extrabold tracking-tight text-white font-display">
+          <h1 className="text-5xl font-extrabold tracking-tight text-foreground font-display">
             Garden
           </h1>
-          <p className="text-[11px] text-white/35 tracking-[0.3em] uppercase font-semibold">
+          <p className="text-[11px] text-foreground/35 tracking-[0.3em] uppercase font-semibold">
             Gestão Inteligente
           </p>
         </div>
@@ -76,9 +76,9 @@ function BrandPanel() {
               key={label}
               className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium"
               style={{
-                background: 'hsl(142 71% 45% / 0.1)',
-                color: 'hsl(142 76% 60%)',
-                border: '1px solid hsl(142 71% 45% / 0.15)',
+                background: 'hsl(var(--primary) / 0.1)',
+                color: 'hsl(var(--primary))',
+                border: '1px solid hsl(var(--primary) / 0.15)',
               }}
             >
               <AppIcon name={icon} size={14} />
@@ -89,15 +89,15 @@ function BrandPanel() {
 
         {/* Social proof */}
         <div className="text-center space-y-4 mt-4">
-          <p className="text-sm text-white/40 leading-relaxed max-w-xs mx-auto">
+          <p className="text-sm text-foreground/40 leading-relaxed max-w-xs mx-auto">
             Simplifique a gestão do seu negócio com a plataforma mais veloz do mercado.
           </p>
-          <div className="flex items-center justify-center gap-6 text-white/20 text-xs">
+          <div className="flex items-center justify-center gap-6 text-foreground/20 text-xs">
             <div className="flex items-center gap-1.5">
               <AppIcon name="Shield" size={14} />
               <span>Dados seguros</span>
             </div>
-            <div className="w-px h-3 bg-white/10" />
+            <div className="w-px h-3 bg-foreground/10" />
             <div className="flex items-center gap-1.5">
               <AppIcon name="Zap" size={14} />
               <span>Setup rápido</span>
@@ -113,26 +113,26 @@ function BrandPanel() {
 function MobileBrandHeader() {
   return (
     <div
-      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full bg-[hsl(220,20%,3%)]"
+      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full bg-background"
       style={{
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
       }}
     >
       {/* Subtle border top separator indicating header */}
-      <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-foreground/5 to-transparent" />
 
       {/* Animated glow orbs - Emerald Theme */}
       <div
         className="absolute top-[15%] left-[20%] w-[250px] h-[250px] rounded-full blur-[100px] opacity-20 pointer-events-none"
         style={{
-          background: 'hsl(142 71% 45%)',
+          background: 'hsl(var(--primary))',
           animation: 'float-orb-1 8s ease-in-out infinite',
         }}
       />
       <div
         className="absolute bottom-[20%] right-[15%] w-[200px] h-[200px] rounded-full blur-[80px] opacity-15 pointer-events-none"
         style={{
-          background: 'hsl(142 76% 36%)',
+          background: 'hsl(var(--primary))',
           animation: 'float-orb-2 10s ease-in-out infinite',
         }}
       />
@@ -152,8 +152,8 @@ function MobileBrandHeader() {
         <div
           className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]"
           style={{
-            background: 'white',
-            boxShadow: '0 0 80px hsl(142 71% 45% / 0.15), 0 16px 50px rgba(0,0,0,0.8)',
+            background: 'hsl(var(--foreground))',
+            boxShadow: '0 0 80px hsl(var(--primary) / 0.15), 0 16px 50px rgba(0,0,0,0.8)',
           }}
         >
           <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
@@ -161,8 +161,8 @@ function MobileBrandHeader() {
 
         {/* Title with staggered entrance */}
         <div className="text-center space-y-1.5 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.25s_both]">
-          <h1 className="text-4xl font-extrabold text-white tracking-tight font-display">Garden</h1>
-          <p className="text-[10px] text-white/35 tracking-[0.25em] uppercase font-semibold">Gestão Inteligente</p>
+          <h1 className="text-4xl font-extrabold text-foreground tracking-tight font-display">Garden</h1>
+          <p className="text-[10px] text-foreground/35 tracking-[0.25em] uppercase font-semibold">Gestão Inteligente</p>
         </div>
 
         {/* Feature pills with stagger */}
@@ -178,9 +178,9 @@ function MobileBrandHeader() {
               key={label}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium"
               style={{
-                background: 'hsl(142 71% 45% / 0.1)',
-                color: 'hsl(142 76% 60%)',
-                border: '1px solid hsl(142 71% 45% / 0.15)',
+                background: 'hsl(var(--primary) / 0.1)',
+                color: 'hsl(var(--primary))',
+                border: '1px solid hsl(var(--primary) / 0.15)',
               }}
             >
               <AppIcon name={icon} size={12} />
@@ -190,12 +190,12 @@ function MobileBrandHeader() {
         </div>
 
         {/* Social proof */}
-        <div className="flex items-center justify-center gap-5 text-white/20 text-[10px] mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
+        <div className="flex items-center justify-center gap-5 text-foreground/20 text-[10px] mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
           <div className="flex items-center gap-1">
             <AppIcon name="Shield" size={12} />
             <span>Dados seguros</span>
           </div>
-          <div className="w-px h-3 bg-white/10" />
+          <div className="w-px h-3 bg-foreground/10" />
           <div className="flex items-center gap-1">
             <AppIcon name="Zap" size={12} />
             <span>Setup rápido</span>
@@ -204,7 +204,7 @@ function MobileBrandHeader() {
       </div>
 
       {/* Bottom overlay blending mask into page content */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[hsl(220,20%,3%)] to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-6 bg-background rounded-t-3xl" />
     </div>
   );
@@ -374,13 +374,13 @@ export default function Auth() {
       <div className="flex-1 flex flex-col relative overflow-y-auto lg:pt-0 pt-0 bg-background">
         {/* Top bar */}
         <div className="flex items-center justify-between px-5 absolute top-0 left-0 right-0 z-20 lg:relative" style={{ paddingTop: 'max(calc(env(safe-area-inset-top) + 8px), 16px)' }}>
-          <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-white/80 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground lg:hover:bg-secondary -ml-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/landing')} className="gap-1.5 text-foreground/80 hover:text-foreground hover:bg-secondary/50 lg:text-muted-foreground lg:hover:text-foreground lg:hover:bg-secondary -ml-2">
             <AppIcon name="ChevronLeft" size={16} />
             Voltar
           </Button>
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-white/60 hover:text-white hover:bg-white/10 lg:text-muted-foreground lg:hover:text-foreground lg:hover:bg-secondary"
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors text-muted-foreground hover:text-foreground hover:bg-secondary/50"
             aria-label="Alternar tema"
           >
             <AppIcon name={theme === 'dark' ? 'Sun' : 'Moon'} size={18} />
