@@ -101,7 +101,7 @@ function getOrderChannel(order: OrderItem): Channel {
 
 function getSourceLabel(order: OrderItem) {
   if (order.source === 'ifood') return order.customer_name || 'iFood';
-  if (order.source === 'delivery') return 'Delivery';
+  if (order.source === 'delivery') return order.customer_name || 'Delivery';
   if ((order.table_number ?? 0) > 0) return `Mesa ${order.table_number}`;
   if (order.customer_name) return order.customer_name;
   return 'Balcão';
