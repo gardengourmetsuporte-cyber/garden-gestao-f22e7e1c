@@ -280,17 +280,22 @@ export default function OrdersPage() {
                       key={tab.key}
                       onClick={() => setOrderTab(tab.key as any)}
                       className={cn(
-                        "relative flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl transition-all duration-200 active:scale-[0.96] touch-manipulation",
+                        "relative flex flex-col items-center gap-2 py-3.5 px-2 rounded-2xl transition-all duration-200 active:scale-[0.96] touch-manipulation",
                         isActive
-                          ? "bg-primary/10 border border-primary/30"
-                          : "bg-card border border-border hover:border-muted-foreground/20"
+                          ? "bg-primary/10"
+                          : "bg-secondary/50 hover:bg-secondary/70"
                       )}
                     >
-                      <AppIcon
-                        name={tab.icon}
-                        size={20}
-                        className={isActive ? "text-primary" : "text-muted-foreground"}
-                      />
+                      <div className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
+                        isActive ? "bg-primary/15" : "bg-secondary/60"
+                      )}>
+                        <AppIcon
+                          name={tab.icon}
+                          size={20}
+                          className={isActive ? "text-primary" : "text-muted-foreground"}
+                        />
+                      </div>
                       <span className={cn(
                         "text-[11px] font-semibold leading-tight text-center",
                         isActive ? "text-primary" : "text-muted-foreground"
