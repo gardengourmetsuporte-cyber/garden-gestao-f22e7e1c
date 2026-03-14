@@ -228,38 +228,41 @@ export default function CopilotPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 pb-2 space-y-3 overscroll-contain">
+        <div className="flex-1 overflow-y-auto px-3 py-4 pb-2 space-y-1 overscroll-contain">
           <BriefingCard stats={stats} contextStats={contextStats} visible={messages.length <= 2} />
 
           {messages.map((msg, i) => {
             const isAction = msg.role === 'assistant' && isActionMessage(msg.content);
             const displayContent = isAction ? stripActionMarker(msg.content) : msg.content;
             const navAction = isAction ? getActionNavigation(displayContent) : null;
+            const isUser = msg.role === 'user';
+            const showTail = i === 0 || messages[i - 1]?.role !== msg.role;
 
             return (
               <div
                 key={i}
                 className={cn(
                   "flex flex-col",
-                  msg.role === 'user' ? "items-end" : "items-start"
+                  isUser ? "items-end" : "items-start",
+                  showTail ? "mt-2" : "mt-0.5"
                 )}
               >
                 {msg.imageUrl && (
                   <img
                     src={msg.imageUrl}
                     alt="Imagem enviada"
-                    className="max-w-[200px] max-h-[200px] rounded-xl mb-1 object-cover border border-border/30"
+                    className="max-w-[200px] max-h-[200px] rounded-2xl mb-1 object-cover"
                   />
                 )}
                 {isAction ? (
-                  <div className="max-w-[85%] space-y-2">
-                    <div className="rounded-2xl px-4 py-3 text-sm leading-relaxed bg-primary/10 border border-primary/20 text-foreground rounded-tl-md">
+                  <div className="max-w-[80%] space-y-1.5">
+                    <div className="rounded-2xl px-3.5 py-2.5 text-[14px] leading-relaxed bg-secondary/60 text-foreground rounded-tl-sm">
                       <CopilotMessageContent content={displayContent} />
                     </div>
                     {navAction && (
                       <button
                         onClick={() => navigate(navAction.href)}
-                        className="flex items-center gap-1.5 text-xs text-primary font-medium px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors"
+                        className="flex items-center gap-1.5 text-xs text-primary font-medium px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/15 transition-colors"
                       >
                         <AppIcon name={navAction.icon as any} size={12} />
                         {navAction.label} →
@@ -269,10 +272,10 @@ export default function CopilotPage() {
                 ) : (
                   <div
                     className={cn(
-                      "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-                      msg.role === 'assistant'
-                        ? "bg-card border border-border/30 text-foreground rounded-tl-md border-l-2 border-l-primary"
-                        : "bg-primary text-primary-foreground rounded-tr-md"
+                      "max-w-[80%] px-3.5 py-2 text-[14px] leading-relaxed",
+                      isUser
+                        ? cn("bg-primary text-primary-foreground", showTail ? "rounded-2xl rounded-tr-sm" : "rounded-2xl")
+                        : cn("bg-secondary/60 text-foreground", showTail ? "rounded-2xl rounded-tl-sm" : "rounded-2xl")
                     )}
                   >
                     {msg.role === 'assistant' ? (
@@ -287,18 +290,18 @@ export default function CopilotPage() {
           })}
 
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-card border border-border/30 rounded-2xl rounded-tl-md px-4 py-3 flex items-center gap-2">
+            <div className="flex justify-start mt-1">
+              <div className="bg-secondary/60 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
                 {isExecuting ? (
                   <>
                     <AppIcon name="Loader2" size={14} className="text-primary animate-spin" />
-                    <span className="text-xs text-muted-foreground">Executando ação...</span>
+                    <span className="text-xs text-muted-foreground">Executando...</span>
                   </>
                 ) : (
-                  <div className="flex gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 )}
               </div>
