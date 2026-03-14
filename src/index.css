@@ -762,7 +762,7 @@ html {
     filter: brightness(0) saturate(100%) invert(50%);
   }
   .dark .icon-tint-muted {
-    filter: brightness(0) saturate(100%) invert(55%);
+    filter: brightness(0) saturate(100%) invert(80%);
   }
   .icon-tint-white {
     filter: brightness(0) invert(100%);
