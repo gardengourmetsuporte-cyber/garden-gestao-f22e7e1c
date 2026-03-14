@@ -123,28 +123,31 @@ export function MultiUnitOverview() {
         <div className="flex items-center gap-5 mb-5">
           <div className="relative shrink-0" style={{ width: 120, height: 120 }}>
             <PieChart data={pieData} total={totalRevenue} size={120} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[10px] text-muted-foreground">Total</span>
-              <span className="text-sm font-bold text-foreground">{formatCurrency(totalRevenue)}</span>
-            </div>
           </div>
 
-          {/* Legend */}
-          <div className="flex-1 space-y-2.5 min-w-0">
-            {data.map((unit, index) => {
-              const pct = totalRevenue > 0 ? ((unit.monthlyRevenue / totalRevenue) * 100).toFixed(0) : '0';
-              return (
-                <div key={unit.unitId} className="flex items-center gap-2.5">
-                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: UNIT_COLORS[index % UNIT_COLORS.length] }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-foreground truncate">{unit.unitName}</p>
-                    <p className="text-[11px] text-muted-foreground tabular-nums">
-                      {formatCurrency(unit.monthlyRevenue)} · {pct}%
-                    </p>
+          {/* Legend + Total */}
+          <div className="flex-1 min-w-0">
+            <div className="mb-3">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Total</p>
+              <p className="text-sm font-bold text-foreground tabular-nums">{formatCurrency(totalRevenue)}</p>
+            </div>
+
+            <div className="space-y-2.5">
+              {data.map((unit, index) => {
+                const pct = totalRevenue > 0 ? ((unit.monthlyRevenue / totalRevenue) * 100).toFixed(0) : '0';
+                return (
+                  <div key={unit.unitId} className="flex items-center gap-2.5">
+                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: UNIT_COLORS[index % UNIT_COLORS.length] }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-foreground truncate">{unit.unitName}</p>
+                      <p className="text-[11px] text-muted-foreground tabular-nums">
+                        {formatCurrency(unit.monthlyRevenue)} · {pct}%
+                      </p>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </CardContent>
