@@ -110,10 +110,8 @@ export function QuickStatsWidget() {
       {allCards.map((card, i) => {
         const colors = card.isChecklist
           ? checklistProgress.percent === 100
-            ? { bg: 'bg-primary/8', icon: 'text-primary', value: 'text-primary' }
-            : checklistProgress.percent > 0
-              ? { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' }
-              : { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' }
+            ? { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground' }
+            : { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground' }
           : getSmartColor(card.key, card.value);
 
         return (
