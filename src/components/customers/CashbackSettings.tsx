@@ -2,14 +2,12 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Coins, Plus, Trash2 } from 'lucide-react';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 export function CashbackSettings() {
@@ -68,6 +66,13 @@ export function CashbackSettings() {
     cashback_percent: 'Cashback (%)',
   };
 
+  const ruleIcons: Record<string, string> = {
+    points_per_real: 'Coins',
+    visits_reward: 'UserCheck',
+    birthday_bonus: 'Gift',
+    cashback_percent: 'Percent',
+  };
+
   const handleCreate = () => {
     createRule.mutate({
       rule_type: form.rule_type,
@@ -83,120 +88,122 @@ export function CashbackSettings() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Coins className="w-4 h-4" />
-            Regras de Fidelidade & Cashback
-          </CardTitle>
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button size="sm" variant="outline">
-                <Plus className="w-4 h-4 mr-1" /> Nova Regra
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="rounded-t-2xl">
-              <SheetHeader>
-                <SheetTitle>Nova Regra de Fidelidade</SheetTitle>
-              </SheetHeader>
-              <div className="space-y-4 pt-4">
-                <div>
-                  <Label>Tipo de Regra</Label>
-                  <Select value={form.rule_type} onValueChange={v => setForm(f => ({ ...f, rule_type: v }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(ruleLabels).map(([k, v]) => (
-                        <SelectItem key={k} value={k}>{v}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label>
-                      {form.rule_type === 'cashback_percent' ? 'Compra mín. (R$)' :
-                       form.rule_type === 'visits_reward' ? 'Nº de visitas' :
-                       form.rule_type === 'birthday_bonus' ? '(não aplicável)' :
-                       'A cada R$'}
-                    </Label>
-                    <Input
-                      type="number"
-                      value={form.threshold}
-                      onChange={e => setForm(f => ({ ...f, threshold: e.target.value }))}
-                      disabled={form.rule_type === 'birthday_bonus'}
-                    />
-                  </div>
-                  <div>
-                    <Label>
-                      {form.rule_type === 'cashback_percent' ? '% de cashback' :
-                       form.rule_type === 'points_per_real' ? 'Pontos ganhos' :
-                       'Pontos bônus'}
-                    </Label>
-                    <Input
-                      type="number"
-                      value={form.reward_value}
-                      onChange={e => setForm(f => ({ ...f, reward_value: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch checked={form.is_active} onCheckedChange={v => setForm(f => ({ ...f, is_active: v }))} />
-                  <Label>Ativa</Label>
-                </div>
-                <Button onClick={handleCreate} className="w-full">Criar Regra</Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+    <div className="card-surface rounded-2xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+            <AppIcon name="Gem" size={16} className="text-primary" />
+          </div>
+          <span className="text-sm font-semibold text-foreground">Fidelidade & Cashback</span>
         </div>
-      </CardHeader>
-      <CardContent>
-        {loyaltyRules.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            Nenhuma regra de fidelidade configurada
-          </p>
-        ) : (
-          <div className="space-y-3">
-            {loyaltyRules.map((rule: any) => (
-              <div key={rule.id} className="flex items-center justify-between p-3 rounded-lg border">
+
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <button className="flex items-center gap-1.5 text-xs font-medium text-primary px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/15 transition-colors">
+              <AppIcon name="Plus" size={12} />
+              Nova Regra
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="rounded-t-2xl">
+            <SheetHeader>
+              <SheetTitle>Nova Regra de Fidelidade</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-4 pt-4">
+              <div>
+                <Label>Tipo de Regra</Label>
+                <Select value={form.rule_type} onValueChange={v => setForm(f => ({ ...f, rule_type: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(ruleLabels).map(([k, v]) => (
+                      <SelectItem key={k} value={k}>{v}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm">
-                      {ruleLabels[rule.rule_type] || rule.rule_type}
-                    </span>
-                    <Badge variant={rule.is_active ? 'default' : 'secondary'}>
-                      {rule.is_active ? 'Ativa' : 'Inativa'}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <Label>
+                    {form.rule_type === 'cashback_percent' ? 'Compra mín. (R$)' :
+                     form.rule_type === 'visits_reward' ? 'Nº de visitas' :
+                     form.rule_type === 'birthday_bonus' ? '(não aplicável)' :
+                     'A cada R$'}
+                  </Label>
+                  <Input
+                    type="number"
+                    value={form.threshold}
+                    onChange={e => setForm(f => ({ ...f, threshold: e.target.value }))}
+                    disabled={form.rule_type === 'birthday_bonus'}
+                  />
+                </div>
+                <div>
+                  <Label>
+                    {form.rule_type === 'cashback_percent' ? '% de cashback' :
+                     form.rule_type === 'points_per_real' ? 'Pontos ganhos' :
+                     'Pontos bônus'}
+                  </Label>
+                  <Input
+                    type="number"
+                    value={form.reward_value}
+                    onChange={e => setForm(f => ({ ...f, reward_value: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={form.is_active} onCheckedChange={v => setForm(f => ({ ...f, is_active: v }))} />
+                <Label>Ativa</Label>
+              </div>
+              <Button onClick={handleCreate} className="w-full">Criar Regra</Button>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Content */}
+      <div className="px-4 pb-4">
+        {loyaltyRules.length === 0 ? (
+          <div className="flex items-center gap-3 py-3 px-3 rounded-xl bg-secondary/40">
+            <AppIcon name="Info" size={14} className="text-muted-foreground shrink-0" />
+            <p className="text-xs text-muted-foreground">
+              Nenhuma regra configurada. Crie sua primeira regra de fidelidade.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {loyaltyRules.map((rule: any) => (
+              <div key={rule.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/40">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <AppIcon name={ruleIcons[rule.rule_type] || 'Coins'} size={14} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {ruleLabels[rule.rule_type] || rule.rule_type}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
                     {rule.rule_type === 'cashback_percent'
-                      ? `${rule.reward_value}% de cashback em compras acima de R$ ${rule.threshold}`
+                      ? `${rule.reward_value}% acima de R$ ${rule.threshold}`
                       : rule.rule_type === 'points_per_real'
-                      ? `${rule.reward_value} ponto(s) a cada R$ ${rule.threshold} gastos`
+                      ? `${rule.reward_value} pt a cada R$ ${rule.threshold}`
                       : rule.rule_type === 'visits_reward'
-                      ? `${rule.reward_value} pontos bônus após ${rule.threshold} visitas`
-                      : `${rule.reward_value} pontos bônus no aniversário`}
+                      ? `${rule.reward_value} pts após ${rule.threshold} visitas`
+                      : `${rule.reward_value} pts no aniversário`}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Switch
-                    checked={rule.is_active}
-                    onCheckedChange={v => updateRule.mutate({ id: rule.id, is_active: v })}
-                  />
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="text-destructive"
-                    onClick={() => deleteRule.mutate(rule.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                <Switch
+                  checked={rule.is_active}
+                  onCheckedChange={v => updateRule.mutate({ id: rule.id, is_active: v })}
+                />
+                <button
+                  onClick={() => deleteRule.mutate(rule.id)}
+                  className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors"
+                >
+                  <AppIcon name="Trash2" size={14} className="text-muted-foreground hover:text-destructive" />
+                </button>
               </div>
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

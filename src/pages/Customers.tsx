@@ -122,9 +122,8 @@ export default function Customers() {
         <DesktopActionBar label="Novo Cliente" onClick={openNewSheet} />
 
         {/* Stats cards */}
-        <div className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
-          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
-          <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
+        <div className="card-surface rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-3 px-4 py-3.5">
             <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
               <AppIcon name="Users" size={20} className="text-primary" />
             </div>
