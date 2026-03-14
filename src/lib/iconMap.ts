@@ -217,6 +217,7 @@ export const ICON_MAP: Record<string, string> = {
   Calendar: 'calendar_today',
   Clock: 'schedule',
   History: 'history',
+  Timer: 'timer',
 
   // Food & Industry
   ChefHat: 'restaurant',
