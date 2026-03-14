@@ -49,19 +49,13 @@ export function AccountCard({ account, onClick }: AccountCardProps) {
       onClick={onClick}
       className={cn(
         "flex items-center gap-3.5 p-3.5 rounded-2xl w-full text-left relative overflow-hidden transition-all duration-200",
-        "bg-card border border-border/40 hover:border-border/70",
+        "bg-card hover:bg-secondary/50",
         onClick && "hover:shadow-lg cursor-pointer active:scale-[0.98]"
       )}
     >
-      {/* Subtle brand accent on left edge */}
-      <div
-        className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
-        style={{ background: brandColor }}
-      />
-
       <BankAvatar account={account} />
 
-      <div className="flex-1 min-w-0 pl-0.5">
+      <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm truncate text-foreground font-display" style={{ letterSpacing: '-0.01em' }}>
           {account.name}
         </p>
