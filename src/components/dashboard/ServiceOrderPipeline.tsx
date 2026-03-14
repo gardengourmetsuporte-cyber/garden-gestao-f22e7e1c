@@ -43,7 +43,7 @@ export function ServiceOrderPipeline({ pipeline }: { pipeline: PipelineGroups })
   const total = pipeline.pending.length + pipeline.preparing.length + pipeline.ready.length;
 
   return (
-    <div className="card-base p-4">
+    <div className="card-surface p-5">
       <div className="flex items-center gap-2 mb-3">
         <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
           <AppIcon name="view_kanban" size={14} className="text-primary" />
