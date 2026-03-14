@@ -4,11 +4,9 @@ import { AppIcon } from "@/components/ui/app-icon";
 import logoImg from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 
-
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -25,32 +23,31 @@ export function LandingNavbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${scrolled
-          ? "bg-[#000000]/80 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+          ? "bg-background/80 backdrop-blur-2xl border-b border-border shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
           : "bg-transparent border-b border-transparent"
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-        {/* Animated Logo */}
         <Link
           to="/landing"
           className={cn(
             "flex items-center h-10 rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
             scrolled
               ? "w-10 bg-transparent p-0 justify-center"
-              : "bg-white/10 border border-white/15 backdrop-blur-md pl-2.5 pr-4 gap-2.5"
+              : "bg-secondary/50 border border-border backdrop-blur-md pl-2.5 pr-4 gap-2.5"
           )}
         >
           <div className={cn(
             "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-500",
             scrolled ? "w-9 h-9" : "w-7 h-7"
           )}>
-            <div className="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center">
+            <div className="w-full h-full rounded-full overflow-hidden bg-foreground flex items-center justify-center">
               <img src={logoImg} alt="Garden" className="w-[85%] h-[85%] object-contain" />
             </div>
           </div>
           <span
             className={cn(
-              "text-sm font-bold text-white whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
+              "text-sm font-bold text-foreground whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] overflow-hidden",
               scrolled ? "max-w-0 opacity-0" : "max-w-[7rem] opacity-100"
             )}
             style={{ letterSpacing: '-0.01em' }}
@@ -61,12 +58,12 @@ export function LandingNavbar() {
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8">
-          <div className="flex items-center gap-2 p-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+          <div className="flex items-center gap-2 p-1.5 rounded-full bg-secondary/40 border border-border backdrop-blur-md">
             {links.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
-                className="px-4 py-1.5 rounded-full text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
+                className="px-4 py-1.5 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all duration-200"
               >
                 {l.label}
               </a>
@@ -78,15 +75,15 @@ export function LandingNavbar() {
         <div className="hidden md:flex items-center gap-5">
           <Link
             to="/auth"
-            className="text-sm font-semibold text-white/70 hover:text-white transition-colors"
+            className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
           >
             Entrar
           </Link>
           <Link
             to="/auth?plan=free"
-            className="group relative inline-flex items-center justify-center h-10 px-6 rounded-full text-sm font-bold bg-white text-black overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]"
+            className="group relative inline-flex items-center justify-center h-10 px-6 rounded-full text-sm font-bold bg-foreground text-background overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_hsl(var(--foreground)/0.1)] hover:shadow-[0_0_25px_hsl(var(--foreground)/0.2)]"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
             <span className="relative z-10">Começar grátis</span>
           </Link>
         </div>
@@ -95,13 +92,13 @@ export function LandingNavbar() {
         <div className="flex items-center gap-3 md:hidden">
           <Link
             to="/auth?plan=free"
-            className="inline-flex items-center justify-center h-8 px-4 rounded-full text-xs font-bold bg-white text-black transition-all active:scale-[0.98]"
+            className="inline-flex items-center justify-center h-8 px-4 rounded-full text-xs font-bold bg-foreground text-background transition-all active:scale-[0.98]"
           >
             Entrar
           </Link>
           <button
             onClick={() => setOpen(!open)}
-            className="p-2 text-white/70 hover:text-white transition-colors rounded-lg hover:bg-white/10 bg-white/5 border border-white/10"
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary/60 bg-secondary/40 border border-border"
           >
             {open ? <AppIcon name="X" size={20} /> : <AppIcon name="Menu" size={20} />}
           </button>
@@ -110,32 +107,31 @@ export function LandingNavbar() {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden absolute top-full left-0 right-0 overflow-hidden transition-all duration-300 ease-in-out ${open ? "max-h-[400px] border-b border-white/10 shadow-2xl relative z-40" : "max-h-0"
-          }`}
+        className={`md:hidden absolute top-full left-0 right-0 overflow-hidden transition-all duration-300 ease-in-out ${open ? "max-h-[400px] border-b border-border shadow-2xl relative z-40" : "max-h-0"}`}
       >
-        <div className="bg-[#050505]/98 backdrop-blur-3xl px-4 pt-4 pb-6 space-y-2">
+        <div className="bg-background/98 backdrop-blur-3xl px-4 pt-4 pb-6 space-y-2">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="block py-3.5 px-4 rounded-xl text-base font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              className="block py-3.5 px-4 rounded-xl text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
             >
               {l.label}
             </a>
           ))}
-          <div className="pt-4 mt-2 border-t border-white/10 flex flex-col gap-3">
+          <div className="pt-4 mt-2 border-t border-border flex flex-col gap-3">
             <Link
               to="/auth"
               onClick={() => setOpen(false)}
-              className="block w-full text-center py-3.5 rounded-xl text-base font-medium text-white hover:bg-white/10 transition-colors border border-white/10"
+              className="block w-full text-center py-3.5 rounded-xl text-base font-medium text-foreground hover:bg-secondary/50 transition-colors border border-border"
             >
               Entrar na conta
             </Link>
             <Link
               to="/auth?plan=free"
               onClick={() => setOpen(false)}
-              className="block w-full text-center py-3.5 rounded-xl text-base font-bold bg-white text-black active:scale-[0.98] transition-transform"
+              className="block w-full text-center py-3.5 rounded-xl text-base font-bold bg-foreground text-background active:scale-[0.98] transition-transform"
             >
               Começar grátis agora
             </Link>

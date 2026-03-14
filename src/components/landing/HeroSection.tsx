@@ -13,35 +13,30 @@ const features = [
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-[#000000]">
+    <section className="relative overflow-hidden bg-background">
       {/* Core Background Mesh/Glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Deep mesh gradient base */}
         <div
           className="absolute inset-0 opacity-40"
           style={{
             backgroundImage: `
-              radial-gradient(circle at 15% 50%, hsl(156 72% 35% / 0.15), transparent 25%),
-              radial-gradient(circle at 85% 30%, hsl(160 80% 40% / 0.12), transparent 25%)
+              radial-gradient(circle at 15% 50%, hsl(var(--primary) / 0.15), transparent 25%),
+              radial-gradient(circle at 85% 30%, hsl(var(--primary) / 0.12), transparent 25%)
             `
           }}
         />
-
-        {/* Animated Orbs for organic feel */}
         <div
           className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[120px] mix-blend-screen opacity-30 animate-pulse"
-          style={{ background: 'hsl(156 72% 40%)', animationDuration: '8s' }}
+          style={{ background: 'hsl(var(--primary))', animationDuration: '8s' }}
         />
         <div
           className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[150px] mix-blend-screen opacity-20"
-          style={{ background: 'hsl(160 80% 45%)', animation: 'float-orb-2 15s ease-in-out infinite' }}
+          style={{ background: 'hsl(var(--primary))', animation: 'float-orb-2 15s ease-in-out infinite' }}
         />
         <div
           className="absolute top-[40%] left-[50%] -translate-x-1/2 w-[800px] h-[400px] rounded-[100%] blur-[120px] mix-blend-screen opacity-10 pointer-events-none"
-          style={{ background: 'hsl(190 90% 50%)', animation: 'float-orb-3 10s ease-in-out infinite' }}
+          style={{ background: 'hsl(var(--primary) / 0.6)', animation: 'float-orb-3 10s ease-in-out infinite' }}
         />
-
-        {/* Subtle Grid overlay for 'tech' feel */}
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -58,23 +53,23 @@ export function HeroSection() {
         <div className="flex flex-col items-center text-center space-y-8 animate-[fade-up_0.8s_ease-out_both] max-w-4xl mx-auto">
 
           {/* Top Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold backdrop-blur-md border border-white/10 bg-white/5 shadow-[0_0_20px_rgba(255,255,255,0.05)] transition-colors cursor-default">
-            <AppIcon name="Sparkles" size={14} className="text-emerald-400" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold backdrop-blur-md border border-border bg-secondary/50 shadow-[0_0_20px_rgba(255,255,255,0.05)] transition-colors cursor-default">
+            <AppIcon name="Sparkles" size={14} className="text-primary" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
               A nova era da gestão para restaurantes
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white font-display leading-[1.1]">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground font-display leading-[1.1]">
             O sistema perfeito para <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/50">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-foreground via-foreground/90 to-foreground/50">
               o seu restaurante crescer.
             </span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed font-medium">
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl leading-relaxed font-medium">
             Tudo em um só lugar. Esqueça planilhas confusas e sistemas lentos. Experimente o SaaS mais inteligente, rápido e bonito do mercado, construído por quem vive o food service.
           </p>
 
@@ -82,28 +77,28 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full sm:w-auto">
             <Link
               to="/auth?plan=free"
-              className="group relative inline-flex items-center justify-center gap-2 h-14 px-8 rounded-full font-bold text-base bg-white text-black overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-              style={{ boxShadow: '0 0 40px hsl(0 0% 100% / 0.15)' }}
+              className="group relative inline-flex items-center justify-center gap-2 h-14 px-8 rounded-full font-bold text-base bg-foreground text-background overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              style={{ boxShadow: '0 0 40px hsl(var(--foreground) / 0.15)' }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-foreground/50 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
               Começar grátis agora
               <AppIcon name="ArrowRight" size={20} className="group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               to="/auth"
-              className="inline-flex items-center justify-center h-14 px-8 rounded-full text-base font-semibold text-white/80 hover:text-white backdrop-blur-md border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 transition-all duration-300"
+              className="inline-flex items-center justify-center h-14 px-8 rounded-full text-base font-semibold text-muted-foreground hover:text-foreground backdrop-blur-md border border-border hover:border-border/60 bg-secondary/30 hover:bg-secondary/50 transition-all duration-300"
             >
               Já tenho uma conta
             </Link>
           </div>
 
           {/* Trust indicators */}
-          <div className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-xs text-white/40 pt-2 font-medium">
-            <span className="flex items-center gap-1.5"><AppIcon name="Check" size={14} className="text-emerald-500" /> Sem cartão de crédito</span>
-            <span className="w-1 h-1 rounded-full bg-white/20 hidden md:block" />
-            <span className="flex items-center gap-1.5"><AppIcon name="Check" size={14} className="text-emerald-500" /> Setup em 5 minutos</span>
-            <span className="w-1 h-1 rounded-full bg-white/20 hidden md:block" />
-            <span className="flex items-center gap-1.5"><AppIcon name="Check" size={14} className="text-emerald-500" /> Cancele quando quiser</span>
+          <div className="flex items-center justify-center flex-wrap gap-2 md:gap-4 text-xs text-muted-foreground pt-2 font-medium">
+            <span className="flex items-center gap-1.5"><AppIcon name="Check" size={14} className="text-primary" /> Sem cartão de crédito</span>
+            <span className="w-1 h-1 rounded-full bg-muted-foreground/30 hidden md:block" />
+            <span className="flex items-center gap-1.5"><AppIcon name="Check" size={14} className="text-primary" /> Setup em 5 minutos</span>
+            <span className="w-1 h-1 rounded-full bg-muted-foreground/30 hidden md:block" />
+            <span className="flex items-center gap-1.5"><AppIcon name="Check" size={14} className="text-primary" /> Cancele quando quiser</span>
           </div>
         </div>
 
@@ -112,15 +107,9 @@ export function HeroSection() {
           {features.map(({ icon, label }) => (
             <div
               key={label}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all hover:scale-[1.05] hover:bg-white/10 cursor-default"
-              style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                color: 'rgba(255, 255, 255, 0.8)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                backdropFilter: 'blur(12px)',
-              }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all hover:scale-[1.05] hover:bg-secondary/80 cursor-default bg-secondary/40 text-foreground/80 border border-border/50 backdrop-blur-xl"
             >
-              <AppIcon name={icon} size={16} className="text-white/60" />
+              <AppIcon name={icon} size={16} className="text-muted-foreground" />
               {label}
             </div>
           ))}
@@ -132,34 +121,27 @@ export function HeroSection() {
             className="relative transition-transform duration-700 ease-out hover:scale-[1.02]"
             style={{ transform: "perspective(1200px) rotateX(4deg)", transformStyle: "preserve-3d" }}
           >
-            {/* Glow behind the mockup */}
             <div className="absolute -inset-10 rounded-[3rem] blur-[80px] bg-gradient-to-b from-primary/20 to-transparent opacity-50 group-hover:opacity-70 transition-opacity duration-700" />
-
-            {/* Mockup Container */}
-            <div className="relative rounded-2xl sm:rounded-[32px] overflow-hidden border border-white/10 bg-black shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)]">
-              {/* Fake Browser Header */}
-              <div className="flex items-center gap-2 px-4 py-3 sm:py-4 border-b border-white/10 bg-[#0a0a0a]">
+            <div className="relative rounded-2xl sm:rounded-[32px] overflow-hidden border border-border bg-background shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)]">
+              <div className="flex items-center gap-2 px-4 py-3 sm:py-4 border-b border-border bg-card">
                 <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FF5F56] border border-white/10" />
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FFBD2E] border border-white/10" />
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#27C93F] border border-white/10" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FF5F56] border border-border/30" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#FFBD2E] border border-border/30" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#27C93F] border border-border/30" />
                 </div>
                 <div className="flex-1 mx-4 sm:mx-8">
-                  <div className="h-6 sm:h-8 rounded-md max-w-[280px] mx-auto flex items-center justify-center bg-white/5 border border-white/5">
-                    <AppIcon name="Lock" size={12} className="text-white/40 mr-1.5" />
-                    <span className="text-[10px] sm:text-xs text-white/40 font-medium tracking-wide">app.gardengestao.com.br</span>
+                  <div className="h-6 sm:h-8 rounded-md max-w-[280px] mx-auto flex items-center justify-center bg-secondary/50 border border-border/30">
+                    <AppIcon name="Lock" size={12} className="text-muted-foreground mr-1.5" />
+                    <span className="text-[10px] sm:text-xs text-muted-foreground font-medium tracking-wide">app.gardengestao.com.br</span>
                   </div>
                 </div>
               </div>
-
-              {/* Animated UI Component */}
               <AnimatedMockup />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom fade transition to app background - matches dark mode background var(--background) */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
     </section>
   );

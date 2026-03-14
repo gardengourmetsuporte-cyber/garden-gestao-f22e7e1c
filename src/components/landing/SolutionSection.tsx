@@ -40,23 +40,22 @@ const modules = [
 
 export function SolutionSection() {
   return (
-    <section id="como-funciona" className="py-24 md:py-32 relative bg-[#000000] overflow-hidden">
-      {/* Top subtle border */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+    <section id="como-funciona" className="py-24 md:py-32 relative bg-background overflow-hidden">
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-20 md:mb-28">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-secondary/40 backdrop-blur-md mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/70">
+            <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
               Como funciona
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-[1.15] tracking-tight font-display mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground leading-[1.15] tracking-tight font-display mb-4">
             Comece em 3 passos práticos
           </h2>
-          <p className="text-white/50 text-base sm:text-lg leading-relaxed font-medium">
+          <p className="text-muted-foreground text-base sm:text-lg leading-relaxed font-medium">
             Do zero ao controle total em menos de 10 minutos. Esqueça sistemas complexos.
           </p>
         </div>
@@ -72,19 +71,18 @@ export function SolutionSection() {
                 <div className="inline-flex items-center gap-4">
                   <div className="relative">
                     <div className="absolute inset-0 bg-primary blur-xl opacity-30" />
-                    <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-lg text-white bg-gradient-to-br from-primary to-primary/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] border border-primary/30">
+                    <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-lg text-primary-foreground bg-gradient-to-br from-primary to-primary/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] border border-primary/30">
                       {step.number}
                     </div>
                   </div>
                   <div className="h-px flex-1 min-w-[60px] max-w-[100px] bg-gradient-to-r from-primary/50 to-transparent" />
                 </div>
                 <div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-4 tracking-tight">{step.title}</h3>
-                  <p className="text-white/50 leading-relaxed text-base sm:text-lg font-medium">{step.desc}</p>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight mb-4 tracking-tight">{step.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed text-base sm:text-lg font-medium">{step.desc}</p>
                 </div>
               </div>
 
-              {/* 3D Mockup Container */}
               <div className="lg:[direction:ltr] perspective-1200 group">
                 <div
                   className="relative transition-transform duration-700 ease-out group-hover:scale-[1.02]"
@@ -93,11 +91,8 @@ export function SolutionSection() {
                     transformStyle: "preserve-3d"
                   }}
                 >
-                  {/* Ambient Glow */}
                   <div className="absolute -inset-8 bg-gradient-to-tr from-primary/10 via-transparent to-primary/10 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700" />
-
-                  {/* Animated Phone Mockup placed natively */}
-                  <div className="relative overflow-hidden pt-4 pb-2 px-6 sm:px-10 flex justify-center bg-[#050505]">
+                  <div className="relative overflow-hidden pt-4 pb-2 px-6 sm:px-10 flex justify-center bg-card">
                     <AnimatedPhoneMockup type={step.type} />
                   </div>
                 </div>
@@ -111,10 +106,10 @@ export function SolutionSection() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
           <div className="text-center mb-16 relative z-10">
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight font-display">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-4 tracking-tight font-display">
               Tudo que você precisa, em um só lugar
             </h3>
-            <p className="text-white/50 max-w-2xl mx-auto text-base sm:text-lg font-medium">
+            <p className="text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg font-medium">
               10 módulos integrados que conversam entre si para você ter a visão completa do negócio.
             </p>
           </div>
@@ -125,15 +120,13 @@ export function SolutionSection() {
                 key={m.title}
                 className="group relative rounded-2xl p-[1px] overflow-hidden transition-all duration-300 hover:-translate-y-1"
               >
-                {/* Border effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/0 group-hover:from-primary/40 group-hover:to-transparent transition-colors duration-500" />
-
-                <div className="relative h-full bg-[#0a0a0a] rounded-[15px] p-5 text-center flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:border-primary/30 transition-all duration-300 shadow-inner">
-                    <AppIcon name={m.icon} size={22} className="text-white/60 group-hover:text-primary transition-colors" />
+                <div className="absolute inset-0 bg-gradient-to-br from-border/60 to-border/0 group-hover:from-primary/40 group-hover:to-transparent transition-colors duration-500" />
+                <div className="relative h-full bg-card rounded-[15px] p-5 text-center flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-xl bg-secondary/50 border border-border flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:border-primary/30 transition-all duration-300 shadow-inner">
+                    <AppIcon name={m.icon} size={22} className="text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
-                  <h4 className="font-bold text-white text-sm mb-2">{m.title}</h4>
-                  <p className="text-white/40 text-[11px] leading-relaxed hidden sm:block">
+                  <h4 className="font-bold text-foreground text-sm mb-2">{m.title}</h4>
+                  <p className="text-muted-foreground text-[11px] leading-relaxed hidden sm:block">
                     {m.desc}
                   </p>
                 </div>
