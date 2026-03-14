@@ -81,11 +81,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             className="lg:hidden fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out"
             style={{
               paddingTop: 'env(safe-area-inset-top)',
-              background: isDashboard && !isScrolled
-                ? 'transparent'
-                : 'hsl(var(--background))',
-              backdropFilter: isScrolled || !isDashboard ? 'blur(16px)' : 'none',
-              WebkitBackdropFilter: isScrolled || !isDashboard ? 'blur(16px)' : 'none',
+              background: isDashboard
+                ? (isScrolled ? 'hsl(var(--background) / 0.7)' : 'transparent')
+                : 'hsl(var(--background) / 0.85)',
+              backdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
+              WebkitBackdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
             }}
           >
             <div className="relative overflow-hidden">
