@@ -120,11 +120,11 @@ html {
 
   /* ===== LIGHT THEME (Spotify Light) ===== */
   :root:not(.dark) {
-    --color-income: 141 73% 35%;
-    --color-expense: 0 72% 45%;
-    --color-transfer: 210 60% 45%;
-    --color-pending: 43 96% 45%;
-    --color-credit-card: 260 60% 45%;
+    --color-income: 152 40% 35%;
+    --color-expense: 4 38% 42%;
+    --color-transfer: 215 32% 45%;
+    --color-pending: 38 38% 45%;
+    --color-credit-card: 255 22% 48%;
 
     --surface-elevated: 0 0% 100%;
     --surface-sunken: 0 0% 96%;
