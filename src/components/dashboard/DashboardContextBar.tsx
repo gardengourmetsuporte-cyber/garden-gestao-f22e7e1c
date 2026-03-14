@@ -29,7 +29,8 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
 
   return (
     <div
-      className="relative -mx-4 -mt-5 lg:-mx-8 lg:-mt-6 px-5 pt-7 pb-8 lg:px-8 lg:pt-10 lg:pb-10 overflow-hidden rounded-b-3xl"
+      className="relative -mx-4 lg:-mx-8 px-5 pb-8 lg:px-8 lg:pb-10 overflow-hidden rounded-b-3xl"
+      style={{ marginTop: 'calc(-1 * env(safe-area-inset-top) - 4rem)', paddingTop: 'calc(env(safe-area-inset-top) + 4rem + 1.75rem)' }}
       style={{
         background: `
           radial-gradient(circle 400px at 85% -15%, hsl(var(--primary) / 0.6) 0%, transparent 100%),
