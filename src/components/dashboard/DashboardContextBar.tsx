@@ -3,13 +3,26 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import gardenLogo from '@/assets/logo.png';
 import type { DashboardStats } from '@/hooks/useDashboardStats';
+import { AppIcon } from '@/components/ui/app-icon';
+import { cn } from '@/lib/utils';
+
+const VIEW_TABS = [
+  { key: 'operational' as const, icon: 'LayoutGrid', label: 'Operacional' },
+  { key: 'financial' as const, icon: 'Landmark', label: 'Financeiro' },
+  { key: 'service' as const, icon: 'Store', label: 'Serviço' },
+  { key: 'team' as const, icon: 'Users', label: 'Equipe' },
+] as const;
+
+export type DashboardView = 'operational' | 'financial' | 'service' | 'team';
 
 interface DashboardContextBarProps {
   firstName: string;
   stats: DashboardStats;
+  view: DashboardView;
+  onViewChange: (v: DashboardView) => void;
 }
 
-export function DashboardContextBar({ firstName, stats }: DashboardContextBarProps) {
+export function DashboardContextBar({ firstName, stats, view, onViewChange }: DashboardContextBarProps) {
   const { activeUnit } = useUnit();
 
   const greeting = (() => {
@@ -24,7 +37,7 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
 
   return (
     <div
-      className="relative -mx-4 -mt-5 lg:-mx-8 lg:-mt-6 px-5 pt-7 pb-8 lg:px-8 lg:pt-10 lg:pb-10 overflow-hidden rounded-b-3xl"
+      className="relative -mx-4 -mt-5 lg:-mx-8 lg:-mt-6 px-5 pt-7 pb-5 lg:px-8 lg:pt-10 lg:pb-6 overflow-hidden rounded-b-3xl"
       style={{
         background: `
           radial-gradient(circle 400px at 85% -15%, hsl(var(--primary) / 0.6) 0%, transparent 100%),
@@ -47,7 +60,7 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
         </div>
       </div>
 
-      {/* Hero text — Spotify style */}
+      {/* Hero text */}
       <h1 className="font-display leading-[1.1] tracking-[-0.03em]">
         <span className="text-[28px] lg:text-[36px] font-extrabold text-foreground">
           Bem-vindo ao{' '}
@@ -61,9 +74,28 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
         </span>
       </h1>
 
-      <p className="text-xs text-muted-foreground mt-3 font-medium">
+      <p className="text-xs text-muted-foreground mt-3 mb-4 font-medium">
         {capitalizedDate}
       </p>
+
+      {/* View Selector — inside gradient */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar">
+        {VIEW_TABS.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => onViewChange(tab.key)}
+            className={cn(
+              "relative flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 touch-manipulation overflow-hidden",
+              view === tab.key
+                ? "bg-foreground text-background"
+                : "liquid-glass-pill-green active:scale-[0.97]"
+            )}
+          >
+            <AppIcon name={tab.icon} size={14} className="shrink-0 relative z-10" />
+            <span className="relative z-10">{tab.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
