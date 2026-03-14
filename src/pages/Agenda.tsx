@@ -350,20 +350,21 @@ export default function Agenda() {
             <div className="flex items-center gap-1.5 ml-auto">
               <div className="flex items-center bg-secondary/60 rounded-full p-0.5">
                 {([
-                  { key: 'grouped' as const, label: 'Agrupado' },
-                  { key: 'flat' as const, label: 'Lista' },
+                  { key: 'grouped' as const, icon: 'LayoutGrid' },
+                  { key: 'flat' as const, icon: 'List' },
                 ] as const).map(tab => (
                   <button
                     key={tab.key}
                     onClick={() => setListMode(tab.key)}
                     className={cn(
-                      "px-3 py-1 rounded-full text-[11px] font-medium transition-all duration-150",
+                      "w-8 h-7 flex items-center justify-center rounded-full transition-all duration-150",
                       listMode === tab.key
                         ? "bg-foreground text-background"
                         : "text-muted-foreground hover:text-foreground"
                     )}
+                    title={tab.key === 'grouped' ? 'Agrupado' : 'Lista'}
                   >
-                    {tab.label}
+                    <AppIcon name={tab.icon} size={14} />
                   </button>
                 ))}
               </div>
