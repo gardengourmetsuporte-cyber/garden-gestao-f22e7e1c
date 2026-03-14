@@ -182,16 +182,16 @@ export function AdminDashboard() {
       <DashboardContextBar firstName={firstName} stats={stats} />
 
       {/* View Selector */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-1">
         {VIEW_TABS.map(tab => (
           <button
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "px-4 h-8 rounded-full text-[13px] font-medium whitespace-nowrap transition-colors duration-200 touch-manipulation shrink-0",
+              "px-3.5 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all duration-150 touch-manipulation shrink-0",
               view === tab.key
                 ? "bg-foreground text-background"
-                : "bg-card border border-border text-muted-foreground hover:text-foreground"
+                : "bg-foreground/[0.07] text-foreground/60 hover:bg-foreground/[0.12] hover:text-foreground/80 active:scale-[0.96]"
             )}
           >
             {tab.label}
