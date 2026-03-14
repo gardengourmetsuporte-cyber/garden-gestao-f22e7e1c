@@ -34,11 +34,11 @@ function BrandPanel() {
       {/* Glow orbs - Emerald theme */}
       <div
         className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[150px] opacity-20 pointer-events-none"
-        style={{ background: 'hsl(142 71% 45%)' }}
+        style={{ background: 'hsl(var(--primary))' }}
       />
       <div
         className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full blur-[120px] opacity-15 pointer-events-none"
-        style={{ background: 'hsl(142 76% 36%)' }}
+        style={{ background: 'hsl(var(--primary))' }}
       />
 
       <div className="relative z-10 flex flex-col items-center gap-8 px-12 max-w-lg">
