@@ -317,6 +317,7 @@ export const ICON_MAP: Record<string, string> = {
 
   // Tech
   Smartphone: 'smartphone',
+  Tablet: 'tablet_android',
   Shirt: 'checkroom',
   Flame: 'local_fire_department',
   Laptop: 'laptop',
