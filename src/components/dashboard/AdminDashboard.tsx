@@ -191,7 +191,7 @@ export function AdminDashboard() {
               "px-4 h-8 rounded-full text-[13px] font-medium whitespace-nowrap transition-colors duration-200 touch-manipulation shrink-0",
               view === tab.key
                 ? "bg-foreground text-background"
-                : "bg-foreground/10 text-muted-foreground hover:text-foreground"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground"
             )}
           >
             {tab.label}
