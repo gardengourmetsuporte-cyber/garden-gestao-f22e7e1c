@@ -79,22 +79,25 @@ export function DashboardContextBar({ firstName, stats, view, onViewChange }: Da
       </p>
 
       {/* View Selector — inside gradient */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar">
-        {VIEW_TABS.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => onViewChange(tab.key)}
-            className={cn(
-              "relative flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 touch-manipulation overflow-hidden",
-              view === tab.key
-                ? "bg-foreground text-background"
-                : "liquid-glass-pill-green active:scale-[0.97]"
-            )}
-          >
-            <AppIcon name={tab.icon} size={14} className="shrink-0 relative z-10" />
-            <span className="relative z-10">{tab.label}</span>
-          </button>
-        ))}
+      <div className="relative flex gap-2 overflow-x-auto no-scrollbar p-1 rounded-2xl bg-primary/8">
+        {VIEW_TABS.map(tab => {
+          const isActive = view === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => onViewChange(tab.key)}
+              className={cn(
+                "relative flex items-center gap-1.5 px-4 h-8 rounded-xl text-[11px] font-semibold whitespace-nowrap transition-all duration-300 ease-out touch-manipulation",
+                isActive
+                  ? "bg-foreground text-background shadow-sm"
+                  : "text-foreground/70 hover:text-foreground hover:bg-primary/10 active:scale-[0.97]"
+              )}
+            >
+              <AppIcon name={tab.icon} size={13} className="shrink-0" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
