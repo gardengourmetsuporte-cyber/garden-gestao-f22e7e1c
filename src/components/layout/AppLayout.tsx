@@ -82,10 +82,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             style={{
               paddingTop: 'env(safe-area-inset-top)',
               background: isDashboard
-                ? (isScrolled ? 'hsl(var(--background) / 0.7)' : 'transparent')
+                ? (isScrolled ? 'hsl(var(--background) / 0.85)' : 'transparent')
                 : 'hsl(var(--background) / 0.85)',
               backdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
               WebkitBackdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
+              borderBottom: isScrolled ? '1px solid hsl(var(--border))' : '1px solid transparent',
+              transition: 'background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease',
             }}
           >
             <div className="relative overflow-hidden">
