@@ -24,9 +24,31 @@ const items = [
   { key: 'pendingQuotations', title: 'cotações', icon: 'Scale', route: '/orders' },
 ] as const;
 
-function getSmartColor(_key: string, value: number) {
-  if (value === 0) return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-muted-foreground/60' };
-  return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground' };
+function getSmartColor(key: string, value: number) {
+  if (value === 0) return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-muted-foreground/60', iconBg: 'bg-muted/30' };
+
+  switch (key) {
+    case 'criticalItems':
+      if (value >= 50) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' };
+      if (value >= 20) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    case 'pendingOrders':
+      if (value >= 10) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' };
+      if (value >= 3) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    case 'pendingClosings':
+      if (value >= 3) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' };
+      if (value >= 1) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    case 'pendingRedemptions':
+      if (value >= 5) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    case 'pendingQuotations':
+      if (value >= 5) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    default:
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+  }
 }
 
 export function QuickStatsWidget() {
@@ -108,11 +130,17 @@ export function QuickStatsWidget() {
   return (
     <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-3">
       {allCards.map((card, i) => {
-        const colors = card.isChecklist
+        const checklistColor = card.isChecklist
           ? checklistProgress.percent === 100
-            ? { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground' }
-            : { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground' }
-          : getSmartColor(card.key, card.value);
+            ? { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' }
+            : checklistProgress.percent >= 70
+              ? { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' }
+              : checklistProgress.percent >= 40
+                ? { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' }
+                : { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' }
+          : null;
+
+        const colors = checklistColor || getSmartColor(card.key, card.value);
 
         return (
           <button
@@ -127,7 +155,7 @@ export function QuickStatsWidget() {
               `dash-stagger-${i + 1}`,
             )}
           >
-             <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", colors.iconBg)}>
               <AppIcon name={card.icon} size={17} className={colors.icon} />
             </div>
             <div className="text-left min-w-0">
