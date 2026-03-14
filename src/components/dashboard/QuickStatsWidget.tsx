@@ -17,12 +17,38 @@ function AnimatedValue({ value }: { value: number }) {
 }
 
 const items = [
-  { key: 'criticalItems', title: 'itens críticos', icon: 'AlertTriangle', iconBg: 'bg-warning/15', iconColor: 'text-warning', route: '/inventory' },
-  { key: 'pendingOrders', title: 'pedidos', icon: 'ShoppingCart', iconBg: 'bg-primary/15', iconColor: 'text-primary', route: '/orders' },
-  { key: 'pendingClosings', title: 'fechamentos', icon: 'FileText', iconBg: 'bg-destructive/15', iconColor: 'text-destructive', route: '/cash-closing' },
-  { key: 'pendingRedemptions', title: 'resgates', icon: 'Gift', iconBg: 'bg-success/15', iconColor: 'text-success', route: '/rewards' },
-  { key: 'pendingQuotations', title: 'cotações', icon: 'Scale', iconBg: 'bg-primary/15', iconColor: 'text-primary', route: '/orders' },
+  { key: 'criticalItems', title: 'itens críticos', icon: 'AlertTriangle', route: '/inventory' },
+  { key: 'pendingOrders', title: 'pedidos', icon: 'ShoppingCart', route: '/orders' },
+  { key: 'pendingClosings', title: 'fechamentos', icon: 'FileText', route: '/cash-closing' },
+  { key: 'pendingRedemptions', title: 'resgates', icon: 'Gift', route: '/rewards' },
+  { key: 'pendingQuotations', title: 'cotações', icon: 'Scale', route: '/orders' },
 ] as const;
+
+function getSmartColor(key: string, value: number) {
+  // Cores inteligentes baseadas em status
+  if (key === 'criticalItems') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    if (value <= 5) return { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' };
+    return { bg: 'bg-destructive/8', icon: 'text-destructive', value: 'text-destructive' };
+  }
+  if (key === 'pendingClosings') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    return { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' };
+  }
+  if (key === 'pendingOrders') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    return { bg: 'bg-primary/8', icon: 'text-primary', value: 'text-primary' };
+  }
+  if (key === 'pendingRedemptions') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    return { bg: 'bg-primary/8', icon: 'text-primary', value: 'text-primary' };
+  }
+  if (key === 'pendingQuotations') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    return { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' };
+  }
+  return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-foreground' };
+}
 
 export function QuickStatsWidget() {
   const navigate = useNavigate();
