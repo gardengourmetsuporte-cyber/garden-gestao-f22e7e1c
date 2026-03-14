@@ -377,7 +377,7 @@ export default function Agenda() {
                   setViewMode(modes[(idx + 1) % modes.length]);
                 }}
               >
-                <AppIcon name={viewMode === 'list' ? 'List' : viewMode === 'calendar' ? 'CalendarDays' : 'LayoutGrid'} size={20} />
+                <AppIcon name={viewMode === 'list' ? 'LayoutList' : viewMode === 'calendar' ? 'CalendarDays' : 'LayoutGrid'} size={20} />
               </Button>
               <Button
                 size="icon"
