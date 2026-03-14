@@ -52,7 +52,7 @@ function PieChart({ data, total, size = 160 }: { data: { value: number; color: s
   }, [data, total, mid, radius]);
 
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block' }}>
       {/* Background track */}
       <circle cx={radius} cy={radius} r={mid} fill="none" stroke="hsl(var(--muted))" strokeWidth={stroke} />
       {total === 0 ? null : (
