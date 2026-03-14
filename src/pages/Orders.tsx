@@ -327,7 +327,7 @@ export default function OrdersPage() {
                     return (
                       <div
                         key={supplierId}
-                        className="bg-card rounded-2xl border border-border overflow-hidden transition-all hover:border-primary/25 animate-fade-in"
+                        className="bg-card rounded-2xl overflow-hidden transition-all animate-fade-in"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
                         <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, [supplierId]: open }))}>
