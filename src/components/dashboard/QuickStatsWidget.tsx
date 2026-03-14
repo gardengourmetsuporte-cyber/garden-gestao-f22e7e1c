@@ -17,12 +17,38 @@ function AnimatedValue({ value }: { value: number }) {
 }
 
 const items = [
-  { key: 'criticalItems', title: 'itens críticos', icon: 'AlertTriangle', iconBg: 'bg-warning/15', iconColor: 'text-warning', route: '/inventory' },
-  { key: 'pendingOrders', title: 'pedidos', icon: 'ShoppingCart', iconBg: 'bg-primary/15', iconColor: 'text-primary', route: '/orders' },
-  { key: 'pendingClosings', title: 'fechamentos', icon: 'FileText', iconBg: 'bg-destructive/15', iconColor: 'text-destructive', route: '/cash-closing' },
-  { key: 'pendingRedemptions', title: 'resgates', icon: 'Gift', iconBg: 'bg-success/15', iconColor: 'text-success', route: '/rewards' },
-  { key: 'pendingQuotations', title: 'cotações', icon: 'Scale', iconBg: 'bg-primary/15', iconColor: 'text-primary', route: '/orders' },
+  { key: 'criticalItems', title: 'itens críticos', icon: 'AlertTriangle', route: '/inventory' },
+  { key: 'pendingOrders', title: 'pedidos', icon: 'ShoppingCart', route: '/orders' },
+  { key: 'pendingClosings', title: 'fechamentos', icon: 'FileText', route: '/cash-closing' },
+  { key: 'pendingRedemptions', title: 'resgates', icon: 'Gift', route: '/rewards' },
+  { key: 'pendingQuotations', title: 'cotações', icon: 'Scale', route: '/orders' },
 ] as const;
+
+function getSmartColor(key: string, value: number) {
+  // Cores inteligentes baseadas em status
+  if (key === 'criticalItems') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    if (value <= 5) return { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' };
+    return { bg: 'bg-destructive/8', icon: 'text-destructive', value: 'text-destructive' };
+  }
+  if (key === 'pendingClosings') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    return { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' };
+  }
+  if (key === 'pendingOrders') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    return { bg: 'bg-primary/8', icon: 'text-primary', value: 'text-primary' };
+  }
+  if (key === 'pendingRedemptions') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    return { bg: 'bg-primary/8', icon: 'text-primary', value: 'text-primary' };
+  }
+  if (key === 'pendingQuotations') {
+    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
+    return { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' };
+  }
+  return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-foreground' };
+}
 
 export function QuickStatsWidget() {
   const navigate = useNavigate();
@@ -87,14 +113,12 @@ export function QuickStatsWidget() {
   const allCards = [
     ...items.map((item) => {
       const value = allStats[item.key as keyof typeof allStats] as number;
-      return { ...item, value, isChecklist: false };
+      return { ...item, value, isChecklist: false, checklistProgress: null as any };
     }),
     {
       key: 'checklist',
       title: activeType === 'abertura' ? 'abertura' : 'fechamento',
       icon: 'checklist',
-      iconBg: checklistProgress.percent === 100 ? 'bg-success/15' : 'bg-primary/15',
-      iconColor: checklistProgress.percent === 100 ? 'text-success' : 'text-primary',
       route: '/checklists',
       value: checklistProgress.percent,
       isChecklist: true,
@@ -103,34 +127,45 @@ export function QuickStatsWidget() {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
-      {allCards.map((card, i) => (
-        <button
-          key={card.key}
-          onClick={() => navigate(card.route)}
-          className={cn(
-            "flex items-center gap-3 rounded-lg p-3.5 transition-all duration-200",
-            "bg-secondary/50 hover:bg-secondary/70",
-            "active:scale-[0.97] touch-manipulation",
-            "animate-card-reveal",
-            `dash-stagger-${i + 1}`,
-          )}
-        >
-          <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", card.iconBg)}>
-            <AppIcon name={card.icon} size={16} className={card.iconColor} />
-          </div>
-          <div className="text-left min-w-0">
-            <p className="text-lg font-extrabold leading-none tabular-nums tracking-tight text-foreground">
-              {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
-            </p>
-            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">
-              {card.isChecklist
-                ? `${(card as any).checklistProgress.completed}/${(card as any).checklistProgress.total}`
-                : card.title}
-            </p>
-          </div>
-        </button>
-      ))}
+    <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-3">
+      {allCards.map((card, i) => {
+        const colors = card.isChecklist
+          ? checklistProgress.percent === 100
+            ? { bg: 'bg-primary/8', icon: 'text-primary', value: 'text-primary' }
+            : checklistProgress.percent > 0
+              ? { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' }
+              : { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' }
+          : getSmartColor(card.key, card.value);
+
+        return (
+          <button
+            key={card.key}
+            onClick={() => navigate(card.route)}
+            className={cn(
+              "flex items-center gap-3 rounded-2xl p-3.5 transition-all duration-200",
+              colors.bg,
+              "hover:brightness-110",
+              "active:scale-[0.97] touch-manipulation",
+              "animate-card-reveal",
+              `dash-stagger-${i + 1}`,
+            )}
+          >
+            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", colors.bg)}>
+              <AppIcon name={card.icon} size={17} className={colors.icon} />
+            </div>
+            <div className="text-left min-w-0">
+              <p className={cn("text-xl font-extrabold leading-none tabular-nums tracking-tight", colors.value)}>
+                {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
+              </p>
+              <p className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">
+                {card.isChecklist
+                  ? `${card.checklistProgress.completed}/${card.checklistProgress.total}`
+                  : card.title}
+              </p>
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 }
