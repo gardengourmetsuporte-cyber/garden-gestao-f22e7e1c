@@ -181,50 +181,49 @@ export default function CopilotPage() {
                 <AppIcon name="Trash2" size={16} className="text-muted-foreground hover:text-foreground" />
               </button>
             )}
-              <button
-                onClick={newConversation}
-                className="p-2 rounded-xl hover:bg-secondary transition-colors"
-                title="Nova conversa"
-              >
-                <AppIcon name="Plus" size={16} className="text-foreground" />
-              </button>
-              <Sheet open={showHistory} onOpenChange={setShowHistory}>
-                <SheetTrigger asChild>
-                  <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
-                    <AppIcon name="Clock" size={16} className="text-foreground" />
-                  </button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] p-0">
-                  <SheetHeader className="p-4 border-b border-border/30">
-                    <SheetTitle className="text-sm">Conversas</SheetTitle>
-                  </SheetHeader>
-                  <div className="overflow-y-auto max-h-[calc(100vh-80px)]">
-                    {conversations.length === 0 ? (
-                      <p className="text-xs text-muted-foreground p-4 text-center">Nenhuma conversa</p>
-                    ) : (
-                      conversations.map((conv) => (
-                        <button
-                          key={conv.id}
-                          onClick={() => {
-                            switchConversation(conv.id);
-                            setShowHistory(false);
-                          }}
-                          className={cn(
-                            "w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/50 transition-colors",
-                            conv.id === conversationId && "bg-primary/10"
-                          )}
-                        >
-                          <p className="text-sm font-medium truncate">{conv.title || 'Conversa'}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">
-                            {format(new Date(conv.created_at), "dd MMM, HH:mm", { locale: ptBR })}
-                          </p>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
+            <button
+              onClick={newConversation}
+              className="p-2 rounded-xl hover:bg-secondary transition-colors"
+              title="Nova conversa"
+            >
+              <AppIcon name="Plus" size={16} className="text-muted-foreground" />
+            </button>
+            <Sheet open={showHistory} onOpenChange={setShowHistory}>
+              <SheetTrigger asChild>
+                <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
+                  <AppIcon name="Clock" size={16} className="text-muted-foreground" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] p-0">
+                <SheetHeader className="p-4 border-b border-border/30">
+                  <SheetTitle className="text-sm">Conversas</SheetTitle>
+                </SheetHeader>
+                <div className="overflow-y-auto max-h-[calc(100vh-80px)]">
+                  {conversations.length === 0 ? (
+                    <p className="text-xs text-muted-foreground p-4 text-center">Nenhuma conversa</p>
+                  ) : (
+                    conversations.map((conv) => (
+                      <button
+                        key={conv.id}
+                        onClick={() => {
+                          switchConversation(conv.id);
+                          setShowHistory(false);
+                        }}
+                        className={cn(
+                          "w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/50 transition-colors",
+                          conv.id === conversationId && "bg-primary/10"
+                        )}
+                      >
+                        <p className="text-sm font-medium truncate">{conv.title || 'Conversa'}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {format(new Date(conv.created_at), "dd MMM, HH:mm", { locale: ptBR })}
+                        </p>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
 
