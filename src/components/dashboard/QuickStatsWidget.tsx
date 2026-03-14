@@ -24,30 +24,9 @@ const items = [
   { key: 'pendingQuotations', title: 'cotações', icon: 'Scale', route: '/orders' },
 ] as const;
 
-function getSmartColor(key: string, value: number) {
-  // Cores inteligentes baseadas em status
-  if (key === 'criticalItems') {
-    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
-    if (value <= 5) return { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' };
-    return { bg: 'bg-destructive/8', icon: 'text-destructive', value: 'text-destructive' };
-  }
-  if (key === 'pendingClosings') {
-    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
-    return { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' };
-  }
-  if (key === 'pendingOrders') {
-    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
-    return { bg: 'bg-primary/8', icon: 'text-primary', value: 'text-primary' };
-  }
-  if (key === 'pendingRedemptions') {
-    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
-    return { bg: 'bg-primary/8', icon: 'text-primary', value: 'text-primary' };
-  }
-  if (key === 'pendingQuotations') {
-    if (value === 0) return { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' };
-    return { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' };
-  }
-  return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-foreground' };
+function getSmartColor(_key: string, value: number) {
+  if (value === 0) return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-muted-foreground/60' };
+  return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground' };
 }
 
 export function QuickStatsWidget() {
@@ -131,10 +110,8 @@ export function QuickStatsWidget() {
       {allCards.map((card, i) => {
         const colors = card.isChecklist
           ? checklistProgress.percent === 100
-            ? { bg: 'bg-primary/8', icon: 'text-primary', value: 'text-primary' }
-            : checklistProgress.percent > 0
-              ? { bg: 'bg-amber-500/8', icon: 'text-amber-400', value: 'text-amber-400' }
-              : { bg: 'bg-muted/40', icon: 'text-muted-foreground', value: 'text-muted-foreground' }
+            ? { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground' }
+            : { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground' }
           : getSmartColor(card.key, card.value);
 
         return (
@@ -150,7 +127,7 @@ export function QuickStatsWidget() {
               `dash-stagger-${i + 1}`,
             )}
           >
-            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", colors.bg)}>
+             <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
               <AppIcon name={card.icon} size={17} className={colors.icon} />
             </div>
             <div className="text-left min-w-0">
