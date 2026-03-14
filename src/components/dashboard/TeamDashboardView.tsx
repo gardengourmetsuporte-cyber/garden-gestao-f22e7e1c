@@ -129,7 +129,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Top performers */}
           {topPerformers.length > 0 && (
-            <div className="card-base p-3">
+            <div className="card-surface p-4">
               <div className="flex items-center gap-1.5 mb-2">
                 <AppIcon name="emoji_events" size={14} className="text-amber-400" />
                 <span className="text-[11px] font-bold text-foreground">Destaques</span>
