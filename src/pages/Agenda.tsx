@@ -315,26 +315,8 @@ export default function Agenda() {
         </div>
       ) : (
         <>
-          {/* List mode toggle */}
-          <div className="flex items-center gap-1">
-            {([
-              { key: 'grouped' as const, label: 'Agrupado' },
-              { key: 'flat' as const, label: 'Lista completa' },
-            ]).map(tab => (
-              <button
-                key={tab.key}
-                onClick={() => setListMode(tab.key)}
-                className={cn(
-                  "px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-150 active:scale-[0.96]",
-                  listMode === tab.key
-                    ? "bg-foreground text-background backdrop-blur-md"
-                    : "bg-foreground/[0.07] backdrop-blur-sm text-foreground/60 hover:bg-foreground/[0.12] hover:text-foreground/80"
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+
+          {listMode === 'grouped' ? <GroupedListContent /> : <FlatListContent />}
 
           {listMode === 'grouped' ? <GroupedListContent /> : <FlatListContent />}
         </>
