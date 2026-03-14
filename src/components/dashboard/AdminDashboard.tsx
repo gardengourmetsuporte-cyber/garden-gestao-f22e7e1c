@@ -53,13 +53,6 @@ const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'calendar', 'mu
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
 const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
-const VIEW_TABS = [
-  { key: 'operational' as const, icon: 'LayoutGrid', label: 'Operacional' },
-  { key: 'financial' as const, icon: 'Landmark', label: 'Financeiro' },
-  { key: 'service' as const, icon: 'Store', label: 'Serviço' },
-  { key: 'team' as const, icon: 'Users', label: 'Equipe' },
-] as const;
-
 export function AdminDashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
