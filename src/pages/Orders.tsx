@@ -430,7 +430,7 @@ export default function OrdersPage() {
                     return (
                       <div
                         key={sli.id}
-                        className="bg-card rounded-2xl border border-border p-4 flex items-center justify-between animate-fade-in"
+                        className="bg-card rounded-2xl p-4 flex items-center justify-between animate-fade-in"
                         style={{ animationDelay: `${index * 30}ms` }}
                       >
                         <div className="min-w-0 flex-1">
