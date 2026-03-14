@@ -119,7 +119,7 @@ export function QuickStatsWidget() {
     {
       key: 'checklist',
       title: activeType === 'abertura' ? 'abertura' : 'fechamento',
-      icon: 'checklist',
+      icon: 'ListChecks',
       route: '/checklists',
       value: checklistProgress.percent,
       isChecklist: true,
