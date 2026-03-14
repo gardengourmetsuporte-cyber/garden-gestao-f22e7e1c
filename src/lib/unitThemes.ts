@@ -8,9 +8,9 @@ export interface UnitTheme {
 }
 
 const STANDARD_THEME_COLORS: Omit<UnitTheme, 'label'> = {
-  primary: '141 73% 42%',
-  neonCyan: '141 73% 42%',
-  ring: '141 73% 42%',
+  primary: '142 71% 45%',
+  neonCyan: '142 71% 45%',
+  ring: '142 71% 45%',
   glowPrimary: 'none',
   glowCyan: 'none',
 };
