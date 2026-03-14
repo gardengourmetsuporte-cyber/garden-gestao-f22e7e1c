@@ -395,7 +395,7 @@ html {
   /* ========== FINANCE HERO CARD — Spotify flat ========== */
 
   .finance-hero-card {
-    @apply relative overflow-hidden rounded-lg transition-all duration-300 active:scale-[0.98];
+    @apply relative overflow-hidden rounded-lg transition-all duration-300 active:scale-[0.98] border-0;
     background: hsl(var(--card));
     border: none;
     box-shadow: none;
