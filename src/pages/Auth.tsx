@@ -161,8 +161,8 @@ function MobileBrandHeader() {
 
         {/* Title with staggered entrance */}
         <div className="text-center space-y-1.5 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.25s_both]">
-          <h1 className="text-4xl font-extrabold text-white tracking-tight font-display">Garden</h1>
-          <p className="text-[10px] text-white/35 tracking-[0.25em] uppercase font-semibold">Gestão Inteligente</p>
+          <h1 className="text-4xl font-extrabold text-foreground tracking-tight font-display">Garden</h1>
+          <p className="text-[10px] text-foreground/35 tracking-[0.25em] uppercase font-semibold">Gestão Inteligente</p>
         </div>
 
         {/* Feature pills with stagger */}
