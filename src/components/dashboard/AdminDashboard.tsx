@@ -182,19 +182,19 @@ export function AdminDashboard() {
       <DashboardContextBar firstName={firstName} stats={stats} />
 
       {/* View Selector — Liquid Glass Pill Tabs */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar">
+      <div className="flex gap-1.5 overflow-x-auto no-scrollbar -mx-5 px-5">
         {VIEW_TABS.map(tab => (
           <button
             key={tab.key}
             onClick={() => handleViewChange(tab.key)}
             className={cn(
-              "relative flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 touch-manipulation overflow-hidden",
+              "relative flex items-center gap-1.5 px-3.5 h-8 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-500 touch-manipulation overflow-hidden shrink-0",
               view === tab.key
-                ? "bg-foreground text-background"
-                : "liquid-glass-pill text-muted-foreground hover:text-foreground active:scale-[0.97]"
+                ? "bg-foreground text-background shadow-[0_0_12px_hsl(var(--foreground)/0.15)]"
+                : "liquid-glass-pill text-muted-foreground hover:text-foreground active:scale-[0.96]"
             )}
           >
-            <AppIcon name={tab.icon} size={14} className="shrink-0 relative z-10" />
+            <AppIcon name={tab.icon} size={13} className="shrink-0 relative z-10" />
             <span className="relative z-10">{tab.label}</span>
           </button>
         ))}
