@@ -239,70 +239,86 @@ export function MarketingBrandTab() {
       </Button>
 
       {/* Section 3: Gallery */}
-      <Card className="border-border/40">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center justify-between">
-            <span className="flex items-center gap-2">
+      <div className="card-surface rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 pt-4 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
               <AppIcon name="Image" size={16} className="text-primary" />
-              Galeria de Assets
-            </span>
-            <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} className="h-7 text-xs">
-              <AppIcon name="Upload" size={12} className="mr-1" /> Upload
-            </Button>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+            </div>
+            <span className="text-sm font-semibold text-foreground">Galeria de Assets</span>
+          </div>
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="flex items-center gap-1.5 text-xs font-medium text-primary px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/15 transition-colors"
+          >
+            <AppIcon name="Upload" size={12} />
+            Upload
+          </button>
+        </div>
+
+        <div className="px-4 pb-4 space-y-3">
           <input ref={fileRef} type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileSelect} />
 
-          {/* Filter */}
-          <div className="flex gap-1.5 overflow-x-auto scrollbar-none">
-            <Badge
-              variant={filterType === 'all' ? 'default' : 'outline'}
-              className="cursor-pointer text-[10px] shrink-0"
+          {/* Filter chips */}
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
+            <button
               onClick={() => setFilterType('all')}
+              className={`shrink-0 text-[11px] font-medium px-3 py-1 rounded-full transition-colors ${
+                filterType === 'all'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary/60 text-muted-foreground hover:text-foreground'
+              }`}
             >
               Todos
-            </Badge>
+            </button>
             {ASSET_TYPES.map(t => (
-              <Badge
+              <button
                 key={t.value}
-                variant={filterType === t.value ? 'default' : 'outline'}
-                className="cursor-pointer text-[10px] shrink-0"
                 onClick={() => setFilterType(t.value)}
+                className={`shrink-0 text-[11px] font-medium px-3 py-1 rounded-full transition-colors ${
+                  filterType === t.value
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary/60 text-muted-foreground hover:text-foreground'
+                }`}
               >
                 {t.label}
-              </Badge>
+              </button>
             ))}
           </div>
 
           {/* Grid */}
           {assetsLoading ? (
-            <div className="flex justify-center py-8"><AppIcon name="Loader2" className="animate-spin text-primary" size={20} /></div>
+            <div className="flex justify-center py-10"><AppIcon name="Loader2" className="animate-spin text-primary" size={20} /></div>
           ) : filtered.length === 0 ? (
-            <div className="py-8 text-center">
-              <AppIcon name="ImagePlus" size={24} className="mx-auto text-muted-foreground/40 mb-2" />
+            <div className="py-10 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-secondary/60 flex items-center justify-center mx-auto mb-3">
+                <AppIcon name="ImagePlus" size={20} className="text-muted-foreground/50" />
+              </div>
               <p className="text-xs text-muted-foreground">Nenhum asset encontrado</p>
+              <p className="text-[10px] text-muted-foreground/60 mt-0.5">Faça upload do primeiro arquivo</p>
             </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
               {filtered.map(asset => (
-                <div key={asset.id} className="relative group rounded-lg overflow-hidden border border-border/30">
-                  <div className="aspect-square bg-muted/20">
+                <div key={asset.id} className="relative group rounded-xl overflow-hidden bg-secondary/40">
+                  <div className="aspect-square">
                     <img src={asset.file_url} alt={asset.title} className="w-full h-full object-cover" loading="lazy" />
                   </div>
                   <button
                     onClick={() => deleteAsset.mutate(asset.id)}
-                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive/80 text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <AppIcon name="X" size={10} />
+                    <AppIcon name="X" size={10} className="text-destructive" />
                   </button>
-                  <p className="text-[9px] p-1 truncate text-muted-foreground">{asset.title}</p>
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-background/80 to-transparent px-2 py-1.5">
+                    <p className="text-[10px] font-medium truncate text-foreground/90">{asset.title}</p>
+                  </div>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Upload Sheet */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
