@@ -89,7 +89,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             }}
           >
             <div className="relative overflow-hidden">
-              <div className="flex items-center justify-between h-16 px-3.5 relative z-10">
+              <div className="flex items-center justify-between h-12 px-3.5 relative z-10">
                 {/* Left: Logo pill */}
                 <div className="flex items-center gap-1 relative" style={{ minWidth: '2.5rem' }}>
                   <button
@@ -97,8 +97,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                     className={cn(
                       "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
                       !isScrolled
-                        ? "h-8 bg-secondary pl-1.5 pr-3 gap-2"
-                        : "h-7 w-7 bg-transparent p-0 justify-center"
+                        ? "h-9 bg-secondary/80 border border-border/40 pl-1.5 pr-3 gap-2"
+                        : "h-8 w-8 bg-transparent p-0 justify-center"
                     )}
                   >
                     <div className={cn(
@@ -134,7 +134,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           {/* ======= Main Content ======= */}
           <main
             className="flex-1 lg:pt-0"
-            style={{ paddingTop: isLgScreen ? '0' : 'calc(env(safe-area-inset-top) + 4rem)' }}
+            style={{ paddingTop: isLgScreen ? '0' : 'calc(env(safe-area-inset-top) + 3rem)' }}
           >
             <PageTransition>
               {children}
