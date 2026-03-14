@@ -171,29 +171,16 @@ export default function CopilotPage() {
     <AppLayout>
       <div className="flex flex-col h-[calc(100vh-3.5rem-5rem)] lg:h-screen">
         {/* Toolbar */}
-        <div className="shrink-0 border-b border-border/20 bg-card/60 backdrop-blur-sm">
-          <div className="flex items-center gap-3 h-12 px-4">
-            <img
-              src={mascotImg}
-              alt="Copiloto"
-              className="w-8 h-8 rounded-xl object-cover border border-primary/20"
-            />
-            <div className="flex-1 min-w-0">
-              <h1 className="text-sm font-bold text-foreground leading-none">Copiloto IA</h1>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                <span className="text-[10px] text-muted-foreground">Online</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-0.5">
-              {messages.length > 2 && (
-                <button
-                  onClick={clearHistory}
-                  className="text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg hover:bg-secondary transition-colors"
-                >
-                  Limpar
-                </button>
-              )}
+        <div className="shrink-0">
+          <div className="flex items-center justify-end gap-1 h-10 px-3">
+            {messages.length > 2 && (
+              <button
+                onClick={clearHistory}
+                className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Limpar"
+              >
+                <AppIcon name="Trash2" size={16} className="text-muted-foreground hover:text-foreground" />
+              </button>
+            )}
               <button
                 onClick={newConversation}
                 className="p-2 rounded-xl hover:bg-secondary transition-colors"
