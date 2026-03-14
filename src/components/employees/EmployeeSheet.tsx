@@ -55,7 +55,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
   // Load per-day schedules when editing
   useEffect(() => {
     if (employee) {
-      reset({ full_name: employee.full_name, cpf: employee.cpf || '', role: employee.role || '', department: employee.department || '', admission_date: employee.admission_date || '', base_salary: employee.base_salary, is_active: employee.is_active, notes: employee.notes || '', user_id: employee.user_id || '', quick_pin: (employee as any).quick_pin || '', shift_start: employee.shift_start || '08:00', shift_end: employee.shift_end || '17:00' });
+      reset({ full_name: employee.full_name, cpf: employee.cpf || '', phone: (employee as any).phone || '', role: employee.role || '', department: employee.department || '', admission_date: employee.admission_date || '', base_salary: employee.base_salary, is_active: employee.is_active, notes: employee.notes || '', user_id: employee.user_id || '', quick_pin: (employee as any).quick_pin || '', shift_start: employee.shift_start || '08:00', shift_end: employee.shift_end || '17:00' });
 
       // Fetch per-day schedules
       supabase
