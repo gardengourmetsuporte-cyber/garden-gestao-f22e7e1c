@@ -61,6 +61,7 @@ export default function Agenda() {
   const [taskSheetOpen, setTaskSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ManagerTask | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'blocks'>('list');
+  const [listMode, setListMode] = useState<'grouped' | 'flat'>('grouped');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [showCompleted, setShowCompleted] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
