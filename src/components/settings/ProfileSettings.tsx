@@ -99,7 +99,9 @@ export function ProfileSettings() {
       setAvatarUrl(newAvatarUrl);
       setAvatarFile(null);
       setAvatarPreview(null);
-    } catch {
+      toast.success('Perfil atualizado com sucesso!');
+    } catch (err) {
+      console.error('Profile save error:', err);
       toast.error('Erro ao atualizar perfil');
     } finally {
       setIsSaving(false);
