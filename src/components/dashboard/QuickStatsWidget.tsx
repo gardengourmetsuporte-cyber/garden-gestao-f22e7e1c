@@ -5,23 +5,39 @@ import { useQuotations } from '@/hooks/useQuotations';
 import { useUnit } from '@/contexts/UnitContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { useCountUp } from '@/hooks/useCountUp';
 import { getCurrentChecklistType, getTodayDateStr } from '@/lib/checklistTiming';
 import { useChecklistDeadlines } from '@/hooks/useChecklistDeadlines';
+
+import statAlert from '@/assets/icons/stat-alert.png';
+import statOrders from '@/assets/icons/stat-orders.png';
+import statReceipt from '@/assets/icons/stat-receipt.png';
+import statGift from '@/assets/icons/stat-gift.png';
+import statScale from '@/assets/icons/stat-scale.png';
+import statChecklist from '@/assets/icons/stat-checklist.png';
+import statBag from '@/assets/icons/stat-bag.png';
 
 function AnimatedValue({ value }: { value: number }) {
   const animated = useCountUp(value);
   return <>{animated}</>;
 }
 
+const STAT_ICONS: Record<string, string> = {
+  criticalItems: statAlert,
+  pendingOrders: statOrders,
+  pendingClosings: statReceipt,
+  pendingRedemptions: statGift,
+  pendingQuotations: statScale,
+  checklist: statChecklist,
+};
+
 const items = [
-  { key: 'criticalItems', title: 'itens críticos', icon: 'AlertTriangle', route: '/inventory' },
-  { key: 'pendingOrders', title: 'pedidos', icon: 'ShoppingCart', route: '/orders' },
-  { key: 'pendingClosings', title: 'fechamentos', icon: 'FileText', route: '/cash-closing' },
-  { key: 'pendingRedemptions', title: 'resgates', icon: 'Gift', route: '/rewards' },
-  { key: 'pendingQuotations', title: 'cotações', icon: 'Scale', route: '/orders' },
+  { key: 'criticalItems', title: 'itens críticos', route: '/inventory' },
+  { key: 'pendingOrders', title: 'pedidos', route: '/orders' },
+  { key: 'pendingClosings', title: 'fechamentos', route: '/cash-closing' },
+  { key: 'pendingRedemptions', title: 'resgates', route: '/rewards' },
+  { key: 'pendingQuotations', title: 'cotações', route: '/orders' },
 ] as const;
 
 function getSmartColor(key: string, value: number) {
