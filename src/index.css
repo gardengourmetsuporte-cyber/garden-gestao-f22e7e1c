@@ -485,7 +485,7 @@ html {
 
   @media (hover: hover) {
     .card-command:hover {
-      background: hsl(var(--secondary));
+      background: hsl(var(--card));
     }
   }
 
