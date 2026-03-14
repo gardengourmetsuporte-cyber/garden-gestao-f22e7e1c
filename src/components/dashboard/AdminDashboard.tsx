@@ -215,14 +215,6 @@ export function AdminDashboard() {
       {/* Setup Onboarding — operational only */}
       {view === 'operational' && <SetupChecklistWidget />}
 
-      {/* Finance Hero — financial */}
-      {view === 'financial' && hasAccess('finance') && (
-        <DashboardHeroFinance
-          balance={stats.monthBalance}
-          pendingExpenses={stats.pendingExpenses}
-          isLoading={statsLoading}
-        />
-      )}
 
       {/* Sales Goal — financial */}
       {view === 'financial' && <SalesGoalWidget />}
