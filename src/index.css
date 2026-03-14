@@ -67,13 +67,13 @@ html {
     --accent: 0 0% 20%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 45% 45%;
     --destructive-foreground: 0 0% 100%;
 
     --success: 141 73% 42%;
     --success-foreground: 0 0% 0%;
 
-    --warning: 43 96% 56%;
+    --warning: 35 55% 50%;
     --warning-foreground: 0 0% 0%;
 
     --border: 0 0% 15%;
@@ -82,10 +82,10 @@ html {
 
     /* Neon accent colors */
     --neon-green: 141 73% 42%;
-    --neon-red: 0 72% 51%;
-    --neon-cyan: 187 85% 53%;
-    --neon-amber: 43 96% 56%;
-    --neon-purple: 260 60% 55%;
+    --neon-red: 0 45% 45%;
+    --neon-cyan: 170 40% 45%;
+    --neon-amber: 35 55% 50%;
+    --neon-purple: 250 30% 50%;
 
     /* No glows — Spotify is flat */
     --glow-primary: none;
@@ -150,13 +150,13 @@ html {
     --accent: 0 0% 92%;
     --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 72% 48%;
+    --destructive: 0 45% 42%;
     --destructive-foreground: 0 0% 100%;
 
     --success: 141 73% 35%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 43 96% 42%;
+    --warning: 35 55% 42%;
     --warning-foreground: 0 0% 100%;
 
     --border: 0 0% 92%;
