@@ -57,8 +57,8 @@ export default function Employees() {
             />
           ) : (
             <>
-              {/* Navigation Cards */}
-              <div className="grid grid-cols-3 gap-2">
+              {/* Navigation Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
                 {tabs.map((tab) => {
                   const isActive = activeTab === tab.key;
                   return (
@@ -66,16 +66,13 @@ export default function Employees() {
                       key={tab.key}
                       onClick={() => setActiveTab(tab.key)}
                       className={cn(
-                        "relative flex flex-col items-center justify-center gap-1.5 py-3 px-1.5 rounded-2xl border transition-all duration-200 active:scale-[0.97] min-w-0 overflow-hidden",
+                        "flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[13px] font-medium whitespace-nowrap transition-all shrink-0",
                         isActive
-                          ? "bg-primary/10 border-primary/30 shadow-lg shadow-primary/10"
-                          : "bg-card border-border hover:border-primary/20"
+                          ? "bg-foreground text-background"
+                          : "bg-foreground/[0.07] text-muted-foreground backdrop-blur-sm"
                       )}
                     >
-                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", isActive ? "bg-primary/20" : "bg-primary/10")}>
-                        <AppIcon name={tab.icon} size={20} fill={(tab.iconFill ?? 1) as 0 | 1} className={isActive ? "text-primary" : "text-muted-foreground"} />
-                      </div>
-                      <span className={cn("text-[10px] font-semibold truncate w-full text-center", isActive ? "text-primary" : "text-muted-foreground")}>{tab.label}</span>
+                      {tab.label}
                     </button>
                   );
                 })}
