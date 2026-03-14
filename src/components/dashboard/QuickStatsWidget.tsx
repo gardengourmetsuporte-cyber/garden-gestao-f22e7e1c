@@ -24,9 +24,31 @@ const items = [
   { key: 'pendingQuotations', title: 'cotações', icon: 'Scale', route: '/orders' },
 ] as const;
 
-function getSmartColor(_key: string, value: number) {
-  if (value === 0) return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-muted-foreground/60' };
-  return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground' };
+function getSmartColor(key: string, value: number) {
+  if (value === 0) return { bg: 'bg-secondary/50', icon: 'text-muted-foreground', value: 'text-muted-foreground/60', iconBg: 'bg-muted/30' };
+
+  switch (key) {
+    case 'criticalItems':
+      if (value >= 50) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' };
+      if (value >= 20) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    case 'pendingOrders':
+      if (value >= 10) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' };
+      if (value >= 3) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    case 'pendingClosings':
+      if (value >= 3) return { bg: 'bg-secondary/50', icon: 'text-destructive', value: 'text-destructive', iconBg: 'bg-destructive/15' };
+      if (value >= 1) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    case 'pendingRedemptions':
+      if (value >= 5) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    case 'pendingQuotations':
+      if (value >= 5) return { bg: 'bg-secondary/50', icon: 'text-warning', value: 'text-warning', iconBg: 'bg-warning/15' };
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+    default:
+      return { bg: 'bg-secondary/50', icon: 'text-primary', value: 'text-foreground', iconBg: 'bg-primary/15' };
+  }
 }
 
 export function QuickStatsWidget() {
