@@ -252,7 +252,7 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                     className={cn(
                       "flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-2xl transition-all active:scale-95 relative overflow-hidden",
                       active
-                        ? "bg-primary/10 border border-primary/20"
+                        ? "bg-primary/10"
                         : "card-stat-holo"
                     )}
                     style={{
