@@ -23,38 +23,45 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
   const capitalizedDate = todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1);
 
   return (
-    <div className="relative -mx-4 -mt-5 lg:-mx-8 lg:-mt-6 px-5 pt-6 pb-6 lg:px-8 lg:pt-8 lg:pb-8 overflow-hidden rounded-b-3xl"
+    <div
+      className="relative -mx-4 -mt-5 lg:-mx-8 lg:-mt-6 px-5 pt-7 pb-8 lg:px-8 lg:pt-10 lg:pb-10 overflow-hidden rounded-b-3xl"
       style={{
         background: `
-          radial-gradient(ellipse 120% 80% at 50% -10%, hsl(141 73% 25% / 0.7) 0%, transparent 60%),
-          radial-gradient(ellipse 80% 60% at 80% 20%, hsl(141 73% 18% / 0.5) 0%, transparent 50%),
-          radial-gradient(ellipse 60% 50% at 20% 30%, hsl(141 73% 15% / 0.4) 0%, transparent 50%),
-          linear-gradient(180deg, hsl(141 73% 12% / 0.8) 0%, hsl(var(--background)) 85%)
+          radial-gradient(ellipse 160% 70% at 50% -20%, hsl(var(--primary) / 0.55) 0%, transparent 70%),
+          radial-gradient(ellipse 100% 50% at 90% 10%, hsl(var(--primary) / 0.35) 0%, transparent 55%),
+          radial-gradient(ellipse 70% 40% at 10% 25%, hsl(var(--primary) / 0.25) 0%, transparent 55%),
+          linear-gradient(180deg, hsl(var(--primary) / 0.15) 0%, hsl(var(--background)) 100%)
         `,
       }}
     >
       {/* Top row: logo + greeting */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3.5 mb-5">
         <img
           src={gardenLogo}
           alt="Garden"
-          className="w-10 h-10 rounded-full object-contain bg-primary/10 p-0.5"
+          className="w-12 h-12 rounded-full object-contain bg-primary/10 p-0.5"
         />
         <div>
-          <p className="text-xs text-muted-foreground">{greeting},</p>
-          <p className="text-sm font-bold text-foreground">{firstName}</p>
+          <p className="text-xs text-muted-foreground font-medium">{greeting},</p>
+          <p className="text-base font-bold text-foreground tracking-tight">{firstName}</p>
         </div>
       </div>
 
-      {/* Hero text */}
-      <h1 className="text-2xl lg:text-3xl font-extrabold text-foreground font-display tracking-tight leading-tight">
-        Bem-vindo ao{' '}
-        <span className="text-primary">Garden</span>
+      {/* Hero text — Spotify style */}
+      <h1 className="font-display leading-[1.1] tracking-[-0.03em]">
+        <span className="text-[28px] lg:text-[36px] font-extrabold text-foreground">
+          Bem-vindo ao{' '}
+        </span>
+        <span className="text-[28px] lg:text-[36px] font-extrabold text-primary">
+          Garden
+        </span>
         <br />
-        {activeUnit?.name || 'Gestão'}
+        <span className="text-[28px] lg:text-[36px] font-extrabold text-foreground">
+          {activeUnit?.name || 'Gestão'}
+        </span>
       </h1>
 
-      <p className="text-xs text-muted-foreground mt-2">
+      <p className="text-xs text-muted-foreground mt-3 font-medium">
         {capitalizedDate}
       </p>
     </div>

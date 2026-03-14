@@ -103,24 +103,24 @@ export function QuickStatsWidget() {
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2 lg:grid-cols-6">
+    <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
       {allCards.map((card, i) => (
         <button
           key={card.key}
           onClick={() => navigate(card.route)}
           className={cn(
-            "flex flex-col items-start gap-2.5 rounded-xl p-3 transition-all duration-200",
-            "bg-secondary/60 hover:bg-secondary/80",
-            "active:scale-[0.96] touch-manipulation",
+            "flex items-center gap-3 rounded-lg p-3.5 transition-all duration-200",
+            "bg-secondary/50 hover:bg-secondary/70",
+            "active:scale-[0.97] touch-manipulation",
             "animate-card-reveal",
             `dash-stagger-${i + 1}`,
           )}
         >
-          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", card.iconBg)}>
-            <AppIcon name={card.icon} size={17} className={card.iconColor} />
+          <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", card.iconBg)}>
+            <AppIcon name={card.icon} size={16} className={card.iconColor} />
           </div>
-          <div className="text-left min-w-0 w-full">
-            <p className="text-xl font-extrabold leading-none tabular-nums tracking-tight text-foreground">
+          <div className="text-left min-w-0">
+            <p className="text-lg font-extrabold leading-none tabular-nums tracking-tight text-foreground">
               {card.isChecklist ? `${card.value}%` : <AnimatedValue value={card.value} />}
             </p>
             <p className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">
