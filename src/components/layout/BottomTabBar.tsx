@@ -186,7 +186,7 @@ export function BottomTabBar() {
       <MoreDrawer open={moreOpen} onOpenChange={setMoreOpen} />
       <QuickActionSheet open={quickOpen} onOpenChange={setQuickOpen} />
 
-      <nav className="fixed bottom-0 left-0 right-0 lg:hidden z-50">
+      <nav className="fixed bottom-0 left-0 right-0 lg:hidden z-[60]">
         {/* Bar background */}
         <div
           className="relative bg-background"
