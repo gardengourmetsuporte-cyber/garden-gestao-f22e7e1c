@@ -5,12 +5,12 @@ import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DatePicker } from '@/components/ui/date-picker';
 import { useEmployeeWarnings, WARNING_TYPE_LABELS, WARNING_TYPE_COLORS, SEVERITY_LABELS, CLT_REASONS } from '@/hooks/useEmployeeWarnings';
 import { useEmployees } from '@/hooks/useEmployees';
@@ -20,6 +20,16 @@ import type { WarningType, WarningSeverity } from '@/types/employee';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
+/* ─── Infractions Data (compact) ─── */
+const INFRACTIONS = [
+  { title: 'Atrasos e Faltas', progression: 'Verbal → Escrita → Suspensão', icon: 'schedule' },
+  { title: 'Insubordinação', progression: 'Escrita → Suspensão → Justa Causa', icon: 'mood_bad' },
+  { title: 'Desídia / Negligência', progression: 'Verbal → Escrita', icon: 'no_food' },
+  { title: 'Higiene e Segurança', progression: 'Escrita imediata → Suspensão', icon: 'clean_hands' },
+  { title: 'Uso de Celular', progression: 'Verbal → Escrita → Suspensão', icon: 'phone_android' },
+  { title: 'Embriaguez / Substâncias', progression: 'Suspensão → Justa Causa', icon: 'local_bar' },
+];
+
 export function EmployeeWarnings() {
   const { isAdmin } = useAuth();
   const { warnings, isLoading, addWarning, acknowledgeWarning, deleteWarning, getWarningCounts } = useEmployeeWarnings();
@@ -28,7 +38,6 @@ export function EmployeeWarnings() {
   const [filterEmployee, setFilterEmployee] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
 
-  // Register FAB action
   useFabAction(
     isAdmin ? { icon: 'add', label: 'Nova Advertência', onClick: () => setSheetOpen(true) } : null,
     [isAdmin]
@@ -52,17 +61,8 @@ export function EmployeeWarnings() {
 
   const resetForm = () => {
     setForm({
-      employee_id: '',
-      type: 'verbal',
-      severity: 'light',
-      reason: '',
-      legal_basis: '',
-      description: '',
-      date: new Date(),
-      suspension_days: 0,
-      witness_1: '',
-      witness_2: '',
-      notes: '',
+      employee_id: '', type: 'verbal', severity: 'light', reason: '', legal_basis: '',
+      description: '', date: new Date(), suspension_days: 0, witness_1: '', witness_2: '', notes: '',
     });
   };
 
@@ -93,10 +93,8 @@ export function EmployeeWarnings() {
     }
   };
 
-  // Filter warnings
   const visibleWarnings = warnings.filter(w => {
     if (!isAdmin) {
-      // Employee sees only own
       if (!myEmployee || w.employee_id !== myEmployee.id) return false;
     }
     if (filterEmployee !== 'all' && w.employee_id !== filterEmployee) return false;
@@ -104,35 +102,103 @@ export function EmployeeWarnings() {
     return true;
   });
 
+  // Group by employee for admin
+  const grouped = isAdmin
+    ? visibleWarnings.reduce((acc, w) => {
+        const name = w.employee?.full_name || 'Sem nome';
+        if (!acc[name]) acc[name] = [];
+        acc[name].push(w);
+        return acc;
+      }, {} as Record<string, typeof visibleWarnings>)
+    : { 'Minhas': visibleWarnings };
+
   if (isLoading) {
-     return <div className="flex justify-center py-12"><AppIcon name="progress_activity" className="animate-spin text-muted-foreground" size={24} /></div>;
+    return <div className="flex justify-center py-12"><AppIcon name="progress_activity" className="animate-spin text-muted-foreground" size={24} /></div>;
   }
+
+  // Stats summary
+  const totalVerbal = warnings.filter(w => w.type === 'verbal').length;
+  const totalWritten = warnings.filter(w => w.type === 'written').length;
+  const totalSuspension = warnings.filter(w => w.type === 'suspension').length;
+  const totalPending = warnings.filter(w => !w.employee_acknowledged).length;
 
   return (
     <div className="space-y-4">
-      {/* Internal Manual */}
+      {/* Manual Card */}
       <InternalManual />
 
-      {/* Filters (admin only) */}
+      {/* Stats Summary */}
+      <div className="grid grid-cols-4 gap-2">
+        {[
+          { label: 'Verbais', value: totalVerbal },
+          { label: 'Escritas', value: totalWritten },
+          { label: 'Suspensões', value: totalSuspension },
+          { label: 'Pendentes', value: totalPending },
+        ].map(s => (
+          <div key={s.label} className="bg-secondary/50 rounded-xl p-3 text-center">
+            <p className="text-xl font-extrabold text-foreground tabular-nums" style={{ letterSpacing: '-0.03em' }}>
+              {s.value}
+            </p>
+            <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">
+              {s.label}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Infractions Guide — Collapsible */}
+      <Collapsible className="group">
+        <CollapsibleTrigger className="w-full">
+          <div className="flex items-center justify-between bg-secondary/50 rounded-xl p-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+                <AppIcon name="gavel" size={16} className="text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-[13px] font-semibold text-foreground">Guia de Infrações</p>
+                <p className="text-[10px] text-muted-foreground">CLT & Acordo Coletivo — {INFRACTIONS.length} tipos</p>
+              </div>
+            </div>
+            <AppIcon name="ChevronDown" size={16} className="text-muted-foreground/40 transition-transform group-data-[state=open]:rotate-180" />
+          </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="mt-2 space-y-1.5">
+            {INFRACTIONS.map((inf, i) => (
+              <div key={i} className="flex items-center gap-3 bg-card rounded-xl p-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                  <AppIcon name={inf.icon} size={16} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-foreground">{inf.title}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{inf.progression}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Filters (admin) */}
       {isAdmin && (
         <div className="flex gap-2">
           <Select value={filterEmployee} onValueChange={setFilterEmployee}>
-            <SelectTrigger className="flex-1 rounded-xl h-10 bg-card/70 border-border/40">
+            <SelectTrigger className="flex-1 rounded-xl h-10 bg-secondary/50 border-0">
               <SelectValue placeholder="Funcionário" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os funcionários</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               {employees.map(e => (
                 <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-36 rounded-xl h-10 bg-card/70 border-border/40">
+            <SelectTrigger className="w-32 rounded-xl h-10 bg-secondary/50 border-0">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os tipos</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="verbal">Verbal</SelectItem>
               <SelectItem value="written">Escrita</SelectItem>
               <SelectItem value="suspension">Suspensão</SelectItem>
@@ -142,188 +208,41 @@ export function EmployeeWarnings() {
         </div>
       )}
 
-      {/* Reference: Infractions guide */}
-      <div className="space-y-2">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
-          Infrações previstas — CLT & Acordo Coletivo
-        </p>
-        {[
-          {
-            icon: 'schedule',
-            title: 'Atrasos e Faltas Injustificadas',
-            desc: 'Chegar atrasado sem justificativa ou faltar sem avisar/comprovar.',
-            warning: 'Verbal → Escrita → Suspensão',
-            cesta: 'Perde cesta com 3+ faltas injustificadas no mês',
-            color: 'text-amber-400',
-            bg: 'bg-amber-500/10',
-          },
-          {
-            icon: 'mood_bad',
-            title: 'Insubordinação / Indisciplina',
-            desc: 'Recusar ordens diretas do superior ou descumprir regras internas.',
-            warning: 'Escrita → Suspensão → Justa Causa (Art. 482, h)',
-            cesta: 'Perde cesta a partir da 1ª suspensão',
-            color: 'text-red-400',
-            bg: 'bg-red-500/10',
-          },
-          {
-            icon: 'no_food',
-            title: 'Desídia / Negligência',
-            desc: 'Desleixo no trabalho, tarefas malfeitas, checklist não executado.',
-            warning: 'Verbal → Escrita (Art. 482, e)',
-            cesta: 'Perde cesta após 2 advertências escritas no mês',
-            color: 'text-orange-400',
-            bg: 'bg-orange-500/10',
-          },
-          {
-            icon: 'clean_hands',
-            title: 'Higiene e Segurança Alimentar',
-            desc: 'Não usar EPI, falta de higiene pessoal, contaminação cruzada.',
-            warning: 'Escrita imediata → Suspensão',
-            cesta: 'Perde cesta na 1ª ocorrência grave (Vigilância Sanitária)',
-            color: 'text-cyan-400',
-            bg: 'bg-cyan-500/10',
-          },
-          {
-            icon: 'phone_android',
-            title: 'Uso de Celular em Serviço',
-            desc: 'Uso de celular durante o expediente sem autorização.',
-            warning: 'Verbal → Escrita',
-            cesta: 'Perde cesta após 3 advertências verbais',
-            color: 'text-violet-400',
-            bg: 'bg-violet-500/10',
-          },
-          {
-            icon: 'local_bar',
-            title: 'Embriaguez / Substâncias em Serviço',
-            desc: 'Estar sob efeito de álcool ou drogas durante o trabalho.',
-            warning: 'Suspensão imediata → Justa Causa (Art. 482, f)',
-            cesta: 'Perde cesta imediatamente',
-            color: 'text-rose-400',
-            bg: 'bg-rose-500/10',
-          },
-        ].map((item, i) => (
-          <div key={i} className="bg-card/60 border border-border/30 rounded-xl p-3 space-y-1.5">
-            <div className="flex items-center gap-2">
-              <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', item.bg)}>
-                <AppIcon name={item.icon} size={18} className={item.color} />
-              </div>
-              <p className="text-sm font-semibold leading-tight">{item.title}</p>
-            </div>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
-            <div className="flex flex-col gap-0.5">
-              <p className="text-[10px] text-amber-400/90">
-                <span className="font-semibold">⚠️ Progressão:</span> {item.warning}
-              </p>
-              <p className="text-[10px] text-red-400/90">
-                <span className="font-semibold">🧺 Cesta básica:</span> {item.cesta}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Warnings list */}
+      {/* Warnings List */}
       {visibleWarnings.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center rounded-2xl border border-dashed border-border/30 bg-card/20">
-          <div className="w-12 h-12 rounded-2xl bg-muted/20 flex items-center justify-center mb-3">
-            <AppIcon name="verified_user" size={28} className="text-muted-foreground/20" />
+        <div className="flex flex-col items-center justify-center py-12 text-center rounded-2xl bg-secondary/30">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-3">
+            <AppIcon name="verified_user" size={28} className="text-primary/30" />
           </div>
-          <p className="text-sm font-semibold text-muted-foreground">Nenhuma advertência registrada</p>
-          <p className="text-xs text-muted-foreground/50 mt-1 max-w-[220px] leading-relaxed">
-            Registros aparecerão aqui
-          </p>
+          <p className="text-sm font-semibold text-muted-foreground">Nenhuma advertência</p>
+          <p className="text-[11px] text-muted-foreground/50 mt-1">Registros aparecerão aqui</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {visibleWarnings.map(w => {
-            const counts = getWarningCounts(w.employee_id);
-            return (
-            <div key={w.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
-                <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{
-                  backgroundColor: w.type === 'dismissal' ? 'hsl(var(--destructive))' :
-                    w.type === 'suspension' ? '#f59e0b' :
-                    'hsl(var(--primary))'
-                }} />
-                <div className="pl-5 pr-4 py-3.5 space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <Badge className={cn('text-xs border', WARNING_TYPE_COLORS[w.type])}>
-                          {WARNING_TYPE_LABELS[w.type]}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {SEVERITY_LABELS[w.severity as WarningSeverity]}
-                        </Badge>
-                        {w.employee_acknowledged ? (
-                          <Badge variant="secondary" className="text-xs gap-1">
-                            <AppIcon name="check_circle" size={12} /> Ciente
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-xs text-amber-400 border-amber-500/30">
-                            Pendente ciência
-                          </Badge>
-                        )}
-                      </div>
-                      {isAdmin && w.employee && (
-                        <p className="text-sm font-semibold mt-1.5">{w.employee.full_name}</p>
-                      )}
-                      <p className="text-[11px] text-muted-foreground mt-1">{w.reason}</p>
-                      {w.legal_basis && (
-                        <p className="text-[11px] text-muted-foreground/70 mt-0.5">{w.legal_basis}</p>
-                      )}
-                      {w.description && (
-                        <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{w.description}</p>
-                      )}
-                      {w.type === 'suspension' && w.suspension_days > 0 && (
-                        <p className="text-[11px] text-red-400 mt-1">Suspensão de {w.suspension_days} dia(s)</p>
-                      )}
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-[11px] text-muted-foreground">{format(new Date(w.date), "dd/MM/yyyy")}</p>
-                      {isAdmin && (
-                        <p className="text-[10px] text-muted-foreground/60 mt-0.5">
-                          {counts.total} advertência(s)
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 pt-1">
-                    {!isAdmin && !w.employee_acknowledged && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-xs gap-1"
-                        onClick={() => acknowledgeWarning(w.id)}
-                      >
-                        <AppIcon name="check_circle" size={14} />
-                        Registrar Ciência
-                      </Button>
-                    )}
-                    {w.witness_1 && (
-                      <span className="text-[10px] text-muted-foreground">
-                        Testemunhas: {w.witness_1}{w.witness_2 ? `, ${w.witness_2}` : ''}
-                      </span>
-                    )}
-                    {isAdmin && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="ml-auto text-destructive hover:text-destructive h-7 w-7 p-0"
-                        onClick={() => {
-                          if (confirm('Remover esta advertência?')) deleteWarning(w.id);
-                        }}
-                      >
-                        <AppIcon name="delete" size={14} />
-                      </Button>
-                    )}
-                  </div>
+        <div className="space-y-4">
+          {Object.entries(grouped).map(([name, items]) => (
+            <div key={name} className="space-y-2">
+              {isAdmin && (
+                <div className="flex items-center gap-2 px-1">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                    {name}
+                    <span className="ml-1.5 text-foreground">{items.length}</span>
+                  </p>
                 </div>
-              </div>
-            );
-          })}
+              )}
+              {items.map(w => (
+                <WarningCard
+                  key={w.id}
+                  warning={w}
+                  isAdmin={isAdmin}
+                  counts={getWarningCounts(w.employee_id)}
+                  onAcknowledge={() => acknowledgeWarning(w.id)}
+                  onDelete={() => {
+                    if (confirm('Remover esta advertência?')) deleteWarning(w.id);
+                  }}
+                />
+              ))}
+            </div>
+          ))}
         </div>
       )}
 
@@ -334,7 +253,6 @@ export function EmployeeWarnings() {
             <SheetTitle>Nova Advertência</SheetTitle>
           </SheetHeader>
           <div className="space-y-4 mt-4 pb-8">
-            {/* Employee */}
             <div className="space-y-1.5">
               <Label>Funcionário *</Label>
               <Select value={form.employee_id} onValueChange={v => setForm(f => ({ ...f, employee_id: v }))}>
@@ -347,48 +265,43 @@ export function EmployeeWarnings() {
               </Select>
             </div>
 
-            {/* Type */}
-            <div className="space-y-1.5">
-              <Label>Tipo *</Label>
-              <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v as WarningType }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="verbal">Advertência Verbal</SelectItem>
-                  <SelectItem value="written">Advertência Escrita</SelectItem>
-                  <SelectItem value="suspension">Suspensão</SelectItem>
-                  <SelectItem value="dismissal">Demissão por Justa Causa</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Tipo *</Label>
+                <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v as WarningType }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="verbal">Verbal</SelectItem>
+                    <SelectItem value="written">Escrita</SelectItem>
+                    <SelectItem value="suspension">Suspensão</SelectItem>
+                    <SelectItem value="dismissal">Justa Causa</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Gravidade</Label>
+                <Select value={form.severity} onValueChange={v => setForm(f => ({ ...f, severity: v as WarningSeverity }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Leve</SelectItem>
+                    <SelectItem value="moderate">Moderada</SelectItem>
+                    <SelectItem value="serious">Grave</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            {/* Suspension days */}
             {form.type === 'suspension' && (
               <div className="space-y-1.5">
                 <Label>Dias de Suspensão</Label>
                 <Input
-                  type="number"
-                  min={1}
-                  max={30}
+                  type="number" min={1} max={30}
                   value={form.suspension_days}
                   onChange={e => setForm(f => ({ ...f, suspension_days: parseInt(e.target.value) || 0 }))}
                 />
               </div>
             )}
 
-            {/* Severity */}
-            <div className="space-y-1.5">
-              <Label>Gravidade</Label>
-              <Select value={form.severity} onValueChange={v => setForm(f => ({ ...f, severity: v as WarningSeverity }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">Leve</SelectItem>
-                  <SelectItem value="moderate">Moderada</SelectItem>
-                  <SelectItem value="serious">Grave</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Legal basis */}
             <div className="space-y-1.5">
               <Label>Base Legal (CLT)</Label>
               <Select value={form.legal_basis} onValueChange={v => setForm(f => ({ ...f, legal_basis: v }))}>
@@ -401,7 +314,6 @@ export function EmployeeWarnings() {
               </Select>
             </div>
 
-            {/* Reason */}
             <div className="space-y-1.5">
               <Label>Motivo *</Label>
               <Input
@@ -411,7 +323,6 @@ export function EmployeeWarnings() {
               />
             </div>
 
-            {/* Date */}
             <div className="space-y-1.5">
               <Label>Data da Ocorrência</Label>
               <DatePicker
@@ -421,38 +332,27 @@ export function EmployeeWarnings() {
               />
             </div>
 
-            {/* Description */}
             <div className="space-y-1.5">
               <Label>Descrição Detalhada</Label>
               <Textarea
-                placeholder="Descreva o ocorrido em detalhes..."
+                placeholder="Descreva o ocorrido..."
                 value={form.description}
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                 rows={3}
               />
             </div>
 
-            {/* Witnesses */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Testemunha 1</Label>
-                <Input
-                  placeholder="Nome"
-                  value={form.witness_1}
-                  onChange={e => setForm(f => ({ ...f, witness_1: e.target.value }))}
-                />
+                <Input placeholder="Nome" value={form.witness_1} onChange={e => setForm(f => ({ ...f, witness_1: e.target.value }))} />
               </div>
               <div className="space-y-1.5">
                 <Label>Testemunha 2</Label>
-                <Input
-                  placeholder="Nome"
-                  value={form.witness_2}
-                  onChange={e => setForm(f => ({ ...f, witness_2: e.target.value }))}
-                />
+                <Input placeholder="Nome" value={form.witness_2} onChange={e => setForm(f => ({ ...f, witness_2: e.target.value }))} />
               </div>
             </div>
 
-            {/* Notes */}
             <div className="space-y-1.5">
               <Label>Observações</Label>
               <Textarea
@@ -463,15 +363,14 @@ export function EmployeeWarnings() {
               />
             </div>
 
-            {/* Progression alert */}
             {form.employee_id && (() => {
               const counts = getWarningCounts(form.employee_id);
               if (counts.written >= 3 && form.type !== 'suspension' && form.type !== 'dismissal') {
                 return (
-                  <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 flex gap-2 items-start">
-                    <AppIcon name="warning" size={16} className="text-amber-400 shrink-0 mt-0.5" />
-                    <p className="text-xs text-amber-300">
-                      Este funcionário já possui {counts.written} advertência(s) escrita(s). Considere aplicar uma suspensão conforme progressão disciplinar da CLT.
+                  <div className="rounded-xl bg-secondary/50 p-3 flex gap-2 items-start">
+                    <AppIcon name="warning" size={16} className="text-primary shrink-0 mt-0.5" />
+                    <p className="text-xs text-muted-foreground">
+                      Este funcionário já possui {counts.written} advertência(s) escrita(s). Considere aplicar uma suspensão.
                     </p>
                   </div>
                 );
@@ -485,6 +384,98 @@ export function EmployeeWarnings() {
           </div>
         </SheetContent>
       </Sheet>
+    </div>
+  );
+}
+
+/* ─── Warning Card ─── */
+function WarningCard({
+  warning: w,
+  isAdmin,
+  counts,
+  onAcknowledge,
+  onDelete,
+}: {
+  warning: any;
+  isAdmin: boolean;
+  counts: { total: number };
+  onAcknowledge: () => void;
+  onDelete: () => void;
+}) {
+  const typeIcon = w.type === 'verbal' ? 'record_voice_over' : w.type === 'written' ? 'description' : w.type === 'suspension' ? 'block' : 'gavel';
+
+  return (
+    <div className="bg-card rounded-2xl p-4 space-y-2.5">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+            <AppIcon name={typeIcon} size={18} className="text-primary" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[13px] font-bold text-foreground">{WARNING_TYPE_LABELS[w.type]}</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-secondary/80 text-muted-foreground font-medium">
+                {SEVERITY_LABELS[w.severity as WarningSeverity]}
+              </span>
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{w.reason}</p>
+          </div>
+        </div>
+
+        <div className="text-right shrink-0">
+          <p className="text-[11px] font-medium text-muted-foreground tabular-nums">
+            {format(new Date(w.date), 'dd/MM/yy')}
+          </p>
+          {w.employee_acknowledged ? (
+            <div className="flex items-center gap-1 mt-0.5 justify-end">
+              <AppIcon name="check_circle" size={10} className="text-primary" />
+              <span className="text-[9px] text-primary font-medium">Ciente</span>
+            </div>
+          ) : (
+            <span className="text-[9px] text-muted-foreground/60 font-medium">Pendente</span>
+          )}
+        </div>
+      </div>
+
+      {/* Details */}
+      {w.description && (
+        <p className="text-[11px] text-muted-foreground/80 leading-relaxed line-clamp-2 pl-[52px]">{w.description}</p>
+      )}
+
+      {w.type === 'suspension' && w.suspension_days > 0 && (
+        <p className="text-[11px] text-muted-foreground pl-[52px]">
+          Suspensão de <span className="font-bold text-foreground">{w.suspension_days} dia(s)</span>
+        </p>
+      )}
+
+      {w.legal_basis && (
+        <p className="text-[10px] text-muted-foreground/60 pl-[52px]">{w.legal_basis}</p>
+      )}
+
+      {/* Actions */}
+      <div className="flex items-center gap-2 pl-[52px]">
+        {!isAdmin && !w.employee_acknowledged && (
+          <Button size="sm" variant="outline" className="text-xs gap-1 h-8 rounded-xl" onClick={onAcknowledge}>
+            <AppIcon name="check_circle" size={14} />
+            Ciente
+          </Button>
+        )}
+        {w.witness_1 && (
+          <span className="text-[10px] text-muted-foreground/50">
+            Testemunhas: {w.witness_1}{w.witness_2 ? `, ${w.witness_2}` : ''}
+          </span>
+        )}
+        {isAdmin && (
+          <Button
+            size="sm" variant="ghost"
+            className="ml-auto text-destructive hover:text-destructive h-7 w-7 p-0 rounded-lg"
+            onClick={onDelete}
+          >
+            <AppIcon name="delete" size={14} />
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
