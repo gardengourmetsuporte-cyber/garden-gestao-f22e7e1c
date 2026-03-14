@@ -23,9 +23,14 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
   const capitalizedDate = todayFormatted.charAt(0).toUpperCase() + todayFormatted.slice(1);
 
   return (
-    <div className="relative -mx-4 -mt-5 lg:-mx-8 lg:-mt-6 px-5 pt-6 pb-5 lg:px-8 lg:pt-8 lg:pb-6 overflow-hidden rounded-b-3xl"
+    <div className="relative -mx-4 -mt-5 lg:-mx-8 lg:-mt-6 px-5 pt-6 pb-6 lg:px-8 lg:pt-8 lg:pb-8 overflow-hidden rounded-b-3xl"
       style={{
-        background: 'linear-gradient(180deg, hsl(141 73% 20% / 0.6) 0%, hsl(var(--background)) 100%)',
+        background: `
+          radial-gradient(ellipse 120% 80% at 50% -10%, hsl(141 73% 25% / 0.7) 0%, transparent 60%),
+          radial-gradient(ellipse 80% 60% at 80% 20%, hsl(141 73% 18% / 0.5) 0%, transparent 50%),
+          radial-gradient(ellipse 60% 50% at 20% 30%, hsl(141 73% 15% / 0.4) 0%, transparent 50%),
+          linear-gradient(180deg, hsl(141 73% 12% / 0.8) 0%, hsl(var(--background)) 85%)
+        `,
       }}
     >
       {/* Top row: logo + greeting */}
