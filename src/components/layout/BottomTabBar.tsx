@@ -29,8 +29,8 @@ const HOME_TAB: TabDef = { key: 'home', icon: 'Home', label: 'Início', path: '/
 // Custom tabs when inside CardapioHub
 const CARDAPIO_TABS: TabDef[] = [
   { key: 'home', icon: 'Home', label: 'Início', path: '/cardapio', moduleKey: 'cardapio' },
-  { key: 'cardapio', icon: 'MenuBook', customIcon: '/icons/cardapio.png', label: 'Cardápio', path: '/cardapio?tab=produtos', moduleKey: 'cardapio' },
-  { key: 'pedidos', icon: 'Task', customIcon: '/icons/pedidos.png', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
+  { key: 'cardapio', icon: 'MenuBook', label: 'Cardápio', path: '/cardapio?tab=produtos', moduleKey: 'cardapio' },
+  { key: 'pedidos', icon: 'Task', label: 'Pedidos', path: '/cardapio?tab=pedidos', moduleKey: 'cardapio' },
 ];
 
 const HIDDEN_ROUTES = ['/finance', '/personal-finance'];
