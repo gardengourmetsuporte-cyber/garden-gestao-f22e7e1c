@@ -113,7 +113,7 @@ function BrandPanel() {
 function MobileBrandHeader() {
   return (
     <div
-      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full bg-[hsl(220,20%,3%)]"
+      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full bg-background"
       style={{
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
       }}
