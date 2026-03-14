@@ -128,6 +128,10 @@ export default function Invite() {
       // Refresh units so ProtectedRoute won't redirect to onboarding
       await refetchUnits();
 
+      // Sync plan + role immediately after accepting invite
+      await refreshUserData();
+      refreshSubscription();
+
       toast.success(`Bem-vindo ao ${invite!.unit_name}!`);
       navigate('/', { replace: true });
     } catch (err: any) {
