@@ -390,18 +390,18 @@ export function FinanceTransactions({
                       <div className={cn(
                         "flex items-center justify-between py-2.5 sticky top-[52px] lg:top-[64px] z-20 backdrop-blur-xl transition-all duration-300",
                         dateStr === todayStr
-                          ? 'px-4 rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/20'
+                          ? 'px-3 rounded-xl bg-primary/10 border border-primary/20'
                           : 'px-1'
                       )}>
                         <div className="flex items-center gap-2">
                           {dateStr === todayStr && (
-                            <span className="w-2 h-2 rounded-full bg-primary-foreground animate-pulse shrink-0" />
+                            <span className="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0" />
                           )}
-                          <span className={cn("text-xs uppercase tracking-wider font-bold", dateStr === todayStr ? 'text-primary-foreground' : 'text-muted-foreground')}>
+                          <span className={cn("text-xs uppercase tracking-wider font-bold", dateStr === todayStr ? 'text-primary' : 'text-muted-foreground')}>
                             {getDateLabel(dateStr)}
                           </span>
                         </div>
-                        <span className={cn("text-sm font-bold font-display", dateStr === todayStr ? 'text-primary-foreground' : (dayTotal >= 0 ? 'text-success' : 'text-destructive'))}>
+                        <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? 'text-success' : 'text-destructive')}>
                           {formatCurrency(dayTotal)}
                         </span>
                       </div>
