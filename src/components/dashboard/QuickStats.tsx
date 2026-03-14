@@ -16,11 +16,11 @@ interface QuickStatsProps {
 }
 
 const variantIcon: Record<string, { bg: string; color: string }> = {
-  default: { bg: 'bg-muted', color: 'text-muted-foreground' },
-  warning: { bg: 'bg-warning/15', color: 'text-warning' },
-  destructive: { bg: 'bg-destructive/15', color: 'text-destructive' },
-  success: { bg: 'bg-success/15', color: 'text-success' },
-  primary: { bg: 'bg-primary/15', color: 'text-primary' },
+  default: { bg: 'bg-muted', color: 'text-foreground' },
+  warning: { bg: 'bg-warning/15', color: 'text-foreground' },
+  destructive: { bg: 'bg-destructive/15', color: 'text-foreground' },
+  success: { bg: 'bg-muted', color: 'text-foreground' },
+  primary: { bg: 'bg-muted', color: 'text-foreground' },
 };
 
 function AnimatedStatValue({ value }: { value: number | string }) {
