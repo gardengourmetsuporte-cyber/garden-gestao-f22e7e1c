@@ -289,15 +289,15 @@ export function FinanceCharts({
           <div className="space-y-5">
             {displayData.length > 0 ? (
               <>
-                <div className="relative overflow-hidden" style={{ height: 260 }}>
+                <div className="relative overflow-hidden" style={{ height: 200 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={displayData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={70}
-                        outerRadius={110}
+                        innerRadius={55}
+                        outerRadius={85}
                         dataKey="amount"
                         nameKey="category.name"
                         paddingAngle={2}
@@ -312,8 +312,8 @@ export function FinanceCharts({
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-xl font-bold text-foreground">{formatCurrency(displayTotal)}</p>
-                    <p className="text-xs text-muted-foreground">total</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Total</p>
+                    <p className="text-base font-bold text-foreground tabular-nums">{formatCurrency(displayTotal)}</p>
                   </div>
                 </div>
 
