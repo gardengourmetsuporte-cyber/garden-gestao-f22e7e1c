@@ -164,11 +164,7 @@ export function AdminDashboard() {
         );
 
       case 'multi-unit':
-        return (
-          <div key={widget.key} className={`lg:col-span-2 animate-card-reveal ${stagger}`}>
-            <LazyWidget><LazyMultiUnit /></LazyWidget>
-          </div>
-        );
+        return null; // Rendered outside grid at the top
 
       default:
         return null;
