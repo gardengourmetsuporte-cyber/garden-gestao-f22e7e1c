@@ -185,7 +185,7 @@ export function MenuCategoryTree({
           : '';
 
         return (
-          <div key={cat.id} className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
+          <div key={cat.id} className="bg-card rounded-2xl overflow-hidden relative">
             {/* Vertical accent bar */}
             <div
               className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full"
@@ -193,19 +193,19 @@ export function MenuCategoryTree({
             />
 
             {/* Category header */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center">
               <button
                 onClick={() => toggleCat(cat.id)}
                 className="flex-1 flex items-center gap-3 pl-5 pr-3 py-3.5 text-sm transition-all"
               >
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: `${cat.color || 'hsl(var(--primary))'}15` }}
                 >
-                  <AppIcon name={cat.icon || 'Package'} size={20} style={{ color: cat.color || 'hsl(var(--primary))' }} />
+                  <AppIcon name={cat.icon || 'Package'} size={18} style={{ color: cat.color || 'hsl(var(--primary))' }} />
                 </div>
                 <div className="flex-1 text-left min-w-0">
-                  <p className="font-semibold text-foreground truncate">{cat.name}</p>
+                  <p className="font-semibold text-foreground truncate text-[14px]">{cat.name}</p>
                   {viewMode === 'ficha' && catStats ? (
                     <p className="text-[11px] text-muted-foreground">
                       {catStats.linked}/{catStats.total} com ficha · CMV {catStats.avgCMV.toFixed(0)}%
@@ -221,14 +221,17 @@ export function MenuCategoryTree({
                     {catStats.avgMargin.toFixed(0)}%
                   </span>
                 ) : (
-                  <AppIcon
-                    name="ChevronDown"
-                    size={16}
-                    className={cn(
-                      "text-muted-foreground/50 transition-transform duration-200",
-                      !expanded && "-rotate-90"
-                    )}
-                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-muted-foreground font-medium">{totalProducts}</span>
+                    <AppIcon
+                      name="ChevronDown"
+                      size={16}
+                      className={cn(
+                        "text-muted-foreground/50 transition-transform duration-200",
+                        !expanded && "-rotate-90"
+                      )}
+                    />
+                  </div>
                 )}
               </button>
               {viewMode !== 'ficha' && (
@@ -254,8 +257,8 @@ export function MenuCategoryTree({
             </div>
 
             {expanded && (
-              <div className="px-4 pl-5 pb-3 space-y-1.5">
-                <div className="h-px bg-border/30 mb-2" />
+              <div className="px-4 pl-5 pb-3 space-y-0.5">
+                <div className="h-px bg-border/20 mb-2" />
                 {catGroups.map(grp => {
                   const count = getProductCount(grp.id);
                   const isSelected = selectedGroupId === grp.id;
@@ -273,18 +276,18 @@ export function MenuCategoryTree({
 
                   return (
                     <div key={grp.id}>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center">
                         <button
                           onClick={() => onSelectGroup(grp.id)}
                           className={cn(
                             "flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 active:scale-[0.98]",
                             isSelected
-                              ? "bg-primary/10 text-foreground font-medium border border-primary/20"
-                              : "text-muted-foreground hover:text-foreground hover:bg-secondary/40 border border-transparent"
+                              ? "bg-primary/10 text-foreground font-medium"
+                              : "text-muted-foreground hover:text-foreground hover:bg-secondary/30"
                           )}
                         >
                           <div
-                            className="w-2 h-2 rounded-full shrink-0"
+                            className="w-1.5 h-1.5 rounded-full shrink-0"
                             style={{ background: isAvailable ? 'hsl(var(--success))' : 'hsl(var(--destructive))' }}
                           />
                           <span className="flex-1 text-left truncate">{grp.name}</span>
@@ -303,39 +306,41 @@ export function MenuCategoryTree({
                               <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
-                                }}
-                                className={cn(
-                                  "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
-                                  avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
-                                )}
-                              >Mesa</button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
-                                }}
-                                className={cn(
-                                  "text-[8px] px-1.5 py-0.5 rounded-full font-semibold transition-colors",
-                                  avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
-                                )}
-                              >Delivery</button>
-                              <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
+                                <div
+                                  className={cn("w-1 h-1 rounded-full", avail?.tablet ? "bg-primary" : "bg-muted-foreground/20")}
+                                  title={avail?.tablet ? 'Mesa ativo' : 'Mesa inativo'}
+                                />
+                                <div
+                                  className={cn("w-1 h-1 rounded-full", avail?.delivery ? "bg-primary" : "bg-muted-foreground/20")}
+                                  title={avail?.delivery ? 'Delivery ativo' : 'Delivery inativo'}
+                                />
+                              </div>
+                              <span className="text-[11px] text-muted-foreground/60 font-medium tabular-nums">{count}</span>
                             </div>
                           )}
                         </button>
                         {viewMode !== 'ficha' && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button className="p-2.5 rounded-lg hover:bg-secondary/60 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
-                                <AppIcon name="MoreVertical" size={12} className="text-muted-foreground" />
+                              <button className="p-2 rounded-lg hover:bg-secondary/60 touch-manipulation" onTouchMove={(e) => e.preventDefault()}>
+                                <AppIcon name="MoreVertical" size={12} className="text-muted-foreground/40" />
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => {
+                                onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
+                              }}>
+                                <AppIcon name={avail?.tablet ? 'CheckCircle2' : 'XCircle'} size={14} className="mr-2" />
+                                Mesa {avail?.tablet ? '(ativo)' : '(inativo)'}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => {
+                                onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
+                              }}>
+                                <AppIcon name={avail?.delivery ? 'CheckCircle2' : 'XCircle'} size={14} className="mr-2" />
+                                Delivery {avail?.delivery ? '(ativo)' : '(inativo)'}
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => openEditGroup(grp)}>
                                 <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
                               </DropdownMenuItem>
