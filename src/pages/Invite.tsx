@@ -27,7 +27,7 @@ interface InviteData {
 export default function Invite() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshUserData, refreshSubscription } = useAuth();
   const { refetchUnits } = useUnit();
   const token = searchParams.get('token');
 

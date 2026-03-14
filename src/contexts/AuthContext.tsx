@@ -376,6 +376,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUserData = useCallback(async () => {
     if (user) {
+      effectivePlanRef.current = null; // clear stale plan so it re-resolves
       fetchingRef.current = false; // allow re-fetch
       await fetchUserDataRef.current?.(user.id);
     }
