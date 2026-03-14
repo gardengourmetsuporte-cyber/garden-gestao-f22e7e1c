@@ -365,7 +365,20 @@ export default function Agenda() {
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center gap-1.5 ml-auto">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-xl w-10 h-10"
+                title="Modo de visualização"
+                onClick={() => {
+                  const modes: Array<'list' | 'calendar' | 'blocks'> = ['list', 'calendar', 'blocks'];
+                  const idx = modes.indexOf(viewMode);
+                  setViewMode(modes[(idx + 1) % modes.length]);
+                }}
+              >
+                <AppIcon name={viewMode === 'list' ? 'List' : viewMode === 'calendar' ? 'CalendarDays' : 'LayoutGrid'} size={20} />
+              </Button>
               <Button
                 size="icon"
                 variant="ghost"
