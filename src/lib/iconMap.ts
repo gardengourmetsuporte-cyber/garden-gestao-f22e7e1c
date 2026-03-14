@@ -365,6 +365,7 @@ export const ICON_MAP: Record<string, string> = {
   Ruler: 'straighten',
   FileImage: 'image',
   ImageIcon: 'image',
+  ImageOff: 'hide_image',
   Play: 'play_arrow',
   Pause: 'pause',
   Power: 'power_settings_new',
