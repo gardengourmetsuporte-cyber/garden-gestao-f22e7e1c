@@ -84,7 +84,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
           }
         });
     } else {
-      reset({ full_name: '', cpf: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '', shift_start: '08:00', shift_end: '17:00' });
+      reset({ full_name: '', cpf: '', phone: '', role: '', department: '', admission_date: '', base_salary: 0, is_active: true, notes: '', user_id: '', quick_pin: '', shift_start: '08:00', shift_end: '17:00' });
       setUsePerDay(false);
       setWeekSchedule(Array.from({ length: 7 }, () => ({ ...DEFAULT_DAY })));
     }
