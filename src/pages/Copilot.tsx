@@ -315,7 +315,7 @@ export default function CopilotPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Hidden file input */}
+        {/* Hidden file inputs */}
         <input
           ref={fileInputRef}
           type="file"
@@ -323,24 +323,42 @@ export default function CopilotPage() {
           className="hidden"
           onChange={handleImageUpload}
         />
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleImageUpload}
+        />
 
-        {/* Input bar — pb-20 to clear bottom tab bar on mobile */}
+        {/* Input bar */}
         <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3">
           <form onSubmit={handleSubmit} className="flex gap-2 items-center">
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="h-11 w-11 p-0 rounded-full shrink-0"
+              className="h-10 w-10 p-0 rounded-full shrink-0"
               disabled={isLoading}
               onClick={() => fileInputRef.current?.click()}
+            >
+              <AppIcon name="Paperclip" size={18} className="text-muted-foreground" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-10 w-10 p-0 rounded-full shrink-0"
+              disabled={isLoading}
+              onClick={() => cameraInputRef.current?.click()}
             >
               <AppIcon name="Camera" size={18} className="text-muted-foreground" />
             </Button>
             <Input
               value={question}
               onChange={e => setQuestion(e.target.value)}
-              placeholder="Pergunte ao Copiloto..."
+              placeholder="Mensagem..."
               className="h-11 text-sm rounded-full bg-secondary/50 border-border/30"
               disabled={isLoading}
             />
