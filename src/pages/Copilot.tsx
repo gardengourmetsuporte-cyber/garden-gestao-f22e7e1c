@@ -117,7 +117,7 @@ export default function CopilotPage() {
   const [question, setQuestion] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!hasGreeted && messages.length === 0) {
