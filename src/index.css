@@ -744,6 +744,12 @@ html {
   .dark .icon-tint-muted {
     filter: brightness(0) saturate(100%) invert(55%);
   }
+  .icon-tint-white {
+    filter: brightness(0) invert(100%);
+  }
+  .dark .icon-tint-white {
+    filter: brightness(0) invert(100%);
+  }
 
   .animate-slide-up {
     animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
