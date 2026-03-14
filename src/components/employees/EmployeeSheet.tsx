@@ -107,7 +107,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
 
   const onSubmit = async (data: FormData) => {
     try {
-      const payload = { full_name: data.full_name, cpf: data.cpf || null, role: data.role || null, department: data.department || null, admission_date: data.admission_date || null, base_salary: data.base_salary, is_active: data.is_active, notes: data.notes || null, user_id: data.user_id || null, unit_id: activeUnitId || null, quick_pin: data.quick_pin || null, shift_start: data.shift_start || '08:00', shift_end: data.shift_end || '17:00' };
+      const payload = { full_name: data.full_name, cpf: data.cpf || null, phone: data.phone || null, role: data.role || null, department: data.department || null, admission_date: data.admission_date || null, base_salary: data.base_salary, is_active: data.is_active, notes: data.notes || null, user_id: data.user_id || null, unit_id: activeUnitId || null, quick_pin: data.quick_pin || null, shift_start: data.shift_start || '08:00', shift_end: data.shift_end || '17:00' };
 
       let empId: string;
       if (employee) {
