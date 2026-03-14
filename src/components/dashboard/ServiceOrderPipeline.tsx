@@ -15,8 +15,8 @@ function OrderCard({ order }: { order: ActiveOrder }) {
 
   return (
     <div className={cn(
-      'flex flex-col gap-1 p-2.5 rounded-xl bg-muted/20 border text-xs min-w-[130px] shrink-0',
-      isLong ? 'border-destructive/40' : isWarning ? 'border-amber-500/30' : 'border-border/10'
+      'flex flex-col gap-1.5 p-3 rounded-2xl text-xs min-w-[140px] shrink-0',
+      isLong ? 'bg-destructive/8' : isWarning ? 'bg-amber-500/8' : 'bg-secondary/50'
     )}>
       <div className="flex items-center justify-between">
         <span className="font-bold text-foreground tabular-nums">
@@ -43,7 +43,7 @@ export function ServiceOrderPipeline({ pipeline }: { pipeline: PipelineGroups })
   const total = pipeline.pending.length + pipeline.preparing.length + pipeline.ready.length;
 
   return (
-    <div className="card-base p-4">
+    <div className="card-surface p-5">
       <div className="flex items-center gap-2 mb-3">
         <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
           <AppIcon name="view_kanban" size={14} className="text-primary" />
