@@ -268,26 +268,28 @@ export default function CardapioHub() {
           <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-md px-4 pt-3 pb-2 lg:px-6 space-y-2">
             {activeUnit && <MenuPublishBar unitId={activeUnit.id} products={products} groups={groups} />}
             <div className="flex items-center gap-2">
-              <div className="flex gap-1 p-1 rounded-xl bg-secondary/50 flex-1 min-w-0">
+              <div className="flex gap-1 p-1 rounded-full bg-foreground/[0.07] backdrop-blur-sm flex-1 min-w-0">
                 {([
-                  { id: 'produtos' as CardapioTab, label: 'Produtos', icon: 'ShoppingBag', count: products.length },
-                  { id: 'opcionais' as CardapioTab, label: 'Opcionais', icon: 'ListPlus', count: optionGroups.length },
-                  { id: 'replicar' as CardapioTab, label: 'Replicar', icon: 'Copy', count: undefined },
+                  { id: 'produtos' as CardapioTab, label: 'Produtos', count: products.length },
+                  { id: 'opcionais' as CardapioTab, label: 'Opcionais', count: optionGroups.length },
+                  { id: 'replicar' as CardapioTab, label: 'Replicar', count: undefined },
                 ]).map(tab => (
                   <button
                     key={tab.id}
                     onClick={() => setCardapioTab(tab.id)}
                     className={cn(
-                      "flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-sm font-medium transition-all",
+                      "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-medium transition-all",
                       cardapioTab === tab.id
-                        ? "bg-background text-foreground shadow-sm"
+                        ? "bg-foreground text-background backdrop-blur-md"
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    <AppIcon name={tab.icon} size={15} fill={cardapioTab === tab.id ? 1 : 0} />
                     <span className="truncate">{tab.label}</span>
                     {tab.count !== undefined && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary shrink-0">
+                      <span className={cn(
+                        "text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0",
+                        cardapioTab === tab.id ? "bg-background/20 text-background" : "bg-primary/10 text-primary"
+                      )}>
                         {tab.count}
                       </span>
                     )}
