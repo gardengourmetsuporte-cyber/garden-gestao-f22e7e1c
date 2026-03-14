@@ -133,15 +133,15 @@ export function InternalManual() {
   return (
     <>
       {/* Manual Card */}
-      <div className="bg-card border border-border/40 rounded-2xl overflow-hidden">
-        <div className="p-4 space-y-3">
+      <div className="bg-secondary/50 rounded-2xl overflow-hidden">
+        <div className="p-3.5 space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <AppIcon name="menu_book" size={24} className="text-primary" />
+            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
+              <AppIcon name="menu_book" size={20} className="text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold">Manual de Boas Práticas e Regras</h3>
-              <p className="text-[11px] text-muted-foreground">Versão {currentVersion} — Base CLT & Acordo Coletivo</p>
+              <h3 className="text-[13px] font-bold">Manual de Boas Práticas e Regras</h3>
+              <p className="text-[10px] text-muted-foreground">Versão {currentVersion} — Base CLT & Acordo Coletivo</p>
             </div>
           </div>
 
@@ -168,20 +168,20 @@ export function InternalManual() {
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 gap-1.5 text-xs"
+              className="flex-1 gap-1.5 text-xs h-8"
               onClick={() => setManualOpen(true)}
             >
-              <AppIcon name="visibility" size={16} />
+              <AppIcon name="visibility" size={14} />
               Ler Manual
             </Button>
             {isAdmin && (
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-1.5 text-xs"
+                className="flex-1 gap-1.5 text-xs h-8"
                 onClick={() => setSignaturesOpen(true)}
               >
-                <AppIcon name="groups" size={16} />
+                <AppIcon name="groups" size={14} />
                 Assinaturas
               </Button>
             )}
