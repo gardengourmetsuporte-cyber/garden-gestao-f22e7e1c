@@ -172,26 +172,7 @@ export function AdminDashboard() {
     <div className="px-4 py-5 lg:px-8 lg:py-6 max-w-[1400px] mx-auto flex flex-col gap-5">
 
       {/* Greeting */}
-      <DashboardContextBar firstName={firstName} stats={stats} />
-
-      {/* View Selector — Liquid Glass Pill Tabs */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar">
-        {VIEW_TABS.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => handleViewChange(tab.key)}
-            className={cn(
-              "relative flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 touch-manipulation overflow-hidden",
-              view === tab.key
-                ? "bg-foreground text-background"
-                : "liquid-glass-pill text-muted-foreground hover:text-foreground active:scale-[0.97]"
-            )}
-          >
-            <AppIcon name={tab.icon} size={14} className="shrink-0 relative z-10" />
-            <span className="relative z-10">{tab.label}</span>
-          </button>
-        ))}
-      </div>
+      <DashboardContextBar firstName={firstName} stats={stats} view={view} onViewChange={handleViewChange} />
 
       {/* Quick Stats — operational only */}
       {view === 'operational' && (
