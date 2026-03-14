@@ -138,7 +138,7 @@ html {
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
 
-    --primary: 142 71% 40%;
+    --primary: 152 44% 40%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 94%;
@@ -150,18 +150,18 @@ html {
     --accent: 0 0% 92%;
     --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 45% 42%;
+    --destructive: 4 38% 42%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 141 73% 35%;
+    --success: 152 40% 35%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 35 55% 42%;
+    --warning: 38 38% 42%;
     --warning-foreground: 0 0% 100%;
 
     --border: 0 0% 92%;
     --input: 0 0% 94%;
-    --ring: 141 73% 37%;
+    --ring: 152 44% 37%;
 
     /* No glows */
     --glow-primary: none;
