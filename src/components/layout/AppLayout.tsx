@@ -82,11 +82,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             style={{
               paddingTop: 'env(safe-area-inset-top)',
               background: isDashboard
-                ? (isScrolled
-                  ? 'hsl(var(--background) / 0.7)'
-                  : `radial-gradient(circle 400px at 85% -15%, hsl(var(--primary) / 0.6) 0%, transparent 100%),
-                     radial-gradient(circle 300px at 15% 40%, hsl(var(--primary) / 0.3) 0%, transparent 100%),
-                     linear-gradient(175deg, hsl(var(--primary) / 0.22) 0%, hsl(var(--background)) 65%)`)
+                ? (isScrolled ? 'hsl(var(--background) / 0.7)' : 'transparent')
                 : 'hsl(var(--background) / 0.85)',
               backdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
               WebkitBackdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
