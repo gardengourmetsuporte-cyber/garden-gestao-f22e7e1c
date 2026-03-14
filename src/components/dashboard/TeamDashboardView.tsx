@@ -162,7 +162,7 @@ export function TeamDashboardView({ currentUserId }: Props) {
       )}
 
       {/* All members */}
-      <div className="card-base p-4">
+      <div className="card-surface p-5">
         <div className="flex items-center gap-2 mb-3">
           <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
             <AppIcon name="bar_chart" size={14} className="text-primary" />
