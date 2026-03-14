@@ -199,6 +199,13 @@ export function AdminDashboard() {
         ))}
       </div>
 
+      {/* Multi-Unit Overview — operational, before everything */}
+      {view === 'operational' && (
+        <Suspense fallback={<GenericWidgetSkeleton />}>
+          <LazyMultiUnit />
+        </Suspense>
+      )}
+
       {/* Quick Stats — operational only */}
       {view === 'operational' && (
         <Suspense fallback={<QuickStatsSkeleton />}>
