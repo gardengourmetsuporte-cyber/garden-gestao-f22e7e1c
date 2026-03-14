@@ -170,8 +170,8 @@ export function QuickStatsWidget() {
               `dash-stagger-${i + 1}`,
             )}
           >
-             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", colors.iconBg)}>
-              <AppIcon name={card.icon} size={17} className={colors.icon} />
+             <div className="w-11 h-11 rounded-full overflow-hidden shrink-0">
+              <img src={STAT_ICONS[card.key]} alt="" className="w-full h-full object-cover" />
             </div>
             <div className="text-left min-w-0">
               <p className={cn("text-xl font-extrabold leading-none tabular-nums tracking-tight", colors.value)}>
