@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
-import gardenLogo from '@/assets/logo.png';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import type { DashboardStats } from '@/hooks/useDashboardStats';
 
 interface DashboardContextBarProps {
@@ -13,9 +13,10 @@ interface DashboardContextBarProps {
 }
 
 export function DashboardContextBar({ firstName, stats }: DashboardContextBarProps) {
-  const { isAdmin, isSuperAdmin } = useAuth();
+  const { isAdmin, isSuperAdmin, profile } = useAuth();
   const navigate = useNavigate();
   const { activeUnit } = useUnit();
+  const initials = firstName?.charAt(0)?.toUpperCase() || 'U';
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -41,13 +42,12 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
         `,
       }}
     >
-      {/* Top row: logo + greeting + edit button */}
+      {/* Top row: avatar + greeting + edit button */}
       <div className="flex items-center gap-3.5 mb-5">
-        <img
-          src={gardenLogo}
-          alt="Garden"
-          className="w-12 h-12 rounded-full object-contain bg-primary/10 p-0.5"
-        />
+        <Avatar className="w-12 h-12 border-2 border-foreground/10">
+          <AvatarImage src={profile?.avatar_url || undefined} alt={firstName} />
+          <AvatarFallback className="bg-primary/20 text-primary font-bold text-lg">{initials}</AvatarFallback>
+        </Avatar>
         <div className="flex-1">
           <p className="text-xs text-muted-foreground font-medium">{greeting},</p>
           <p className="text-base font-bold text-foreground tracking-tight">{firstName}</p>
