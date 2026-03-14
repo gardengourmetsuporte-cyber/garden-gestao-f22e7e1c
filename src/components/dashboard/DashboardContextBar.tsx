@@ -1,6 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { useUnit } from '@/contexts/UnitContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { AppIcon } from '@/components/ui/app-icon';
 import gardenLogo from '@/assets/logo.png';
 import type { DashboardStats } from '@/hooks/useDashboardStats';
 
