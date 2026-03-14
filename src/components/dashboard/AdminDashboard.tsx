@@ -216,7 +216,14 @@ export function AdminDashboard() {
       {view === 'operational' && <SetupChecklistWidget />}
 
 
-      {/* Sales Goal — financial */}
+      {/* Finance Hero + Sales Goal — financial */}
+      {view === 'financial' && hasAccess('finance') && (
+        <DashboardHeroFinance
+          balance={stats.monthBalance}
+          pendingExpenses={stats.pendingExpenses}
+          isLoading={statsLoading}
+        />
+      )}
       {view === 'financial' && <SalesGoalWidget />}
 
       {/* Service View */}
