@@ -7,7 +7,8 @@ import { useDashboardWidgets } from '@/hooks/useDashboardWidgets';
 import { useLazyVisible } from '@/hooks/useLazyVisible';
 import { DashboardWidgetManager } from './DashboardWidgetManager';
 import { SetupChecklistWidget } from './SetupChecklistWidget';
-import { DashboardContextBar, type DashboardView } from './DashboardContextBar';
+import { DashboardContextBar } from './DashboardContextBar';
+import type { DashboardView } from './DashboardContextBar';
 import { DashboardHeroFinance } from './DashboardHeroFinance';
 import { DashboardSection } from './DashboardSection';
 
