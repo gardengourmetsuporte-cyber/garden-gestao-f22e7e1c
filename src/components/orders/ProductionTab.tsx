@@ -77,7 +77,7 @@ export function ProductionTab() {
         ) : (
           <div className="space-y-2">
             {history.map(order => (
-              <div key={order.id} className="bg-card rounded-2xl border border-border p-4">
+              <div key={order.id} className="bg-card rounded-2xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
                     <p className="font-semibold text-foreground truncate">{order.item?.name || '—'}</p>
