@@ -171,73 +171,59 @@ export default function CopilotPage() {
     <AppLayout>
       <div className="flex flex-col h-[calc(100vh-3.5rem-5rem)] lg:h-screen">
         {/* Toolbar */}
-        <div className="shrink-0 border-b border-border/20 bg-card/60 backdrop-blur-sm">
-          <div className="flex items-center gap-3 h-12 px-4">
-            <img
-              src={mascotImg}
-              alt="Copiloto"
-              className="w-8 h-8 rounded-xl object-cover border border-primary/20"
-            />
-            <div className="flex-1 min-w-0">
-              <h1 className="text-sm font-bold text-foreground leading-none">Copiloto IA</h1>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                <span className="text-[10px] text-muted-foreground">Online</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-0.5">
-              {messages.length > 2 && (
-                <button
-                  onClick={clearHistory}
-                  className="text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg hover:bg-secondary transition-colors"
-                >
-                  Limpar
-                </button>
-              )}
+        <div className="shrink-0">
+          <div className="flex items-center justify-end gap-1 h-10 px-3">
+            {messages.length > 2 && (
               <button
-                onClick={newConversation}
-                className="p-2 rounded-xl hover:bg-secondary transition-colors"
-                title="Nova conversa"
+                onClick={clearHistory}
+                className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Limpar"
               >
-                <AppIcon name="Plus" size={16} className="text-foreground" />
+                <AppIcon name="Trash2" size={16} className="text-muted-foreground hover:text-foreground" />
               </button>
-              <Sheet open={showHistory} onOpenChange={setShowHistory}>
-                <SheetTrigger asChild>
-                  <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
-                    <AppIcon name="Clock" size={16} className="text-foreground" />
-                  </button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] p-0">
-                  <SheetHeader className="p-4 border-b border-border/30">
-                    <SheetTitle className="text-sm">Conversas</SheetTitle>
-                  </SheetHeader>
-                  <div className="overflow-y-auto max-h-[calc(100vh-80px)]">
-                    {conversations.length === 0 ? (
-                      <p className="text-xs text-muted-foreground p-4 text-center">Nenhuma conversa</p>
-                    ) : (
-                      conversations.map((conv) => (
-                        <button
-                          key={conv.id}
-                          onClick={() => {
-                            switchConversation(conv.id);
-                            setShowHistory(false);
-                          }}
-                          className={cn(
-                            "w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/50 transition-colors",
-                            conv.id === conversationId && "bg-primary/10"
-                          )}
-                        >
-                          <p className="text-sm font-medium truncate">{conv.title || 'Conversa'}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">
-                            {format(new Date(conv.created_at), "dd MMM, HH:mm", { locale: ptBR })}
-                          </p>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
+            )}
+            <button
+              onClick={newConversation}
+              className="p-2 rounded-xl hover:bg-secondary transition-colors"
+              title="Nova conversa"
+            >
+              <AppIcon name="Plus" size={16} className="text-muted-foreground" />
+            </button>
+            <Sheet open={showHistory} onOpenChange={setShowHistory}>
+              <SheetTrigger asChild>
+                <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
+                  <AppIcon name="Clock" size={16} className="text-muted-foreground" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] p-0">
+                <SheetHeader className="p-4 border-b border-border/30">
+                  <SheetTitle className="text-sm">Conversas</SheetTitle>
+                </SheetHeader>
+                <div className="overflow-y-auto max-h-[calc(100vh-80px)]">
+                  {conversations.length === 0 ? (
+                    <p className="text-xs text-muted-foreground p-4 text-center">Nenhuma conversa</p>
+                  ) : (
+                    conversations.map((conv) => (
+                      <button
+                        key={conv.id}
+                        onClick={() => {
+                          switchConversation(conv.id);
+                          setShowHistory(false);
+                        }}
+                        className={cn(
+                          "w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/50 transition-colors",
+                          conv.id === conversationId && "bg-primary/10"
+                        )}
+                      >
+                        <p className="text-sm font-medium truncate">{conv.title || 'Conversa'}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {format(new Date(conv.created_at), "dd MMM, HH:mm", { locale: ptBR })}
+                        </p>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
 
