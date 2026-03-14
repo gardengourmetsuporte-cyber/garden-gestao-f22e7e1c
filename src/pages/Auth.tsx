@@ -55,10 +55,10 @@ function BrandPanel() {
 
         {/* Headline */}
         <div className="text-center space-y-2">
-          <h1 className="text-5xl font-extrabold tracking-tight text-white font-display">
+          <h1 className="text-5xl font-extrabold tracking-tight text-foreground font-display">
             Garden
           </h1>
-          <p className="text-[11px] text-white/35 tracking-[0.3em] uppercase font-semibold">
+          <p className="text-[11px] text-foreground/35 tracking-[0.3em] uppercase font-semibold">
             Gestão Inteligente
           </p>
         </div>
