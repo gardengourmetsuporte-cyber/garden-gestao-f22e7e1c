@@ -179,20 +179,23 @@ export function AdminDashboard() {
 
       {/* View Selector */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-1">
-        {VIEW_TABS.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => handleViewChange(tab.key)}
-            className={cn(
-              "px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all duration-200 touch-manipulation shrink-0",
-              view === tab.key
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground active:scale-[0.96]"
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {VIEW_TABS.map(tab => {
+          const isActive = view === tab.key;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => handleViewChange(tab.key)}
+              className={cn(
+                "h-9 px-5 rounded-full text-[13px] font-bold whitespace-nowrap transition-all duration-200 touch-manipulation shrink-0",
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground active:scale-[0.96]"
+              )}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Multi-Unit Overview — operational, before everything */}
