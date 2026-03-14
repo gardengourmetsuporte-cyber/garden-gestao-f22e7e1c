@@ -121,7 +121,7 @@ export function QuickStatsWidget() {
             className={cn(
               "flex items-center gap-3 rounded-2xl p-3.5 transition-all duration-200",
               colors.bg,
-              "hover:brightness-110",
+              "hover:bg-secondary/70",
               "active:scale-[0.97] touch-manipulation",
               "animate-card-reveal",
               `dash-stagger-${i + 1}`,
