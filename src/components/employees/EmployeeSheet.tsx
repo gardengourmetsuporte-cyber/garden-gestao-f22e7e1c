@@ -169,6 +169,7 @@ export function EmployeeSheet({ open, onOpenChange, employee, availableUsers }: 
           </div>
           <div className="space-y-2"><Label htmlFor="full_name">Nome completo *</Label><Input id="full_name" {...register('full_name', { required: true })} placeholder="Nome do funcionário" /></div>
           <div className="space-y-2"><Label htmlFor="cpf">CPF</Label><Input id="cpf" {...register('cpf')} placeholder="000.000.000-00" /></div>
+          <div className="space-y-2"><Label htmlFor="phone" className="flex items-center gap-1.5"><img src="/icons/whatsapp.png" alt="" className="w-3.5 h-3.5" />WhatsApp</Label><Input id="phone" {...register('phone')} placeholder="(11) 99999-9999" type="tel" /></div>
           <div className="space-y-2"><Label htmlFor="role">Cargo</Label><Input id="role" {...register('role')} placeholder="Ex: Atendente, Cozinheiro" /></div>
           <div className="space-y-2"><Label htmlFor="department">Departamento</Label><Input id="department" {...register('department')} placeholder="Ex: Cozinha, Salão" /></div>
           <div className="space-y-2"><Label htmlFor="admission_date">Data de admissão</Label><Input id="admission_date" type="date" {...register('admission_date')} /></div>
