@@ -27,10 +27,10 @@ export function DashboardContextBar({ firstName, stats }: DashboardContextBarPro
       className="relative -mx-4 -mt-5 lg:-mx-8 lg:-mt-6 px-5 pt-7 pb-8 lg:px-8 lg:pt-10 lg:pb-10 overflow-hidden rounded-b-3xl"
       style={{
         background: `
-          radial-gradient(ellipse 160% 70% at 50% -20%, hsl(var(--primary) / 0.55) 0%, transparent 70%),
-          radial-gradient(ellipse 100% 50% at 90% 10%, hsl(var(--primary) / 0.35) 0%, transparent 55%),
-          radial-gradient(ellipse 70% 40% at 10% 25%, hsl(var(--primary) / 0.25) 0%, transparent 55%),
-          linear-gradient(180deg, hsl(var(--primary) / 0.15) 0%, hsl(var(--background)) 100%)
+          radial-gradient(circle 400px at 85% -15%, hsl(var(--primary) / 0.6) 0%, transparent 100%),
+          radial-gradient(circle 300px at 15% 40%, hsl(var(--primary) / 0.3) 0%, transparent 100%),
+          radial-gradient(circle 500px at 60% 60%, hsl(var(--primary) / 0.08) 0%, transparent 100%),
+          linear-gradient(175deg, hsl(var(--primary) / 0.22) 0%, hsl(var(--background)) 65%)
         `,
       }}
     >
