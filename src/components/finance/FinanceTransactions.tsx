@@ -388,10 +388,10 @@ export function FinanceTransactions({
                   return (
                     <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined} className="space-y-1">
                       <div className={cn(
-                        "flex items-center justify-between py-2.5 px-4 rounded-xl sticky top-[52px] lg:top-[64px] z-20 backdrop-blur-xl transition-all duration-300",
+                        "flex items-center justify-between py-2.5 sticky top-[52px] lg:top-[64px] z-20 backdrop-blur-xl transition-all duration-300",
                         dateStr === todayStr
-                          ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
-                          : 'bg-card/90 border border-border/20'
+                          ? 'px-4 rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/20'
+                          : 'px-1'
                       )}>
                         <div className="flex items-center gap-2">
                           {dateStr === todayStr && (
