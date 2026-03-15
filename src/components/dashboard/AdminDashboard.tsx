@@ -66,7 +66,7 @@ export function AdminDashboard() {
   const { user, profile } = useAuth();
   const { hasAccess, isLoading: modulesLoading } = useUserModules();
   const { stats, isLoading: statsLoading } = useDashboardStats();
-  const { widgets, setWidgets, resetDefaults } = useDashboardWidgets();
+  const { widgets, setWidgets, resetDefaults, isVisible } = useDashboardWidgets();
   const [managerOpen, setManagerOpen] = useState(false);
   const [view, setView] = useState<DashboardView>(() => {
     try {
