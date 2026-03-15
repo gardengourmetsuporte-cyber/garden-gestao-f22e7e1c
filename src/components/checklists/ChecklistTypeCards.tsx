@@ -59,15 +59,23 @@ export function ChecklistTypeCard({
         />
       )}
       <div className="flex items-center gap-3 mb-3">
-        <AppIcon
-          name={progress.percent === 100 ? 'check_circle' : icon}
-          size={22}
-          fill={progress.percent === 100 ? 1 : 0}
-          className={cn(
-            "transition-colors",
-            progress.percent === 100 ? "text-success" : isSelected ? "text-foreground" : "text-muted-foreground"
-          )}
-        />
+        <div
+          className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+          style={{
+            background: progress.percent === 100
+              ? 'linear-gradient(135deg, #22C55E, #10B981)'
+              : type === 'abertura'
+                ? 'linear-gradient(135deg, #F59E0B, #F97316)'
+                : 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+          }}
+        >
+          <AppIcon
+            name={progress.percent === 100 ? 'check_circle' : icon}
+            size={22}
+            fill={1}
+            className="text-white"
+          />
+        </div>
         <h3 className="text-base font-bold font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>{label}</h3>
       </div>
       {!settingsMode && (
