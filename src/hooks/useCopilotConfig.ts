@@ -40,7 +40,7 @@ export function useCopilotConfig() {
         .eq('unit_id', activeUnitId)
         .maybeSingle();
       if (error) throw error;
-      return data as CopilotAgentConfig | null;
+      return data as unknown as CopilotAgentConfig | null;
     },
     enabled: !!activeUnitId,
   });
