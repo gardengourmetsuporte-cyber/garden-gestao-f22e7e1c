@@ -85,7 +85,7 @@ export function AICopilotWidget() {
                 disabled={isLoading || !question.trim()}
                 className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 copilot-send-btn disabled:opacity-30 transition-all duration-200 active:scale-90"
               >
-                <AppIcon name="ArrowUp" size={16} className="text-white" />
+                <AppIcon name="Send" size={16} className="text-white" />
               </button>
             </form>
 
