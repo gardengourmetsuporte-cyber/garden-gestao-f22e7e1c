@@ -209,10 +209,10 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
             {(plan !== 'free' && isAdmin) && (
               <button
                 onClick={() => { navigate('/plans'); onOpenChange(false); }}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 transition-all"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl bg-card hover:bg-secondary/50 transition-all"
               >
-                <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
-                  <AppIcon name="Diamond" size={20} style={{ color: 'hsl(45 90% 55%)' }} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+                  <AppIcon name="Diamond" size={18} className="text-white" />
                 </div>
                 <span className="text-sm font-semibold text-foreground">Planos</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>{plan?.toUpperCase()}</span>
