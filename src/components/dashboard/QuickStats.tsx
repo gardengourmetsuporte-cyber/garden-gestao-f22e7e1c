@@ -15,12 +15,12 @@ interface QuickStatsProps {
   columns?: 2 | 3 | 4;
 }
 
-const variantIcon: Record<string, { bg: string; color: string }> = {
-  default: { bg: 'bg-muted', color: 'text-foreground' },
-  warning: { bg: 'bg-warning/15', color: 'text-foreground' },
-  destructive: { bg: 'bg-destructive/15', color: 'text-foreground' },
-  success: { bg: 'bg-muted', color: 'text-foreground' },
-  primary: { bg: 'bg-muted', color: 'text-foreground' },
+const variantStyles: Record<string, { gradient: string }> = {
+  default: { gradient: 'linear-gradient(135deg, #6366F1, #8B5CF6)' },
+  warning: { gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
+  destructive: { gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
+  success: { gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+  primary: { gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
 };
 
 function AnimatedStatValue({ value }: { value: number | string }) {
