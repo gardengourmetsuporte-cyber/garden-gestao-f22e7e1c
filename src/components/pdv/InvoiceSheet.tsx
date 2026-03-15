@@ -208,8 +208,8 @@ export function InvoiceSheet({
             {/* Found customer card */}
             {foundCustomer && (
               <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-                  <AppIcon name="UserCheck" size={18} className="text-primary" />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #3B82F6, #06B6D4)' }}>
+                  <AppIcon name="UserCheck" size={18} className="text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-foreground truncate">{foundCustomer.name}</p>
