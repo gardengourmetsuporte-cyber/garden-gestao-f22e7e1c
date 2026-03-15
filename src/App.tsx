@@ -81,6 +81,7 @@ const PDV = lazy(() => lazyRetry(() => import("./pages/PDV")));
 
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
 const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
+const CopilotSettings = lazy(() => lazyRetry(() => import("./pages/CopilotSettings")));
 
 const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
 
@@ -300,6 +301,7 @@ function AuthenticatedRoutes() {
           <Route path="/pdv" element={<ProtectedRoute><PDV /></ProtectedRoute>} />
           <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
+          <Route path="/copilot/settings" element={<ProtectedRoute><CopilotSettings /></ProtectedRoute>} />
           <Route path="/gamification" element={<Navigate to="/cardapio" replace />} />
           <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
           <Route path="/calendar" element={<ProtectedRoute><CalendarFull /></ProtectedRoute>} />

@@ -1251,6 +1251,37 @@ serve(async (req) => {
       }
     }
 
+    // Load agent config and knowledge base from DB
+    let agentConfig: any = null;
+    let knowledgeBlock = "";
+    if (unit_id) {
+      const sb = getSupabaseAdmin();
+      const { data: cfg } = await sb
+        .from("copilot_agent_config")
+        .select("*")
+        .eq("unit_id", unit_id)
+        .maybeSingle();
+      agentConfig = cfg;
+
+      const { data: articles } = await sb
+        .from("copilot_knowledge")
+        .select("title, content, category")
+        .eq("unit_id", unit_id)
+        .eq("is_active", true)
+        .order("sort_order")
+        .limit(50);
+      if (articles && articles.length > 0) {
+        const kLines = articles.map((a: any) => `[${a.category}] ${a.title}: ${a.content}`);
+        knowledgeBlock = `\n\nBASE DE CONHECIMENTO DO ESTABELECIMENTO:\n${kLines.join("\n")}`;
+      }
+    }
+
+    // Filter tools based on agent config
+    let activeTools = TOOLS;
+    if (agentConfig?.enabled_tools?.length > 0) {
+      activeTools = TOOLS.filter((t: any) => agentConfig.enabled_tools.includes(t.function.name));
+    }
+
     // Build data snapshot
     const dataLines: string[] = [];
 
@@ -1302,7 +1333,11 @@ serve(async (req) => {
 
     const dataSnapshot = dataLines.length > 0 ? dataLines.join('\n') : 'Dados ainda carregando...';
 
-    const systemPrompt = `Você é o Copiloto Garden, assistente de gestão para restaurantes.
+    const agentName = agentConfig?.agent_name || 'Copiloto Garden';
+    const toneOfVoice = agentConfig?.tone_of_voice || 'profissional e amigável';
+    const customPrompt = agentConfig?.system_prompt || '';
+
+    const systemPrompt = customPrompt || `Você é o ${agentName}, assistente de gestão para restaurantes.
 
 REGRAS DE RESPOSTA:
 - Máximo 3 frases curtas + dados numéricos formatados
@@ -1312,6 +1347,7 @@ REGRAS DE RESPOSTA:
 - Nunca invente valores - use os dados abaixo
 - Use **negrito** para valores e nomes importantes
 - Use listas com • quando listar itens
+- Tom de voz: ${toneOfVoice}
 
 ANÁLISE DE IMAGENS:
 - Quando receber uma imagem, analise e extraia TODAS as informações relevantes
@@ -1348,7 +1384,7 @@ REGRAS PARA AÇÕES:
 
 CONTEXTO (use sob demanda, NÃO despeje tudo na resposta):
 - Dia: ${context?.dayOfWeek || '?'} (${context?.timeOfDay || ''})
-${dataSnapshot}${preferencesBlock}`;
+${dataSnapshot}${preferencesBlock}${knowledgeBlock}`;
 
     const aiMessages: { role: string; content: any }[] = [
       { role: "system", content: systemPrompt },
@@ -1394,7 +1430,7 @@ ${dataSnapshot}${preferencesBlock}`;
           model: "google/gemini-2.5-flash",
           messages: currentMessages,
           max_tokens: 1200,
-          tools: TOOLS,
+          tools: activeTools,
         }),
       });
 

@@ -1,88 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-# Painel de Gerenciamento do Agente Copiloto IA
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-## Situação Atual
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-Atualmente **não existe** uma página de configuração/gerenciamento do agente Copiloto. O prompt do sistema, as tools e o contexto estão hardcoded na edge function `management-ai`. A base de conhecimento (knowledge base) existe apenas para o WhatsApp (`whatsapp_knowledge`), não para o Copilot principal.
+---
 
-## O que será construído
+## Bloco de Relatórios Avançados ✅
 
-Uma nova página `/copilot/settings` com abas para gerenciar o agente:
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-### Aba 1 — Prompt & Personalidade
-- Editor de texto para o **prompt do sistema** (instrução principal do agente)
-- Campo para **nome do agente** e **tom de voz**
-- Preview do prompt final montado
-- Salva em nova tabela `copilot_agent_config`
+## Dashboard Analytics ✅
 
-### Aba 2 — Base de Conhecimento (RAG)
-- Reutiliza o padrão do `WhatsAppKnowledge` adaptado para o Copilot
-- CRUD de artigos com título, conteúdo, categoria e toggle ativo/inativo
-- Os artigos são injetados no contexto do agente automaticamente
-- Nova tabela `copilot_knowledge` (mesma estrutura de `whatsapp_knowledge`)
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-### Aba 3 — Ferramentas (Tools)
-- Lista as 16 tools disponíveis do agente com toggle para ativar/desativar cada uma
-- Descrição de cada ferramenta e quando é usada
-- Salva em `copilot_agent_config.enabled_tools` (array JSON)
+## Operacional ✅
 
-### Aba 4 — Integrações / MCPs
-- Lista de integrações disponíveis (WhatsApp, n8n, etc.)
-- Status de conexão de cada uma
-- Links para configurar cada integração
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-## Mudanças no Banco de Dados
+## CRM / Clientes ✅
 
-```sql
--- Configuração do agente por unidade
-CREATE TABLE public.copilot_agent_config (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  unit_id uuid REFERENCES public.units(id) ON DELETE CASCADE NOT NULL UNIQUE,
-  agent_name text DEFAULT 'Copiloto Garden',
-  system_prompt text,
-  tone_of_voice text DEFAULT 'profissional e amigável',
-  enabled_tools text[] DEFAULT '{}',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
--- Base de conhecimento do Copilot
-CREATE TABLE public.copilot_knowledge (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  unit_id uuid REFERENCES public.units(id) ON DELETE CASCADE NOT NULL,
-  title text NOT NULL,
-  content text NOT NULL,
-  category text DEFAULT 'geral',
-  is_active boolean DEFAULT true,
-  sort_order int DEFAULT 0,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
+## Funcionários ✅
 
--- RLS para ambas tabelas
-ALTER TABLE public.copilot_agent_config ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.copilot_knowledge ENABLE ROW LEVEL SECURITY;
--- Policies via user_units join
-```
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
-## Mudanças na Edge Function `management-ai`
+## Cardápio Digital ✅
 
-- Buscar `copilot_agent_config` da unidade para customizar o prompt do sistema
-- Buscar artigos ativos de `copilot_knowledge` e injetar como contexto RAG
-- Filtrar tools habilitadas pelo `enabled_tools`
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
 
-## Arquivos
+## Sistema / UX ✅
 
-| Arquivo | Ação |
-|---------|------|
-| `src/pages/CopilotSettings.tsx` | Criar — página principal com abas |
-| `src/components/copilot/AgentPromptEditor.tsx` | Criar — editor de prompt |
-| `src/components/copilot/CopilotKnowledgeBase.tsx` | Criar — CRUD de artigos RAG |
-| `src/components/copilot/AgentToolsManager.tsx` | Criar — toggle de tools |
-| `src/components/copilot/AgentIntegrations.tsx` | Criar — status de integrações |
-| `src/hooks/useCopilotConfig.ts` | Criar — hook para config do agente |
-| `src/App.tsx` | Adicionar rota `/copilot/settings` |
-| `supabase/functions/management-ai/index.ts` | Atualizar — ler config + knowledge |
-| Migração SQL | Criar tabelas + RLS |
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
 
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
