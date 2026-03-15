@@ -202,14 +202,14 @@ export function AdminDashboard() {
       {view === 'operational' && <AICopilotWidget />}
 
       {/* Multi-Unit Overview */}
-      {view === 'operational' && (
+      {view === 'operational' && isVisible('multi-unit') && (
         <Suspense fallback={<GenericWidgetSkeleton />}>
           <LazyMultiUnit />
         </Suspense>
       )}
 
       {/* Quick Stats — operational only */}
-      {view === 'operational' && (
+      {view === 'operational' && isVisible('quick-stats') && (
         <Suspense fallback={<QuickStatsSkeleton />}>
           <LazyQuickStats />
         </Suspense>
