@@ -10,26 +10,20 @@ import { useCountUp } from '@/hooks/useCountUp';
 import { getCurrentChecklistType, getTodayDateStr } from '@/lib/checklistTiming';
 import { useChecklistDeadlines } from '@/hooks/useChecklistDeadlines';
 
-import statAlert from '@/assets/icons/stat-alert.png';
-import statOrders from '@/assets/icons/stat-orders.png';
-import statReceipt from '@/assets/icons/stat-receipt.png';
-import statGift from '@/assets/icons/stat-gift.png';
-import statScale from '@/assets/icons/stat-scale.png';
-import statChecklist from '@/assets/icons/stat-checklist.png';
-import statBag from '@/assets/icons/stat-bag.png';
+import { AppIcon } from '@/components/ui/app-icon';
 
 function AnimatedValue({ value }: { value: number }) {
   const animated = useCountUp(value);
   return <>{animated}</>;
 }
 
-const STAT_ICONS: Record<string, string> = {
-  criticalItems: statAlert,
-  pendingOrders: statOrders,
-  pendingClosings: statReceipt,
-  pendingRedemptions: statGift,
-  pendingQuotations: statScale,
-  checklist: statChecklist,
+const STAT_ICON_MAP: Record<string, { icon: string; gradient: string }> = {
+  criticalItems: { icon: 'error', gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
+  pendingOrders: { icon: 'restaurant_menu', gradient: 'linear-gradient(135deg, #EC4899, #A855F7)' },
+  pendingClosings: { icon: 'receipt_long', gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
+  pendingRedemptions: { icon: 'redeem', gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+  pendingQuotations: { icon: 'balance', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+  checklist: { icon: 'task_alt', gradient: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' },
 };
 
 const items = [
@@ -170,8 +164,11 @@ export function QuickStatsWidget() {
               `dash-stagger-${i + 1}`,
             )}
           >
-             <div className="w-11 h-11 rounded-full overflow-hidden shrink-0">
-              <img src={STAT_ICONS[card.key]} alt="" className="w-full h-full object-cover" />
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+              style={{ background: STAT_ICON_MAP[card.key]?.gradient }}
+            >
+              <AppIcon name={STAT_ICON_MAP[card.key]?.icon || 'help'} size={22} className="text-white" />
             </div>
             <div className="text-left min-w-0">
               <p className={cn("text-xl font-extrabold leading-none tabular-nums tracking-tight", colors.value)}>
