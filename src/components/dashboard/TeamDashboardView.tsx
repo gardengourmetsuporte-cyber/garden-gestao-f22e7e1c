@@ -89,8 +89,9 @@ export function TeamDashboardView({ currentUserId }: Props) {
             { value: `${utilizationPct}%`, label: 'Eficiência', icon: 'speed', color: pulseCfg.color, bg: pulseCfg.bg },
           ].map((stat, i) => (
             <div key={stat.label} className={cn('flex flex-col items-center gap-2 py-4 rounded-2xl transition-all duration-300', stat.bg, 'animate-slide-up', `dash-stagger-${i + 2}`)}>
-              <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', stat.bg)}>
-                <AppIcon name={stat.icon} size={18} className={stat.color} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                style={{ background: stat.label === 'Ativos' ? 'linear-gradient(135deg, #3B82F6, #06B6D4)' : stat.label === 'Concluídos' ? 'linear-gradient(135deg, #22C55E, #10B981)' : stat.label === 'Pendentes' ? 'linear-gradient(135deg, #F59E0B, #F97316)' : 'linear-gradient(135deg, #EF4444, #F472B6)' }}>
+                <AppIcon name={stat.icon} size={18} className="text-white" />
               </div>
               <span className="text-lg font-extrabold font-display leading-tight tabular-nums">{stat.value}</span>
               <span className="text-[10px] text-muted-foreground font-medium">{stat.label}</span>
