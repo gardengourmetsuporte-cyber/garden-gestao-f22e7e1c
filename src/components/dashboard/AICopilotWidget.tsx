@@ -18,6 +18,8 @@ export function AICopilotWidget() {
   const [question, setQuestion] = useState('');
   const [expanded, setExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-greet on first expand
@@ -27,17 +29,20 @@ export function AICopilotWidget() {
     }
   }, [expanded]);
 
-  // Auto-scroll messages
+  // Auto-scroll ONLY the messages container (not the page)
   useEffect(() => {
-    if (expanded) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (expanded && messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages, expanded, isLoading]);
 
-  // Focus input on expand
+  // Scroll widget into view + focus input on expand
   useEffect(() => {
     if (expanded) {
-      setTimeout(() => inputRef.current?.focus(), 350);
+      requestAnimationFrame(() => {
+        widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => inputRef.current?.focus(), 300);
+      });
     }
   }, [expanded]);
 
