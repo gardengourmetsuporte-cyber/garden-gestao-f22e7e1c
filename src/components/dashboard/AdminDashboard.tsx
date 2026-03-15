@@ -6,6 +6,7 @@ import { useUserModules } from '@/hooks/useAccessLevels';
 import { useDashboardWidgets } from '@/hooks/useDashboardWidgets';
 import { useLazyVisible } from '@/hooks/useLazyVisible';
 import { DashboardWidgetManager } from './DashboardWidgetManager';
+import { AICopilotWidget } from './AICopilotWidget';
 import { SetupChecklistWidget } from './SetupChecklistWidget';
 import { DashboardContextBar } from './DashboardContextBar';
 import { DashboardHeroFinance } from './DashboardHeroFinance';
@@ -211,6 +212,9 @@ export function AdminDashboard() {
           <LazyQuickStats />
         </Suspense>
       )}
+
+      {/* AI Copilot Chat — operational only */}
+      {view === 'operational' && <AICopilotWidget />}
 
       {/* Upgrade Banner — operational only */}
       {view === 'operational' && <UpgradeBanner />}
