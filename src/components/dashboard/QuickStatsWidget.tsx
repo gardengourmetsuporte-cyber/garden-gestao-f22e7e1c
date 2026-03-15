@@ -10,13 +10,7 @@ import { useCountUp } from '@/hooks/useCountUp';
 import { getCurrentChecklistType, getTodayDateStr } from '@/lib/checklistTiming';
 import { useChecklistDeadlines } from '@/hooks/useChecklistDeadlines';
 
-import statAlert from '@/assets/icons/stat-alert.png';
-import statOrders from '@/assets/icons/stat-orders.png';
-import statReceipt from '@/assets/icons/stat-receipt.png';
-import statGift from '@/assets/icons/stat-gift.png';
-import statScale from '@/assets/icons/stat-scale.png';
-import statChecklist from '@/assets/icons/stat-checklist.png';
-import statBag from '@/assets/icons/stat-bag.png';
+import { AppIcon } from '@/components/ui/app-icon';
 
 function AnimatedValue({ value }: { value: number }) {
   const animated = useCountUp(value);
