@@ -1,79 +1,71 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+# Chat Interativo do Copiloto na Dashboard Operacional
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+## Conceito
 
----
+Substituir o widget antigo `AICopilotWidget` por um novo componente moderno inspirado em interfaces de IA contemporâneas (ChatGPT, Perplexity). O chat será integrado diretamente na dashboard operacional com uma transição animada fluida.
 
-## Bloco de Relatórios Avançados ✅
+### Comportamento
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+1. **Estado Colapsado (barra de entrada)**: Uma barra de input elegante com fundo gradiente sutil, ícone do copiloto pulsante e placeholder convidativo — estilo "Ask AI". Sugestões rápidas em chips horizontais abaixo.
 
-## Dashboard Analytics ✅
+2. **Transição de Abertura**: Ao clicar ou digitar, a barra se expande suavemente (animação de height + opacity + scale) transformando-se em um painel de chat inline que ocupa o espaço na dashboard, empurrando os widgets abaixo.
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+3. **Estado Expandido**: Chat completo com mensagens em bolhas assimétricas, renderização markdown, indicador de digitação com shimmer, e header minimalista com botão de fechar que faz a transição reversa.
 
-## Operacional ✅
+## Mudanças Técnicas
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+### 1. Reescrever `AICopilotWidget.tsx`
+- Novo design com 2 estados: barra compacta e chat expandido
+- Barra compacta: input com gradiente de fundo (`#1a1a2e` → `#0f3460`), ícone com gradiente roxo/rosa pulsante, chips de sugestão
+- Chips de sugestão: "Como está meu estoque?", "Resumo do dia", "Despesas pendentes"
+- Transição com `max-height`, `opacity` e `transform` via CSS transitions (300ms ease-out)
+- Chat expandido: bolhas com markdown (via `CopilotMessageContent`), shimmer loading, scroll automático
+- Indicador de typing com shimmer gradient animado (não apenas dots)
 
-## CRM / Clientes ✅
+### 2. Adicionar CSS de animação em `index.css`
+- Keyframe `@keyframes shimmer-typing` para efeito de digitação
+- Keyframe `@keyframes copilot-glow` para brilho pulsante no ícone
+- Classes de transição para expand/collapse suave
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+### 3. Integrar no `AdminDashboard.tsx`
+- Adicionar o widget na view `operational`, logo após o `QuickStats` e antes dos outros widgets
+- Importar o componente reescrito
 
-## Funcionários ✅
+## Visual
 
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
+```text
+┌─────────────────────────────────────┐
+│  ✨  Pergunte ao Copiloto...   [→] │  ← Barra gradiente com glow
+├─────────────────────────────────────┤
+│ [Como está meu estoque?] [Resumo]  │  ← Chips de sugestão
+└─────────────────────────────────────┘
 
-## Cardápio Digital ✅
+         ↓ ao clicar/digitar ↓
 
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
+┌─────────────────────────────────────┐
+│  🤖 Copiloto IA          Online [X]│  ← Header minimalista
+│─────────────────────────────────────│
+│  ┌──────────────────────┐           │
+│  │ Olá! Aqui está o     │           │  ← Bolha assistente
+│  │ resumo do seu dia... │           │
+│  └──────────────────────┘           │
+│           ┌─────────────────┐       │
+│           │ Como está meu   │       │  ← Bolha usuário
+│           │ estoque?        │       │
+│           └─────────────────┘       │
+│  ┌──▒▒▒▒░░░░░░░─────────┐          │  ← Shimmer typing
+│─────────────────────────────────────│
+│  [  Pergunte algo...          ] [→] │  ← Input
+└─────────────────────────────────────┘
+```
 
-## Sistema / UX ✅
+## Arquivos Afetados
 
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
+| Arquivo | Ação |
+|---------|------|
+| `src/components/dashboard/AICopilotWidget.tsx` | Reescrever completamente |
+| `src/components/dashboard/AdminDashboard.tsx` | Adicionar widget na view operacional |
+| `src/index.css` | Adicionar keyframes shimmer e glow |
 
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
