@@ -164,8 +164,11 @@ export function QuickStatsWidget() {
               `dash-stagger-${i + 1}`,
             )}
           >
-             <div className="w-11 h-11 rounded-full overflow-hidden shrink-0">
-              <img src={STAT_ICONS[card.key]} alt="" className="w-full h-full object-cover" />
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+              style={{ background: STAT_ICON_MAP[card.key]?.gradient }}
+            >
+              <AppIcon name={STAT_ICON_MAP[card.key]?.icon || 'help'} size={22} className="text-white" />
             </div>
             <div className="text-left min-w-0">
               <p className={cn("text-xl font-extrabold leading-none tabular-nums tracking-tight", colors.value)}>
