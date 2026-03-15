@@ -18,6 +18,8 @@ export function AICopilotWidget() {
   const [question, setQuestion] = useState('');
   const [expanded, setExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-greet on first expand
@@ -27,17 +29,20 @@ export function AICopilotWidget() {
     }
   }, [expanded]);
 
-  // Auto-scroll messages
+  // Auto-scroll ONLY the messages container (not the page)
   useEffect(() => {
-    if (expanded) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (expanded && messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages, expanded, isLoading]);
 
-  // Focus input on expand
+  // Scroll widget into view + focus input on expand
   useEffect(() => {
     if (expanded) {
-      setTimeout(() => inputRef.current?.focus(), 350);
+      requestAnimationFrame(() => {
+        widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => inputRef.current?.focus(), 300);
+      });
     }
   }, [expanded]);
 
@@ -55,7 +60,7 @@ export function AICopilotWidget() {
   };
 
   return (
-    <div className="copilot-widget-root w-full">
+    <div ref={widgetRef} className="copilot-widget-root w-full">
       {/* === COLLAPSED: Modern AI search bar === */}
       {!expanded && (
         <div className="copilot-bar-gradient rounded-2xl p-[1px] animate-fade-in">
@@ -130,7 +135,7 @@ export function AICopilotWidget() {
             </div>
 
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5 scrollbar-thin min-h-[120px] max-h-[340px]">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5 scrollbar-thin min-h-[120px] max-h-[340px]">
               {messages.map((msg, i) => (
                 <div
                   key={i}
