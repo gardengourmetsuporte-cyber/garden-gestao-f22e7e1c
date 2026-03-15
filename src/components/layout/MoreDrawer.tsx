@@ -144,8 +144,8 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                   onClick={() => setUnitSelectorOpen(!unitSelectorOpen)}
                   className="flex items-center gap-3 w-full px-4 py-3 transition-all active:scale-[0.98] hover:bg-secondary/50"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
-                    <AppIcon name="Store" size={18} className="text-primary" />
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+                    <AppIcon name="Store" size={18} className="text-white" />
                   </div>
                   <div className="flex-1 min-w-0 text-left">
                     <p className="text-sm font-semibold truncate text-foreground">
