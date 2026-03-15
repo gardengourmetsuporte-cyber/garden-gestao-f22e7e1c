@@ -196,8 +196,8 @@ export function FinanceHome({
           <>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center">
-                  <AppIcon name="Target" size={18} className="text-primary" />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+                  <AppIcon name="Target" size={18} className="text-white" />
                 </div>
                 <div>
                   <span className="text-sm font-bold text-foreground">Orçamento</span>

@@ -72,8 +72,8 @@ export function AICopilotWidget() {
             )}
           </div>
           <div className="shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center group-hover:bg-primary/25 transition-colors">
-              <AppIcon name="MessageCircle" size={16} className="text-primary" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}>
+              <AppIcon name="MessageCircle" size={18} className="text-white" />
             </div>
           </div>
         </div>

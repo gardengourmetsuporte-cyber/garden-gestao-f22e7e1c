@@ -409,8 +409,8 @@ function WarningCard({
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-            <AppIcon name={typeIcon} size={18} className="text-primary" />
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: w.severity === 'grave' || w.type === 'suspension' ? 'linear-gradient(135deg, #EF4444, #F472B6)' : w.severity === 'media' ? 'linear-gradient(135deg, #F59E0B, #F97316)' : 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}>
+            <AppIcon name={typeIcon} size={20} className="text-white" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
