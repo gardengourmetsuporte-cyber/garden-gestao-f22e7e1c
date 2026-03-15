@@ -131,8 +131,8 @@ export function MarketingBrandTab() {
       {/* Section 1: Links */}
       <div className="card-surface rounded-2xl px-4 py-4 space-y-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
-            <AppIcon name="Link" size={16} className="text-primary" />
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #3B82F6, #06B6D4)' }}>
+            <AppIcon name="Link" size={16} className="text-white" />
           </div>
           <span className="text-sm font-semibold text-foreground">Links da Marca</span>
         </div>
