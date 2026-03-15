@@ -199,7 +199,10 @@ export function AdminDashboard() {
         })}
       </div>
 
-      {/* Multi-Unit Overview — operational, before everything */}
+      {/* AI Copilot Chat — operational, first */}
+      {view === 'operational' && <AICopilotWidget />}
+
+      {/* Multi-Unit Overview */}
       {view === 'operational' && (
         <Suspense fallback={<GenericWidgetSkeleton />}>
           <LazyMultiUnit />
@@ -212,9 +215,6 @@ export function AdminDashboard() {
           <LazyQuickStats />
         </Suspense>
       )}
-
-      {/* AI Copilot Chat — operational only */}
-      {view === 'operational' && <AICopilotWidget />}
 
       {/* Upgrade Banner — operational only */}
       {view === 'operational' && <UpgradeBanner />}
