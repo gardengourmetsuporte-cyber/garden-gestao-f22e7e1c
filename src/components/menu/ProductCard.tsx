@@ -188,8 +188,8 @@ function FichaTecnicaCard({
       {product.image_url ? (
         <img src={product.image_url} alt={product.name} className="w-10 h-10 rounded-xl object-cover shrink-0" />
       ) : (
-        <div className="w-10 h-10 rounded-xl bg-secondary/60 flex items-center justify-center shrink-0">
-          <AppIcon name="Package" size={16} className="text-muted-foreground/40" />
+        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+          <AppIcon name="Package" size={16} className="text-white" />
         </div>
       )}
 

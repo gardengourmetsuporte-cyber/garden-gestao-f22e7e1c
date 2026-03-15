@@ -4,10 +4,10 @@ import { cn } from '@/lib/utils';
 import { hapticLight } from '@/lib/native';
 
 const actions = [
-  { icon: 'point_of_sale', label: 'Fechar Caixa', route: '/cash-closing' },
-  { icon: 'receipt_long', label: 'Novo Pedido', route: '/orders' },
-  { icon: 'checklist', label: 'Checklist', route: '/checklists' },
-  { icon: 'storefront', label: 'Minha Loja', route: '/settings?tab=units' },
+  { icon: 'point_of_sale', label: 'Fechar Caixa', route: '/cash-closing', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+  { icon: 'receipt_long', label: 'Novo Pedido', route: '/orders', gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
+  { icon: 'checklist', label: 'Checklist', route: '/checklists', gradient: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' },
+  { icon: 'storefront', label: 'Minha Loja', route: '/settings?tab=units', gradient: 'linear-gradient(135deg, #8B5CF6, #EC4899)' },
 ] as const;
 
 export function QuickActionsRow() {
@@ -26,8 +26,8 @@ export function QuickActionsRow() {
             "touch-manipulation"
           )}
         >
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <AppIcon name={action.icon} size={20} className="text-primary" />
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style={{ background: action.gradient }}>
+            <AppIcon name={action.icon} size={22} className="text-white" />
           </div>
           <span className="text-[10px] font-medium text-muted-foreground leading-tight text-center">
             {action.label}

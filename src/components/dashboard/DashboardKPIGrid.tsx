@@ -12,6 +12,7 @@ interface KPICard {
   iconColor: string;
   route: string;
   visible: boolean;
+  gradient?: string;
 }
 
 interface DashboardKPIGridProps {
@@ -37,30 +38,33 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
       label: 'Pedidos',
       value: stats.pendingOrders,
       icon: 'ShoppingCart',
-      iconBg: 'bg-primary/15',
-      iconColor: 'text-primary',
+      iconBg: '',
+      iconColor: 'text-white',
       route: '/orders',
       visible: hasAccess('orders') && isVisible('pending-orders'),
+      gradient: 'linear-gradient(135deg, #F59E0B, #F97316)',
     },
     {
       key: 'bills-due',
       label: 'Contas',
       value: billsCount,
       icon: 'AlertTriangle',
-      iconBg: 'bg-warning/15',
-      iconColor: 'text-warning',
+      iconBg: '',
+      iconColor: 'text-white',
       route: '/finance',
       visible: hasAccess('finance') && isVisible('bills-due'),
+      gradient: 'linear-gradient(135deg, #EF4444, #F472B6)',
     },
     {
       key: 'pending-actions',
       label: 'Resgates',
       value: stats.pendingRedemptions,
       icon: 'Gift',
-      iconBg: 'bg-destructive/15',
-      iconColor: 'text-destructive',
+      iconBg: '',
+      iconColor: 'text-white',
       route: '/rewards',
       visible: hasAccess('rewards') && isVisible('pending-actions'),
+      gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)',
     },
   ];
 
@@ -80,8 +84,8 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
             `animate-card-reveal dash-stagger-${i + 2}`,
           )}
         >
-          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", card.iconBg)}>
-            <AppIcon name={card.icon} size={18} className={card.iconColor} />
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: card.gradient }}>
+            <AppIcon name={card.icon} size={20} className={card.iconColor} />
           </div>
           <div className="flex-1 min-w-0 text-left">
             {isLoading ? (

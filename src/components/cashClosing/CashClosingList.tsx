@@ -83,9 +83,9 @@ import { AppIcon } from '@/components/ui/app-icon';
                       onClick={() => setSelectedClosing(closing)}
                     >
                       <div className="flex items-center gap-3 px-4 py-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-                          <AppIcon name="User" className="w-5 h-5 text-primary" />
-                        </div>
+                         <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+                           <AppIcon name="User" className="w-5 h-5 text-white" />
+                         </div>
                         <div className="flex-1 min-w-0">
                           <span className="font-semibold text-sm text-foreground truncate block">
                             {closing.profile?.full_name || 'Usuário'}

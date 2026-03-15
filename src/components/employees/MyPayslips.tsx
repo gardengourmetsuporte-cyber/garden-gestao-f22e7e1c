@@ -51,9 +51,9 @@ export function MyPayslips() {
       <div className="bg-card border border-border/40 rounded-2xl overflow-hidden relative">
         <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
         <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
-          <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
-            <AppIcon name="User" size={20} className="text-primary" />
-          </div>
+           <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}>
+             <AppIcon name="User" size={22} className="text-white" />
+           </div>
           <div className="flex-1">
             <h2 className="font-semibold text-foreground">{myEmployee.full_name}</h2>
             <p className="text-[11px] text-muted-foreground">{myEmployee.role || 'Funcionário'}{myEmployee.department && ` • ${myEmployee.department}`}</p>
@@ -166,7 +166,7 @@ export function MyPayslips() {
             <Card key={payment.id} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center"><AppIcon name="DollarSign" size={20} className="text-muted-foreground" /></div>
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}><AppIcon name="DollarSign" size={22} className="text-white" /></div>
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{PAYMENT_TYPE_LABELS[payment.type]}</span>
