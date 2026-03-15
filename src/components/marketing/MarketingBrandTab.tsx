@@ -165,8 +165,8 @@ export function MarketingBrandTab() {
       {/* Section 2: Identity */}
       <div className="card-surface rounded-2xl px-4 py-4 space-y-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
-            <AppIcon name="Palette" size={16} className="text-primary" />
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #EC4899, #A855F7)' }}>
+            <AppIcon name="Palette" size={16} className="text-white" />
           </div>
           <span className="text-sm font-semibold text-foreground">Identidade Visual</span>
         </div>
