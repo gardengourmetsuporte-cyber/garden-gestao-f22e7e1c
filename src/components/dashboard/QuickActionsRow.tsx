@@ -4,10 +4,10 @@ import { cn } from '@/lib/utils';
 import { hapticLight } from '@/lib/native';
 
 const actions = [
-  { icon: 'point_of_sale', label: 'Fechar Caixa', route: '/cash-closing' },
-  { icon: 'receipt_long', label: 'Novo Pedido', route: '/orders' },
-  { icon: 'checklist', label: 'Checklist', route: '/checklists' },
-  { icon: 'storefront', label: 'Minha Loja', route: '/settings?tab=units' },
+  { icon: 'point_of_sale', label: 'Fechar Caixa', route: '/cash-closing', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+  { icon: 'receipt_long', label: 'Novo Pedido', route: '/orders', gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
+  { icon: 'checklist', label: 'Checklist', route: '/checklists', gradient: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' },
+  { icon: 'storefront', label: 'Minha Loja', route: '/settings?tab=units', gradient: 'linear-gradient(135deg, #8B5CF6, #EC4899)' },
 ] as const;
 
 export function QuickActionsRow() {
