@@ -529,13 +529,13 @@ export function ChecklistView({
 
               {/* Icon */}
               <div className={cn(
-                "w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300",
-                sectorComplete ? "bg-success/15" : "bg-muted/40"
-              )}>
+                "w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 shadow-lg",
+                sectorComplete && "ring-2 ring-success/30"
+              )} style={{ background: sectorComplete ? 'linear-gradient(135deg, #22C55E, #10B981)' : getSectorGradient(sector) }}>
                 {sectorComplete ? (
-                  <AppIcon name="check_circle" size={22} fill={1} className="text-success animate-scale-in" />
+                  <AppIcon name="check_circle" size={22} fill={1} className="text-white animate-scale-in" />
                 ) : (
-                  <AppIcon name={getSectorIcon(sector)} size={20} fill={0} className="text-muted-foreground" />
+                  <AppIcon name={getSectorIcon(sector)} size={22} fill={1} className="text-white" />
                 )}
               </div>
 
