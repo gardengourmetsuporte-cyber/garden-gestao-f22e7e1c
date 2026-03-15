@@ -166,7 +166,7 @@ export function MyPayslips() {
             <Card key={payment.id} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center"><AppIcon name="DollarSign" size={20} className="text-muted-foreground" /></div>
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}><AppIcon name="DollarSign" size={22} className="text-white" /></div>
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{PAYMENT_TYPE_LABELS[payment.type]}</span>

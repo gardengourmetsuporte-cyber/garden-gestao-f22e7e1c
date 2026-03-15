@@ -86,8 +86,8 @@ export function PendingOrdersWidget() {
         className="w-full text-left p-4 pb-3 flex items-center justify-between"
       >
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-            <AppIcon name="ShoppingCart" size={16} className="text-primary" />
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+            <AppIcon name="ShoppingCart" size={18} className="text-white" />
           </div>
           <div>
             <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-muted-foreground">

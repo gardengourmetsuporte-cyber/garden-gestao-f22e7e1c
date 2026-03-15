@@ -26,8 +26,8 @@ export function QuickActionsRow() {
             "touch-manipulation"
           )}
         >
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <AppIcon name={action.icon} size={20} className="text-primary" />
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style={{ background: action.gradient }}>
+            <AppIcon name={action.icon} size={22} className="text-white" />
           </div>
           <span className="text-[10px] font-medium text-muted-foreground leading-tight text-center">
             {action.label}

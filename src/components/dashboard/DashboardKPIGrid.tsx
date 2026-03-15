@@ -84,8 +84,8 @@ export function DashboardKPIGrid({ stats, isLoading, hasAccess, isVisible }: Das
             `animate-card-reveal dash-stagger-${i + 2}`,
           )}
         >
-          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", card.iconBg)}>
-            <AppIcon name={card.icon} size={18} className={card.iconColor} />
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: card.gradient }}>
+            <AppIcon name={card.icon} size={20} className={card.iconColor} />
           </div>
           <div className="flex-1 min-w-0 text-left">
             {isLoading ? (
