@@ -144,8 +144,8 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                   onClick={() => setUnitSelectorOpen(!unitSelectorOpen)}
                   className="flex items-center gap-3 w-full px-4 py-3 transition-all active:scale-[0.98] hover:bg-secondary/50"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
-                    <AppIcon name="Store" size={18} className="text-primary" />
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+                    <AppIcon name="Store" size={18} className="text-white" />
                   </div>
                   <div className="flex-1 min-w-0 text-left">
                     <p className="text-sm font-semibold truncate text-foreground">
@@ -179,8 +179,8 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                         }}
                         className="flex items-center gap-3 w-full px-4 py-3 border-t border-border/20 transition-all active:scale-[0.98] hover:bg-secondary/50"
                       >
-                        <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center shrink-0">
-                          <AppIcon name="Store" size={18} className="text-muted-foreground" />
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #6B7280, #9CA3AF)' }}>
+                          <AppIcon name="Store" size={18} className="text-white" />
                         </div>
                         <div className="flex-1 min-w-0 text-left">
                           <p className="text-sm font-semibold truncate text-muted-foreground">
@@ -197,10 +197,10 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
             {(plan === 'free') && (
               <button
                 onClick={() => { navigate('/plans'); onOpenChange(false); }}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 transition-all"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl bg-card hover:bg-secondary/50 transition-all"
               >
-                <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
-                  <AppIcon name="Diamond" size={20} style={{ color: 'hsl(45 90% 55%)' }} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+                  <AppIcon name="Diamond" size={18} className="text-white" />
                 </div>
                 <span className="text-sm font-semibold text-foreground">Upgrade de Plano</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>FREE</span>
@@ -209,10 +209,10 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
             {(plan !== 'free' && isAdmin) && (
               <button
                 onClick={() => { navigate('/plans'); onOpenChange(false); }}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 transition-all"
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-2xl bg-card hover:bg-secondary/50 transition-all"
               >
-                <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center shrink-0">
-                  <AppIcon name="Diamond" size={20} style={{ color: 'hsl(45 90% 55%)' }} />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+                  <AppIcon name="Diamond" size={18} className="text-white" />
                 </div>
                 <span className="text-sm font-semibold text-foreground">Planos</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider ml-auto" style={{ color: 'hsl(45 90% 55%)' }}>{plan?.toUpperCase()}</span>
