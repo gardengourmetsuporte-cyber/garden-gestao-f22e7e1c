@@ -103,8 +103,8 @@ export function TeamDashboardView({ currentUserId }: Props) {
       {/* Utilization Progress */}
       <div className="card-surface p-5 animate-slide-up dash-stagger-4">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-            <AppIcon name="speed" size={15} className="text-primary" />
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' }}>
+            <AppIcon name="speed" size={15} className="text-white" />
           </div>
           <h3 className="text-sm font-semibold text-foreground flex-1">Aproveitamento Geral</h3>
           <span className={cn(
