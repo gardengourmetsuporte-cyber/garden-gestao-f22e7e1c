@@ -947,6 +947,47 @@ export type Database = {
           },
         ]
       }
+      copilot_agent_config: {
+        Row: {
+          agent_name: string | null
+          created_at: string | null
+          enabled_tools: string[] | null
+          id: string
+          system_prompt: string | null
+          tone_of_voice: string | null
+          unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          agent_name?: string | null
+          created_at?: string | null
+          enabled_tools?: string[] | null
+          id?: string
+          system_prompt?: string | null
+          tone_of_voice?: string | null
+          unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          agent_name?: string | null
+          created_at?: string | null
+          enabled_tools?: string[] | null
+          id?: string
+          system_prompt?: string | null
+          tone_of_voice?: string | null
+          unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_agent_config_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: true
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       copilot_conversations: {
         Row: {
           created_at: string
@@ -975,6 +1016,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "copilot_conversations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      copilot_knowledge: {
+        Row: {
+          category: string | null
+          content: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          title: string
+          unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title: string
+          unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          title?: string
+          unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_knowledge_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "units"
