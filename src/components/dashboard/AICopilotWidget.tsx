@@ -135,7 +135,7 @@ export function AICopilotWidget() {
             </div>
 
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5 scrollbar-thin min-h-[120px] max-h-[340px]">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5 scrollbar-thin min-h-[120px] max-h-[340px]">
               {messages.map((msg, i) => (
                 <div
                   key={i}
