@@ -77,8 +77,8 @@ export function ServiceDeliveryStatus({ deliveries, hubOrders }: { deliveries: A
       {hubOrders.length > 0 && (
         <div className="card-base p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-full bg-red-500/15 flex items-center justify-center">
-              <AppIcon name="hub" size={14} className="text-red-400" />
+            <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #EF4444, #F472B6)' }}>
+              <AppIcon name="hub" size={14} className="text-white" />
             </div>
             <h3 className="text-sm font-semibold text-foreground flex-1">Delivery Hub</h3>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 tabular-nums">

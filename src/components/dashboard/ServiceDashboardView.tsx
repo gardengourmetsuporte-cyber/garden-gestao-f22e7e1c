@@ -41,8 +41,8 @@ export function ServiceDashboardView() {
               `dash-stagger-${i + 2}`,
             )}
           >
-            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110", kpi.variant)}>
-              <AppIcon name={kpi.icon} size={18} />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: kpi.gradient }}>
+              <AppIcon name={kpi.icon} size={18} className="text-white" />
             </div>
             <div className="text-left min-w-0">
               <p className="text-lg font-extrabold font-display leading-tight" style={{ letterSpacing: '-0.02em' }}>

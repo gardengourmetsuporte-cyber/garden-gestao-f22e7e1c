@@ -165,8 +165,8 @@ export function TeamDashboardView({ currentUserId }: Props) {
       {/* All members */}
       <div className="card-surface p-5">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
-            <AppIcon name="bar_chart" size={14} className="text-primary" />
+          <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}>
+            <AppIcon name="bar_chart" size={14} className="text-white" />
           </div>
           <h3 className="text-sm font-semibold text-foreground flex-1">Equipe Completa</h3>
           <span className="text-[10px] text-muted-foreground tabular-nums">{memberStats.length} membros</span>
