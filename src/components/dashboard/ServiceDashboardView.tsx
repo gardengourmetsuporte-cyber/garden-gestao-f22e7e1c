@@ -8,10 +8,10 @@ import { formatCurrency } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 const KPI_ITEMS = [
-  { key: 'sales', icon: 'payments', label: 'Vendas Hoje', variant: 'bg-primary/15 text-primary' },
-  { key: 'orders', icon: 'receipt_long', label: 'Pedidos Ativos', variant: 'bg-blue-500/15 text-blue-400' },
-  { key: 'deliveries', icon: 'two_wheeler', label: 'Entregas', variant: 'bg-amber-500/15 text-amber-400' },
-  { key: 'hub', icon: 'hub', label: 'Delivery Hub', variant: 'bg-red-500/15 text-red-400' },
+  { key: 'sales', icon: 'payments', label: 'Vendas Hoje', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+  { key: 'orders', icon: 'receipt_long', label: 'Pedidos Ativos', gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+  { key: 'deliveries', icon: 'two_wheeler', label: 'Entregas', gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
+  { key: 'hub', icon: 'hub', label: 'Delivery Hub', gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
 ] as const;
 
 export function ServiceDashboardView() {
