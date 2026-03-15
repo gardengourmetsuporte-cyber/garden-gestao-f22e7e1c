@@ -212,6 +212,9 @@ export function AdminDashboard() {
         </Suspense>
       )}
 
+      {/* AI Copilot Chat — operational only */}
+      {view === 'operational' && <AICopilotWidget />}
+
       {/* Upgrade Banner — operational only */}
       {view === 'operational' && <UpgradeBanner />}
 
