@@ -1,79 +1,38 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Padronizar Ícones dos QuickStats
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+### Problema
+Os ícones PNG atuais (`stat-alert.png`, `stat-orders.png`, etc.) têm tamanhos e estilos visuais diferentes entre si — alguns são maiores, outros menores, e os designs internos não seguem um padrão único.
 
----
+### Solução
+Substituir todos os ícones PNG por ícones SVG inline renderizados via código, todos com:
+- **Círculo colorido uniforme** de `w-12 h-12` (48px) — tamanho grande e consistente
+- **Ícone interno branco** centralizado, todos no mesmo tamanho (22px)
+- **Cores vibrantes e divertidas** por categoria, com gradiente sutil para dar vida
 
-## Bloco de Relatórios Avançados ✅
+### Implementação
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+**Arquivo: `src/components/dashboard/QuickStatsWidget.tsx`**
 
-## Dashboard Analytics ✅
+Substituir o sistema de ícones PNG por um componente inline `StatIcon` que renderiza:
+- Um `div` circular com background gradient colorido (tamanho fixo `w-12 h-12`)
+- Um `AppIcon` branco centralizado dentro (tamanho 22)
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+Mapeamento de cores e ícones:
+| Card | Cor do Círculo | Ícone Material |
+|------|---------------|----------------|
+| Itens Críticos | Vermelho/Rosa gradient | `error` (!) |
+| Pedidos | Rosa/Pink gradient | `restaurant_menu` |
+| Fechamentos | Laranja gradient | `receipt_long` |
+| Resgates | Azul/Cyan gradient | `redeem` (presente) |
+| Cotações | Verde gradient | `balance` (balança) |
+| Checklist | Teal gradient | `task_alt` (check) |
 
-## Operacional ✅
+- Remover imports dos PNGs (`stat-alert.png`, etc.)
+- Remover o `STAT_ICONS` record
+- Alterar o container do ícone de `w-11 h-11` para `w-12 h-12` com gradiente via style inline
+- O `AppIcon` interno usa `size={22}` e `className="text-white"`
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+**Nenhum outro arquivo precisa ser alterado** — o `QuickStatsWidget` é autocontido.
 
-## CRM / Clientes ✅
-
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
-
-## Funcionários ✅
-
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
