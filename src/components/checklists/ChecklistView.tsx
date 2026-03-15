@@ -74,12 +74,30 @@ const sectorNameIconMap: Record<string, string> = {
   'atendimento': 'support_agent',
 };
 
+const sectorGradientMap: Record<string, string> = {
+  'cozinha': 'linear-gradient(135deg, #F97316, #EF4444)',
+  'salão': 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+  'salao': 'linear-gradient(135deg, #8B5CF6, #EC4899)',
+  'caixa': 'linear-gradient(135deg, #22C55E, #10B981)',
+  'banheiro': 'linear-gradient(135deg, #06B6D4, #3B82F6)',
+  'banheiros': 'linear-gradient(135deg, #06B6D4, #3B82F6)',
+  'geral': 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+  'produção': 'linear-gradient(135deg, #F59E0B, #F97316)',
+  'producao': 'linear-gradient(135deg, #F59E0B, #F97316)',
+  'estoque': 'linear-gradient(135deg, #14B8A6, #0EA5E9)',
+  'limpeza': 'linear-gradient(135deg, #06B6D4, #22D3EE)',
+  'atendimento': 'linear-gradient(135deg, #EC4899, #A855F7)',
+};
+
 function getSectorIcon(sector: { icon?: string | null; name: string }): string {
-  // If icon is set and not the generic 'Folder', use it
   if (sector.icon && sector.icon !== 'Folder') return sector.icon;
-  // Fallback: match by sector name
   const key = sector.name.toLowerCase().trim();
   return sectorNameIconMap[key] || 'folder';
+}
+
+function getSectorGradient(sector: { name: string; color?: string }): string {
+  const key = sector.name.toLowerCase().trim();
+  return sectorGradientMap[key] || `linear-gradient(135deg, ${sector.color || '#6366F1'}, ${sector.color || '#8B5CF6'})`;
 }
 
 export function ChecklistView({
