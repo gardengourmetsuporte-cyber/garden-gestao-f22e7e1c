@@ -45,8 +45,8 @@ export function ServiceActiveOrders({ orders }: { orders: ActiveOrder[] }) {
   return (
     <div className="card-base p-4">
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
-          <AppIcon name="receipt_long" size={14} className="text-primary" />
+        <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+          <AppIcon name="receipt_long" size={14} className="text-white" />
         </div>
         <h3 className="text-sm font-semibold text-foreground flex-1">Pedidos Ativos</h3>
         {orders.length > 0 && (

@@ -236,8 +236,8 @@ export function OrdersTab({
                   <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
 
                   <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-                      <AppIcon name={isNoSupplier ? 'HelpCircle' : 'Truck'} size={20} className="text-primary" />
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: isNoSupplier ? 'linear-gradient(135deg, #6B7280, #9CA3AF)' : 'linear-gradient(135deg, #14B8A6, #0EA5E9)' }}>
+                      <AppIcon name={isNoSupplier ? 'HelpCircle' : 'Truck'} size={20} className="text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-foreground truncate">

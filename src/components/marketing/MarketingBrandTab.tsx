@@ -262,8 +262,8 @@ export function MarketingBrandTab() {
       <div className="card-surface rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
-              <AppIcon name="Image" size={16} className="text-primary" />
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+              <AppIcon name="Image" size={16} className="text-white" />
             </div>
             <span className="text-sm font-semibold text-foreground">Galeria de Assets</span>
           </div>

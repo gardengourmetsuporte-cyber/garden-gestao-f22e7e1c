@@ -330,8 +330,8 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                   onClick={() => { navigate('/settings?tab=cardapio'); onOpenChange(false); }}
                   className="flex items-center gap-3 w-full px-4 py-3 rounded-xl card-surface hover:bg-card/90 active:scale-[0.98] transition-all"
                 >
-                  <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
-                    <AppIcon name="Settings" size={18} className="text-primary" />
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}>
+                    <AppIcon name="Settings" size={18} className="text-white" />
                   </div>
                   <span className="text-sm font-medium text-foreground">Configurações do PDV</span>
                   <AppIcon name="ChevronRight" size={16} className="text-muted-foreground ml-auto shrink-0" />

@@ -116,11 +116,9 @@ function NotificationRow({ group, onMarkRead, index }: { group: GroupedNotificat
       style={{ animationDelay: `${index * 30}ms`, animationFillMode: 'both' }}
     >
       {/* Type icon */}
-      <div className={cn(
-        "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border",
-        config.bg, config.border
-      )}>
-        <AppIcon name={config.icon} size={18} className={config.color} />
+      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+        style={{ background: config.gradient || 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}>
+        <AppIcon name={config.icon} size={18} className="text-white" />
       </div>
 
       {/* Content */}

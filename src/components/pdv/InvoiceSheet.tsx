@@ -255,8 +255,8 @@ export function InvoiceSheet({
           /* After linking */
           <div className="space-y-3">
             <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center">
-                <AppIcon name="CheckCircle" size={18} className="text-emerald-600" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+                <AppIcon name="CheckCircle" size={18} className="text-white" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">{name}</p>

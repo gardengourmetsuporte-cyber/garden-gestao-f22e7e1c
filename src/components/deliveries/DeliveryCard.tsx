@@ -51,13 +51,12 @@ export function DeliveryCard({ delivery, selected, compact, onStatusChange, onCa
     >
       <div className="flex items-center gap-3">
         {/* Status icon */}
-        <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0',
-          delivery.status === 'pending' && 'bg-amber-500/10',
-          delivery.status === 'out' && 'bg-blue-500/10',
-          delivery.status === 'delivered' && 'bg-success/10',
-          delivery.status === 'cancelled' && 'bg-destructive/10',
-        )}>
-          <AppIcon name={cfg.icon} size={18} className={cfg.color} />
+        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+          style={{ background: delivery.status === 'pending' ? 'linear-gradient(135deg, #F59E0B, #F97316)'
+            : delivery.status === 'out' ? 'linear-gradient(135deg, #3B82F6, #06B6D4)'
+            : delivery.status === 'delivered' ? 'linear-gradient(135deg, #22C55E, #10B981)'
+            : 'linear-gradient(135deg, #EF4444, #F472B6)' }}>
+          <AppIcon name={cfg.icon} size={18} className="text-white" />
         </div>
 
         {/* Info */}
