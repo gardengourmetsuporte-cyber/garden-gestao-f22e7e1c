@@ -223,7 +223,7 @@ export function AdminDashboard() {
 
 
       {/* Finance Hero + Sales Goal — financial */}
-      {view === 'financial' && hasAccess('finance') && (
+      {view === 'financial' && hasAccess('finance') && isVisible('finance') && (
         <DashboardHeroFinance
           balance={stats.monthBalance}
           pendingExpenses={stats.pendingExpenses}
