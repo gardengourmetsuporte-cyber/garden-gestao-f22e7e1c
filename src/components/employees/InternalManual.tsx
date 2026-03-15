@@ -136,8 +136,8 @@ export function InternalManual() {
       <div className="bg-secondary/50 rounded-2xl overflow-hidden">
         <div className="p-3.5 space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-              <AppIcon name="menu_book" size={20} className="text-primary" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #3B82F6, #06B6D4)' }}>
+              <AppIcon name="menu_book" size={20} className="text-white" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-[13px] font-bold">Manual de Boas Práticas e Regras</h3>

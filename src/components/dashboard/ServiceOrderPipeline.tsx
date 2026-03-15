@@ -45,8 +45,8 @@ export function ServiceOrderPipeline({ pipeline }: { pipeline: PipelineGroups })
   return (
     <div className="card-surface p-5">
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
-          <AppIcon name="view_kanban" size={14} className="text-primary" />
+        <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #3B82F6, #06B6D4)' }}>
+          <AppIcon name="view_kanban" size={14} className="text-white" />
         </div>
         <h3 className="text-sm font-semibold text-foreground flex-1">Pipeline de Pedidos</h3>
         {total > 0 && (

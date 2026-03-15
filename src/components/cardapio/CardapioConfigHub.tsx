@@ -99,8 +99,8 @@ export function CardapioConfigHub() {
             <AccordionItem key={section.id} value={section.id} className="border-0 rounded-2xl bg-card border border-border/30 overflow-hidden">
               <AccordionTrigger className="px-4 py-3.5 hover:no-underline hover:bg-secondary/20 [&[data-state=open]]:bg-secondary/10">
                 <div className="flex items-center gap-3 text-left">
-                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <AppIcon name={section.icon} size={18} className="text-primary" />
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}>
+                    <AppIcon name={section.icon} size={18} className="text-white" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-foreground">{section.label}</p>

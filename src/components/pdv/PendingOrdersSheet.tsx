@@ -132,8 +132,8 @@ function OrderDetailSheet({
           <div className="card-surface rounded-2xl divide-y divide-border/20 overflow-hidden">
             {/* Customer row */}
             <div className="flex items-center gap-3 p-3.5">
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <AppIcon name="User" size={18} className="text-primary" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #3B82F6, #06B6D4)' }}>
+                <AppIcon name="User" size={18} className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground truncate">{order.customer_name || 'Cliente'}</p>
@@ -152,9 +152,9 @@ function OrderDetailSheet({
                   href={whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors flex items-center justify-center shrink-0"
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}
                 >
-                  <AppIcon name="MessageCircle" size={18} />
+                  <AppIcon name="MessageCircle" size={18} className="text-white" />
                 </a>
               )}
             </div>
@@ -162,8 +162,8 @@ function OrderDetailSheet({
             {/* Address row (if delivery) */}
             {order.customer_address && (
               <div className="px-3.5 py-3 flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-primary/5 flex items-center justify-center shrink-0">
-                  <AppIcon name="MapPin" size={16} className="text-primary" />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #EF4444, #F472B6)' }}>
+                  <AppIcon name="MapPin" size={16} className="text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground leading-relaxed">{order.customer_address}</p>
@@ -188,8 +188,8 @@ function OrderDetailSheet({
                 onClick={() => setShowItems(true)}
                 className="w-full flex items-center gap-3 p-3.5 hover:bg-secondary/30 transition-colors active:scale-[0.99] text-left"
               >
-                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <AppIcon name="ShoppingBag" size={16} className="text-primary" />
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+                  <AppIcon name="ShoppingBag" size={16} className="text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-foreground">Itens do pedido</p>

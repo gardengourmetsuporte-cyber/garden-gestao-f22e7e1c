@@ -158,8 +158,8 @@ export function EmployeePayments({ employee, onBack }: EmployeePaymentsProps) {
             <div key={payment.id} className="bg-card rounded-2xl overflow-hidden relative">
                <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full" style={{ backgroundColor: PAYMENT_TYPE_COLORS[payment.type] }} />
                <div className="flex items-center pl-5 pr-3 py-3.5 gap-3">
-                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${PAYMENT_TYPE_COLORS[payment.type]}15` }}>
-                   <AppIcon name="DollarSign" size={18} style={{ color: PAYMENT_TYPE_COLORS[payment.type] }} />
+                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: `linear-gradient(135deg, ${PAYMENT_TYPE_COLORS[payment.type]}, ${PAYMENT_TYPE_COLORS[payment.type]}99)` }}>
+                   <AppIcon name="DollarSign" size={18} className="text-white" />
                  </div>
                  <div className="flex-1 min-w-0">
                    <div className="flex items-center gap-1.5">

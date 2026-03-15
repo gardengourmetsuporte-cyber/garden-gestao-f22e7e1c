@@ -110,8 +110,8 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
             className="bg-secondary/50 rounded-xl p-3 text-left active:scale-[0.97] transition-all"
           >
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                <AppIcon name={stat.icon} size={16} className="text-primary" />
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+                <AppIcon name={stat.icon} size={16} className="text-white" />
               </div>
               <div>
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">{stat.label}</p>
@@ -135,8 +135,8 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
               onClick={() => onNavigate('produtos')}
               className="w-full flex items-center gap-3 bg-secondary/50 rounded-xl p-3 text-left active:scale-[0.97] transition-all"
             >
-              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                <AppIcon name="EyeOff" size={16} className="text-muted-foreground" />
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #6B7280, #9CA3AF)' }}>
+                <AppIcon name="EyeOff" size={16} className="text-white" />
               </div>
               <div className="flex-1">
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Desativados</p>
@@ -150,8 +150,8 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
               onClick={() => onNavigate('produtos')}
               className="w-full flex items-center gap-3 bg-secondary/50 rounded-xl p-3 text-left active:scale-[0.97] transition-all"
             >
-              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                <AppIcon name="ImageOff" size={16} className="text-muted-foreground" />
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #EF4444, #F472B6)' }}>
+                <AppIcon name="ImageOff" size={16} className="text-white" />
               </div>
               <div className="flex-1">
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Sem Foto</p>
@@ -211,8 +211,8 @@ function DeliveryTimeWidget({ unitId, onNavigate }: { unitId?: string; onNavigat
     <div className="bg-secondary/50 rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-            <AppIcon name="Clock" size={16} className="text-primary" />
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' }}>
+            <AppIcon name="Clock" size={16} className="text-white" />
           </div>
           <div>
             <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Tempo de Entrega</p>

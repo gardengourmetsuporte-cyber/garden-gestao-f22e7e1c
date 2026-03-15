@@ -7,9 +7,9 @@ import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 
 const typeConfig = {
-  alert: { icon: 'AlertTriangle', color: 'text-destructive', bg: 'bg-destructive/10', border: 'border-destructive/15' },
-  info: { icon: 'Info', color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/15' },
-  success: { icon: 'CheckCircle2', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/15' },
+  alert: { icon: 'AlertTriangle', color: 'text-destructive', bg: 'bg-destructive/10', border: 'border-destructive/15', gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
+  info: { icon: 'Info', color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/15', gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+  success: { icon: 'CheckCircle2', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/15', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
 } as const;
 
 const originConfig: Record<string, { icon: string; label: string; route: string }> = {
@@ -116,11 +116,9 @@ function NotificationRow({ group, onMarkRead, index }: { group: GroupedNotificat
       style={{ animationDelay: `${index * 30}ms`, animationFillMode: 'both' }}
     >
       {/* Type icon */}
-      <div className={cn(
-        "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border",
-        config.bg, config.border
-      )}>
-        <AppIcon name={config.icon} size={18} className={config.color} />
+      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+        style={{ background: config.gradient || 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}>
+        <AppIcon name={config.icon} size={18} className="text-white" />
       </div>
 
       {/* Content */}

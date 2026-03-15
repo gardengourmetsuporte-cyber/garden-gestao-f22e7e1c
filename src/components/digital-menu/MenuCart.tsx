@@ -425,8 +425,8 @@ export function MenuCart({ cart, cartTotal, unitId, autoConfirm = false, custome
             {/* Login CTA */}
             {!customerUser && (
               <div className="rounded-2xl border border-border/40 p-5 text-center space-y-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
-                  <AppIcon name="Receipt" size={24} className="text-primary" />
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+                  <AppIcon name="Receipt" size={24} className="text-white" />
                 </div>
                 <p className="text-sm text-muted-foreground">Entre e tenha seus dados salvos para a próxima compra!</p>
                 <button onClick={onLogin}
