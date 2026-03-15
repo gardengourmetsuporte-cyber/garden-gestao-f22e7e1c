@@ -60,7 +60,7 @@ export function AICopilotWidget() {
   };
 
   return (
-    <div className="copilot-widget-root w-full">
+    <div ref={widgetRef} className="copilot-widget-root w-full">
       {/* === COLLAPSED: Modern AI search bar === */}
       {!expanded && (
         <div className="copilot-bar-gradient rounded-2xl p-[1px] animate-fade-in">
