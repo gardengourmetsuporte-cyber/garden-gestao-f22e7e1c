@@ -101,10 +101,9 @@ export function AdminDashboard() {
     if (view === 'financial' && (OPERATIONAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
 
     switch (widget.key) {
-      case 'finance':
-      case 'checklist':
       case 'quick-stats':
-        return null;
+      case 'multi-unit':
+        return null; // Rendered outside grid, controlled by isVisible
 
       case 'bills-due':
         return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
