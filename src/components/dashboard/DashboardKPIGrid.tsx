@@ -12,6 +12,7 @@ interface KPICard {
   iconColor: string;
   route: string;
   visible: boolean;
+  gradient?: string;
 }
 
 interface DashboardKPIGridProps {
