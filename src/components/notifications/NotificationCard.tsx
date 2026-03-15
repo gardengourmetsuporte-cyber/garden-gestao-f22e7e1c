@@ -7,9 +7,9 @@ import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 
 const typeConfig = {
-  alert: { icon: 'AlertTriangle', color: 'text-destructive', bg: 'bg-destructive/10', border: 'border-destructive/15' },
-  info: { icon: 'Info', color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/15' },
-  success: { icon: 'CheckCircle2', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/15' },
+  alert: { icon: 'AlertTriangle', color: 'text-destructive', bg: 'bg-destructive/10', border: 'border-destructive/15', gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
+  info: { icon: 'Info', color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/15', gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+  success: { icon: 'CheckCircle2', color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/15', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
 } as const;
 
 const originConfig: Record<string, { icon: string; label: string; route: string }> = {
