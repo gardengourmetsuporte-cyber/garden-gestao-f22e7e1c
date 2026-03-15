@@ -89,8 +89,9 @@ export function TeamDashboardView({ currentUserId }: Props) {
             { value: `${utilizationPct}%`, label: 'Eficiência', icon: 'speed', color: pulseCfg.color, bg: pulseCfg.bg },
           ].map((stat, i) => (
             <div key={stat.label} className={cn('flex flex-col items-center gap-2 py-4 rounded-2xl transition-all duration-300', stat.bg, 'animate-slide-up', `dash-stagger-${i + 2}`)}>
-              <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', stat.bg)}>
-                <AppIcon name={stat.icon} size={18} className={stat.color} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                style={{ background: stat.label === 'Ativos' ? 'linear-gradient(135deg, #3B82F6, #06B6D4)' : stat.label === 'Concluídos' ? 'linear-gradient(135deg, #22C55E, #10B981)' : stat.label === 'Pendentes' ? 'linear-gradient(135deg, #F59E0B, #F97316)' : 'linear-gradient(135deg, #EF4444, #F472B6)' }}>
+                <AppIcon name={stat.icon} size={18} className="text-white" />
               </div>
               <span className="text-lg font-extrabold font-display leading-tight tabular-nums">{stat.value}</span>
               <span className="text-[10px] text-muted-foreground font-medium">{stat.label}</span>
@@ -102,8 +103,8 @@ export function TeamDashboardView({ currentUserId }: Props) {
       {/* Utilization Progress */}
       <div className="card-surface p-5 animate-slide-up dash-stagger-4">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-            <AppIcon name="speed" size={15} className="text-primary" />
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' }}>
+            <AppIcon name="speed" size={15} className="text-white" />
           </div>
           <h3 className="text-sm font-semibold text-foreground flex-1">Aproveitamento Geral</h3>
           <span className={cn(
@@ -164,8 +165,8 @@ export function TeamDashboardView({ currentUserId }: Props) {
       {/* All members */}
       <div className="card-surface p-5">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
-            <AppIcon name="bar_chart" size={14} className="text-primary" />
+          <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}>
+            <AppIcon name="bar_chart" size={14} className="text-white" />
           </div>
           <h3 className="text-sm font-semibold text-foreground flex-1">Equipe Completa</h3>
           <span className="text-[10px] text-muted-foreground tabular-nums">{memberStats.length} membros</span>

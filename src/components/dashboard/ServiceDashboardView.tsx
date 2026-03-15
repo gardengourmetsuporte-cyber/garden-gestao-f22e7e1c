@@ -8,10 +8,10 @@ import { formatCurrency } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 const KPI_ITEMS = [
-  { key: 'sales', icon: 'payments', label: 'Vendas Hoje', variant: 'bg-primary/15 text-primary' },
-  { key: 'orders', icon: 'receipt_long', label: 'Pedidos Ativos', variant: 'bg-blue-500/15 text-blue-400' },
-  { key: 'deliveries', icon: 'two_wheeler', label: 'Entregas', variant: 'bg-amber-500/15 text-amber-400' },
-  { key: 'hub', icon: 'hub', label: 'Delivery Hub', variant: 'bg-red-500/15 text-red-400' },
+  { key: 'sales', icon: 'payments', label: 'Vendas Hoje', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+  { key: 'orders', icon: 'receipt_long', label: 'Pedidos Ativos', gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+  { key: 'deliveries', icon: 'two_wheeler', label: 'Entregas', gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
+  { key: 'hub', icon: 'hub', label: 'Delivery Hub', gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
 ] as const;
 
 export function ServiceDashboardView() {
@@ -41,8 +41,8 @@ export function ServiceDashboardView() {
               `dash-stagger-${i + 2}`,
             )}
           >
-            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110", kpi.variant)}>
-              <AppIcon name={kpi.icon} size={18} />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: kpi.gradient }}>
+              <AppIcon name={kpi.icon} size={18} className="text-white" />
             </div>
             <div className="text-left min-w-0">
               <p className="text-lg font-extrabold font-display leading-tight" style={{ letterSpacing: '-0.02em' }}>

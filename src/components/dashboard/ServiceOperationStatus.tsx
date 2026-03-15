@@ -67,9 +67,10 @@ export function ServiceOperationStatus({ pulse }: { pulse: OperationPulse }) {
               )}
             >
               <div className="relative">
-                <div className={cn('w-2 h-2 rounded-full shrink-0 aspect-square absolute -top-0.5 -right-0.5', style.dot)} />
-                <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', style.bg)}>
-                  <AppIcon name={sector.icon} size={20} className={style.text} />
+                <div className={cn('w-2 h-2 rounded-full shrink-0 aspect-square absolute -top-0.5 -right-0.5 z-10', style.dot)} />
+                <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ background: p === 'calm' ? 'linear-gradient(135deg, #22C55E, #10B981)' : p === 'moderate' ? 'linear-gradient(135deg, #F59E0B, #F97316)' : 'linear-gradient(135deg, #EF4444, #F472B6)' }}>
+                  <AppIcon name={sector.icon} size={20} className="text-white" />
                 </div>
               </div>
               <span className="text-[12px] font-bold text-foreground">{sector.label}</span>
