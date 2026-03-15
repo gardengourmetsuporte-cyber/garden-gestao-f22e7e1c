@@ -90,7 +90,7 @@ export function useCopilotKnowledge() {
         .eq('unit_id', activeUnitId)
         .order('sort_order');
       if (error) throw error;
-      return (data || []) as CopilotKnowledgeArticle[];
+      return (data || []) as unknown as CopilotKnowledgeArticle[];
     },
     enabled: !!activeUnitId,
   });
