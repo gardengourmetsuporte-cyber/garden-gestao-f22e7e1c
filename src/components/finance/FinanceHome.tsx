@@ -82,9 +82,10 @@ export function FinanceHome({
         <div className="finance-hero-inner p-5 pb-4">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-white/[0.08] flex items-center justify-center border border-white/[0.06]">
-                <AppIcon name="Landmark" size={16} style={{ color: 'var(--gp-icon)' }} />
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg"
+                style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}>
+                <AppIcon name="Landmark" size={16} className="text-white" />
               </div>
               <span className="text-[11px] font-semibold tracking-[0.08em] uppercase" style={{ color: 'var(--gp-label)' }}>
                 {variant === 'personal' ? 'Saldo pessoal' : 'Saldo em contas'}
