@@ -103,6 +103,7 @@ export function AdminDashboard() {
     switch (widget.key) {
       case 'quick-stats':
       case 'multi-unit':
+      case 'finance':
         return null; // Rendered outside grid, controlled by isVisible
 
       case 'bills-due':
