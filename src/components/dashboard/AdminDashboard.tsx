@@ -164,8 +164,6 @@ export function AdminDashboard() {
           </div>
         );
 
-      case 'multi-unit':
-        return null; // Rendered outside grid at the top
 
       default:
         return null;
