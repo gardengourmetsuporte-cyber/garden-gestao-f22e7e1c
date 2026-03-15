@@ -247,7 +247,7 @@ export default function Agenda() {
               <div className="flex items-center gap-2">
                 <span
                   className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: category.color, boxShadow: `0 0 6px ${category.color}60` }}
+                  style={{ backgroundColor: category.color }}
                 />
                 <AppIcon name="ChevronDown" size={18} className={cn("text-muted-foreground/60 transition-transform duration-300 ease-out", isExpanded && "rotate-180")} />
               </div>
