@@ -86,8 +86,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         </div>
         <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
           <div className="flex items-center gap-3 text-sm">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/12 flex items-center justify-center shrink-0">
-              <AppIcon name="Schedule" size={20} className="text-amber-500" />
+            <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+              <AppIcon name="Schedule" size={22} className="text-white" />
             </div>
             <div className="text-left">
               <p className="font-semibold text-foreground">Aguardando preparo</p>

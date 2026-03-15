@@ -73,8 +73,8 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
         className="w-full text-left bg-card rounded-2xl p-5 active:scale-[0.98] transition-all"
       >
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center">
-            <AppIcon name="TrendingUp" size={16} className="text-primary" />
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+            <AppIcon name="TrendingUp" size={18} className="text-white" />
           </div>
           <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Faturamento hoje
