@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface DashboardHeroFinanceProps {
   balance: number;
@@ -14,10 +17,22 @@ interface DashboardHeroFinanceProps {
 export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: DashboardHeroFinanceProps) {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(true);
+  const { activeUnitId } = useUnit();
   const masked = '•••••';
   const income = Math.max(balance + pendingExpenses, 0);
   const profit = income - pendingExpenses;
   const profitPercent = income > 0 ? ((profit / income) * 100).toFixed(0) : '0';
+
+  const { data: accountCount = 0 } = useQuery({
+    queryKey: ['finance-account-count', activeUnitId],
+    queryFn: async () => {
+      let query = supabase.from('finance_accounts').select('id', { count: 'exact', head: true }).eq('is_active', true);
+      if (activeUnitId) query = query.eq('unit_id', activeUnitId);
+      const { count } = await query;
+      return count || 0;
+    },
+    staleTime: 60000,
+  });
 
   const fmtCurrency = (value: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -45,7 +60,7 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
         </div>
       </div>
 
-      {/* === HERO BALANCE CARD — same as Finance page === */}
+      {/* === HERO BALANCE CARD === */}
       <button
         onClick={() => navigate('/finance')}
         className="finance-hero-card w-full text-left"
@@ -53,9 +68,12 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
         <div className="finance-hero-inner p-5 pb-4">
           {/* Card header */}
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-white/[0.08] flex items-center justify-center border border-white/[0.06]">
-                <AppIcon name="Landmark" size={16} style={{ color: 'var(--gp-icon)' }} />
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg"
+                style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}
+              >
+                <AppIcon name="Landmark" size={16} className="text-white" />
               </div>
               <span className="text-[11px] font-semibold tracking-[0.08em] uppercase" style={{ color: 'var(--gp-label)' }}>
                 Saldo em contas
@@ -79,8 +97,11 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
           <div className="flex gap-2.5 mt-5">
             <div className="finance-hero-chip">
               <div className="flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full bg-primary/15 flex items-center justify-center">
-                  <AppIcon name="TrendingUp" size={11} style={{ color: 'var(--gp-positive)' }} />
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center shadow-md"
+                  style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}
+                >
+                  <AppIcon name="TrendingUp" size={12} className="text-white" />
                 </div>
                 <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>
                   Lucro
@@ -104,6 +125,22 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
                 )}
               </div>
             </div>
+            <div className="finance-hero-chip">
+              <div className="flex items-center gap-1.5">
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center shadow-md"
+                  style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}
+                >
+                  <AppIcon name="Landmark" size={12} className="text-white" />
+                </div>
+                <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>
+                  Contas
+                </span>
+              </div>
+              <span className="text-[15px] font-bold tabular-nums" style={{ color: 'var(--gp-value)' }}>
+                {accountCount}
+              </span>
+            </div>
           </div>
         </div>
       </button>
@@ -115,8 +152,11 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
           className="card-command-success p-4 text-left cursor-pointer transition-all duration-200"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-full bg-success/20 flex items-center justify-center">
-              <AppIcon name="ArrowUpCircle" size={18} className="text-success" />
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+              style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}
+            >
+              <AppIcon name="ArrowUpCircle" size={16} className="text-white" />
             </div>
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Receitas</span>
           </div>
@@ -133,8 +173,11 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
           className="card-command-danger p-4 text-left cursor-pointer transition-all duration-200"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-full bg-destructive/20 flex items-center justify-center">
-              <AppIcon name="ArrowDownCircle" size={18} className="text-destructive" />
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+              style={{ background: 'linear-gradient(135deg, #EF4444, #F472B6)' }}
+            >
+              <AppIcon name="ArrowDownCircle" size={16} className="text-white" />
             </div>
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Despesas</span>
           </div>
