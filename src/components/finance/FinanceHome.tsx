@@ -127,8 +127,9 @@ export function FinanceHome({
             </div>
             <div className="finance-hero-chip">
               <div className="flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full bg-blue-500/15 flex items-center justify-center">
-                  <AppIcon name="Landmark" size={11} style={{ color: 'var(--gp-sublabel)' }} />
+                <div className="w-6 h-6 rounded-full flex items-center justify-center shadow-md"
+                  style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}>
+                  <AppIcon name="Landmark" size={12} className="text-white" />
                 </div>
                 <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--gp-sublabel)' }}>
                   Contas
