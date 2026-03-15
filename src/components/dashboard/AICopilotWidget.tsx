@@ -43,7 +43,7 @@ export function AICopilotWidget() {
   useEffect(() => {
     if (expanded) {
       requestAnimationFrame(() => {
-        widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
         setTimeout(() => inputRef.current?.focus(), 300);
       });
     }
