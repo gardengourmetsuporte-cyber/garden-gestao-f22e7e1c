@@ -9,18 +9,20 @@ export interface DashboardWidget {
 }
 
 const DEFAULT_WIDGETS: DashboardWidget[] = [
+  // Operational
+  { key: 'multi-unit', label: 'Visão multi-unidade', icon: 'Building2', visible: true },
   { key: 'quick-stats', label: 'Visão geral', icon: 'LayoutDashboard', visible: true },
+  { key: 'calendar', label: 'Calendário', icon: 'CalendarDays', visible: true },
+  // Financial
   { key: 'finance', label: 'Saldo financeiro', icon: 'Wallet', visible: true },
-  { key: 'checklist', label: 'Checklists', icon: 'CheckSquare', visible: true },
   { key: 'bills-due', label: 'Contas a vencer', icon: 'AlertTriangle', visible: true },
   { key: 'analytics', label: 'Analytics', icon: 'TrendingUp', visible: true },
   { key: 'heatmap', label: 'Mapa de calor', icon: 'Flame', visible: true },
   { key: 'month-comparison', label: 'Mês a mês', icon: 'ArrowLeftRight', visible: true },
   { key: 'break-even', label: 'Break-even', icon: 'Target', visible: true },
   { key: 'weekly-summary', label: 'Resumo semanal', icon: 'Calendar', visible: true },
-  { key: 'calendar', label: 'Calendário', icon: 'CalendarDays', visible: true },
+  // Team
   { key: 'leaderboard', label: 'Ranking', icon: 'Trophy', visible: true },
-  { key: 'multi-unit', label: 'Visão multi-unidade', icon: 'Building2', visible: true },
 ];
 
 const STORAGE_KEY = 'dashboard-widgets-config-v6';

@@ -50,7 +50,7 @@ function LazyWidget({ children, fallback }: { children: React.ReactNode; fallbac
 
 type DashboardView = 'operational' | 'financial' | 'service' | 'team';
 
-const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'calendar', 'multi-unit']);
+const OPERATIONAL_WIDGETS = new Set(['calendar']);
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
 const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
@@ -66,7 +66,7 @@ export function AdminDashboard() {
   const { user, profile } = useAuth();
   const { hasAccess, isLoading: modulesLoading } = useUserModules();
   const { stats, isLoading: statsLoading } = useDashboardStats();
-  const { widgets, setWidgets, resetDefaults } = useDashboardWidgets();
+  const { widgets, setWidgets, resetDefaults, isVisible } = useDashboardWidgets();
   const [managerOpen, setManagerOpen] = useState(false);
   const [view, setView] = useState<DashboardView>(() => {
     try {
@@ -101,10 +101,10 @@ export function AdminDashboard() {
     if (view === 'financial' && (OPERATIONAL_WIDGETS.has(widget.key) || TEAM_ONLY_WIDGETS.has(widget.key))) return null;
 
     switch (widget.key) {
-      case 'finance':
-      case 'checklist':
       case 'quick-stats':
-        return null;
+      case 'multi-unit':
+      case 'finance':
+        return null; // Rendered outside grid, controlled by isVisible
 
       case 'bills-due':
         return hasAccess('finance') && (stats.billsDueSoon?.length ?? 0) > 0 ? (
@@ -164,8 +164,6 @@ export function AdminDashboard() {
           </div>
         );
 
-      case 'multi-unit':
-        return null; // Rendered outside grid at the top
 
       default:
         return null;
@@ -203,14 +201,14 @@ export function AdminDashboard() {
       {view === 'operational' && <AICopilotWidget />}
 
       {/* Multi-Unit Overview */}
-      {view === 'operational' && (
+      {view === 'operational' && isVisible('multi-unit') && (
         <Suspense fallback={<GenericWidgetSkeleton />}>
           <LazyMultiUnit />
         </Suspense>
       )}
 
       {/* Quick Stats — operational only */}
-      {view === 'operational' && (
+      {view === 'operational' && isVisible('quick-stats') && (
         <Suspense fallback={<QuickStatsSkeleton />}>
           <LazyQuickStats />
         </Suspense>
@@ -224,7 +222,7 @@ export function AdminDashboard() {
 
 
       {/* Finance Hero + Sales Goal — financial */}
-      {view === 'financial' && hasAccess('finance') && (
+      {view === 'financial' && hasAccess('finance') && isVisible('finance') && (
         <DashboardHeroFinance
           balance={stats.monthBalance}
           pendingExpenses={stats.pendingExpenses}
