@@ -8,6 +8,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
 import { SortableList, DragHandle } from '@/components/ui/sortable-list';
 import { cn } from '@/lib/utils';
+import { InventoryReplication } from '@/components/inventory/InventoryReplication';
 
 const colorOptions = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', 
