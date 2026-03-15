@@ -1430,7 +1430,7 @@ ${dataSnapshot}${preferencesBlock}${knowledgeBlock}`;
           model: "google/gemini-2.5-flash",
           messages: currentMessages,
           max_tokens: 1200,
-          tools: TOOLS,
+          tools: activeTools,
         }),
       });
 
