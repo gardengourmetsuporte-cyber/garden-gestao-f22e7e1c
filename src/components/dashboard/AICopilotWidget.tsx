@@ -29,10 +29,13 @@ export function AICopilotWidget() {
     }
   }, [expanded]);
 
-  // Auto-scroll ONLY the messages container (not the page)
+  // Auto-scroll ONLY the messages container (not the page) + keep widget visible
   useEffect(() => {
     if (expanded && messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      setTimeout(() => {
+        widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 100);
     }
   }, [messages, expanded, isLoading]);
 
@@ -40,7 +43,7 @@ export function AICopilotWidget() {
   useEffect(() => {
     if (expanded) {
       requestAnimationFrame(() => {
-        widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
         setTimeout(() => inputRef.current?.focus(), 300);
       });
     }
