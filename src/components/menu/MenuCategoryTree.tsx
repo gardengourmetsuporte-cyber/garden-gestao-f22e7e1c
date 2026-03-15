@@ -199,10 +199,10 @@ export function MenuCategoryTree({
                 className="flex-1 flex items-center gap-3 pl-5 pr-3 py-3.5 text-sm transition-all"
               >
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: `${cat.color || 'hsl(var(--primary))'}15` }}
+                  className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+                  style={{ background: `linear-gradient(135deg, ${cat.color || 'hsl(var(--primary))'}, ${cat.color || 'hsl(var(--primary))'}99)` }}
                 >
-                  <AppIcon name={cat.icon || 'Package'} size={18} style={{ color: cat.color || 'hsl(var(--primary))' }} />
+                  <AppIcon name={cat.icon || 'Package'} size={18} className="text-white" />
                 </div>
                 <div className="flex-1 text-left min-w-0">
                   <p className="font-semibold text-foreground truncate text-[14px]">{cat.name}</p>
