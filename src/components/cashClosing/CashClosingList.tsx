@@ -51,8 +51,8 @@ import { AppIcon } from '@/components/ui/app-icon';
    if (closings.length === 0) {
      return (
        <div className="flex flex-col items-center justify-center py-12 text-center">
-         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-           <AppIcon name="Clock" className="w-8 h-8 text-muted-foreground" />
+         <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg" style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}>
+           <AppIcon name="Clock" className="w-8 h-8 text-white" />
          </div>
          <h3 className="font-medium text-lg mb-1">Nenhum fechamento</h3>
          <p className="text-muted-foreground text-sm">

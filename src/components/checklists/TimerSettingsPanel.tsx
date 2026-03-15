@@ -127,8 +127,8 @@ export function TimerSettingsPanel({ checklistType }: TimerSettingsPanelProps) {
     <div className="rounded-xl border bg-card p-4 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <AppIcon name="Timer" className="w-4 h-4 text-primary" />
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' }}>
+            <AppIcon name="Timer" className="w-5 h-5 text-white" />
           </div>
           <div>
             <p className="font-semibold text-sm text-foreground">Modo Timer</p>

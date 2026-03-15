@@ -202,8 +202,8 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
       {messages.length === 0 && !pendingImage ? (
         <div className="flex-1 flex flex-col items-center justify-center px-4 gap-6">
           <div className="text-center space-y-2">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-              <AppIcon name="Sparkles" size={28} className="text-primary" />
+            <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg" style={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}>
+              <AppIcon name="Sparkles" size={28} className="text-white" />
             </div>
             <h3 className="text-base font-semibold">Assistente de Marketing</h3>
             <p className="text-sm text-muted-foreground max-w-[280px]">

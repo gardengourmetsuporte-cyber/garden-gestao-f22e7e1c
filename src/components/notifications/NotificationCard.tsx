@@ -189,8 +189,8 @@ export function NotificationCard() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="relative">
-            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-              <AppIcon name="Bell" size={16} className="text-primary" />
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+              <AppIcon name="Bell" size={16} className="text-white" />
             </div>
             <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
               {grouped.length}

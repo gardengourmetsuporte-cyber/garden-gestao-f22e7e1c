@@ -30,8 +30,8 @@ export function CustomerAuthBanner({ bonusPoints = 0, onEmailLogin, onSkip }: Pr
     <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 space-y-3">
       {/* Promo header */}
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-          <AppIcon name="CardGiftcard" size={20} className="text-primary" />
+        <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #EF4444)' }}>
+          <AppIcon name="CardGiftcard" size={22} className="text-white" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold text-foreground">
