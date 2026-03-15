@@ -55,27 +55,21 @@ export function AICopilotWidget() {
   };
 
   return (
-    <div className="copilot-widget-root">
+    <div className="copilot-widget-root w-full">
       {/* === COLLAPSED: Modern AI search bar === */}
-      <div
-        className={cn(
-          "transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          expanded ? "max-h-0 opacity-0 scale-95 pointer-events-none overflow-hidden" : "max-h-[200px] opacity-100 scale-100"
-        )}
-      >
-        <div className="copilot-bar-gradient rounded-2xl p-[1px]">
-          <div className="bg-[hsl(var(--background))] rounded-2xl">
+      {!expanded && (
+        <div className="copilot-bar-gradient rounded-2xl p-[1px] animate-fade-in">
+          <div className="bg-background rounded-2xl">
             <form onSubmit={handleSubmit} className="flex items-center gap-3 px-4 py-3">
-              {/* Pulsing mascot */}
               <div className="relative shrink-0">
                 <img src={mascotImg} alt="Copiloto" className="w-9 h-9 rounded-xl object-cover" />
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[hsl(var(--background))] copilot-glow-dot" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-background copilot-glow-dot" />
               </div>
 
               <input
                 value={question}
                 onChange={e => setQuestion(e.target.value)}
-                onFocus={() => !expanded && setExpanded(true)}
+                onFocus={() => setExpanded(true)}
                 placeholder="Pergunte ao Copiloto..."
                 className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 outline-none min-w-0"
               />
@@ -89,7 +83,6 @@ export function AICopilotWidget() {
               </button>
             </form>
 
-            {/* Suggestion chips */}
             <div className="flex gap-2 px-4 pb-3 overflow-x-auto no-scrollbar">
               {SUGGESTIONS.map(s => (
                 <button
@@ -104,22 +97,17 @@ export function AICopilotWidget() {
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* === EXPANDED: Full chat panel === */}
-      <div
-        className={cn(
-          "transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] origin-top",
-          expanded ? "max-h-[600px] opacity-100 scale-100" : "max-h-0 opacity-0 scale-95 pointer-events-none overflow-hidden"
-        )}
-      >
-        <div className="copilot-bar-gradient rounded-2xl p-[1px]">
-          <div className="bg-[hsl(var(--background))] rounded-2xl overflow-hidden flex flex-col" style={{ maxHeight: '500px' }}>
+      {expanded && (
+        <div className="copilot-bar-gradient rounded-2xl p-[1px] animate-scale-in">
+          <div className="bg-background rounded-2xl overflow-hidden flex flex-col" style={{ maxHeight: '500px' }}>
             {/* Header */}
             <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/20">
               <div className="relative">
                 <img src={mascotImg} alt="Copiloto" className="w-8 h-8 rounded-xl object-cover" />
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[hsl(var(--background))]" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-background" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-foreground leading-tight">Copiloto IA</p>
@@ -170,7 +158,6 @@ export function AICopilotWidget() {
                 </div>
               ))}
 
-              {/* Shimmer typing indicator */}
               {isLoading && (
                 <div className="flex justify-start animate-fade-in">
                   <div className="bg-card rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1">
@@ -214,7 +201,7 @@ export function AICopilotWidget() {
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
