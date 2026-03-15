@@ -17,13 +17,13 @@ function AnimatedValue({ value }: { value: number }) {
   return <>{animated}</>;
 }
 
-const STAT_ICONS: Record<string, string> = {
-  criticalItems: statAlert,
-  pendingOrders: statOrders,
-  pendingClosings: statReceipt,
-  pendingRedemptions: statGift,
-  pendingQuotations: statScale,
-  checklist: statChecklist,
+const STAT_ICON_MAP: Record<string, { icon: string; gradient: string }> = {
+  criticalItems: { icon: 'error', gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
+  pendingOrders: { icon: 'restaurant_menu', gradient: 'linear-gradient(135deg, #EC4899, #A855F7)' },
+  pendingClosings: { icon: 'receipt_long', gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
+  pendingRedemptions: { icon: 'redeem', gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+  pendingQuotations: { icon: 'balance', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+  checklist: { icon: 'task_alt', gradient: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' },
 };
 
 const items = [
