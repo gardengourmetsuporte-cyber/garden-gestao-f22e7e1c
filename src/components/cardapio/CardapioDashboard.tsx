@@ -110,8 +110,8 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
             className="bg-secondary/50 rounded-xl p-3 text-left active:scale-[0.97] transition-all"
           >
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                <AppIcon name={stat.icon} size={16} className="text-primary" />
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+                <AppIcon name={stat.icon} size={16} className="text-white" />
               </div>
               <div>
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">{stat.label}</p>
