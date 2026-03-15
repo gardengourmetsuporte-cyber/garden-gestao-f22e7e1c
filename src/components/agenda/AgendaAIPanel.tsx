@@ -144,8 +144,8 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
         {/* Copilot IA Card — clean */}
         <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-secondary/50">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-              <AppIcon name="Sparkles" size={18} className="text-primary" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}>
+              <AppIcon name="Sparkles" size={18} className="text-white" />
             </div>
             <div className="flex flex-col min-w-0">
               <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Copilot IA</span>

@@ -234,10 +234,10 @@ export default function Agenda() {
             <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3.5 rounded-2xl bg-card border border-border/50 hover:border-primary/25 transition-all duration-300 group">
               <div className="flex items-center gap-3.5">
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border shadow-inner"
-                  style={{ backgroundColor: category.color + '15', border: `1px solid ${category.color}30` }}
+                  className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-lg transition-transform duration-300 group-hover:scale-105"
+                  style={{ background: `linear-gradient(135deg, ${category.color}, ${category.color}99)` }}
                 >
-                  <span className="material-symbols-rounded" style={{ fontSize: 20, color: category.color, filter: `drop-shadow(0 0 4px ${category.color}60)` }}>{category.icon || 'folder'}</span>
+                  <span className="material-symbols-rounded text-white" style={{ fontSize: 20 }}>{category.icon || 'folder'}</span>
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="font-semibold text-[15px] leading-tight text-foreground">{category.name}</span>
