@@ -154,7 +154,7 @@ function OrderDetailSheet({
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}
                 >
-                  <AppIcon name="MessageCircle" size={18} />
+                  <AppIcon name="MessageCircle" size={18} className="text-white" />
                 </a>
               )}
             </div>
