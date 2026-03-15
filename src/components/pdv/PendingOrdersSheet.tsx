@@ -132,8 +132,8 @@ function OrderDetailSheet({
           <div className="card-surface rounded-2xl divide-y divide-border/20 overflow-hidden">
             {/* Customer row */}
             <div className="flex items-center gap-3 p-3.5">
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <AppIcon name="User" size={18} className="text-primary" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #3B82F6, #06B6D4)' }}>
+                <AppIcon name="User" size={18} className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-foreground truncate">{order.customer_name || 'Cliente'}</p>
