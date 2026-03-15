@@ -558,8 +558,11 @@ export function ChecklistSettings({
                       onClick={() => toggleSector(sector.id)}
                       className="flex-1 flex items-center gap-3"
                     >
-                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-muted/40">
-                        <AppIcon name={getSectorIcon(sector)} size={20} fill={0} className="text-muted-foreground" />
+                      <div
+                        className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+                        style={{ background: `linear-gradient(135deg, ${sector.color}, ${sector.color}99)` }}
+                      >
+                        <AppIcon name={getSectorIcon(sector)} size={20} fill={0} className="text-white" />
                       </div>
                       <div className="min-w-0">
                         <span className="font-semibold text-sm text-foreground">{sector.name}</span>
