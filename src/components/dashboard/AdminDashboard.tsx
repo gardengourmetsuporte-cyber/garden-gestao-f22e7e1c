@@ -50,7 +50,7 @@ function LazyWidget({ children, fallback }: { children: React.ReactNode; fallbac
 
 type DashboardView = 'operational' | 'financial' | 'service' | 'team';
 
-const OPERATIONAL_WIDGETS = new Set(['checklist', 'quick-stats', 'calendar', 'multi-unit']);
+const OPERATIONAL_WIDGETS = new Set(['calendar']);
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
 const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
