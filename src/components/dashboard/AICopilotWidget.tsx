@@ -29,10 +29,13 @@ export function AICopilotWidget() {
     }
   }, [expanded]);
 
-  // Auto-scroll ONLY the messages container (not the page)
+  // Auto-scroll ONLY the messages container (not the page) + keep widget visible
   useEffect(() => {
     if (expanded && messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      setTimeout(() => {
+        widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 100);
     }
   }, [messages, expanded, isLoading]);
 
