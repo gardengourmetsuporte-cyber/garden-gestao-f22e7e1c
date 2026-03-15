@@ -39,13 +39,13 @@ export function QuickStats({ stats, columns = 2 }: QuickStatsProps) {
     )}>
       {stats.map((stat, index) => {
         const variant = stat.variant || 'default';
-        const style = variantIcon[variant];
+        const style = variantStyles[variant];
 
         return (
           <div key={index} className="bg-card rounded-2xl p-3.5 border border-border/40">
             <div className="flex items-center gap-3">
-              <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", style.bg)}>
-                <AppIcon name={stat.icon} size={18} className={style.color} />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: style.gradient }}>
+                <AppIcon name={stat.icon} size={20} className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-lg font-bold tabular-nums leading-none tracking-tight">
