@@ -32,8 +32,8 @@ export function ServiceDeliveryStatus({ deliveries, hubOrders }: { deliveries: A
           <h3 className="text-sm font-semibold text-foreground">Entregas</h3>
         </div>
         <div className="flex flex-col items-center py-6 gap-1.5">
-          <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center">
-            <AppIcon name="local_shipping" size={20} className="text-muted-foreground/50" />
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #6B7280, #9CA3AF)' }}>
+            <AppIcon name="local_shipping" size={20} className="text-white" />
           </div>
           <p className="text-xs text-muted-foreground">Nenhuma entrega ativa</p>
         </div>
