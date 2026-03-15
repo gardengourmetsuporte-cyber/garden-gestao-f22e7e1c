@@ -263,12 +263,12 @@ export default function OrdersPage() {
           {/* Navigation Grid 2x3 */}
           {(() => {
             const tabs = [
-              { key: 'to-order' as const, label: 'Sugestões', icon: 'Package', badge: lowStockItems.length || undefined },
-              { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined },
-              { key: 'orders' as const, label: 'Pedidos', icon: 'ClipboardList', badge: pendingOrders.length || undefined },
-              { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined },
-              { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: undefined },
-              { key: 'production' as const, label: 'Produção', icon: 'ChefHat', badge: undefined },
+              { key: 'to-order' as const, label: 'Sugestões', icon: 'Package', badge: lowStockItems.length || undefined, gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+              { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+              { key: 'orders' as const, label: 'Pedidos', icon: 'ClipboardList', badge: pendingOrders.length || undefined, gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
+              { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, gradient: 'linear-gradient(135deg, #8B5CF6, #EC4899)' },
+              { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: undefined, gradient: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' },
+              { key: 'production' as const, label: 'Produção', icon: 'ChefHat', badge: undefined, gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
             ];
 
             return (
@@ -286,15 +286,14 @@ export default function OrdersPage() {
                           : "bg-secondary/50 hover:bg-secondary/70"
                       )}
                     >
-                      <div className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
-                        isActive ? "bg-primary/15" : "bg-secondary/60"
-                      )}>
-                        <AppIcon
-                          name={tab.icon}
-                          size={20}
-                          className={isActive ? "text-primary" : "text-muted-foreground"}
-                        />
+                      <div
+                        className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg transition-opacity"
+                        style={{
+                          background: tab.gradient,
+                          opacity: isActive ? 1 : 0.45,
+                        }}
+                      >
+                        <AppIcon name={tab.icon} size={20} className="text-white" />
                       </div>
                       <span className={cn(
                         "text-[11px] font-semibold leading-tight text-center",
