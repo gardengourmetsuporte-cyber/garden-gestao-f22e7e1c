@@ -135,8 +135,8 @@ export function CardapioDashboard({ onNavigate, unitId, menuLoading, products, g
               onClick={() => onNavigate('produtos')}
               className="w-full flex items-center gap-3 bg-secondary/50 rounded-xl p-3 text-left active:scale-[0.97] transition-all"
             >
-              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                <AppIcon name="EyeOff" size={16} className="text-muted-foreground" />
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #6B7280, #9CA3AF)' }}>
+                <AppIcon name="EyeOff" size={16} className="text-white" />
               </div>
               <div className="flex-1">
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Desativados</p>
