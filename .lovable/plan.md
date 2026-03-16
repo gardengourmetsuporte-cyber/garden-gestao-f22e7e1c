@@ -1,79 +1,50 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+# Central de Replicação entre Unidades
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+## Problema
+Hoje a replicação está espalhada: estoque fica em Configurações > Categorias, cardápio tem botão próprio no CardapioHub, e checklist tem o `ChecklistClone` nas configurações de checklist. Não existe replicação para fornecedores nem categorias financeiras. O usuário quer um lugar centralizado para escolher o que replicar.
 
----
+## Solução
+Criar uma nova seção **"Replicar Dados"** nas Configurações (seção "Sistema"), com uma interface unificada onde o usuário seleciona a unidade de origem/destino e marca quais módulos quer copiar.
 
-## Bloco de Relatórios Avançados ✅
+## Módulos replicáveis
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+| Módulo | O que copia | Comportamento |
+|--------|------------|---------------|
+| **Estoque** | Categorias + produtos (sem saldo) | Ignora duplicatas por nome |
+| **Fornecedores** | Cadastro de fornecedores | Ignora duplicatas por nome |
+| **Checklists** | Setores, subcategorias e itens | Cópia completa |
+| **Categorias Financeiras** | Árvore de categorias (receita/despesa) | Ignora duplicatas por nome |
+| **Cardápio** | Categorias, grupos e produtos | Substitui tudo na unidade destino |
 
-## Dashboard Analytics ✅
+## Interface
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+- Select de unidade de origem
+- Seta indicando direção (origem → unidade ativa)
+- Grid de cards com checkbox para cada módulo (ícone colorido, nome, descrição curta)
+- Botão "Replicar Selecionados" com AlertDialog de confirmação
+- Resultado com contadores por módulo
 
-## Operacional ✅
+## Implementação técnica
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+1. **Novo componente** `src/components/settings/DataReplication.tsx`
+   - Componente centralizado que orquestra toda a replicação
+   - Cada módulo tem sua função async de replicação interna
+   - Reutiliza lógica já existente dos componentes `InventoryReplication`, `ChecklistClone`, `MenuReplication`
 
-## CRM / Clientes ✅
+2. **Novo item no menu de Configurações** (`Settings.tsx`)
+   - Adicionar `{ value: 'replication', icon: 'Copy', label: 'Replicar Dados', description: 'Copiar dados entre lojas', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' }`
+   - Lazy load do `DataReplication`
+   - Visível apenas para admins com mais de 1 unidade
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+3. **Lógica de replicação de fornecedores** (nova)
+   - Busca `suppliers` da unidade origem
+   - Insere na unidade destino ignorando duplicatas por nome
 
-## Funcionários ✅
+4. **Lógica de replicação de categorias financeiras** (nova)
+   - Busca `finance_categories` da unidade origem (com hierarquia parent_id)
+   - Insere na unidade destino mapeando parent_id, ignorando duplicatas por nome+tipo
 
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
+5. **Remover** `InventoryReplication` do `CategorySettings.tsx` (fica só no hub centralizado)
 
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
