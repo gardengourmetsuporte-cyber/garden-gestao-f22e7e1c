@@ -35,6 +35,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
   }, [activeTab, tabs]);
 
   const isCompact = tabs.length >= 4;
+  const hideIcons = tabs.length >= 6;
 
   return (
     <div
