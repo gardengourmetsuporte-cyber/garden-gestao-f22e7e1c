@@ -216,15 +216,27 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
     <div className="space-y-0">
       {/* ─── Sticky Header ─── */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pt-2 pb-3 space-y-3">
-        {/* Date Strip */}
-        <UnifiedDateStrip
-          days={days}
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-          getDayIndicators={getDayIndicators}
-        />
-
-        {/* Channel Pills — Spotify style */}
+        {/* Date Filter Chips */}
+        <div className="flex items-center gap-2 px-4">
+          {([
+            { key: 'hoje' as const, label: 'Hoje' },
+            { key: 'ontem' as const, label: 'Ontem' },
+            { key: 'semana' as const, label: 'Últimos 7 dias' },
+          ]).map(f => (
+            <button
+              key={f.key}
+              onClick={() => setDateFilter(f.key)}
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-semibold transition-all active:scale-[0.96]",
+                dateFilter === f.key
+                  ? "bg-primary/15 text-primary"
+                  : "bg-secondary/40 text-muted-foreground"
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-4">
           {CHANNELS.map(ch => {
             const active = channel === ch.id;
