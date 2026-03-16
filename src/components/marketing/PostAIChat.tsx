@@ -129,71 +129,35 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
         const errData = await resp.json().catch(() => ({}));
         throw new Error(errData.error || `Erro ${resp.status}`);
       }
-      if (!resp.body) throw new Error('No stream');
 
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      const upsertAssistant = (text: string, postData?: PostData) => {
-        setMessages(prev => {
-          const last = prev[prev.length - 1];
-          if (last?.role === 'assistant') {
-            return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: text, postData: postData || m.postData } : m);
-          }
-          return [...prev, { role: 'assistant', content: text, postData }];
-        });
-      };
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        let newlineIdx: number;
-        while ((newlineIdx = buffer.indexOf('\n')) !== -1) {
-          let line = buffer.slice(0, newlineIdx);
-          buffer = buffer.slice(newlineIdx + 1);
-          if (line.endsWith('\r')) line = line.slice(0, -1);
-          if (!line.startsWith('data: ')) continue;
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === '[DONE]') break;
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const delta = parsed.choices?.[0]?.delta;
-            if (delta?.content) {
-              assistantContent += delta.content;
-              upsertAssistant(assistantContent);
-            }
-            if (delta?.tool_calls) {
-              isToolCall = true;
-              for (const tc of delta.tool_calls) {
-                if (tc.function?.arguments) {
-                  toolCallArgs += tc.function.arguments;
-                }
-              }
-            }
-          } catch {
-            buffer = line + '\n' + buffer;
-            break;
-          }
+      const data = await resp.json();
+      const responseText = data.suggestion || 'Desculpe, não consegui gerar uma resposta.';
+      
+      // Check if response contains a marketing post (tool call result)
+      let postData: PostData | undefined;
+      
+      // Try to detect structured post data from the response
+      const titleMatch = responseText.match(/\*\*(.+?)\*\*/);
+      if (data.action_executed && titleMatch) {
+        // The AI executed create_marketing_post tool
+        // Extract post data from the formatted response
+        const captionMatch = responseText.match(/📌.*?\n\n([\s\S]*?)(?:\n\n🏷️|$)/);
+        const tagsMatch = responseText.match(/🏷️ Tags: (.+)/);
+        const imagePromptMatch = responseText.match(/🎨 Prompt de imagem: (.+)/);
+        const bestTimeMatch = responseText.match(/⏰ Melhor horário: (.+)/);
+        
+        if (captionMatch) {
+          postData = {
+            title: titleMatch[1],
+            caption: captionMatch[1].trim(),
+            tags: tagsMatch ? tagsMatch[1].split(', ') : [],
+            image_prompt: imagePromptMatch ? imagePromptMatch[1] : '',
+            best_time: bestTimeMatch ? bestTimeMatch[1] : undefined,
+          };
         }
       }
 
-      if (isToolCall && toolCallArgs) {
-        try {
-          const postData: PostData = JSON.parse(toolCallArgs);
-          const summary = `✅ **Post criado!**\n\n**${postData.title}**\n\n${postData.caption}\n\n${postData.best_time ? `⏰ Melhor horário: ${postData.best_time}` : ''}`;
-          upsertAssistant(summary, postData);
-        } catch (e) {
-          console.error('Failed to parse tool call:', e);
-        }
-      }
-
-      if (!assistantContent && !isToolCall) {
-        upsertAssistant('Desculpe, não consegui gerar uma resposta. Tente novamente.');
-      }
+      setMessages(prev => [...prev, { role: 'assistant', content: responseText, postData }]);
     } catch (e: any) {
       console.error('Chat error:', e);
       toast.error(e.message || 'Erro ao conversar com a IA');
