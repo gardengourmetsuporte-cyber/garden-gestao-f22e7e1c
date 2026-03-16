@@ -78,6 +78,7 @@ const PLAN_LABELS: Record<PlanTier, string> = {
 
 export default function SettingsPage() {
   const { isAdmin, isSuperAdmin, hasPlan } = useAuth();
+  const { units } = useUnit();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState<string | null>(
