@@ -238,7 +238,7 @@ export function AICopilotWidget() {
 
               {/* Typing indicator */}
               {isLoading && (
-                <div className="flex justify-start gap-2.5 copilot-msg-enter">
+                <div className="flex justify-start gap-2.5 animate-in fade-in duration-150">
                   <img src={mascotImg} alt="" className="w-6 h-6 rounded-lg object-cover mt-0.5 shrink-0 ring-1 ring-border/10" />
                   <div className="copilot-bubble-ai rounded-2xl rounded-tl-lg px-4 py-3.5">
                     <div className="copilot-typing-dots flex gap-1.5">
