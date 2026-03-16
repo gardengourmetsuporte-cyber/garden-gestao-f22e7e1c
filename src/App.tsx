@@ -81,7 +81,6 @@ const PDV = lazy(() => lazyRetry(() => import("./pages/PDV")));
 
 const Landing = lazy(() => lazyRetry(() => import("./pages/Landing")));
 const Copilot = lazy(() => lazyRetry(() => import("./pages/Copilot")));
-const CopilotSettings = lazy(() => lazyRetry(() => import("./pages/CopilotSettings")));
 
 const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
 
