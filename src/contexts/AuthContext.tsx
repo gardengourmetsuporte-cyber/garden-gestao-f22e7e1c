@@ -21,6 +21,7 @@ interface AuthContextType {
   isFree: boolean;
   hasPlan: (required: PlanTier) => boolean;
   setEffectivePlan: (plan: PlanTier) => void;
+  setUnitRole: (unitRole: string | null) => void;
   refreshSubscription: () => Promise<void>;
   refreshUserData: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
@@ -60,6 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [planStatus, setPlanStatus] = useState<string>(cached?.planStatus ?? 'active');
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Unit-level role set by UnitContext to override global isAdmin determination
+  const [unitRole, setUnitRoleState] = useState<string | null>(null);
   const subIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchUserDataRef = useRef<(userId: string) => Promise<void>>();
   // Track whether a fetchUserData call is in-flight to prevent double calls
@@ -363,12 +366,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPlan('free');
     setPlanStatus('active');
     setSubscriptionEnd(null);
+    setUnitRoleState(null);
     effectivePlanRef.current = null;
     clearCachedAuth();
   };
 
-  const isAdmin = role === 'admin' || role === 'super_admin';
+  // isAdmin is derived from unit-level role when available, with fallback to global role
+  // super_admin always has admin access regardless of unit role
   const isSuperAdmin = role === 'super_admin';
+  const isAdmin = isSuperAdmin || (
+    unitRole !== null
+      ? (unitRole === 'owner' || unitRole === 'admin')
+      : (role === 'admin')
+  );
   const isPro = plan === 'pro' || plan === 'business';
   const isBusiness = plan === 'business';
   const isFree = plan === 'free';
@@ -380,6 +390,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPlan(newPlan);
     setCachedAuth(profile, role, newPlan, planStatus);
   }, [profile, role, planStatus]);
+
+  const setUnitRole = useCallback((newUnitRole: string | null) => {
+    setUnitRoleState(newUnitRole);
+  }, []);
 
   const refreshUserData = useCallback(async () => {
     if (user) {
@@ -407,6 +421,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isFree,
         hasPlan,
         setEffectivePlan,
+        setUnitRole,
         refreshSubscription,
         refreshUserData,
         signIn,

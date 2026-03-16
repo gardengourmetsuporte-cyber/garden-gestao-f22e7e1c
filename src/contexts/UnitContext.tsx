@@ -46,7 +46,7 @@ const UnitContext = createContext<UnitContextType | undefined>(undefined);
 const ACTIVE_UNIT_KEY = 'garden_active_unit_id';
 
 export function UnitProvider({ children }: { children: ReactNode }) {
-  const { user, isSuperAdmin, isLoading: authLoading, setEffectivePlan, refreshUserData } = useAuth();
+  const { user, isSuperAdmin, isLoading: authLoading, setEffectivePlan, setUnitRole, refreshUserData } = useAuth();
   const queryClient = useQueryClient();
   const [units, setUnits] = useState<Unit[]>([]);
   const [activeUnitId, setActiveUnitIdState] = useState<string | null>(null);
@@ -242,6 +242,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!activeUnitId || !user) {
       setUserUnitRole(null);
+      setUnitRole(null);
       return;
     }
     let cancelled = false;
@@ -254,7 +255,11 @@ export function UnitProvider({ children }: { children: ReactNode }) {
       .eq('user_id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (!cancelled) setUserUnitRole(data?.role ?? null);
+        if (!cancelled) {
+          const r = data?.role ?? null;
+          setUserUnitRole(r);
+          setUnitRole(r); // Propagate to AuthContext for isAdmin derivation
+        }
       });
 
     // Fetch effective plan
