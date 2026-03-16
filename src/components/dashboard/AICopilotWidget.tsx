@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useManagementAI } from '@/hooks/useManagementAI';
 import { cn } from '@/lib/utils';
