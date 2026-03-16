@@ -42,22 +42,13 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
       {/* Header */}
       <div className="flex items-center justify-between border-0">
         <span className="text-sm font-bold text-foreground">Finanças</span>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setVisible(!visible)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
-            aria-label={visible ? 'Ocultar valores' : 'Mostrar valores'}
-          >
-            <AppIcon name={visible ? 'Eye' : 'EyeOff'} size={15} className="text-muted-foreground" />
-          </button>
-          <button
-            onClick={() => navigate('/finance')}
-            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
-            aria-label="Ir para finanças"
-          >
-            <AppIcon name="ArrowRight" size={15} className="text-muted-foreground" />
-          </button>
-        </div>
+        <button
+          onClick={() => navigate('/finance')}
+          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
+          aria-label="Ir para finanças"
+        >
+          <AppIcon name="ArrowRight" size={15} className="text-muted-foreground" />
+        </button>
       </div>
 
       {/* === HERO BALANCE CARD === */}
