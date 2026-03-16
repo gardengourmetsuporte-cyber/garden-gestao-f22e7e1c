@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
-import { startOfDay, subDays, isWithinInterval, format, isToday as isDateToday, eachDayOfInterval } from 'date-fns';
+import { useState, useMemo } from 'react';
+import { startOfDay, subDays, isWithinInterval, format, isToday as isDateToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
