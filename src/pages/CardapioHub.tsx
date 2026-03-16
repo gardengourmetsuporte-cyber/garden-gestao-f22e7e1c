@@ -359,10 +359,6 @@ export default function CardapioHub() {
             />
           )}
 
-          {/* ==================== REPLICAR ==================== */}
-          {cardapioTab === 'replicar' && (
-            <MenuReplication />
-          )}
         </div>
       </div>
 
