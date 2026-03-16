@@ -334,7 +334,7 @@ export default function CopilotPage() {
         />
 
         {/* Input bar */}
-        <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3">
+        <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] mb-[64px] lg:mb-0">
           <form onSubmit={handleSubmit} className="flex gap-2 items-center">
             <Button
               type="button"
