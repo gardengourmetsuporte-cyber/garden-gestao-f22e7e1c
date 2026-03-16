@@ -238,6 +238,7 @@ function PublicRoutes() {
         <Route path="/gamification/:unitId" element={<TabletGames />} />
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
         <Route path="/fornecedor/:token" element={<SupplierPortal />} />
+        <Route path="/pesquisa/:token" element={<PriceSurveyPublic />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/invite" element={<PublicWithAuth><RouteErrorBoundary><Invite /></RouteErrorBoundary></PublicWithAuth>} />
         <Route path="/share-receipt" element={<ShareReceiptHandler />} />
