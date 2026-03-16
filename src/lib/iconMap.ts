@@ -398,4 +398,6 @@ export const ICON_MAP: Record<string, string> = {
   Restaurant: 'restaurant',
   Newspaper: 'newspaper',
   ScanLine: 'document_scanner',
+  Wand2: 'auto_fix_high',
+  ImagePlus: 'add_photo_alternate',
 };
