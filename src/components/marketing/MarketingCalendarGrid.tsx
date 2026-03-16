@@ -89,7 +89,7 @@ export function MarketingCalendarGrid({ posts, onEdit, onDelete, onPublish, onNe
   return (
     <div className="space-y-3">
       {/* Month Navigation */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-center px-1">
         <UnifiedMonthNav
           currentMonth={currentMonth}
           onMonthChange={setCurrentMonth}
