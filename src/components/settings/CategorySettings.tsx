@@ -124,8 +124,6 @@ export function CategorySettings() {
           </div>
         </SheetContent>
       </Sheet>
-
-      <InventoryReplication />
     </div>
   );
 }
