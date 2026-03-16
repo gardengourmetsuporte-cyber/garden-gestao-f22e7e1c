@@ -14,6 +14,8 @@ interface Props {
 
 export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
   const [search, setSearch] = useState('');
+
+  const inventoryItems: any[] = survey.inventoryItems || [];
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
 
   const surveySuppliers = survey.price_survey_suppliers || [];
