@@ -96,8 +96,8 @@ function AnimatedCurrency({ value }: { value: number }) {
         </button>
 
         <div className="text-center flex-1">
-          <h3 className="text-sm font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Resumo da Semana</h3>
-          <span className="text-[10px] text-muted-foreground">
+          <h3 className="text-sm font-bold text-white font-display" style={{ letterSpacing: '-0.02em' }}>Resumo da Semana</h3>
+          <span className="text-[10px] text-white/50">
             {summary.weekLabel} • {summary.count} fechamento{summary.count !== 1 ? 's' : ''}
           </span>
         </div>
