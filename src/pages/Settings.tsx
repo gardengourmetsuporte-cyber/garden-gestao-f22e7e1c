@@ -154,6 +154,7 @@ export default function SettingsPage() {
       {activeSection === 'cardapio-digital' && <CardapioSettings />}
       {activeSection === 'loyalty' && <LoyaltySettings />}
       {activeSection === 'system-backup' && <SystemBackupSettings />}
+      {activeSection === 'replication' && <DataReplication />}
     </Suspense>
   ) : null;
 
