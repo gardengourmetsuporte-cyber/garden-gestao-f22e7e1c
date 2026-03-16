@@ -186,18 +186,22 @@ export default function OrdersPage() {
     return phone.replace(/\D/g, '').length >= 10;
   };
 
-  const handleSendWhatsApp = async (order: Order) => {
-    if (!order.supplier?.phone || !hasValidWhatsApp(order.supplier.phone)) {
-      toast.error('Fornecedor sem WhatsApp cadastrado');
-      return;
-    }
+  const openWhatsApp = (order: Order) => {
     const itemsList = order.order_items?.map(oi => {
       const unit = oi.item?.unit_type === 'kg' ? 'kg' : oi.item?.unit_type === 'litro' ? 'L' : 'un';
       return `• ${oi.item?.name}: ${oi.quantity} ${unit}`;
     }).join('\n');
     const message = `*Pedido de Compra*\n\nOlá! Gostaria de fazer o seguinte pedido:\n\n${itemsList}\n\n${order.notes ? `Obs: ${order.notes}` : ''}`;
-    const phone = formatPhoneForWhatsApp(order.supplier.phone);
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    const phone = formatPhoneForWhatsApp(order.supplier!.phone);
+    const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+    window.location.href = url;
+  };
+
+  const handleSendWhatsApp = async (order: Order) => {
+    if (!order.supplier?.phone || !hasValidWhatsApp(order.supplier.phone)) {
+      toast.error('Fornecedor sem WhatsApp cadastrado');
+      return;
+    }
 
     // Update status BEFORE opening WhatsApp to avoid losing state on iOS
     try {
@@ -207,14 +211,15 @@ export default function OrdersPage() {
       toast.error('Pedido enviado mas houve erro ao atualizar o status');
     }
 
-    // Use anchor click for reliable mobile behavior (avoids blank page on iOS return)
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => document.body.removeChild(a), 100);
+    openWhatsApp(order);
+  };
+
+  const handleResendWhatsApp = (order: Order) => {
+    if (!order.supplier?.phone || !hasValidWhatsApp(order.supplier.phone)) {
+      toast.error('Fornecedor sem WhatsApp cadastrado');
+      return;
+    }
+    openWhatsApp(order);
   };
 
   const handleReceiveOrder = async (orderId: string, receivedItems: { itemId: string; quantity: number }[]) => {
@@ -572,15 +577,27 @@ export default function OrdersPage() {
                                       )
                                     )}
                                     {order.status === 'sent' && (
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={(e) => { e.stopPropagation(); setOrderToReceive(order); setReceiveOrderOpen(true); }}
-                                        className="gap-1.5 rounded-xl bg-success/10 hover:bg-success/20 text-success border-success/30"
-                                      >
-                                        <AppIcon name="PackageCheck" size={16} />
-                                        Receber
-                                      </Button>
+                                      <>
+                                        {hasValidWhatsApp(order.supplier?.phone || null) && (
+                                          <Button
+                                            size="sm"
+                                            onClick={(e) => { e.stopPropagation(); handleResendWhatsApp(order); }}
+                                            className="gap-1.5 rounded-xl bg-[#25D366] hover:bg-[#1da851] text-white"
+                                          >
+                                            <img src="/icons/whatsapp.png" alt="" className="w-4 h-4" />
+                                            Reenviar
+                                          </Button>
+                                        )}
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={(e) => { e.stopPropagation(); setOrderToReceive(order); setReceiveOrderOpen(true); }}
+                                          className="gap-1.5 rounded-xl bg-success/10 hover:bg-success/20 text-success border-success/30"
+                                        >
+                                          <AppIcon name="PackageCheck" size={16} />
+                                          Receber
+                                        </Button>
+                                      </>
                                     )}
                                     <Button
                                       size="sm"
