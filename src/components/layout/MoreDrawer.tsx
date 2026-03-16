@@ -281,9 +281,9 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                           : 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted) / 0.6))'
                       }}>
                         {item.customIcon ? (
-                          <img src={item.customIcon} alt="" className={cn("w-5 h-5 transition-all", item.keepIconColor ? "" : active ? "icon-tint-white" : "icon-tint-white")} />
+                          <img src={item.customIcon} alt="" className={cn("w-5 h-5 transition-all", item.keepIconColor ? "" : active ? "icon-tint-white" : "icon-tint-foreground")} />
                         ) : (
-                          <AppIcon name={item.icon} size={20} fill={1} className={cn("transition-colors duration-300", active ? "text-white" : "text-foreground/80")} />
+                          <AppIcon name={item.icon} size={20} fill={active ? 1 : 0} className={cn("transition-colors duration-300", active ? "text-white" : "text-foreground/70")} />
                         )}
                       </div>
                       {locked && (
