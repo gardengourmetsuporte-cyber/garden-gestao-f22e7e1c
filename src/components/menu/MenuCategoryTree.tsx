@@ -342,14 +342,20 @@ export function MenuCategoryTree({
                               <DropdownMenuItem onClick={() => {
                                 onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
                               }}>
-                                <AppIcon name={avail?.tablet ? 'CheckCircle2' : 'XCircle'} size={14} className="mr-2" />
-                                Mesa {avail?.tablet ? '(ativo)' : '(inativo)'}
+                                <div className={cn("w-2 h-2 rounded-full mr-2", avail?.tablet ? "bg-primary" : "bg-muted-foreground/30")} />
+                                Mesa
+                                <span className={cn("ml-auto text-[10px] font-semibold", avail?.tablet ? "text-primary" : "text-muted-foreground")}>
+                                  {avail?.tablet ? 'ON' : 'OFF'}
+                                </span>
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => {
                                 onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
                               }}>
-                                <AppIcon name={avail?.delivery ? 'CheckCircle2' : 'XCircle'} size={14} className="mr-2" />
-                                Delivery {avail?.delivery ? '(ativo)' : '(inativo)'}
+                                <div className={cn("w-2 h-2 rounded-full mr-2", avail?.delivery ? "bg-primary" : "bg-muted-foreground/30")} />
+                                Delivery
+                                <span className={cn("ml-auto text-[10px] font-semibold", avail?.delivery ? "text-primary" : "text-muted-foreground")}>
+                                  {avail?.delivery ? 'ON' : 'OFF'}
+                                </span>
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => openEditGroup(grp)}>
                                 <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
