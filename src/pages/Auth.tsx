@@ -146,10 +146,9 @@ function MobileBrandHeader() {
       <div className="relative z-10 flex flex-col items-center gap-6 pt-16 pb-12">
         {/* Logo with entrance animation */}
         <div
-          className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]"
+          className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.1s_both] bg-card border-[3px] border-background/80 dark:bg-foreground dark:border-0"
           style={{
-            background: 'hsl(var(--foreground))',
-            boxShadow: '0 0 80px hsl(var(--primary) / 0.15), 0 16px 50px rgba(0,0,0,0.8)',
+            boxShadow: '0 0 60px hsl(var(--primary) / 0.2), 0 12px 40px rgba(0,0,0,0.15)',
           }}
         >
           <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
