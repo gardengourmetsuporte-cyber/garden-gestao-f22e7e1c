@@ -518,15 +518,35 @@ export default function OrdersPage() {
                                  <div className="border-t border-border/50 px-4 py-3 space-y-3">
                                    {/* Items */}
                                    <div className="space-y-1.5">
-                                     {order.order_items?.map(oi => (
-                                       <div key={oi.id} className="flex items-center justify-between py-1.5">
-                                        <span className="text-sm text-foreground">{oi.item?.name}</span>
-                                        <span className="text-xs font-semibold text-muted-foreground px-2 py-0.5 rounded-full bg-secondary">
-                                          ×{oi.quantity} {oi.item?.unit_type}
-                                        </span>
-                                      </div>
-                                    ))}
-                                  </div>
+                                     {order.order_items?.map((oi: any) => {
+                                       const price = oi.unit_price || 0;
+                                       const total = price * oi.quantity;
+                                       return (
+                                        <div key={oi.id} className="flex items-center justify-between py-1.5">
+                                         <span className="text-sm text-foreground">{oi.item?.name}</span>
+                                         <div className="flex items-center gap-2">
+                                           <span className="text-xs font-semibold text-muted-foreground px-2 py-0.5 rounded-full bg-secondary">
+                                             ×{oi.quantity} {oi.item?.unit_type}
+                                           </span>
+                                           {price > 0 && (
+                                             <span className="text-xs font-semibold text-foreground">
+                                               R$ {total.toFixed(2)}
+                                             </span>
+                                           )}
+                                         </div>
+                                       </div>
+                                       );
+                                     })}
+                                     {(() => {
+                                       const orderTotal = (order.order_items || []).reduce((sum: number, oi: any) => sum + (oi.unit_price || 0) * oi.quantity, 0);
+                                       return orderTotal > 0 ? (
+                                         <div className="flex items-center justify-between pt-2 border-t border-border/30">
+                                           <span className="text-sm font-bold text-foreground">Total</span>
+                                           <span className="text-sm font-bold text-primary">R$ {orderTotal.toFixed(2)}</span>
+                                         </div>
+                                       ) : null;
+                                     })()}
+                                   </div>
 
                                   {/* Actions */}
                                    <div className="flex items-center gap-2 pt-1 border-t border-border/50">
