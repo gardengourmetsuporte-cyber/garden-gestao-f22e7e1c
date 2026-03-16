@@ -116,17 +116,18 @@ export function usePriceSurveys() {
 
     if (!survey) return null;
 
+    const unitId = (survey as any).unit_id;
     const supplierIds = ((survey as any).price_survey_suppliers || []).map((s: any) => s.id);
-    let responses: any[] = [];
-    if (supplierIds.length > 0) {
-      const { data } = await supabase
-        .from('price_survey_responses' as any)
-        .select('*')
-        .in('survey_supplier_id', supplierIds);
-      responses = data || [];
-    }
+    
+    // Fetch responses and inventory items in parallel
+    const [responsesResult, itemsResult] = await Promise.all([
+      supplierIds.length > 0
+        ? supabase.from('price_survey_responses' as any).select('*').in('survey_supplier_id', supplierIds)
+        : Promise.resolve({ data: [] }),
+      supabase.from('inventory_items').select('id, name, unit_type, category_id, category:categories(id, name, color)').eq('unit_id', unitId),
+    ]);
 
-    return { ...(survey as object), responses } as any;
+    return { ...(survey as object), responses: responsesResult.data || [], inventoryItems: itemsResult.data || [] } as any;
   };
 
   return {
