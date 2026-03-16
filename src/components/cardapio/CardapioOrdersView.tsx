@@ -230,10 +230,10 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
                 key={ch.id}
                 onClick={() => setChannel(ch.id)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all",
+                  "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all active:scale-[0.97]",
                   active
-                    ? "bg-foreground text-background"
-                    : "bg-foreground/[0.07] text-muted-foreground backdrop-blur-sm"
+                    ? "bg-primary/15 text-primary"
+                    : "bg-secondary/40 text-muted-foreground"
                 )}
               >
                 {ch.label}
