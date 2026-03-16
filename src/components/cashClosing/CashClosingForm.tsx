@@ -633,21 +633,21 @@ export function CashClosingForm({ onSuccess }: Props) {
               </div>
             </div>
           ) : (
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button
                 variant="outline"
-                className="flex-1 h-32 border-dashed flex flex-col gap-2"
+                className="flex-1 h-12 border-dashed gap-2"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <AppIcon name="ScanLine" className="w-7 h-7 text-muted-foreground" />
+                <AppIcon name="ScanLine" className="w-4 h-4 text-muted-foreground" />
                 <span className="text-muted-foreground text-sm">Scanner</span>
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 h-32 border-dashed flex flex-col gap-2"
+                className="flex-1 h-12 border-dashed gap-2"
                 onClick={() => galleryInputRef.current?.click()}
               >
-                <AppIcon name="Upload" className="w-7 h-7 text-muted-foreground" />
+                <AppIcon name="Upload" className="w-4 h-4 text-muted-foreground" />
                 <span className="text-muted-foreground text-sm">Galeria / Arquivo</span>
               </Button>
             </div>
