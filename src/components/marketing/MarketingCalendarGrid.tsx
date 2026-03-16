@@ -63,7 +63,7 @@ export function MarketingCalendarGrid({ posts, onEdit, onDelete, onPublish, onNe
     return (
       <>
         {specialDate && (
-          <span className="text-[10px] absolute top-0.5 right-1" title={specialDate.title}>{specialDate.emoji}</span>
+          <span className="text-[10px] absolute -top-0.5 -right-0.5 z-10" title={specialDate.title}>{specialDate.emoji}</span>
         )}
         <div className="space-y-0.5 mt-0.5">
           {dayPosts.slice(0, maxChips).map(p => (
