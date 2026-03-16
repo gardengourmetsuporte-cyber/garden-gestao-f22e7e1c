@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
-import { startOfDay, subDays, isWithinInterval, format, isToday as isDateToday, eachDayOfInterval } from 'date-fns';
+import { useState, useMemo } from 'react';
+import { startOfDay, subDays, isWithinInterval, format, isToday as isDateToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppIcon } from '@/components/ui/app-icon';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { UnifiedDateStrip } from '@/components/ui/unified-date-strip';
+
 import { formatCurrency } from '@/lib/format';
 import type { HubOrder } from '@/hooks/useDeliveryHub';
 
@@ -138,14 +138,13 @@ function mapToFlowStatus(status: string): typeof STATUS_FLOW[number] {
 /* ─── Main Component ─── */
 export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   const [channel, setChannel] = useState<Channel>('todos');
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [dateFilter, setDateFilter] = useState<'hoje' | 'ontem' | 'semana'>('hoje');
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
 
-  // Generate 14 days for the strip (7 past + today + 6 future)
-  const days = useMemo(() => {
-    const today = new Date();
-    return eachDayOfInterval({ start: subDays(today, 7), end: today });
-  }, []);
+  const selectedDate = useMemo(() => {
+    if (dateFilter === 'ontem') return subDays(new Date(), 1);
+    return new Date();
+  }, [dateFilter]);
 
   const allOrders = useMemo(() => {
     const normalized = normalizeHubOrders(hubOrders);
@@ -154,11 +153,16 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
 
   // Filter by selected date
   const dateRange = useMemo(() => {
+    if (dateFilter === 'semana') {
+      const end = new Date();
+      end.setDate(end.getDate() + 1);
+      return { start: startOfDay(subDays(new Date(), 6)), end };
+    }
     const start = startOfDay(selectedDate);
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
     return { start, end };
-  }, [selectedDate]);
+  }, [selectedDate, dateFilter]);
 
   const channelCounts = useMemo(() => {
     const counts: Record<Channel, number> = { todos: 0, delivery: 0, mesa: 0, balcao: 0, ifood: 0 };
@@ -195,32 +199,32 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
     return { active, done, revenue };
   }, [grouped, filtered]);
 
-  // Day indicators for the date strip
-  const getDayIndicators = useCallback((day: Date) => {
-    const dayStart = startOfDay(day);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setDate(dayEnd.getDate() + 1);
-    const count = allOrders.filter(o => {
-      const d = new Date(o.created_at);
-      return isWithinInterval(d, { start: dayStart, end: dayEnd });
-    }).length;
-    if (count > 0) return [{ color: 'hsl(var(--primary))' }];
-    return [];
-  }, [allOrders]);
 
   return (
     <div className="space-y-0">
       {/* ─── Sticky Header ─── */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pt-2 pb-3 space-y-3">
-        {/* Date Strip */}
-        <UnifiedDateStrip
-          days={days}
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-          getDayIndicators={getDayIndicators}
-        />
-
-        {/* Channel Pills — Spotify style */}
+        {/* Date Filter Chips */}
+        <div className="flex items-center gap-2 px-4">
+          {([
+            { key: 'hoje' as const, label: 'Hoje' },
+            { key: 'ontem' as const, label: 'Ontem' },
+            { key: 'semana' as const, label: 'Últimos 7 dias' },
+          ]).map(f => (
+            <button
+              key={f.key}
+              onClick={() => setDateFilter(f.key)}
+              className={cn(
+                "px-4 py-2 rounded-xl text-xs font-semibold transition-all active:scale-[0.96]",
+                dateFilter === f.key
+                  ? "bg-primary/15 text-primary"
+                  : "bg-secondary/40 text-muted-foreground"
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-4">
           {CHANNELS.map(ch => {
             const active = channel === ch.id;
