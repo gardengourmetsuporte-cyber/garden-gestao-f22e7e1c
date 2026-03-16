@@ -7,10 +7,10 @@ import { Switch } from '@/components/ui/switch';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AppIcon } from '@/components/ui/app-icon';
-import { useCopilotKnowledge, type CopilotKnowledgeArticle } from '@/hooks/useCopilotConfig';
+import { useUnifiedKnowledge, type CopilotKnowledgeArticle } from '@/hooks/useCopilotConfig';
 import { useUnit } from '@/contexts/UnitContext';
 
-const CATEGORY_OPTIONS = ['geral', 'operação', 'financeiro', 'equipe', 'estoque', 'atendimento', 'delivery'];
+const CATEGORY_OPTIONS = ['geral', 'operação', 'financeiro', 'equipe', 'estoque', 'atendimento', 'delivery', 'entrega', 'pagamento', 'funcionamento', 'politicas', 'contato'];
 
 const SUGGESTIONS = [
   { title: 'Regras de Fechamento de Caixa', category: 'financeiro', content: 'Ex: O caixa deve ser fechado diariamente até 23h. Diferenças acima de R$20 devem ser justificadas.' },
@@ -21,7 +21,7 @@ const SUGGESTIONS = [
 
 export function CopilotKnowledgeBase() {
   const { activeUnitId } = useUnit();
-  const { articles, isLoading, upsertArticle, deleteArticle, toggleActive } = useCopilotKnowledge();
+  const { articles, isLoading, upsertArticle, deleteArticle, toggleActive } = useUnifiedKnowledge();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<CopilotKnowledgeArticle> | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);

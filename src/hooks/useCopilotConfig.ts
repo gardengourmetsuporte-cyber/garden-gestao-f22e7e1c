@@ -82,12 +82,12 @@ export function useCopilotConfig() {
   };
 }
 
-export function useCopilotKnowledge() {
+export function useUnifiedKnowledge() {
   const { activeUnitId } = useUnit();
   const qc = useQueryClient();
 
   const articlesQuery = useQuery({
-    queryKey: ['copilot-knowledge', activeUnitId],
+    queryKey: ['unified-knowledge', activeUnitId],
     queryFn: async () => {
       if (!activeUnitId) return [];
       const { data, error } = await supabase
@@ -120,7 +120,7 @@ export function useCopilotKnowledge() {
       }
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['copilot-knowledge', activeUnitId] });
+      qc.invalidateQueries({ queryKey: ['unified-knowledge', activeUnitId] });
       toast.success('Artigo salvo!');
     },
   });
@@ -134,7 +134,7 @@ export function useCopilotKnowledge() {
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['copilot-knowledge', activeUnitId] });
+      qc.invalidateQueries({ queryKey: ['unified-knowledge', activeUnitId] });
       toast.success('Artigo excluído!');
     },
   });
@@ -148,7 +148,7 @@ export function useCopilotKnowledge() {
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['copilot-knowledge', activeUnitId] });
+      qc.invalidateQueries({ queryKey: ['unified-knowledge', activeUnitId] });
     },
   });
 
@@ -160,3 +160,6 @@ export function useCopilotKnowledge() {
     toggleActive,
   };
 }
+
+/** @deprecated Use useUnifiedKnowledge instead */
+export const useCopilotKnowledge = useUnifiedKnowledge;
