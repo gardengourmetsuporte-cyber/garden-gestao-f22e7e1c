@@ -6,11 +6,15 @@ export async function fetchAccountsCore(userId: string, unitId: string | null, i
   let query = supabase
     .from('finance_accounts')
     .select('*')
-    .eq('user_id', userId)
     .eq('is_active', true)
     .order('created_at');
-  if (isPersonal) query = query.is('unit_id', null);
-  else if (unitId) query = query.eq('unit_id', unitId);
+  if (isPersonal) {
+    query = query.eq('user_id', userId).is('unit_id', null);
+  } else if (unitId) {
+    query = query.eq('unit_id', unitId);
+  } else {
+    query = query.eq('user_id', userId);
+  }
   const { data } = await query;
   return (data || []) as FinanceAccount[];
 }
