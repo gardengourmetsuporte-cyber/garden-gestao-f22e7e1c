@@ -551,7 +551,7 @@ export default function TabletHome() {
             onClick={() => setShowConfig(true)}
             className="flex items-center gap-2 px-5 py-2 rounded-full border border-border/40 bg-card/60 backdrop-blur-sm hover:bg-card transition-colors"
           >
-            <AppIcon name="DiningOutlined" size={15} className="text-primary" />
+            <AppIcon name="Restaurant" size={15} className="text-primary" />
             <span className="text-sm font-bold text-foreground">Mesa {mesa || '?'}</span>
             <AppIcon name="ChevronDown" size={13} className="text-muted-foreground" />
           </button>
