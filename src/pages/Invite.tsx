@@ -34,6 +34,7 @@ export default function Invite() {
   const [invite, setInvite] = useState<InviteData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [accepting, setAccepting] = useState(false);
 
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
@@ -41,6 +42,9 @@ export default function Invite() {
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [signupDone, setSignupDone] = useState(false);
+
+  // Detect if returning from email confirmation (hash contains access_token)
+  const isReturningFromConfirmation = window.location.hash.includes('access_token');
 
   useEffect(() => {
     if (!token) {
