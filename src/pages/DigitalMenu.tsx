@@ -459,12 +459,12 @@ export default function DigitalMenu() {
           {/* Full menu inline */}
           <div className="mt-6">
             <div className="px-5 md:px-8 mb-3">
-              <h2 className="text-lg font-bold text-foreground">Cardápio</h2>
+              <h2 className="text-lg font-bold text-foreground">{locale === 'pt' ? 'Cardápio' : locale === 'en' ? 'Menu' : 'Menú'}</h2>
             </div>
             <MenuProductList
-              categories={categories}
-              groups={groups}
-              products={products}
+              categories={tCategories}
+              groups={tGroups}
+              products={tProducts}
               getGroupProducts={getGroupProducts}
               selectedCategory={selectedCategory}
               onSelectCategory={setSelectedCategory}
