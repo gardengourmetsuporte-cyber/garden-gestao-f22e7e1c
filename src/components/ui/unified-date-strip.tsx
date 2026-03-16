@@ -46,7 +46,7 @@ export function UnifiedDateStrip({
 
             return (
               <button
-                key={day.toISOString()}
+                key={`${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}`}
                 onClick={() => onSelectDate(day)}
                 className="flex flex-col items-center gap-1 shrink-0 w-[48px] group"
               >
