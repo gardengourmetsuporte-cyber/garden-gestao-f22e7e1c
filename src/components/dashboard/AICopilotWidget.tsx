@@ -285,25 +285,23 @@ export function AICopilotWidget() {
 
             {/* Input area */}
             <div className="px-3 pb-3 pt-1.5">
+              {plusOpen && (
+                <div className="flex gap-2 mb-2 animate-fade-in">
+                  <button onClick={() => { fileInputRef.current?.click(); setPlusOpen(false); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary/60 text-xs font-medium text-foreground transition-all active:scale-95">
+                    <AppIcon name="Paperclip" size={13} className="text-primary" /> Arquivo
+                  </button>
+                  <button onClick={() => { cameraInputRef.current?.click(); setPlusOpen(false); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary/60 text-xs font-medium text-foreground transition-all active:scale-95">
+                    <AppIcon name="Camera" size={13} className="text-primary" /> Câmera
+                  </button>
+                  <button onClick={() => { galleryInputRef.current?.click(); setPlusOpen(false); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary/60 text-xs font-medium text-foreground transition-all active:scale-95">
+                    <AppIcon name="Image" size={13} className="text-primary" /> Galeria
+                  </button>
+                </div>
+              )}
               <div className="copilot-input-bar flex items-end gap-1.5 rounded-[14px] px-1.5 py-1.5">
-                <Popover open={plusOpen} onOpenChange={setPlusOpen}>
-                  <PopoverTrigger asChild>
-                    <button className="copilot-icon-btn-sm shrink-0 mb-[1px]">
-                      <AppIcon name="Plus" size={16} />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="top" align="start" className="w-44 p-1.5 rounded-[14px] border-border/20 bg-card/95 backdrop-blur-xl">
-                    <button onClick={() => { fileInputRef.current?.click(); setPlusOpen(false); }} className="copilot-menu-item">
-                      <AppIcon name="Paperclip" size={14} className="text-primary" /> Arquivo
-                    </button>
-                    <button onClick={() => { cameraInputRef.current?.click(); setPlusOpen(false); }} className="copilot-menu-item">
-                      <AppIcon name="Camera" size={14} className="text-primary" /> Câmera
-                    </button>
-                    <button onClick={() => { galleryInputRef.current?.click(); setPlusOpen(false); }} className="copilot-menu-item">
-                      <AppIcon name="Image" size={14} className="text-primary" /> Galeria
-                    </button>
-                  </PopoverContent>
-                </Popover>
+                <button onClick={() => setPlusOpen(v => !v)} className="copilot-icon-btn-sm shrink-0 mb-[1px]">
+                  <AppIcon name={plusOpen ? "X" : "Plus"} size={16} />
+                </button>
 
                 <textarea
                   ref={textareaRef}
