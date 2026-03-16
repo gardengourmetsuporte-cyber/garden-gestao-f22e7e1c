@@ -101,6 +101,7 @@ export default function SettingsPage() {
   const menuItems = allMenuItems.filter(item => {
     if (item.value === 'plan') return true;
     if (item.value === 'units') return isSuperAdmin;
+    if (item.value === 'replication') return isAdmin && units.length > 1;
     if (item.value === 'team') return isAdmin;
     if (item.value === 'audit-log') return isAdmin;
     if (item.value === 'medals') return isAdmin;
