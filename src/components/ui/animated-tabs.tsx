@@ -5,6 +5,7 @@ interface AnimatedTab {
   key: string;
   label: string;
   icon?: ReactNode;
+  iconGradient?: string;
   badge?: number;
 }
 
@@ -39,7 +40,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
     <div
       ref={containerRef}
       className={cn(
-        "relative flex bg-muted/50 rounded-2xl p-1 border border-border",
+        "relative flex bg-muted/50 rounded-2xl p-1 border border-border/30",
         isCompact ? "overflow-x-auto scrollbar-none" : "overflow-hidden",
         className
       )}
@@ -54,32 +55,45 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
         }}
       />
 
-      {tabs.map((tab) => (
-        <button
-          key={tab.key}
-          ref={(el) => { if (el) tabRefs.current.set(tab.key, el); }}
-          onClick={() => { navigator.vibrate?.(10); onTabChange(tab.key); }}
-          className={cn(
-            "relative flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-medium z-10 transition-colors duration-200",
-            isCompact ? "min-w-0 shrink-0 px-3 flex-1" : "flex-1 px-1",
-            "min-h-[44px]",
-            activeTab === tab.key ? 'text-primary' : 'text-muted-foreground'
-          )}
-        >
-          {tab.icon}
-          <span className={cn(isCompact ? "whitespace-nowrap" : "truncate")}>{tab.label}</span>
-          {tab.badge !== undefined && tab.badge > 0 && (
-            <span className={cn(
-              "min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0",
-              activeTab === tab.key
-                ? "bg-primary/15 text-primary"
-                : "bg-muted text-muted-foreground"
-            )}>
-              {tab.badge > 99 ? '99+' : tab.badge}
-            </span>
-          )}
-        </button>
-      ))}
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.key;
+        return (
+          <button
+            key={tab.key}
+            ref={(el) => { if (el) tabRefs.current.set(tab.key, el); }}
+            onClick={() => { navigator.vibrate?.(10); onTabChange(tab.key); }}
+            className={cn(
+              "relative flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold z-10 transition-all duration-200",
+              isCompact ? "min-w-0 shrink-0 px-3 flex-1" : "flex-1 px-1",
+              "min-h-[44px]",
+              isActive ? 'text-primary' : 'text-muted-foreground'
+            )}
+          >
+            {tab.icon && (
+              <div
+                className={cn(
+                  "w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 shadow-md",
+                  !isActive && "opacity-50 saturate-0"
+                )}
+                style={{ background: tab.iconGradient || 'hsl(var(--primary))' }}
+              >
+                <span className="text-white flex items-center justify-center">{tab.icon}</span>
+              </div>
+            )}
+            <span className={cn(isCompact ? "whitespace-nowrap" : "truncate")}>{tab.label}</span>
+            {tab.badge !== undefined && tab.badge > 0 && (
+              <span className={cn(
+                "min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0",
+                isActive
+                  ? "bg-primary/15 text-primary"
+                  : "bg-muted text-muted-foreground"
+              )}>
+                {tab.badge > 99 ? '99+' : tab.badge}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
