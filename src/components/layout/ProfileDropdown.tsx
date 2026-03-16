@@ -33,8 +33,8 @@ export function ProfileDropdown() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-muted/50 active:scale-95 transition-all">
-            <Avatar className="w-7 h-7 ring-1 ring-border/40">
+          <button className="w-9 h-9 flex items-center justify-center rounded-full hover:opacity-80 active:scale-95 transition-all">
+            <Avatar className="w-7 h-7">
               {profile?.avatar_url ? (
                 <AvatarImage src={profile.avatar_url} alt={profile?.full_name || 'Avatar'} className="object-cover" />
               ) : null}
