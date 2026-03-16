@@ -85,7 +85,7 @@ function AnimatedCurrency({ value }: { value: number }) {
 
 
   return (
-    <div className="card-command p-4 space-y-3">
+    <div className="finance-hero-card p-4 space-y-3">
       {/* Header with navigation */}
       <div className="flex items-center justify-between">
         <button
