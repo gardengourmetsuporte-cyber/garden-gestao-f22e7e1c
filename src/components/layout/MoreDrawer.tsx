@@ -278,12 +278,12 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                       )} style={{
                         background: active
                           ? 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))'
-                          : 'linear-gradient(135deg, hsl(var(--foreground) / 0.15), hsl(var(--foreground) / 0.08))'
+                          : 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted) / 0.6))'
                       }}>
                         {item.customIcon ? (
                           <img src={item.customIcon} alt="" className={cn("w-5 h-5 transition-all", item.keepIconColor ? "" : "icon-tint-white")} />
                         ) : (
-                          <AppIcon name={item.icon} size={20} fill={1} className={cn("transition-colors duration-300", active ? "text-white" : "text-white dark:text-white")} />
+                          <AppIcon name={item.icon} size={20} fill={1} className={cn("transition-colors duration-300", active ? "text-white" : "text-foreground/80")} />
                         )}
                       </div>
                       {locked && (
