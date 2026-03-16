@@ -54,11 +54,11 @@ const OPERATIONAL_WIDGETS = new Set(['calendar']);
 const FINANCIAL_WIDGETS = new Set(['finance', 'bills-due', 'analytics', 'heatmap', 'month-comparison', 'break-even', 'weekly-summary']);
 const TEAM_ONLY_WIDGETS = new Set(['leaderboard']);
 
-const VIEW_TABS = [
-  { key: 'operational' as const, icon: 'LayoutGrid', label: 'Operacional' },
-  { key: 'financial' as const, icon: 'Landmark', label: 'Financeiro' },
-  { key: 'service' as const, icon: 'Store', label: 'Serviço' },
-  { key: 'team' as const, icon: 'Users', label: 'Equipe' },
+const ALL_VIEW_TABS = [
+  { key: 'operational' as const, icon: 'LayoutGrid', label: 'Operacional', module: null },
+  { key: 'financial' as const, icon: 'Landmark', label: 'Financeiro', module: 'finance' },
+  { key: 'service' as const, icon: 'Store', label: 'Serviço', module: null },
+  { key: 'team' as const, icon: 'Users', label: 'Equipe', module: 'employees' },
 ] as const;
 
 export function AdminDashboard() {
@@ -68,10 +68,16 @@ export function AdminDashboard() {
   const { stats, isLoading: statsLoading } = useDashboardStats();
   const { widgets, setWidgets, resetDefaults, isVisible } = useDashboardWidgets();
   const [managerOpen, setManagerOpen] = useState(false);
+
+  // Filter tabs by module access
+  const VIEW_TABS = ALL_VIEW_TABS.filter(tab => !tab.module || hasAccess(tab.module));
+
   const [view, setView] = useState<DashboardView>(() => {
     try {
-      return (localStorage.getItem('dashboard-view') as DashboardView) || 'operational';
-    } catch { return 'operational'; }
+      const saved = localStorage.getItem('dashboard-view') as DashboardView;
+      if (saved && VIEW_TABS.some(t => t.key === saved)) return saved;
+    } catch {}
+    return 'operational';
   });
 
   const isReady = !statsLoading && !modulesLoading && !!profile;

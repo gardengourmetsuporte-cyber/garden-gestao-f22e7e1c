@@ -22,7 +22,6 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Verify caller via getClaims (faster than getUser)
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
     const token = authHeader.replace("Bearer ", "");
     const { data: claimsData, error: claimsError } = await adminClient.auth.getClaims(token);
@@ -58,7 +57,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Prevent self-action
     if (target_user_id === callerId) {
       return new Response(JSON.stringify({ error: "Não é possível executar esta ação em si mesmo" }), {
         status: 400,
@@ -126,6 +124,29 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (!existing) {
+        // Fetch the default access level for the target unit
+        const { data: defaultLevel } = await adminClient
+          .from("access_levels")
+          .select("id")
+          .eq("unit_id", target_unit_id)
+          .eq("is_default", true)
+          .limit(1)
+          .maybeSingle();
+
+        // For owners, try to find the full access level instead
+        let accessLevelId = defaultLevel?.id || null;
+        if (userRole === "owner") {
+          const { data: fullLevel } = await adminClient
+            .from("access_levels")
+            .select("id")
+            .eq("unit_id", target_unit_id)
+            .eq("is_default", false)
+            .order("created_at", { ascending: true })
+            .limit(1)
+            .maybeSingle();
+          accessLevelId = fullLevel?.id || accessLevelId;
+        }
+
         const { error } = await adminClient
           .from("user_units")
           .insert({
@@ -133,6 +154,7 @@ Deno.serve(async (req) => {
             unit_id: target_unit_id,
             role: userRole,
             is_default: true,
+            access_level_id: accessLevelId,
           });
 
         if (error) {
@@ -149,7 +171,6 @@ Deno.serve(async (req) => {
     }
 
     if (action === "delete_account") {
-      // Delete user completely
       await adminClient.from("user_units").delete().eq("user_id", target_user_id);
       await adminClient.from("user_roles").delete().eq("user_id", target_user_id);
       await adminClient.from("profiles").delete().eq("user_id", target_user_id);

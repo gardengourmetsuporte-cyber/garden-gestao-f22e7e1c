@@ -36,18 +36,41 @@ async function fetchAccessLevels(unitId: string): Promise<AccessLevel[]> {
 
 // Fetch current user's allowed modules
 async function fetchUserModules(userId: string, unitId: string): Promise<string[] | null> {
-  // Single query with join to avoid sequential waterfall
+  // Get user_units record with access level join AND the user's role in the unit
   const { data, error } = await supabase
     .from('user_units')
-    .select('access_level_id, access_levels:access_levels!user_units_access_level_id_fkey(modules)')
+    .select('access_level_id, role, access_levels:access_levels!user_units_access_level_id_fkey(modules)')
     .eq('user_id', userId)
     .eq('unit_id', unitId)
     .maybeSingle();
 
-  if (error || !data?.access_level_id) return null; // null = no restriction (full access)
+  if (error) return null;
 
-  const level = data.access_levels as any;
-  return (level?.modules as string[]) || null;
+  // Owners always have full access regardless of access_level
+  const unitRole = data?.role as string | undefined;
+  if (unitRole === 'owner') return null;
+
+  // If access_level_id is set, use its modules
+  if (data?.access_level_id) {
+    const level = data.access_levels as any;
+    return (level?.modules as string[]) || null;
+  }
+
+  // No access_level_id assigned — fetch the unit's default access level
+  const { data: defaultLevel } = await supabase
+    .from('access_levels')
+    .select('modules')
+    .eq('unit_id', unitId)
+    .eq('is_default', true)
+    .limit(1)
+    .maybeSingle();
+
+  if (defaultLevel?.modules) {
+    return defaultLevel.modules as string[];
+  }
+
+  // No default level exists — full access (backward compat)
+  return null;
 }
 
 export function useAccessLevels() {

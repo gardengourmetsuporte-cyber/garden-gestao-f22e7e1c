@@ -1,52 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-## Diagnóstico dos Problemas
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-### Problema 1: Maria vê a Dashboard do dono (AdminDashboard)
-Maria foi adicionada com role `admin` (Gerente) na unidade, o que faz `isAdmin = true` no `AuthContext`. Isso renderiza `AdminDashboard` em vez de `EmployeeDashboard`. Isso é esperado para gerentes — eles precisam ver o painel operacional. O problema real é que ela vê **conteúdo financeiro** que não deveria.
-
-### Problema 2: Módulo financeiro aparece sem permissão
-Quando Maria foi transferida/adicionada à unidade Porto Ferreira via edge function `admin-manage-user` (ação `transfer_to_unit`), o registro em `user_units` foi criado **sem `access_level_id`**. Na lógica de `useAccessLevels`, quando `access_level_id` é `null`, o sistema interpreta como **acesso total** — retorna `null` e `hasAccess()` retorna `true` para tudo.
-
-### Problema 3: Novas contas sem acesso padrão
-O mesmo ocorre com qualquer usuário adicionado fora do fluxo de convite por link — o `access_level_id` fica vazio.
-
----
-
-## Plano de Correção
-
-### 1. Edge Function: Atribuir nível de acesso padrão ao transferir/adicionar
-**Arquivo:** `supabase/functions/admin-manage-user/index.ts`
-
-Na ação `transfer_to_unit`, após inserir o `user_units`, buscar o nível de acesso padrão (`is_default = true`) da unidade destino e atribuí-lo ao novo registro. Se o usuário tiver role `owner`, atribuir o nível "Acesso Completo" em vez do padrão.
-
-### 2. Dashboard: Filtrar abas por permissão de módulo
-**Arquivo:** `src/components/dashboard/AdminDashboard.tsx`
-
-- Filtrar os `VIEW_TABS` com base em `hasAccess`: se o usuário não tem acesso a `finance`, ocultar a aba "Financeiro". Se não tem acesso a módulos de equipe, ocultar "Equipe".
-- Se a view salva no localStorage não for acessível, fazer fallback para a primeira aba permitida (sempre "Operacional").
-
-### 3. Dashboard operacional: Ocultar widgets financeiros quando sem acesso
-Os widgets `DashboardHeroFinance`, `BillsDueWidget`, `SalesGoalWidget`, analytics, heatmap, etc. já checam `hasAccess('finance')` em alguns casos, mas não todos. Garantir que **todos** os widgets financeiros respeitem `hasAccess('finance')`.
-
-### 4. Fallback de acesso padrão para registros existentes sem access_level
-**Arquivo:** `src/hooks/useAccessLevels.ts` (função `fetchUserModules`)
-
-Alterar a lógica: quando `access_level_id` é `null`, em vez de retornar `null` (acesso total), buscar o nível de acesso padrão (`is_default = true`) da unidade. Se existir, usar seus módulos. Se não existir nenhum nível padrão, aí sim retornar `null` (acesso total — mantém compatibilidade para donos sem nível configurado).
-
-**Exceção importante:** Usuários com role `owner` na unidade continuam com acesso total independente do nível de acesso atribuído.
-
-### 5. Migração SQL: Preencher access_level_id em registros existentes vazios
-Criar migração que atualiza todos os `user_units` com `access_level_id IS NULL` e `role = 'member'` para usar o nível padrão da unidade correspondente.
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
 ---
 
-## Resumo de Arquivos
+## Bloco de Relatórios Avançados ✅
 
-| Arquivo | Ação |
-|---|---|
-| `supabase/functions/admin-manage-user/index.ts` | Atribuir access_level padrão em transfer_to_unit |
-| `src/hooks/useAccessLevels.ts` | Fallback para nível padrão quando access_level_id é null (exceto owners) |
-| `src/components/dashboard/AdminDashboard.tsx` | Filtrar abas e widgets por permissão |
-| Migração SQL | Preencher access_level_id em registros existentes |
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
+## Dashboard Analytics ✅
+
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
+
+## Operacional ✅
+
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
+
+## CRM / Clientes ✅
+
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+
+## Funcionários ✅
+
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
