@@ -75,6 +75,7 @@ Deno.serve(async (req) => {
       suppliersRes, recentTxRes, tasksRes, employeePaymentsRes,
       allMonthTxRes, checklistItemsRes, checklistCompletionsRes,
       supplierInvoicesRes, budgetsRes, budgetSpentRes, preferencesRes,
+      productsRes, brandRes, assetsRes,
     ] = await Promise.all([
       sb.from("finance_accounts").select("name, type, balance").eq("unit_id", unit_id).eq("is_active", true),
       sb.from("finance_transactions").select("amount").eq("user_id", userId).eq("unit_id", unit_id).eq("type", "income").eq("is_paid", true).gte("date", monthStart).lte("date", monthEnd),
