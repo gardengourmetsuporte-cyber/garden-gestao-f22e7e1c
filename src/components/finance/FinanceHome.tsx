@@ -258,8 +258,8 @@ export function FinanceHome({
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-warning/20 flex items-center justify-center">
-                <AppIcon name="AlertCircle" size={16} className="text-warning" />
+              <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+                <AppIcon name="AlertCircle" size={20} className="text-white" />
               </div>
               <span className="font-semibold text-sm text-warning">Pendências</span>
             </div>
