@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTheme } from "next-themes";
 import { AppIcon } from "@/components/ui/app-icon";
 import logoImg from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
@@ -7,6 +8,8 @@ import { cn } from "@/lib/utils";
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -72,7 +75,14 @@ export function LandingNavbar() {
         </div>
 
         {/* Desktop CTA */}
-        <div className="hidden md:flex items-center gap-5">
+        <div className="hidden md:flex items-center gap-4">
+          <button
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+            aria-label="Alternar tema"
+          >
+            <AppIcon name={isDark ? "Sun" : "Moon"} size={18} />
+          </button>
           <Link
             to="/auth"
             className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
@@ -96,6 +106,13 @@ export function LandingNavbar() {
           >
             Entrar
           </Link>
+          <button
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Alternar tema"
+          >
+            <AppIcon name={isDark ? "Sun" : "Moon"} size={16} />
+          </button>
           <button
             onClick={() => setOpen(!open)}
             className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary/60 bg-secondary/40 border border-border"
