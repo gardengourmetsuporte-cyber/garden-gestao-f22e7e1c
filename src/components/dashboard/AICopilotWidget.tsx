@@ -8,10 +8,10 @@ import mascotImg from '@/assets/garden-mascot.png';
 const CopilotMessageContent = lazy(() => import('@/components/copilot/CopilotMessageContent'));
 
 const SUGGESTIONS = [
-  { label: 'Resumo do dia', icon: 'BarChart3', gradient: 'from-emerald-400 to-teal-500', bg: 'bg-emerald-500/10 hover:bg-emerald-500/20' },
-  { label: 'Meu estoque', icon: 'Package', gradient: 'from-amber-400 to-orange-500', bg: 'bg-amber-500/10 hover:bg-amber-500/20' },
-  { label: 'Pendências', icon: 'Receipt', gradient: 'from-rose-400 to-pink-500', bg: 'bg-rose-500/10 hover:bg-rose-500/20' },
-  { label: 'Criar post', icon: 'Megaphone', gradient: 'from-violet-400 to-purple-500', bg: 'bg-violet-500/10 hover:bg-violet-500/20' },
+  { label: 'Resumo do dia', icon: 'BarChart3' },
+  { label: 'Meu estoque', icon: 'Package' },
+  { label: 'Pendências', icon: 'Receipt' },
+  { label: 'Criar post', icon: 'Megaphone' },
 ];
 
 const ACCEPTED_FILES = 'image/*,.pdf,.doc,.docx,.csv,.xlsx,.xls,.txt,.json';
@@ -149,23 +149,15 @@ export function AICopilotWidget() {
             </form>
 
             {/* Suggestion chips */}
-            <div className="flex gap-2 px-4 pb-3.5 overflow-x-auto no-scrollbar">
-              {SUGGESTIONS.map((s, i) => (
+            <div className="flex gap-1.5 px-4 pb-3 overflow-x-auto no-scrollbar">
+              {SUGGESTIONS.map((s) => (
                 <button
                   key={s.label}
                   onClick={() => handleSuggestion(s.label)}
-                  className={cn(
-                    "flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-[11px] font-semibold whitespace-nowrap",
-                    s.bg,
-                    "border border-white/[0.04]",
-                    "transition-all duration-300 hover:scale-[1.04] active:scale-95"
-                  )}
-                  style={{ animationDelay: `${i * 50}ms` }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
                 >
-                  <span className={cn("w-6 h-6 rounded-lg bg-gradient-to-br flex items-center justify-center shadow-md", s.gradient)}>
-                    <AppIcon name={s.icon} size={13} className="text-white" />
-                  </span>
-                  <span className="text-foreground/80">{s.label}</span>
+                  <AppIcon name={s.icon} size={12} className="opacity-60" />
+                  <span>{s.label}</span>
                 </button>
               ))}
             </div>
