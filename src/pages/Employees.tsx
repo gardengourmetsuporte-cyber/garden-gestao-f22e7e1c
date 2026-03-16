@@ -23,9 +23,12 @@ export default function Employees() {
   const openMaterialRef = useRef<(() => void) | null>(null);
   useScrollToTopOnChange(activeTab);
 
+  // Only register FAB for tabs that don't have their own FAB registration
+  // EmployeeList registers its own FAB, so skip when activeTab === 'employees'
+  const shouldRegisterFab = activeTab === 'deliveries';
   useFabAction(
-    activeTab === 'deliveries' ? { icon: 'Plus', label: 'Registrar', onClick: () => openMaterialRef.current?.() } : null,
-    [activeTab]
+    shouldRegisterFab ? { icon: 'Plus', label: 'Registrar', onClick: () => openMaterialRef.current?.() } : null,
+    [activeTab, shouldRegisterFab]
   );
 
   const adminTabs = [
