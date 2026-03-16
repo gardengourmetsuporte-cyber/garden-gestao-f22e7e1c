@@ -502,7 +502,7 @@ serve(async (req) => {
         .eq("status", "draft")
         .single(),
       supabase
-        .from("whatsapp_knowledge_base")
+        .from("copilot_knowledge")
         .select("title, content, category")
         .eq("unit_id", unitId)
         .eq("is_active", true)

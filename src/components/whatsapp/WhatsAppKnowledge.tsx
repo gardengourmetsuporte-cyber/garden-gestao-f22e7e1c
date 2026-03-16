@@ -6,9 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useWhatsAppKnowledge } from '@/hooks/useWhatsApp';
+import { useUnifiedKnowledge, type CopilotKnowledgeArticle } from '@/hooks/useCopilotConfig';
 import { useUnit } from '@/contexts/UnitContext';
-import type { WhatsAppKnowledgeArticle } from '@/types/whatsapp';
 import { AppIcon } from '@/components/ui/app-icon';
 
 const CATEGORY_OPTIONS = ['geral', 'entrega', 'pagamento', 'funcionamento', 'politicas', 'contato'];

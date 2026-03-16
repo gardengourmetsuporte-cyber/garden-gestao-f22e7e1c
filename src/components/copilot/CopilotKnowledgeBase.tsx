@@ -21,7 +21,7 @@ const SUGGESTIONS = [
 
 export function CopilotKnowledgeBase() {
   const { activeUnitId } = useUnit();
-  const { articles, isLoading, upsertArticle, deleteArticle, toggleActive } = useCopilotKnowledge();
+  const { articles, isLoading, upsertArticle, deleteArticle, toggleActive } = useUnifiedKnowledge();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<CopilotKnowledgeArticle> | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
