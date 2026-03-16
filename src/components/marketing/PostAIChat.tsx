@@ -5,6 +5,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PostData {
   title: string;
