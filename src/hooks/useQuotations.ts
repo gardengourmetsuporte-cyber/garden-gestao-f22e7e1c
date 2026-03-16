@@ -197,7 +197,7 @@ export function useQuotations() {
       const prices = await fetchPrices(quotationId);
 
       // For each item, use manual winner if provided, otherwise find best price
-      const winners: { item_id: string; quantity: number; supplier_id: string; unit_price: number }[] = [];
+      const winners: { item_id: string; qi_id: string; quantity: number; supplier_id: string; unit_price: number }[] = [];
 
       // Build latest price map per item per supplier
       const latestPriceMap = new Map<string, Map<string, QuotationPrice>>();
