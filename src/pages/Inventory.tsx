@@ -117,11 +117,6 @@ export default function InventoryPage() {
   const handleAddItem = () => { setEditingItem(null); setItemFormOpen(true); };
 
   const handleFabAdd = () => {
-    if (items.length === 0 && showTemplates) {
-      // Scroll to top so user sees the template selector
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
     handleAddItem();
   };
   useFabAction(isAdmin ? { icon: 'Plus', label: 'Novo Item', onClick: handleFabAdd } : null, [isAdmin, items.length, showTemplates]);
