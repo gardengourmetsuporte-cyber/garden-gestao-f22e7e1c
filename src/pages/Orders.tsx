@@ -577,15 +577,27 @@ export default function OrdersPage() {
                                       )
                                     )}
                                     {order.status === 'sent' && (
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={(e) => { e.stopPropagation(); setOrderToReceive(order); setReceiveOrderOpen(true); }}
-                                        className="gap-1.5 rounded-xl bg-success/10 hover:bg-success/20 text-success border-success/30"
-                                      >
-                                        <AppIcon name="PackageCheck" size={16} />
-                                        Receber
-                                      </Button>
+                                      <>
+                                        {hasValidWhatsApp(order.supplier?.phone || null) && (
+                                          <Button
+                                            size="sm"
+                                            onClick={(e) => { e.stopPropagation(); handleResendWhatsApp(order); }}
+                                            className="gap-1.5 rounded-xl bg-[#25D366] hover:bg-[#1da851] text-white"
+                                          >
+                                            <img src="/icons/whatsapp.png" alt="" className="w-4 h-4" />
+                                            Reenviar
+                                          </Button>
+                                        )}
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={(e) => { e.stopPropagation(); setOrderToReceive(order); setReceiveOrderOpen(true); }}
+                                          className="gap-1.5 rounded-xl bg-success/10 hover:bg-success/20 text-success border-success/30"
+                                        >
+                                          <AppIcon name="PackageCheck" size={16} />
+                                          Receber
+                                        </Button>
+                                      </>
                                     )}
                                     <Button
                                       size="sm"
