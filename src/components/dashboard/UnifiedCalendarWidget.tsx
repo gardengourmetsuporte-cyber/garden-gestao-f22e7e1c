@@ -13,7 +13,7 @@ import { UnifiedMonthNav } from '@/components/ui/unified-month-nav';
 export function UnifiedCalendarWidget() {
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(format(new Date(), 'yyyy-MM-dd'));
   const { eventsMap, isLoading } = useDashboardCalendar(currentMonth);
 
   const selectedEvents = selectedDate ? eventsMap.get(selectedDate) : null;
