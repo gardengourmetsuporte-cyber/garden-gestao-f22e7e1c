@@ -44,11 +44,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Use service role for cross-table access
-    const sb = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    // Validate unit access (sb already created above with service role)
 
     // Validate unit access
     const { data: unitAccess } = await sb
