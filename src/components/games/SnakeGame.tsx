@@ -408,7 +408,7 @@ export function SnakeGame({ onBack, unitId }: Props) {
           {gameState === 'menu' && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm rounded-2xl gap-5">
               <span className="text-6xl">🐍</span>
-              <h2 className="text-2xl font-black text-white">Snake Garden</h2>
+              <h2 className="text-2xl font-black text-white">Snake Mania</h2>
               <p className="text-sm text-emerald-300/80">Coma os lanches e fique enorme!</p>
               <button
                 onClick={startGame}

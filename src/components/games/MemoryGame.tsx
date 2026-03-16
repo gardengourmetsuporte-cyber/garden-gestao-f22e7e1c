@@ -165,7 +165,7 @@ export function MemoryGame({ onBack, unitId }: Props) {
           {gameState === 'menu' && (
             <div className="flex flex-col items-center justify-center gap-6 py-12">
               <span className="text-6xl">🧠</span>
-              <h2 className="text-2xl font-black text-white">Memory Garden</h2>
+              <h2 className="text-2xl font-black text-white">Memory Match</h2>
               <p className="text-sm text-amber-300/80">Encontre os pares de lanches!</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {CARD_ITEMS.slice(0, 6).map(e => (
