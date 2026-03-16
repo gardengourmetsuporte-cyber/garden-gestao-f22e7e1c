@@ -52,15 +52,19 @@ export async function fetchTransactionsCore(userId: string, unitId: string | nul
   let query = supabase
     .from('finance_transactions')
     .select(selectStr)
-    .eq('user_id', userId)
     .gte('date', startDate)
     .lte('date', endDate)
     .order('date', { ascending: false })
     .order('sort_order', { ascending: true })
     .order('created_at', { ascending: false });
 
-  if (isPersonal) query = query.is('unit_id', null);
-  else if (unitId) query = query.eq('unit_id', unitId);
+  if (isPersonal) {
+    query = query.eq('user_id', userId).is('unit_id', null);
+  } else if (unitId) {
+    query = query.eq('unit_id', unitId);
+  } else {
+    query = query.eq('user_id', userId);
+  }
   const { data } = await query;
   return (data || []) as unknown as FinanceTransaction[];
 }
