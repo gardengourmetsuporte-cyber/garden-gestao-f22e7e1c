@@ -17,7 +17,7 @@ import { ProductSheet } from '@/components/menu/ProductSheet';
 import { OptionGroupList } from '@/components/menu/OptionGroupList';
 import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
-import { MenuReplication } from '@/components/menu-admin/MenuReplication';
+
 import { RecipeSyncPanel } from '@/components/menu/RecipeSyncPanel';
 import { FichaTecnicaHeader } from '@/components/menu/FichaTecnicaHeader';
 // UnifiedOrdersPanel removed — orders managed via PDV/KDS/Deliveries
@@ -295,20 +295,6 @@ export default function CardapioHub() {
                    </button>
                  ))}
                </div>
-
-               {/* Replicar icon button */}
-               <button
-                 onClick={() => setCardapioTab('replicar')}
-                 className={cn(
-                   "shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all",
-                   cardapioTab === 'replicar'
-                     ? "bg-foreground text-background"
-                     : "bg-foreground/[0.07] text-muted-foreground hover:text-foreground"
-                 )}
-                 title="Replicar Cardápio"
-               >
-                 <AppIcon name="Copy" size={16} />
-               </button>
              </div>
           </div>
         )}
@@ -373,10 +359,6 @@ export default function CardapioHub() {
             />
           )}
 
-          {/* ==================== REPLICAR ==================== */}
-          {cardapioTab === 'replicar' && (
-            <MenuReplication />
-          )}
         </div>
       </div>
 
