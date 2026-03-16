@@ -440,9 +440,12 @@ function OrdersPanel({ unitId, mesa, onClose }: { unitId: string; mesa: string; 
 }
 
 // ─── Game Selection Panel ───
+import snakeBanner from '@/assets/game-snake-banner.jpg';
+import memoryBanner from '@/assets/game-memory-banner.jpg';
+
 const GAMES = [
-  { id: 'snake', emoji: '🐍', title: 'Snake Garden', description: 'Coma lanches e fique enorme!', gradient: 'from-emerald-600/25 to-emerald-900/40', border: 'border-emerald-500/30' },
-  { id: 'memory', emoji: '🧠', title: 'Memory Garden', description: 'Encontre os pares de lanches!', gradient: 'from-amber-600/25 to-amber-900/40', border: 'border-amber-500/30' },
+  { id: 'snake', title: 'Snake Mania', description: 'Coma lanches e fique enorme!', banner: snakeBanner, accent: 'from-emerald-600/80 to-emerald-900/90' },
+  { id: 'memory', title: 'Memory Match', description: 'Encontre os pares de lanches!', banner: memoryBanner, accent: 'from-amber-600/80 to-amber-900/90' },
 ];
 
 type ActivePanel = 'bill' | 'orders' | 'games' | null;
