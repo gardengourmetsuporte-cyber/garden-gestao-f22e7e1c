@@ -210,7 +210,7 @@ export function BottomTabBar() {
                   } else if (fabAction) {
                     fabAction.onClick();
                   } else {
-                    setQuickOpen(true);
+                    setQuickOpen(!quickOpen);
                   }
                 }}
                 className={cn(
