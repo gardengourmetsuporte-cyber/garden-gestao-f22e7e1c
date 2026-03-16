@@ -36,7 +36,7 @@ export function PriceSurveyList({ suppliers }: Props) {
     if (!phone) return;
     const surveyUrl = `${window.location.origin}/pesquisa/${pending.token}`;
     const message = `Olá ${pending.supplier?.name || ''}! 🛒\n\nLembrete: sua pesquisa de preços ainda está pendente.\n\n${surveyUrl}`;
-    window.location.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+    window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const getStatusConfig = (status: string) => {
