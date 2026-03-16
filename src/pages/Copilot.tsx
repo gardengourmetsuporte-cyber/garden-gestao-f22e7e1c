@@ -10,6 +10,7 @@ import mascotImg from '@/assets/garden-mascot.png';
 import CopilotMessageContent from '@/components/copilot/CopilotMessageContent';
 import CopilotSuggestionChips from '@/components/copilot/CopilotSuggestionChips';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppLayout } from '@/components/layout/AppLayout';
