@@ -101,10 +101,6 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
     setPendingImage(null);
     setIsLoading(true);
 
-    let assistantContent = '';
-    let toolCallArgs = '';
-    let isToolCall = false;
-
     try {
       const apiMessages = newMessages.map(m => ({
         role: m.role,
