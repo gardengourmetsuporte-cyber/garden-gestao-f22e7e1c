@@ -370,8 +370,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearCachedAuth();
   };
 
-  const isAdmin = role === 'admin' || role === 'super_admin';
+  // isAdmin is derived from unit-level role when available, with fallback to global role
+  // super_admin always has admin access regardless of unit role
   const isSuperAdmin = role === 'super_admin';
+  const isAdmin = isSuperAdmin || (
+    unitRole !== null
+      ? (unitRole === 'owner' || unitRole === 'admin')
+      : (role === 'admin')
+  );
   const isPro = plan === 'pro' || plan === 'business';
   const isBusiness = plan === 'business';
   const isFree = plan === 'free';
