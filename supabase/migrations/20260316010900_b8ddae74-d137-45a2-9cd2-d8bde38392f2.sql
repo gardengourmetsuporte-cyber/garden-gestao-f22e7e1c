@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_invites_unit_invitedby_active ON public.invites (unit_id, invited_by, email) WHERE accepted_at IS NULL;
