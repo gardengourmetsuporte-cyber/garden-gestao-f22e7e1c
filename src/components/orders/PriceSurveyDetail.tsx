@@ -72,7 +72,8 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
     if (!phone) return;
     const surveyUrl = `${window.location.origin}/pesquisa/${ss.token}`;
     const message = `Olá ${ss.supplier?.name || ''}! 🛒\n\nLembrete: sua pesquisa de preços ainda está pendente.\n\n${surveyUrl}`;
-    window.location.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   return (
