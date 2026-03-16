@@ -38,10 +38,10 @@ export default function Employees() {
   ];
 
   const employeeTabs = [
-    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', iconFill: 1 },
-    { key: 'payslips', label: 'Holerites', icon: 'FileText', iconFill: 1 },
-    { key: 'schedules', label: 'Folgas', icon: 'Calendar', iconFill: 1 },
-    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', iconFill: 0 },
+    { key: 'time-tracking', label: 'Ponto', icon: 'Clock', iconFill: 1, gradient: 'linear-gradient(135deg, #6366F1, #8B5CF6)' },
+    { key: 'payslips', label: 'Holerites', icon: 'FileText', iconFill: 1, gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+    { key: 'schedules', label: 'Folgas', icon: 'Calendar', iconFill: 1, gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+    { key: 'warnings', label: 'Advertências', icon: 'AlertTriangle', iconFill: 0, gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
   ];
 
   const tabs = isAdmin ? adminTabs : employeeTabs;
