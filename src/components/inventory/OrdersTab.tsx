@@ -141,7 +141,7 @@ export function OrdersTab({
     const message = `*Pedido de Compra*\n\nOlá! Gostaria de fazer o seguinte pedido:\n\n${itemsList}\n\n${order.notes ? `Obs: ${order.notes}` : ''}`;
     
     const phone = formatPhoneForWhatsApp(order.supplier.phone);
-    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
 
     // Update status BEFORE opening WhatsApp to avoid losing state on iOS
     try {
@@ -151,14 +151,7 @@ export function OrdersTab({
       toast.error('Pedido enviado mas houve erro ao atualizar o status');
     }
     
-    // Use anchor click for reliable mobile behavior (avoids blank page on iOS return)
-    const a = document.createElement('a');
-    a.href = whatsappUrl;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => document.body.removeChild(a), 100);
+    window.location.href = whatsappUrl;
   };
 
   const getStatusBadge = (status: Order['status']) => {
