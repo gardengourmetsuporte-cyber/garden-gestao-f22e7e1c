@@ -131,7 +131,7 @@ export function EmployeeList({ onSelectEmployee }: EmployeeListProps) {
                   <img
                     src={avatarUrl}
                     alt={employee.full_name}
-                    className="w-10 h-10 rounded-xl object-cover flex-shrink-0"
+                    className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                   />
                 ) : (
                   <div className="flex-shrink-0">
