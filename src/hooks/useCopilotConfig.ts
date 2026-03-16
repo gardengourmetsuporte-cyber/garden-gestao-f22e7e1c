@@ -10,6 +10,12 @@ export interface CopilotAgentConfig {
   system_prompt: string | null;
   tone_of_voice: string;
   enabled_tools: string[];
+  allowed_roles: string[];
+  restrict_destructive_tools: boolean;
+  max_response_length: string;
+  active_hours: { start: string; end: string } | null;
+  auto_greet: boolean;
+  language: string;
   created_at: string;
   updated_at: string;
 }
