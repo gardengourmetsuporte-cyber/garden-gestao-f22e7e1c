@@ -362,79 +362,89 @@ export function SnakeGame({ onBack, unitId }: Props) {
   }, [canvasSize, gameState, drawGame]);
 
   return (
-    <div className="h-[100dvh] bg-[hsl(150,12%,5%)] flex flex-col overflow-hidden">
+    <div className="h-[100dvh] bg-[hsl(150,8%,4%)] flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top,8px),12px)] pb-2 shrink-0">
-        <button onClick={onBack} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-          <AppIcon name="ArrowLeft" size={18} className="text-white/70" />
+      <div className="flex items-center justify-between px-5 pt-[max(env(safe-area-inset-top,8px),14px)] pb-1 shrink-0">
+        <button onClick={onBack} className="w-10 h-10 rounded-2xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center active:scale-95 transition-transform">
+          <AppIcon name="ArrowLeft" size={18} className="text-white/60" />
         </button>
         <div className="text-center">
-          <h1 className="text-base font-bold text-white flex items-center gap-1.5">
-            🐍 Snake <span className="text-emerald-400">Mania</span>
+          <h1 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
+            <span className="text-xl">🐍</span> Snake <span className="text-emerald-400">Mania</span>
           </h1>
         </div>
-        <button onClick={() => setShowRanking(true)} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+        <button onClick={() => setShowRanking(true)} className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center active:scale-95 transition-transform">
           <Trophy size={18} className="text-amber-400" />
         </button>
       </div>
 
       {/* Score bar */}
-      <div className="flex items-center justify-center gap-4 px-4 py-2 shrink-0">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-          <span className="text-xs text-emerald-400 font-bold">⭐ {score}</span>
+      <div className="flex items-center justify-center gap-3 px-4 py-2.5 shrink-0">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/8 border border-emerald-500/15">
+          <span className="text-sm">⭐</span>
+          <span className="text-sm text-emerald-400 font-black tabular-nums">{score}</span>
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-          <span className="text-xs text-amber-400 font-bold">🏆 {highScore}</span>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/8 border border-amber-500/15">
+          <span className="text-sm">🏆</span>
+          <span className="text-sm text-amber-400 font-black tabular-nums">{highScore}</span>
         </div>
         {lastFood && (
-          <span className="text-xs font-bold text-emerald-300 animate-bounce">{lastFood}</span>
+          <span className="text-sm font-black text-emerald-300 animate-bounce">{lastFood}</span>
         )}
       </div>
 
       {/* Game area */}
       <div ref={containerRef} className="flex-1 flex items-center justify-center px-4 relative">
-        <div className="relative">
+        <div className="relative rounded-3xl overflow-hidden" style={{ boxShadow: '0 0 60px hsla(142, 40%, 25%, 0.12), 0 0 120px hsla(142, 40%, 15%, 0.06)' }}>
+          {/* Glow border effect */}
+          <div className="absolute inset-0 rounded-3xl border border-emerald-500/10 pointer-events-none z-10" />
+          
           <canvas
             ref={canvasRef}
             width={canvasSize}
             height={canvasSize}
-            className="rounded-2xl"
-            style={{ boxShadow: '0 0 40px hsla(142, 50%, 30%, 0.15), inset 0 0 20px hsla(142, 50%, 20%, 0.05)' }}
+            className="rounded-3xl"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           />
 
           {/* Menu overlay */}
           {gameState === 'menu' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm rounded-2xl gap-5">
-              <span className="text-6xl">🐍</span>
-              <h2 className="text-2xl font-black text-white">Snake Mania</h2>
-              <p className="text-sm text-emerald-300/80">Coma os lanches e fique enorme!</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-md rounded-3xl gap-6">
+              <div className="text-7xl animate-pulse" style={{ animationDuration: '2s' }}>🐍</div>
+              <div className="text-center space-y-2">
+                <h2 className="text-3xl font-black text-white tracking-tight">Snake Mania</h2>
+                <p className="text-sm text-emerald-300/60">Coma os lanches e fique enorme!</p>
+              </div>
               <button
                 onClick={startGame}
-                className="px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base shadow-lg shadow-emerald-500/30 active:scale-95 transition-all"
+                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-white font-black text-base shadow-[0_8px_32px_hsla(142,60%,40%,0.35)] active:scale-95 transition-all hover:shadow-[0_8px_40px_hsla(142,60%,40%,0.5)]"
               >
-                Jogar! 🎮
+                ▶ JOGAR
               </button>
-              <p className="text-[11px] text-white/40">Deslize ou use as setas para mover</p>
+              <p className="text-[11px] text-white/30 font-medium">Deslize ou use as setas para mover</p>
             </div>
           )}
 
           {/* Game over */}
           {gameState === 'gameover' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm rounded-2xl gap-4">
-              <span className="text-5xl">😵</span>
-              <h2 className="text-xl font-black text-white">Game Over!</h2>
-              <p className="text-3xl font-black text-emerald-400">{score}</p>
-              <p className="text-xs text-white/50">pontos</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md rounded-3xl gap-5">
+              <span className="text-6xl">💀</span>
+              <h2 className="text-2xl font-black text-white tracking-tight">Game Over</h2>
+              <div className="text-center space-y-1">
+                <p className="text-4xl font-black text-emerald-400 tabular-nums">{score}</p>
+                <p className="text-xs text-white/40 font-semibold uppercase tracking-wider">pontos</p>
+              </div>
               {score >= highScore && score > 0 && (
-                <p className="text-sm font-bold text-amber-400 animate-pulse">🏆 Novo recorde!</p>
+                <div className="px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/25">
+                  <p className="text-sm font-black text-amber-400 animate-pulse">🏆 Novo recorde!</p>
+                </div>
               )}
-              <div className="flex gap-3 mt-2">
-                <button onClick={onBack} className="px-5 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white font-semibold text-sm">
+              <div className="flex gap-3 mt-1">
+                <button onClick={onBack} className="px-6 py-3 rounded-2xl bg-white/[0.06] border border-white/[0.08] text-white font-bold text-sm active:scale-95 transition-all">
                   Sair
                 </button>
-                <button onClick={startGame} className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm shadow-lg shadow-emerald-500/30 active:scale-95 transition-all">
+                <button onClick={startGame} className="px-8 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-400 text-white font-black text-sm shadow-[0_6px_24px_hsla(142,60%,40%,0.3)] active:scale-95 transition-all">
                   Jogar de novo 🔄
                 </button>
               </div>
@@ -445,8 +455,8 @@ export function SnakeGame({ onBack, unitId }: Props) {
 
       {/* D-Pad */}
       {gameState === 'playing' && (
-        <div className="shrink-0 flex justify-center pb-[max(env(safe-area-inset-bottom,8px),12px)] pt-2">
-          <div className="relative w-[150px] h-[150px]">
+        <div className="shrink-0 flex justify-center pb-[max(env(safe-area-inset-bottom,8px),14px)] pt-2">
+          <div className="relative w-[140px] h-[140px]">
             {(['UP', 'DOWN', 'LEFT', 'RIGHT'] as Direction[]).map(d => {
               const pos = {
                 UP: 'top-0 left-1/2 -translate-x-1/2',
@@ -465,9 +475,9 @@ export function SnakeGame({ onBack, unitId }: Props) {
                   key={d}
                   onTouchStart={() => changeDir(d)}
                   onMouseDown={() => changeDir(d)}
-                  className={`absolute ${pos} w-12 h-12 rounded-xl bg-white/6 border border-white/10 flex items-center justify-center active:bg-emerald-500/20 transition-colors`}
+                  className={`absolute ${pos} w-11 h-11 rounded-2xl bg-emerald-500/8 border border-emerald-500/15 flex items-center justify-center active:bg-emerald-500/25 active:scale-95 transition-all`}
                 >
-                  <AppIcon name={icon} size={24} className="text-white/50" />
+                  <AppIcon name={icon} size={22} className="text-emerald-400/60" />
                 </button>
               );
             })}
