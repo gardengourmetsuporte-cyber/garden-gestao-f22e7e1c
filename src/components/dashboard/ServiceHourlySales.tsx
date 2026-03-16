@@ -7,8 +7,8 @@ export function ServiceHourlySales({ data }: { data: HourlySale[] }) {
   return (
     <div className="card-base p-4">
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
-          <AppIcon name="bar_chart" size={20} className="text-white" />
+        <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+          <AppIcon name="bar_chart" size={16} className="text-white" />
         </div>
         <h3 className="text-sm font-semibold text-foreground">Vendas por Hora</h3>
       </div>
