@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { AppIcon } from '@/components/ui/app-icon';
 import { useUserModules } from '@/hooks/useAccessLevels';
+import { cn } from '@/lib/utils';
 
 interface QuickActionSheetProps {
   open: boolean;
@@ -77,40 +77,51 @@ export function QuickActionSheet({ open, onOpenChange }: QuickActionSheetProps) 
 
   const visibleActions = actions.filter(a => hasAccess(a.moduleKey));
 
+  if (!open) return null;
+
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="px-4 pb-8 pt-2">
-        <h3 className="text-sm font-bold text-muted-foreground/60 uppercase tracking-wider mb-3 px-1 font-display">
-          Ação rápida
-        </h3>
-        <div className="space-y-2">
-          {visibleActions.map((action, i) => (
-            <button
-              key={action.label}
-              onClick={() => { navigator.vibrate?.(10); action.action(); }}
-              className="flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl bg-secondary/50 hover:bg-secondary active:scale-[0.98] transition-all group opacity-0 animate-[slideUpFade_0.35s_ease-out_forwards]"
-              style={{ animationDelay: `${i * 70}ms` }}
-            >
-              <div
-                className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110 group-active:scale-95"
-                style={{
-                  background: `linear-gradient(135deg, ${action.glow}, transparent)`,
-                  border: `1px solid ${action.color}25`,
-                  boxShadow: `0 0 0 0 ${action.color}00`,
-                }}
-                onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 20px ${action.color}30`)}
-                onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 0 0 ${action.color}00`)}
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-[55] bg-black/40 backdrop-blur-[2px] animate-fade-in"
+        onClick={() => onOpenChange(false)}
+      />
+
+      {/* Panel above bottom bar */}
+      <div
+        className="fixed left-0 right-0 z-[58] px-3 animate-[slideUpFade_0.3s_ease-out]"
+        style={{ bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))' }}
+      >
+        <div className="bg-card/95 backdrop-blur-xl rounded-2xl border border-border/20 shadow-2xl p-4 max-w-lg mx-auto">
+          <h3 className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-3 px-1">
+            Ação rápida
+          </h3>
+          <div className="space-y-1.5">
+            {visibleActions.map((action, i) => (
+              <button
+                key={action.label}
+                onClick={() => { navigator.vibrate?.(10); action.action(); }}
+                className="flex items-center gap-3.5 w-full px-3 py-3 rounded-xl bg-secondary/40 hover:bg-secondary/70 active:scale-[0.98] transition-all group opacity-0 animate-[slideUpFade_0.3s_ease-out_forwards]"
+                style={{ animationDelay: `${i * 50}ms` }}
               >
-                <AppIcon name={action.icon} size={22} style={{ color: action.color }} />
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors duration-200">{action.label}</p>
-                <p className="text-xs text-muted-foreground">{action.description}</p>
-              </div>
-            </button>
-          ))}
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-105"
+                  style={{
+                    background: `linear-gradient(135deg, ${action.glow}, transparent)`,
+                    border: `1px solid ${action.color}25`,
+                  }}
+                >
+                  <AppIcon name={action.icon} size={20} style={{ color: action.color }} />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-foreground">{action.label}</p>
+                  <p className="text-[11px] text-muted-foreground">{action.description}</p>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </div>
+    </>
   );
 }
