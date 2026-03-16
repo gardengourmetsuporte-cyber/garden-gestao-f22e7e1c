@@ -85,19 +85,19 @@ function AnimatedCurrency({ value }: { value: number }) {
 
 
   return (
-    <div className="card-command p-4 space-y-3">
+    <div className="finance-hero-card p-4 space-y-3">
       {/* Header with navigation */}
       <div className="flex items-center justify-between">
         <button
           onClick={() => setWeekOffset(o => o - 1)}
-          className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/60 hover:bg-secondary transition-colors"
+          className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors"
         >
-          <AppIcon name="ChevronLeft" size={16} className="text-muted-foreground" />
+          <AppIcon name="ChevronLeft" size={16} className="text-white/70" />
         </button>
 
         <div className="text-center flex-1">
-          <h3 className="text-sm font-bold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>Resumo da Semana</h3>
-          <span className="text-[10px] text-muted-foreground">
+          <h3 className="text-sm font-bold text-white font-display" style={{ letterSpacing: '-0.02em' }}>Resumo da Semana</h3>
+          <span className="text-[10px] text-white/50">
             {summary.weekLabel} • {summary.count} fechamento{summary.count !== 1 ? 's' : ''}
           </span>
         </div>
@@ -105,25 +105,25 @@ function AnimatedCurrency({ value }: { value: number }) {
         <button
           onClick={() => setWeekOffset(o => o + 1)}
           disabled={summary.isCurrentWeek}
-          className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/60 hover:bg-secondary transition-colors disabled:opacity-30 disabled:pointer-events-none"
+          className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-30 disabled:pointer-events-none"
         >
-          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+          <AppIcon name="ChevronRight" size={16} className="text-white/70" />
         </button>
       </div>
 
       {summary.count === 0 ? (
         <div className="text-center py-4">
-          <p className="text-sm text-muted-foreground">Nenhum fechamento nesta semana</p>
+          <p className="text-sm text-white/50">Nenhum fechamento nesta semana</p>
         </div>
       ) : (
         <>
           {/* Total */}
           <div className="text-center py-2">
-            <span className="text-2xl font-black text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
+            <span className="text-2xl font-black text-white font-display" style={{ letterSpacing: '-0.03em' }}>
               <AnimatedCurrency value={summary.total} />
             </span>
             <div className="flex items-center justify-center gap-2 mt-0.5">
-              <p className="text-[10px] text-muted-foreground">Total em vendas na semana</p>
+              <p className="text-[10px] text-white/50">Total em vendas na semana</p>
               {summary.variation !== null && (
                 <span className={`text-[10px] font-bold flex items-center gap-0.5 ${summary.variation >= 0 ? 'text-success' : 'text-destructive'}`}>
                   <AppIcon name={summary.variation >= 0 ? 'TrendingUp' : 'TrendingDown'} size={10} />
@@ -132,7 +132,7 @@ function AnimatedCurrency({ value }: { value: number }) {
               )}
             </div>
             {summary.prevTotal > 0 && (
-              <p className="text-[9px] text-muted-foreground/60 mt-0.5">
+               <p className="text-[9px] text-white/30 mt-0.5">
                 Semana anterior: {formatCurrency(summary.prevTotal)}
               </p>
             )}
@@ -142,13 +142,13 @@ function AnimatedCurrency({ value }: { value: number }) {
           {summary.topMethods.length > 0 && (
             <div className="grid grid-cols-2 gap-2">
               {summary.topMethods.map(m => (
-                <div key={m.key} className="flex items-center gap-2 p-2 rounded-lg bg-secondary/40">
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: m.color + '20' }}>
-                    <AppIcon name={m.icon} size={12} style={{ color: m.color }} />
+                <div key={m.key} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 border border-white/5">
+                  <div className="w-7 h-7 rounded-md flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}99)` }}>
+                    <AppIcon name={m.icon} size={13} className="text-white" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[10px] text-muted-foreground block truncate">{m.label}</span>
-                    <span className="text-xs font-bold text-foreground">
+                    <span className="text-[10px] text-white/50 block truncate">{m.label}</span>
+                    <span className="text-xs font-bold text-white">
                       {formatCurrency(m.value)}
                     </span>
                   </div>
