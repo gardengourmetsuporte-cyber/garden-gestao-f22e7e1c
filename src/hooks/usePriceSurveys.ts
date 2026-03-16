@@ -41,7 +41,7 @@ export function usePriceSurveys() {
   const { user } = useAuth();
   const { activeUnitId } = useUnit();
   const qc = useQueryClient();
-  const unitId = currentUnit?.id;
+  const unitId = activeUnitId;
 
   const { data: surveys = [], isLoading } = useQuery({
     queryKey: ['price-surveys', unitId],
