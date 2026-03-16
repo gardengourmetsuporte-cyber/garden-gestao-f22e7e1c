@@ -17,7 +17,7 @@ import { ProductSheet } from '@/components/menu/ProductSheet';
 import { OptionGroupList } from '@/components/menu/OptionGroupList';
 import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
-import { MenuReplication } from '@/components/menu-admin/MenuReplication';
+
 import { RecipeSyncPanel } from '@/components/menu/RecipeSyncPanel';
 import { FichaTecnicaHeader } from '@/components/menu/FichaTecnicaHeader';
 // UnifiedOrdersPanel removed — orders managed via PDV/KDS/Deliveries
