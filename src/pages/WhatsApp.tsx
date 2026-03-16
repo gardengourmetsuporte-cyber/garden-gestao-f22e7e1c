@@ -5,10 +5,10 @@ import { useWhatsAppChannels, useWhatsAppConversations, useWhatsAppOrders } from
 import { cn } from '@/lib/utils';
 
 const sections = [
-  { key: 'chats', label: 'Conversas', icon: 'MessageSquare', desc: 'Atendimentos ativos e histórico', href: '/whatsapp/chats' },
-  { key: 'orders', label: 'Pedidos', icon: 'ShoppingBag', desc: 'Pedidos recebidos via WhatsApp', href: '/whatsapp/orders' },
-  { key: 'knowledge', label: 'Base de Conhecimento', icon: 'BookOpen', desc: 'Respostas e informações da IA', href: '/whatsapp/knowledge' },
-  { key: 'logs', label: 'Logs IA', icon: 'Brain', desc: 'Histórico de interações da IA', href: '/whatsapp/logs' },
+  { key: 'chats', label: 'Conversas', icon: 'MessageSquare', desc: 'Atendimentos ativos e histórico', href: '/whatsapp/chats', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+  { key: 'orders', label: 'Pedidos', icon: 'ShoppingBag', desc: 'Pedidos recebidos via WhatsApp', href: '/whatsapp/orders', gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+  { key: 'knowledge', label: 'Base de Conhecimento', icon: 'BookOpen', desc: 'Respostas e informações da IA', href: '/whatsapp/knowledge', gradient: 'linear-gradient(135deg, #8B5CF6, #A855F7)' },
+  { key: 'logs', label: 'Logs IA', icon: 'Brain', desc: 'Histórico de interações da IA', href: '/whatsapp/logs', gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
 ];
 
 export default function WhatsAppHub() {
@@ -73,8 +73,8 @@ export default function WhatsAppHub() {
               className="card-command p-4 text-left space-y-3 active:scale-[0.97] transition-all"
             >
               <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary">
-                  <AppIcon name={s.icon} size={20} />
+              <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg" style={{ background: s.gradient }}>
+                  <AppIcon name={s.icon} size={20} className="text-white" />
                 </div>
                 {(counters[s.key] ?? 0) > 0 && (
                   <span className="text-[10px] font-bold bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
@@ -95,8 +95,8 @@ export default function WhatsAppHub() {
           onClick={() => navigate('/whatsapp/settings')}
           className="card-command p-4 w-full text-left flex items-center gap-3 active:scale-[0.98] transition-all"
         >
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-secondary text-muted-foreground">
-            <AppIcon name="Settings" size={20} />
+          <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #6B7280, #9CA3AF)' }}>
+            <AppIcon name="Settings" size={20} className="text-white" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground">Configurações</p>
