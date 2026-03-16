@@ -153,11 +153,16 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
 
   // Filter by selected date
   const dateRange = useMemo(() => {
+    if (dateFilter === 'semana') {
+      const end = new Date();
+      end.setDate(end.getDate() + 1);
+      return { start: startOfDay(subDays(new Date(), 6)), end };
+    }
     const start = startOfDay(selectedDate);
     const end = new Date(start);
     end.setDate(end.getDate() + 1);
     return { start, end };
-  }, [selectedDate]);
+  }, [selectedDate, dateFilter]);
 
   const channelCounts = useMemo(() => {
     const counts: Record<Channel, number> = { todos: 0, delivery: 0, mesa: 0, balcao: 0, ifood: 0 };
