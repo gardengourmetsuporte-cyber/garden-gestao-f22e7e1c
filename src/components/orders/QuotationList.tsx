@@ -111,13 +111,17 @@ export function QuotationList() {
                       <span
                         key={qs.id}
                         className={cn(
-                          'text-[10px] px-2 py-0.5 rounded-full font-semibold',
-                          qs.status === 'responded' ? 'bg-success/15 text-success' :
-                          qs.status === 'contested' ? 'bg-warning/15 text-warning' :
-                          'bg-secondary text-muted-foreground'
+                          'inline-flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-lg font-semibold',
+                          qs.status === 'responded' ? 'bg-success/10 text-success' :
+                          qs.status === 'contested' ? 'bg-warning/10 text-warning' :
+                          'bg-secondary/60 text-muted-foreground'
                         )}
                       >
-                        {qs.supplier?.name} {qs.status === 'responded' ? '✅' : qs.status === 'contested' ? '⚠️' : '⏳'}
+                        {qs.supplier?.name}
+                        <AppIcon
+                          name={qs.status === 'responded' ? 'CheckCircle2' : qs.status === 'contested' ? 'AlertTriangle' : 'Clock'}
+                          size={12}
+                        />
                       </span>
                     ))}
                   </div>
