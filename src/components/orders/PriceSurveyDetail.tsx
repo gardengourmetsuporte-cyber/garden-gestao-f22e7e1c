@@ -137,26 +137,18 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
                 </tr>
               </thead>
               <tbody>
-                {allItemIds
-                  .filter((itemId: string) => {
-                    if (!search.trim()) return true;
-                    // We don't have item names here easily, so pass all
-                    return true;
-                  })
-                  .map((itemId: string) => {
-                    const prices = itemPriceMap[itemId] || [];
+                {allItems.map((item) => {
+                    const prices = itemPriceMap[item.id] || [];
                     const availablePrices = prices.filter(p => p.hasItem && p.unitPrice > 0);
                     const minPrice = availablePrices.length > 0
                       ? Math.min(...availablePrices.map(p => p.unitPrice))
                       : 0;
 
-                    // Get any name we can find
-                    const anyResponse = responses.find((r: any) => r.item_id === itemId);
-
                     return (
-                      <tr key={itemId} className="border-b border-muted/30">
-                        <td className="py-2 pr-2 font-medium sticky left-0 bg-background">
-                          {itemId.slice(0, 8)}…
+                      <tr key={item.id} className="border-b border-muted/30">
+                        <td className="py-2 pr-2 font-medium sticky left-0 bg-background text-xs">
+                          {item.name}
+                          {item.unitType && <span className="text-muted-foreground ml-1">({item.unitType})</span>}
                         </td>
                         {respondedSuppliers.map((ss: any) => {
                           const entry = prices.find(p => p.supplierId === ss.supplier_id);
@@ -183,7 +175,7 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
             </table>
           </div>
 
-          {allItemIds.length === 0 && (
+          {allItems.length === 0 && (
             <p className="text-center text-sm text-muted-foreground py-6">Nenhuma resposta com preços ainda</p>
           )}
         </div>
