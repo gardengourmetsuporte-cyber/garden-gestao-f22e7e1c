@@ -197,31 +197,40 @@ export function useQuotations() {
       const prices = await fetchPrices(quotationId);
 
       // For each item, use manual winner if provided, otherwise find best price
-      const winners: { item_id: string; quantity: number; supplier_id: string }[] = [];
+      const winners: { item_id: string; quantity: number; supplier_id: string; unit_price: number }[] = [];
+
+      // Build latest price map per item per supplier
+      const latestPriceMap = new Map<string, Map<string, QuotationPrice>>();
+      for (const p of prices) {
+        if (!latestPriceMap.has(p.quotation_item_id)) latestPriceMap.set(p.quotation_item_id, new Map());
+        const bySupplier = latestPriceMap.get(p.quotation_item_id)!;
+        const existing = bySupplier.get(p.quotation_supplier_id);
+        if (!existing || p.round > existing.round) {
+          bySupplier.set(p.quotation_supplier_id, p);
+        }
+      }
 
       for (const item of qItems) {
         let winnerQsId: string | null = null;
+        let winnerPrice = 0;
 
-        // Check manual override first (manualWinners maps item.id -> quotation_supplier.id)
+        const bySupplier = latestPriceMap.get(item.id) || new Map<string, QuotationPrice>();
+
         if (manualWinners && manualWinners[item.id]) {
           winnerQsId = manualWinners[item.id];
+          const p = bySupplier.get(winnerQsId);
+          if (p) winnerPrice = p.unit_price;
         } else {
-          // Auto: find cheapest
-          const itemPrices = prices.filter(p => p.quotation_item_id === item.id);
-          const latestBySupplier = new Map<string, QuotationPrice>();
-          for (const p of itemPrices) {
-            const existing = latestBySupplier.get(p.quotation_supplier_id);
-            if (!existing || p.round > existing.round) {
-              latestBySupplier.set(p.quotation_supplier_id, p);
-            }
-          }
           let bestPrice: QuotationPrice | null = null;
-          for (const p of latestBySupplier.values()) {
+          for (const p of bySupplier.values()) {
             if (!bestPrice || p.unit_price < bestPrice.unit_price) {
               bestPrice = p;
             }
           }
-          if (bestPrice) winnerQsId = bestPrice.quotation_supplier_id;
+          if (bestPrice) {
+            winnerQsId = bestPrice.quotation_supplier_id;
+            winnerPrice = bestPrice.unit_price;
+          }
         }
 
         if (winnerQsId) {
@@ -236,16 +245,17 @@ export function useQuotations() {
               item_id: item.item_id,
               quantity: item.quantity,
               supplier_id: winnerQs.supplier_id,
+              unit_price: winnerPrice,
             });
           }
         }
       }
 
       // Group by supplier and create orders
-      const grouped = new Map<string, { item_id: string; quantity: number }[]>();
+      const grouped = new Map<string, { item_id: string; quantity: number; unit_price: number }[]>();
       for (const w of winners) {
         if (!grouped.has(w.supplier_id)) grouped.set(w.supplier_id, []);
-        grouped.get(w.supplier_id)!.push({ item_id: w.item_id, quantity: w.quantity });
+        grouped.get(w.supplier_id)!.push({ item_id: w.item_id, quantity: w.quantity, unit_price: w.unit_price });
       }
 
       for (const [supplierId, items] of grouped) {
@@ -268,9 +278,20 @@ export function useQuotations() {
           item_id: i.item_id,
           quantity: i.quantity,
           unit_id: activeUnitId,
+          unit_price: i.unit_price,
         }));
 
         await supabase.from('order_items').insert(orderItems);
+      }
+
+      // Update inventory prices with winning bid prices
+      for (const w of winners) {
+        if (w.unit_price > 0) {
+          await supabase
+            .from('inventory_items')
+            .update({ unit_price: w.unit_price, supplier_id: w.supplier_id } as any)
+            .eq('id', w.item_id);
+        }
       }
 
       await supabase
