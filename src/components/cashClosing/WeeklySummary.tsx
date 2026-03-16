@@ -132,7 +132,7 @@ function AnimatedCurrency({ value }: { value: number }) {
               )}
             </div>
             {summary.prevTotal > 0 && (
-              <p className="text-[9px] text-muted-foreground/60 mt-0.5">
+               <p className="text-[9px] text-white/30 mt-0.5">
                 Semana anterior: {formatCurrency(summary.prevTotal)}
               </p>
             )}
