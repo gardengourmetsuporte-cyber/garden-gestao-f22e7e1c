@@ -185,7 +185,7 @@ export default function TabletMenu() {
       {/* Products by category */}
       <main className="pb-24 px-4 pt-4">
         {loading && products.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground">Carregando cardápio...</div>
+          <div className="flex items-center justify-center py-16"><MenuLoadingScreen /></div>
         ) : (
           categories.map(cat => (
             <div key={cat} className="mb-6">

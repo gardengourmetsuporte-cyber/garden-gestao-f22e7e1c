@@ -160,11 +160,7 @@ export default function TabletBill() {
   }, [pixKey, pixKeyType, storeName, grandTotal]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-[100dvh] bg-background flex items-center justify-center">
-        <AppIcon name="Loader2" size={28} className="animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <MenuLoadingScreen />;
   }
 
   const hasOrders = orders && orders.length > 0;
