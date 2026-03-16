@@ -27,7 +27,7 @@ export function WhatsAppKnowledge() {
   const { activeUnitId } = useUnit();
   const { articles, isLoading, upsertArticle, deleteArticle, toggleActive } = useUnifiedKnowledge();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [editing, setEditing] = useState<Partial<WhatsAppKnowledgeArticle> | null>(null);
+  const [editing, setEditing] = useState<Partial<CopilotKnowledgeArticle> | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const openNew = () => {
