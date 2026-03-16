@@ -236,13 +236,9 @@ export function useQuotations() {
         if (winnerQsId) {
           const winnerQs = qSuppliers.find(s => s.id === winnerQsId);
           if (winnerQs) {
-            await supabase
-              .from('quotation_items')
-              .update({ winner_supplier_id: winnerQs.supplier_id })
-              .eq('id', item.id);
-
             winners.push({
               item_id: item.item_id,
+              qi_id: item.id,
               quantity: item.quantity,
               supplier_id: winnerQs.supplier_id,
               unit_price: winnerPrice,
@@ -251,6 +247,13 @@ export function useQuotations() {
         }
       }
 
+      // Batch update quotation_items winners (parallel)
+      await Promise.all(
+        winners.map(w =>
+          supabase.from('quotation_items').update({ winner_supplier_id: w.supplier_id }).eq('id', w.qi_id)
+        )
+      );
+
       // Group by supplier and create orders
       const grouped = new Map<string, { item_id: string; quantity: number; unit_price: number }[]>();
       for (const w of winners) {
@@ -258,6 +261,7 @@ export function useQuotations() {
         grouped.get(w.supplier_id)!.push({ item_id: w.item_id, quantity: w.quantity, unit_price: w.unit_price });
       }
 
+      // Create orders (sequential per supplier, but items batch inserted)
       for (const [supplierId, items] of grouped) {
         const { data: order, error: oErr } = await supabase
           .from('orders')
@@ -284,15 +288,17 @@ export function useQuotations() {
         await supabase.from('order_items').insert(orderItems);
       }
 
-      // Update inventory prices with winning bid prices
-      for (const w of winners) {
-        if (w.unit_price > 0) {
-          await supabase
-            .from('inventory_items')
-            .update({ unit_price: w.unit_price, supplier_id: w.supplier_id } as any)
-            .eq('id', w.item_id);
-        }
-      }
+      // Batch update inventory prices (parallel)
+      await Promise.all(
+        winners
+          .filter(w => w.unit_price > 0)
+          .map(w =>
+            supabase
+              .from('inventory_items')
+              .update({ unit_price: w.unit_price, supplier_id: w.supplier_id } as any)
+              .eq('id', w.item_id)
+          )
+      );
 
       await supabase
         .from('quotations')
