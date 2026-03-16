@@ -10,7 +10,7 @@ import { useUnifiedKnowledge, type CopilotKnowledgeArticle } from '@/hooks/useCo
 import { useUnit } from '@/contexts/UnitContext';
 import { AppIcon } from '@/components/ui/app-icon';
 
-const CATEGORY_OPTIONS = ['geral', 'entrega', 'pagamento', 'funcionamento', 'politicas', 'contato'];
+const CATEGORY_OPTIONS = ['geral', 'operação', 'financeiro', 'equipe', 'estoque', 'atendimento', 'delivery', 'entrega', 'pagamento', 'funcionamento', 'politicas', 'contato'];
 
 const SUGGESTIONS = [
   { title: 'Horário de Funcionamento', category: 'funcionamento', content: 'Ex: Segunda a Sexta: 11h às 23h\nSábados: 11h às 00h\nDomingos: 12h às 22h' },
