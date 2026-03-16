@@ -65,10 +65,10 @@ export default function RewardsPage() {
               <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #EAB308)' }}>
                 <AppIcon name="Star" size={22} className="text-white" />
               </div>
-              <span className="text-5xl font-black text-foreground font-display" style={{ letterSpacing: '-0.04em' }}>
+              <span className="text-5xl font-black text-white font-display" style={{ letterSpacing: '-0.04em' }}>
                 {animatedBalance}
               </span>
-              <span className="text-base text-muted-foreground mt-2">pontos</span>
+              <span className="text-base text-white/50 mt-2">pontos</span>
             </div>
 
             {/* Progress to next prize */}
