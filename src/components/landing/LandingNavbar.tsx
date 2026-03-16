@@ -99,7 +99,7 @@ export function LandingNavbar() {
         </div>
 
         {/* Mobile Toggle */}
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
           <Link
             to="/auth?plan=free"
             className="inline-flex items-center justify-center h-8 px-4 rounded-full text-xs font-bold bg-foreground text-background transition-all active:scale-[0.98]"
@@ -107,15 +107,8 @@ export function LandingNavbar() {
             Entrar
           </Link>
           <button
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Alternar tema"
-          >
-            <AppIcon name={isDark ? "Sun" : "Moon"} size={16} />
-          </button>
-          <button
             onClick={() => setOpen(!open)}
-            className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary/60 bg-secondary/40 border border-border"
+            className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors rounded-xl hover:bg-secondary/60 bg-secondary/40 border border-border"
           >
             {open ? <AppIcon name="X" size={20} /> : <AppIcon name="Menu" size={20} />}
           </button>
@@ -138,6 +131,13 @@ export function LandingNavbar() {
             </a>
           ))}
           <div className="pt-4 mt-2 border-t border-border flex flex-col gap-3">
+            <button
+              onClick={() => { setTheme(isDark ? "light" : "dark"); }}
+              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors border border-border"
+            >
+              <AppIcon name={isDark ? "Sun" : "Moon"} size={18} />
+              {isDark ? "Tema claro" : "Tema escuro"}
+            </button>
             <Link
               to="/auth"
               onClick={() => setOpen(false)}
