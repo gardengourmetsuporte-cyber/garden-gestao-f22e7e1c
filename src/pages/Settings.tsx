@@ -167,6 +167,11 @@ export default function SettingsPage() {
             {section.items.map((item) => {
               const locked = !hasPlan(item.requiredPlan);
               const planLabel = PLAN_LABELS[item.requiredPlan];
+              const iconGradient = item.variant === 'cyan'
+                ? 'linear-gradient(135deg, #06B6D4, #3B82F6)'
+                : item.variant === 'amber'
+                  ? 'linear-gradient(135deg, #F59E0B, #F97316)'
+                  : 'linear-gradient(135deg, #8B5CF6, #A855F7)';
               return (
                 <button
                   key={item.value}
@@ -177,7 +182,13 @@ export default function SettingsPage() {
                     activeSection === item.value && "bg-primary/5 border-l-2 border-primary"
                   )}
                 >
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-3">
+                    <span
+                      className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-md"
+                      style={{ background: locked ? 'hsl(var(--muted))' : iconGradient }}
+                    >
+                      <AppIcon name={item.icon} size={16} className="text-white" />
+                    </span>
                     <span className={cn("font-medium text-sm", locked ? "text-muted-foreground" : "text-foreground")}>{item.label}</span>
                     {locked && planLabel && (
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded-full">
