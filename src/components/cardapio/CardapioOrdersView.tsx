@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { UnifiedDateStrip } from '@/components/ui/unified-date-strip';
+
 import { formatCurrency } from '@/lib/format';
 import type { HubOrder } from '@/hooks/useDeliveryHub';
 
