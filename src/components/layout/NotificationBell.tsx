@@ -15,7 +15,7 @@ export function NotificationBell() {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-muted/50 transition-colors">
+        <button className="relative w-9 h-9 flex items-center justify-center rounded-lg hover:bg-muted/50 transition-colors outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 focus-visible:ring-0">
           <AppIcon name="Bell" size={19} className="text-muted-foreground" />
           {unreadCount > 0 && (
             <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] px-0.5 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center">
