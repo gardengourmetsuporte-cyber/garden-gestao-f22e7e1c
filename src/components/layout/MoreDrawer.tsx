@@ -271,15 +271,19 @@ export const MoreDrawer = React.forwardRef<HTMLDivElement, MoreDrawerProps>(func
                     )}
                     <div className="relative">
                       <div className={cn(
-                        "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300",
+                        "w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 shadow-lg",
                         active
-                          ? "bg-primary/20"
-                          : "bg-muted/50"
-                      )}>
+                          ? ""
+                          : ""
+                      )} style={{
+                        background: active
+                          ? 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))'
+                          : 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted) / 0.6))'
+                      }}>
                         {item.customIcon ? (
-                          <img src={item.customIcon} alt="" className={cn("w-6 h-6 transition-all", item.keepIconColor ? "" : "icon-tint-white")} />
+                          <img src={item.customIcon} alt="" className={cn("w-5 h-5 transition-all", item.keepIconColor ? "" : active ? "icon-tint-white" : "icon-tint-white")} />
                         ) : (
-                          <AppIcon name={item.icon} size={22} fill={1} className="text-foreground transition-colors duration-300" />
+                          <AppIcon name={item.icon} size={20} fill={1} className={cn("transition-colors duration-300", active ? "text-white" : "text-foreground/80")} />
                         )}
                       </div>
                       {locked && (
