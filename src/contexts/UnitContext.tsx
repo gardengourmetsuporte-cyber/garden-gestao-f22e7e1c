@@ -254,7 +254,11 @@ export function UnitProvider({ children }: { children: ReactNode }) {
       .eq('user_id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (!cancelled) setUserUnitRole(data?.role ?? null);
+        if (!cancelled) {
+          const r = data?.role ?? null;
+          setUserUnitRole(r);
+          setUnitRole(r); // Propagate to AuthContext for isAdmin derivation
+        }
       });
 
     // Fetch effective plan
