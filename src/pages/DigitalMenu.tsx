@@ -424,14 +424,14 @@ export default function DigitalMenu() {
           )}
 
           {/* Featured products */}
-          {products.filter(p => p.is_highlighted).length > 0 && (
+          {tProducts.filter(p => p.is_highlighted).length > 0 && (
             <div className="mt-6 px-5 md:px-8">
               <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
                 <AppIcon name="Whatshot" size={14} className="text-primary" />
-                Destaques
+                {locale === 'pt' ? 'Destaques' : locale === 'en' ? 'Featured' : 'Destacados'}
               </h3>
               <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
-                {products.filter(p => p.is_highlighted).slice(0, 8).map(product => (
+                {tProducts.filter(p => p.is_highlighted).slice(0, 8).map(product => (
                   <button
                     key={product.id}
                     onClick={() => handleProductSelect(product)}
