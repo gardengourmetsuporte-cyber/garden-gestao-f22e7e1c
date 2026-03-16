@@ -8,7 +8,7 @@ import { StableNavIcon } from '@/components/ui/stable-nav-icon';
 import { cn } from '@/lib/utils';
 import { FinanceTab, TransactionType } from '@/types/finance';
 
-function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab; icon: string; customIcon?: string; label: string }; active: boolean; onTabChange: (tab: FinanceTab) => void }) {
+function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab; icon: string; label: string }; active: boolean; onTabChange: (tab: FinanceTab) => void }) {
   const [bouncing, setBouncing] = useState(false);
   const handledByPointer = useRef(false);
 
@@ -78,7 +78,6 @@ function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab;
         />
         <StableNavIcon
           name={tab.icon}
-          customIcon={tab.customIcon}
           active={active}
           size={22}
           fill={1}
@@ -99,10 +98,10 @@ interface FinanceBottomNavProps {
   variant?: 'business' | 'personal';
 }
 
-const tabs: { id: FinanceTab; icon: string; customIcon?: string; label: string }[] = [
+const tabs: { id: FinanceTab; icon: string; label: string }[] = [
   { id: 'home', icon: 'Home', label: 'Início' },
-  { id: 'transactions', icon: 'FileText', customIcon: '/icons/transacoes.png', label: 'Transações' },
-  { id: 'charts', icon: 'ChartPie', customIcon: '/icons/graficos.png', label: 'Gráficos' },
+  { id: 'transactions', icon: 'Receipt', label: 'Transações' },
+  { id: 'charts', icon: 'BarChart3', label: 'Gráficos' },
   { id: 'more', icon: 'Menu', label: 'Mais' },
 ];
 
