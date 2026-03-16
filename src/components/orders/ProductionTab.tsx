@@ -50,7 +50,7 @@ export function ProductionTab() {
       <div className="flex items-center gap-3">
         <div className={cn(
           "flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium",
-          needsProduction.length > 0 ? "bg-amber-500/10 text-amber-400" : "bg-emerald-500/10 text-emerald-400"
+          needsProduction.length > 0 ? "bg-amber-500/10 text-amber-400" : "bg-primary/10 text-primary"
         )}>
           <AppIcon name={needsProduction.length > 0 ? "AlertTriangle" : "CheckCircle2"} size={14} />
           {needsProduction.length > 0
