@@ -1412,6 +1412,16 @@ serve(async (req) => {
     if (context?.budgetStatus?.length) {
       dataLines.push(`\n🎯 ORÇAMENTO vs REALIZADO:\n${context.budgetStatus.join('\n')}`);
     }
+    if (context?.products?.length) {
+      dataLines.push(`\n🍽️ PRODUTOS DO CARDÁPIO (${context.products.length} itens):\n${context.products.join('\n')}`);
+    }
+    if (context?.brand) {
+      const b = context.brand;
+      dataLines.push(`\n🎨 IDENTIDADE DE MARCA:\n- Tom de voz: ${b.tone_of_voice || 'não definido'}\n- Tagline: ${b.tagline || 'não definida'}\n- Instagram: ${b.instagram_url || 'não informado'}\n- Site: ${b.website_url || 'não informado'}\n- Frases: ${JSON.stringify(b.institutional_phrases || [])}`);
+    }
+    if (context?.brandAssets?.length) {
+      dataLines.push(`\n📸 ASSETS VISUAIS:\n${context.brandAssets.join('\n')}`);
+    }
 
     const dataSnapshot = dataLines.length > 0 ? dataLines.join('\n') : 'Dados ainda carregando...';
 
