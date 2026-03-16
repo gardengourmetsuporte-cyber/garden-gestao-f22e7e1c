@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { format, isSameDay, isToday as isDateToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -21,25 +21,46 @@ export function UnifiedDateStrip({
   getDayIndicators,
 }: UnifiedDateStripProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
-  useEffect(() => {
+  const scrollToSelected = useCallback((behavior: ScrollBehavior = 'smooth') => {
     const container = containerRef.current;
     if (!container) return;
     const selectedIdx = days.findIndex(d => isSameDay(d, selectedDate));
     if (selectedIdx < 0) return;
-    const itemWidth = 48;
-    const gap = 6;
-    const padding = 16;
-    const btnCenter = padding + selectedIdx * (itemWidth + gap) + itemWidth / 2;
+    const btn = itemRefs.current.get(selectedIdx);
+    if (!btn) return;
+    const containerRect = container.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const btnCenter = btnRect.left - containerRect.left + container.scrollLeft + btnRect.width / 2;
     const scrollLeft = btnCenter - container.clientWidth / 2;
-    container.scrollTo({ left: Math.max(0, scrollLeft), behavior: 'smooth' });
-  }, [selectedDate, days]);
+    container.scrollTo({ left: Math.max(0, scrollLeft), behavior });
+  }, [days, selectedDate]);
+
+  // Scroll on mount (instant) and on selection change (smooth)
+  useEffect(() => {
+    // Use requestAnimationFrame to ensure DOM is laid out
+    requestAnimationFrame(() => scrollToSelected('instant'));
+  }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => scrollToSelected('smooth'));
+  }, [selectedDate]);
+
+  const setItemRef = useCallback((idx: number) => (el: HTMLButtonElement | null) => {
+    if (el) itemRefs.current.set(idx, el);
+    else itemRefs.current.delete(idx);
+  }, []);
 
   return (
     <div className="space-y-2">
-      <div className="-mx-4 overflow-x-auto scrollbar-hide" ref={containerRef}>
+      <div
+        className="-mx-4 overflow-x-auto scrollbar-hide scroll-smooth"
+        ref={containerRef}
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
         <div className="flex gap-1.5 px-4 py-1.5">
-          {days.map((day) => {
+          {days.map((day, idx) => {
             const isSelected = isSameDay(day, selectedDate);
             const isDayToday = isDateToday(day);
             const indicators = getDayIndicators?.(day) || [];
@@ -47,8 +68,9 @@ export function UnifiedDateStrip({
             return (
               <button
                 key={`${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}`}
+                ref={setItemRef(idx)}
                 onClick={() => onSelectDate(day)}
-                className="flex flex-col items-center gap-1 shrink-0 w-[48px] group"
+                className="flex flex-col items-center gap-1 shrink-0 w-[48px] group touch-manipulation"
               >
                 {/* Day label */}
                 <span className={cn(
