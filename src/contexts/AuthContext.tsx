@@ -21,6 +21,7 @@ interface AuthContextType {
   isFree: boolean;
   hasPlan: (required: PlanTier) => boolean;
   setEffectivePlan: (plan: PlanTier) => void;
+  setUnitRole: (unitRole: string | null) => void;
   refreshSubscription: () => Promise<void>;
   refreshUserData: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
