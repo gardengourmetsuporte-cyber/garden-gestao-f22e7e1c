@@ -273,10 +273,10 @@ export function CategoryManagement({
                       )}>
                         <DragHandle dragHandleProps={dragHandleProps} />
                         <div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: category.color + '20' }}
+                          className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg shrink-0"
+                          style={{ background: `linear-gradient(135deg, ${category.color}, ${category.color}99)` }}
                         >
-                          <AppIcon name={category.icon} size={20} style={{ color: category.color }} />
+                          <AppIcon name={category.icon} size={20} className="text-white" />
                         </div>
                         <div className="flex-1">
                           <p className="font-medium">{category.name}</p>
