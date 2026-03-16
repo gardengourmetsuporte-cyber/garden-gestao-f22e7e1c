@@ -71,8 +71,9 @@ export default function Invite() {
 
   async function acceptInviteForUser(userId: string, userEmail: string) {
     try {
-      // Check email matches
-      if (invite && invite.email.toLowerCase() !== userEmail.toLowerCase()) {
+      // Check email matches (skip for open invites)
+      const isOpenInvite = invite?.email === 'open-invite@garden.app';
+      if (invite && !isOpenInvite && invite.email.toLowerCase() !== userEmail.toLowerCase()) {
         setError(`Este convite é para ${invite.email}. Faça login com esse email.`);
         return;
       }
