@@ -35,7 +35,7 @@ const QUICK_PROMPTS = [
   { icon: 'BarChart3', label: 'Engajamento', color: 'text-primary', bg: 'bg-primary/10', prompt: 'Crie um post interativo para engajar o público — pode ser enquete, pergunta, ou "isso ou aquilo".' },
 ];
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/marketing-post-chat`;
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/management-ai`;
 
 function getTextContent(content: MessageContent): string {
   if (typeof content === 'string') return content;
