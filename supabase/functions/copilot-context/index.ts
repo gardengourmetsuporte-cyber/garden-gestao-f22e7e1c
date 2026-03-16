@@ -96,6 +96,9 @@ Deno.serve(async (req) => {
       sb.from("finance_budgets").select("planned_amount, category:finance_categories(id, name)").eq("unit_id", unit_id).eq("user_id", userId).eq("month", now.getMonth() + 1).eq("year", now.getFullYear()),
       sb.from("finance_transactions").select("amount, category_id").eq("user_id", userId).eq("unit_id", unit_id).in("type", ["expense", "credit_card"]).eq("is_paid", true).gte("date", monthStart).lte("date", monthEnd),
       sb.from("copilot_preferences").select("key, value, category").eq("user_id", userId).limit(50),
+      sb.from("tablet_products").select("name, description, price, image_url, is_highlight, category, is_active").eq("unit_id", unit_id).eq("is_active", true).limit(50),
+      sb.from("brand_identity").select("*").eq("unit_id", unit_id).maybeSingle(),
+      sb.from("brand_assets").select("title, type, tags, file_url").eq("unit_id", unit_id).limit(10),
     ]);
 
     // Process data
