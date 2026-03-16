@@ -160,8 +160,8 @@ export function MemoryGame({ onBack, unitId }: Props) {
       </div>
 
       {/* Game area */}
-      <div className="flex-1 flex items-center justify-center px-4 relative">
-        <div className="relative w-full max-w-[500px]">
+      <div className="flex-1 flex items-center justify-center px-4 py-2 relative">
+        <div className="relative w-full max-w-[600px]">
           {gameState === 'menu' && (
             <div className="flex flex-col items-center justify-center gap-6 py-12">
               <span className="text-6xl">🧠</span>
