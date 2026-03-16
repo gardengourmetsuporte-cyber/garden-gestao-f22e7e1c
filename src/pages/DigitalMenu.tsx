@@ -359,7 +359,7 @@ export default function DigitalMenu() {
       {/* Language switcher floating */}
       <div className="fixed top-3 right-3 z-50">
         <LanguageSwitcher onChange={() => forceRerender(n => n + 1)} />
-      </div>
+        {isTranslating && <div className="mt-1 flex justify-end"><span className="text-[9px] text-muted-foreground animate-pulse">Traduzindo...</span></div>}
       {/* Auth modal (sheet overlay) */}
       {showAuth && (
         <MenuCustomerAuth
