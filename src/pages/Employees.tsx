@@ -75,12 +75,12 @@ export default function Employees() {
                            : "bg-secondary/50 text-muted-foreground"
                        )}
                      >
-                       <div className={cn(
-                         "w-9 h-9 rounded-xl flex items-center justify-center transition-colors",
-                         isActive ? "bg-primary/20" : "bg-foreground/[0.05]"
-                       )}>
-                         <AppIcon name={tab.icon} size={18} fill={tab.iconFill as 0 | 1} className={isActive ? "text-primary" : "text-muted-foreground"} />
-                       </div>
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-all"
+                          style={{ background: isActive ? tab.gradient : undefined }}
+                        >
+                          <AppIcon name={tab.icon} size={20} fill={tab.iconFill as 0 | 1} className={isActive ? "text-white" : "text-muted-foreground"} />
+                        </div>
                        <span className="truncate w-full text-center">{tab.label}</span>
                      </button>
                    );
