@@ -500,7 +500,7 @@ export default function TabletHome() {
         onClick: () => navigate(`/tablet/${unitId}/rodizio?mesa=${mesa}`),
       }] : []),
       { id: 'cardapio', icon: 'Restaurant', label: 'Cardápio', subtitle: 'Menu completo', onClick: () => navigate(`/tablet/${unitId}/menu?mesa=${mesa}`) },
-      { id: 'jogos', icon: 'SportsEsports', label: 'Jogos', subtitle: 'Diversão na mesa', onClick: () => setActivePanel('games') },
+      { id: 'jogos', icon: 'Casino', label: 'Jogos', subtitle: 'Diversão na mesa', onClick: () => setActivePanel('games') },
       { id: 'mural', icon: 'Newspaper', label: 'Mural da Casa', subtitle: 'Novidades e avisos', onClick: () => navigate(`/tablet/${unitId}/mural?mesa=${mesa}`) },
       { id: 'avalie', icon: 'Star', label: 'Avalie o Local', subtitle: 'Deixe sua opinião', onClick: () => navigate(`/tablet/${unitId}/review?mesa=${mesa}`) },
     ];
