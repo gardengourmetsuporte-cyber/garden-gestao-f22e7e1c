@@ -131,6 +131,13 @@ export function LandingNavbar() {
             </a>
           ))}
           <div className="pt-4 mt-2 border-t border-border flex flex-col gap-3">
+            <button
+              onClick={() => { setTheme(isDark ? "light" : "dark"); }}
+              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors border border-border"
+            >
+              <AppIcon name={isDark ? "Sun" : "Moon"} size={18} />
+              {isDark ? "Tema claro" : "Tema escuro"}
+            </button>
             <Link
               to="/auth"
               onClick={() => setOpen(false)}
