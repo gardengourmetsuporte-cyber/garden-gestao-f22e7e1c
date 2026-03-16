@@ -199,18 +199,6 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
     return { active, done, revenue };
   }, [grouped, filtered]);
 
-  // Day indicators for the date strip
-  const getDayIndicators = useCallback((day: Date) => {
-    const dayStart = startOfDay(day);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setDate(dayEnd.getDate() + 1);
-    const count = allOrders.filter(o => {
-      const d = new Date(o.created_at);
-      return isWithinInterval(d, { start: dayStart, end: dayEnd });
-    }).length;
-    if (count > 0) return [{ color: 'hsl(var(--primary))' }];
-    return [];
-  }, [allOrders]);
 
   return (
     <div className="space-y-0">
