@@ -35,7 +35,7 @@ export function WhatsAppKnowledge() {
     setSheetOpen(true);
   };
 
-  const openEdit = (article: WhatsAppKnowledgeArticle) => {
+  const openEdit = (article: CopilotKnowledgeArticle) => {
     setEditing({ ...article });
     setSheetOpen(true);
   };
