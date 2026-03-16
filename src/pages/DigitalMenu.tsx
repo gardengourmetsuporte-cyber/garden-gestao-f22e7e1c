@@ -419,7 +419,7 @@ export default function DigitalMenu() {
 
           {searchOpen && (
             <div className="px-4 md:px-8 mt-3">
-              <MenuSearch products={products} onSelectProduct={(p) => { handleProductSelect(p); setSearchOpen(false); }} />
+              <MenuSearch products={tProducts} onSelectProduct={(p) => { handleProductSelect(p); setSearchOpen(false); }} />
             </div>
           )}
 
