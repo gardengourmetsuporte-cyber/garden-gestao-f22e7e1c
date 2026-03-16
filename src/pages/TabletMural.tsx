@@ -2,6 +2,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
+import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -44,7 +45,7 @@ export default function TabletMural() {
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-6 py-6 space-y-4">
           {isLoading && (
-            <div className="text-center py-16 text-muted-foreground text-sm">Carregando...</div>
+            <MenuLoadingScreen />
           )}
 
           {!isLoading && (!posts || posts.length === 0) && (

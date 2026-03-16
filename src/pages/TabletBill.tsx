@@ -3,6 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
+import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
 import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/format';
 import { QRCodeSVG } from 'qrcode.react';
@@ -159,11 +160,7 @@ export default function TabletBill() {
   }, [pixKey, pixKeyType, storeName, grandTotal]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-[100dvh] bg-background flex items-center justify-center">
-        <AppIcon name="Loader2" size={28} className="animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <MenuLoadingScreen />;
   }
 
   const hasOrders = orders && orders.length > 0;

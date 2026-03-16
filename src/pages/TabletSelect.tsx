@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
+import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
 
 interface TableData {
   id: string;
@@ -40,7 +41,7 @@ export default function TabletSelect() {
       {/* Tables */}
       <main className="flex-1 px-4 py-6">
         {loading ? (
-          <p className="text-center text-muted-foreground py-12">Carregando mesas...</p>
+          <MenuLoadingScreen />
         ) : tables.length === 0 ? (
           <div className="text-center py-12">
             <AppIcon name="Utensils" className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
