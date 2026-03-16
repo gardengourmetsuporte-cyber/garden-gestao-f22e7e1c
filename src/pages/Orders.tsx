@@ -21,6 +21,7 @@ import { SmartReceivingSheet } from '@/components/inventory/SmartReceivingSheet'
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { QuotationList } from '@/components/orders/QuotationList';
+import { PriceSurveyList } from '@/components/orders/PriceSurveyList';
 import { useShoppingList } from '@/hooks/useShoppingList';
 import { SupplierProfileSheet } from '@/components/orders/SupplierProfileSheet';
 import { ProductionTab } from '@/components/orders/ProductionTab';
@@ -46,7 +47,7 @@ export default function OrdersPage() {
   const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
   const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
-  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list' | 'suppliers' | 'production'>('to-order');
+  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'price-survey' | 'shopping-list' | 'suppliers' | 'production'>('to-order');
   const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
   const [cotationStep, setCotationStep] = useState(false);
   const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
@@ -272,12 +273,13 @@ export default function OrdersPage() {
               { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
               { key: 'orders' as const, label: 'Pedidos', icon: 'ClipboardList', badge: pendingOrders.length || undefined, gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
               { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, gradient: 'linear-gradient(135deg, #8B5CF6, #EC4899)' },
+              { key: 'price-survey' as const, label: 'Pesquisa', icon: 'SearchCheck', badge: undefined, gradient: 'linear-gradient(135deg, #06B6D4, #3B82F6)' },
               { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: undefined, gradient: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' },
               { key: 'production' as const, label: 'Produção', icon: 'ChefHat', badge: undefined, gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
             ];
 
             return (
-              <div className="grid grid-cols-3 gap-2 lg:grid-cols-6 lg:gap-3">
+              <div className="grid grid-cols-4 gap-2 lg:grid-cols-7 lg:gap-3">
                 {tabs.map(tab => {
                   const isActive = orderTab === tab.key;
                   return (
@@ -477,6 +479,9 @@ export default function OrdersPage() {
 
             {/* Cotações Tab */}
             {orderTab === 'quotations' && <QuotationList />}
+
+            {/* Pesquisa de Preços Tab */}
+            {orderTab === 'price-survey' && <PriceSurveyList suppliers={suppliers} />}
 
             {/* Histórico Tab */}
             {orderTab === 'orders' && (

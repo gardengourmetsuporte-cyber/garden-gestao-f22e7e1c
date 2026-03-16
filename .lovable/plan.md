@@ -1,120 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-## Plano: Cotação Global — Catálogo de Preços por Fornecedor
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-### Conceito
-
-Uma nova modalidade de cotação chamada **"Pesquisa de Preços"** (ou Cotação Global). Diferente da cotação normal (itens específicos com quantidades), esta envia **toda a lista de estoque** para os fornecedores selecionados, onde cada um informa:
-- Quais itens **fornece**
-- O **preço unitário** de cada item
-- A **marca** (opcional)
-
-O resultado alimenta a tabela `supplier_last_prices` e permite visualizar um mapa completo de quem vende o quê e por quanto.
-
----
-
-### O que será feito
-
-**1. Nova tabela `price_surveys`**
-Armazena as pesquisas de preço globais, separada das cotações normais.
-
-```text
-price_surveys
-├── id (uuid PK)
-├── user_id (uuid)
-├── unit_id (uuid)
-├── title (text)
-├── status (draft | sent | completed)
-├── notes (text)
-├── created_at / updated_at
-```
-
-**2. Nova tabela `price_survey_suppliers`**
-Link entre pesquisa e fornecedores, com token público.
-
-```text
-price_survey_suppliers
-├── id (uuid PK)
-├── survey_id → price_surveys
-├── supplier_id → suppliers
-├── token (uuid, default gen_random_uuid())
-├── status (pending | responded)
-├── responded_at (timestamptz)
-```
-
-**3. Nova tabela `price_survey_responses`**
-Cada preço informado pelo fornecedor.
-
-```text
-price_survey_responses
-├── id (uuid PK)
-├── survey_supplier_id → price_survey_suppliers
-├── item_id → inventory_items
-├── unit_price (numeric)
-├── brand (text)
-├── has_item (boolean, default true)
-├── created_at
-```
-
-**4. Edge Function `price-survey-public`**
-- **GET**: Retorna todos os itens do estoque da unidade com suas categorias, agrupados para o fornecedor
-- **POST**: Recebe as respostas do fornecedor, salva em `price_survey_responses` e faz upsert em `supplier_last_prices`
-
-**5. Página pública do fornecedor (`/pesquisa/:token`)**
-Interface interativa e mobile-first:
-- Lista completa de itens **agrupados por categoria** do estoque
-- Filtro de busca e filtro por categoria (chips horizontais)
-- Toggle "Tenho este item" + campo de preço + marca
-- Botão "Marcar todos como disponíveis" para agilizar
-- Barra fixa inferior com progresso e botão de enviar
-
-**6. Tela interna de resultados**
-- Nova sub-aba dentro de Cotações ou acesso direto
-- Grid comparativo: itens nas linhas × fornecedores nas colunas
-- Destaque visual para menor preço por item
-- Indicador de quais fornecedores têm cada item
-- Possibilidade de **gerar pedido** direto a partir dos resultados (selecionar itens → criar rascunho para o fornecedor escolhido)
-
-**7. Criação da pesquisa (Sheet no app)**
-- Selecionar fornecedores (mín. 1, sem mínimo de 2 como cotação)
-- Título e observações
-- Envio do link via WhatsApp (mesmo padrão atual)
-- Todos os itens do estoque são incluídos automaticamente
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
 ---
 
-### Alterações técnicas
+## Bloco de Relatórios Avançados ✅
 
-**Migração SQL:**
-- 3 novas tabelas com RLS por `unit_id`
-- Políticas baseadas em `user_has_unit_access`
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-**Novos arquivos:**
-- `supabase/functions/price-survey-public/index.ts` — Edge function pública
-- `src/pages/PriceSurveyPublic.tsx` — Página do fornecedor
-- `src/components/orders/PriceSurveySheet.tsx` — Sheet de criação
-- `src/components/orders/PriceSurveyList.tsx` — Listagem
-- `src/components/orders/PriceSurveyDetail.tsx` — Comparativo de resultados
-- `src/hooks/usePriceSurveys.ts` — Hook CRUD
+## Dashboard Analytics ✅
 
-**Arquivos editados:**
-- `src/App.tsx` — Rota `/pesquisa/:token`
-- `src/pages/Orders.tsx` — Nova aba ou botão para pesquisa de preços
-- `supabase/config.toml` — JWT config para nova function
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
----
+## Operacional ✅
 
-### Fluxo resumido
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-```text
-Admin cria pesquisa → Seleciona fornecedores → Links gerados
-         ↓
-Fornecedor abre link → Vê lista completa por categoria
-         ↓
-Marca itens que tem → Informa preços → Envia
-         ↓
-Admin vê comparativo → Identifica melhor fornecedor por item
-         ↓
-Pode gerar pedido direto ou usar info para cotações futuras
-```
+## CRM / Clientes ✅
 
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+
+## Funcionários ✅
+
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)

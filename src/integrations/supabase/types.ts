@@ -4709,6 +4709,137 @@ export type Database = {
           },
         ]
       }
+      price_survey_responses: {
+        Row: {
+          brand: string | null
+          created_at: string
+          has_item: boolean
+          id: string
+          item_id: string
+          survey_supplier_id: string
+          unit_price: number
+        }
+        Insert: {
+          brand?: string | null
+          created_at?: string
+          has_item?: boolean
+          id?: string
+          item_id: string
+          survey_supplier_id: string
+          unit_price?: number
+        }
+        Update: {
+          brand?: string | null
+          created_at?: string
+          has_item?: boolean
+          id?: string
+          item_id?: string
+          survey_supplier_id?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_survey_responses_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_survey_responses_survey_supplier_id_fkey"
+            columns: ["survey_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "price_survey_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_survey_suppliers: {
+        Row: {
+          created_at: string
+          id: string
+          responded_at: string | null
+          status: string
+          supplier_id: string
+          survey_id: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          responded_at?: string | null
+          status?: string
+          supplier_id: string
+          survey_id: string
+          token?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          responded_at?: string | null
+          status?: string
+          supplier_id?: string
+          survey_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_survey_suppliers_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_survey_suppliers_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "price_surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_surveys: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          status: string
+          title: string
+          unit_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          title?: string
+          unit_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          title?: string
+          unit_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_surveys_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       production_orders: {
         Row: {
           created_at: string | null

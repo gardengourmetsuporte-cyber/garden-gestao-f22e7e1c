@@ -86,6 +86,7 @@ const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
 
 const Plans = lazy(() => lazyRetry(() => import("./pages/Plans")));
 const QuotationPublic = lazy(() => lazyRetry(() => import("./pages/QuotationPublic")));
+const PriceSurveyPublic = lazy(() => lazyRetry(() => import("./pages/PriceSurveyPublic")));
 const CalendarFull = lazy(() => lazyRetry(() => import("./pages/CalendarFull")));
 const Customers = lazy(() => lazyRetry(() => import("./pages/Customers")));
 const DigitalMenu = lazy(() => lazyRetry(() => import("./pages/DigitalMenu")));
@@ -237,6 +238,7 @@ function PublicRoutes() {
         <Route path="/gamification/:unitId" element={<TabletGames />} />
         <Route path="/cotacao/:token" element={<QuotationPublic />} />
         <Route path="/fornecedor/:token" element={<SupplierPortal />} />
+        <Route path="/pesquisa/:token" element={<PriceSurveyPublic />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/invite" element={<PublicWithAuth><RouteErrorBoundary><Invite /></RouteErrorBoundary></PublicWithAuth>} />
         <Route path="/share-receipt" element={<ShareReceiptHandler />} />
