@@ -26,8 +26,8 @@ export function ServiceDeliveryStatus({ deliveries, hubOrders }: { deliveries: A
     return (
       <div className="card-base p-4">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' }}>
-            <AppIcon name="local_shipping" size={14} className="text-white" />
+          <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' }}>
+            <AppIcon name="local_shipping" size={16} className="text-white" />
           </div>
           <h3 className="text-sm font-semibold text-foreground">Entregas</h3>
         </div>
@@ -47,8 +47,8 @@ export function ServiceDeliveryStatus({ deliveries, hubOrders }: { deliveries: A
       {deliveries.length > 0 && (
         <div className="card-base p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
-              <AppIcon name="two_wheeler" size={14} className="text-white" />
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+              <AppIcon name="two_wheeler" size={16} className="text-white" />
             </div>
             <h3 className="text-sm font-semibold text-foreground flex-1">Entregas em Rota</h3>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 tabular-nums">
