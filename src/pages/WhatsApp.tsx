@@ -95,8 +95,8 @@ export default function WhatsAppHub() {
           onClick={() => navigate('/whatsapp/settings')}
           className="card-command p-4 w-full text-left flex items-center gap-3 active:scale-[0.98] transition-all"
         >
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-secondary text-muted-foreground">
-            <AppIcon name="Settings" size={20} />
+          <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #6B7280, #9CA3AF)' }}>
+            <AppIcon name="Settings" size={20} className="text-white" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground">Configurações</p>
