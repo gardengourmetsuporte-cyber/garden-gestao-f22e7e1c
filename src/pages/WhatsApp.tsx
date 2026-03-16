@@ -5,10 +5,10 @@ import { useWhatsAppChannels, useWhatsAppConversations, useWhatsAppOrders } from
 import { cn } from '@/lib/utils';
 
 const sections = [
-  { key: 'chats', label: 'Conversas', icon: 'MessageSquare', desc: 'Atendimentos ativos e histórico', href: '/whatsapp/chats' },
-  { key: 'orders', label: 'Pedidos', icon: 'ShoppingBag', desc: 'Pedidos recebidos via WhatsApp', href: '/whatsapp/orders' },
-  { key: 'knowledge', label: 'Base de Conhecimento', icon: 'BookOpen', desc: 'Respostas e informações da IA', href: '/whatsapp/knowledge' },
-  { key: 'logs', label: 'Logs IA', icon: 'Brain', desc: 'Histórico de interações da IA', href: '/whatsapp/logs' },
+  { key: 'chats', label: 'Conversas', icon: 'MessageSquare', desc: 'Atendimentos ativos e histórico', href: '/whatsapp/chats', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+  { key: 'orders', label: 'Pedidos', icon: 'ShoppingBag', desc: 'Pedidos recebidos via WhatsApp', href: '/whatsapp/orders', gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
+  { key: 'knowledge', label: 'Base de Conhecimento', icon: 'BookOpen', desc: 'Respostas e informações da IA', href: '/whatsapp/knowledge', gradient: 'linear-gradient(135deg, #8B5CF6, #A855F7)' },
+  { key: 'logs', label: 'Logs IA', icon: 'Brain', desc: 'Histórico de interações da IA', href: '/whatsapp/logs', gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
 ];
 
 export default function WhatsAppHub() {
