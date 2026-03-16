@@ -86,6 +86,7 @@ const Invite = lazy(() => lazyRetry(() => import("./pages/Invite")));
 
 const Plans = lazy(() => lazyRetry(() => import("./pages/Plans")));
 const QuotationPublic = lazy(() => lazyRetry(() => import("./pages/QuotationPublic")));
+const PriceSurveyPublic = lazy(() => lazyRetry(() => import("./pages/PriceSurveyPublic")));
 const CalendarFull = lazy(() => lazyRetry(() => import("./pages/CalendarFull")));
 const Customers = lazy(() => lazyRetry(() => import("./pages/Customers")));
 const DigitalMenu = lazy(() => lazyRetry(() => import("./pages/DigitalMenu")));
