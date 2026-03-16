@@ -138,14 +138,13 @@ function mapToFlowStatus(status: string): typeof STATUS_FLOW[number] {
 /* ─── Main Component ─── */
 export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   const [channel, setChannel] = useState<Channel>('todos');
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [dateFilter, setDateFilter] = useState<'hoje' | 'ontem' | 'semana'>('hoje');
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
 
-  // Generate 14 days for the strip (7 past + today + 6 future)
-  const days = useMemo(() => {
-    const today = new Date();
-    return eachDayOfInterval({ start: subDays(today, 7), end: today });
-  }, []);
+  const selectedDate = useMemo(() => {
+    if (dateFilter === 'ontem') return subDays(new Date(), 1);
+    return new Date();
+  }, [dateFilter]);
 
   const allOrders = useMemo(() => {
     const normalized = normalizeHubOrders(hubOrders);
