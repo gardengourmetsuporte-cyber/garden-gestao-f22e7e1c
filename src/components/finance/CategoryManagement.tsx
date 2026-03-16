@@ -273,10 +273,10 @@ export function CategoryManagement({
                       )}>
                         <DragHandle dragHandleProps={dragHandleProps} />
                         <div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: category.color + '20' }}
+                          className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg shrink-0"
+                          style={{ background: `linear-gradient(135deg, ${category.color}, ${category.color}99)` }}
                         >
-                          <AppIcon name={category.icon} size={20} style={{ color: category.color }} />
+                          <AppIcon name={category.icon} size={20} className="text-white" />
                         </div>
                         <div className="flex-1">
                           <p className="font-medium">{category.name}</p>
@@ -307,7 +307,9 @@ export function CategoryManagement({
                               key={sub.id}
                               className="flex items-center gap-2 p-2 bg-secondary/50 rounded-lg"
                             >
-                              <AppIcon name={sub.icon} size={16} style={{ color: sub.color }} />
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ background: `linear-gradient(135deg, ${sub.color}, ${sub.color}99)` }}>
+                                <AppIcon name={sub.icon} size={14} className="text-white" />
+                              </div>
                               <span className="flex-1 text-sm">{sub.name}</span>
                               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(sub)}>
                                 <AppIcon name="Pencil" size={12} />
@@ -390,10 +392,10 @@ export function CategoryManagement({
                 <Label className="text-xs text-muted-foreground mb-2 block">Prévia</Label>
                 <div className="flex items-center gap-3">
                   <div 
-                    className="w-12 h-12 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: color + '20' }}
+                    className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+                    style={{ background: `linear-gradient(135deg, ${color}, ${color}99)` }}
                   >
-                    <AppIcon name={icon} size={24} style={{ color }} />
+                    <AppIcon name={icon} size={24} className="text-white" />
                   </div>
                   <span className="font-medium">{name || 'Nome da categoria'}</span>
                 </div>
