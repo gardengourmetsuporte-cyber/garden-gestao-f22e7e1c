@@ -390,6 +390,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCachedAuth(profile, role, newPlan, planStatus);
   }, [profile, role, planStatus]);
 
+  const setUnitRole = useCallback((newUnitRole: string | null) => {
+    setUnitRoleState(newUnitRole);
+  }, []);
+
   const refreshUserData = useCallback(async () => {
     if (user) {
       effectivePlanRef.current = null; // clear stale plan so it re-resolves
