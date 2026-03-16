@@ -505,6 +505,10 @@ export default function OrdersPage() {
                                       <p className="font-semibold font-display text-foreground truncate">{order.supplier?.name}</p>
                                       <p className="text-xs text-muted-foreground">
                                         {new Date(order.created_at).toLocaleDateString('pt-BR')} · {Array.isArray(order.order_items) ? order.order_items.length : 0} itens
+                                        {(() => {
+                                          const t = (order.order_items || []).reduce((s: number, oi: any) => s + (oi.unit_price || 0) * oi.quantity, 0);
+                                          return t > 0 ? ` · R$ ${t.toFixed(2)}` : '';
+                                        })()}
                                       </p>
                                     </div>
                                   </div>
