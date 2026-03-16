@@ -63,16 +63,16 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             ref={(el) => { if (el) tabRefs.current.set(tab.key, el); }}
             onClick={() => { navigator.vibrate?.(10); onTabChange(tab.key); }}
             className={cn(
-              "relative flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold z-10 transition-all duration-200",
-              isCompact ? "min-w-0 shrink-0 px-3 flex-1" : "flex-1 px-1",
-              "min-h-[44px]",
+              "relative flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold z-10 transition-all duration-200",
+              isCompact ? "min-w-0 shrink-0 px-2 flex-1" : "flex-1 px-1",
+              "min-h-[40px]",
               isActive ? 'text-primary' : 'text-muted-foreground'
             )}
           >
             {tab.icon && (
               <div
                 className={cn(
-                  "w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 shadow-md",
+                  "w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 shadow-sm",
                   !isActive && "opacity-50 saturate-0"
                 )}
                 style={{ background: tab.iconGradient || 'hsl(var(--primary))' }}
