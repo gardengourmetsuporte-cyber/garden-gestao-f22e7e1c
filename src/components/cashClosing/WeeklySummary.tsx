@@ -123,7 +123,7 @@ function AnimatedCurrency({ value }: { value: number }) {
               <AnimatedCurrency value={summary.total} />
             </span>
             <div className="flex items-center justify-center gap-2 mt-0.5">
-              <p className="text-[10px] text-muted-foreground">Total em vendas na semana</p>
+              <p className="text-[10px] text-white/50">Total em vendas na semana</p>
               {summary.variation !== null && (
                 <span className={`text-[10px] font-bold flex items-center gap-0.5 ${summary.variation >= 0 ? 'text-success' : 'text-destructive'}`}>
                   <AppIcon name={summary.variation >= 0 ? 'TrendingUp' : 'TrendingDown'} size={10} />
