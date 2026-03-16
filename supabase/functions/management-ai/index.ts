@@ -284,6 +284,39 @@ const TOOLS = [
       },
     },
   },
+  // ── MARKETING TOOLS ──
+  {
+    type: "function",
+    function: {
+      name: "create_marketing_post",
+      description: "Criar um post estruturado para redes sociais (Instagram, Facebook, etc.) com título, legenda, hashtags, prompt de imagem e horário ideal. Use quando o usuário pedir para criar, gerar ou montar um post de marketing.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "Título curto do post" },
+          caption: { type: "string", description: "Legenda completa pronta para Instagram com hashtags — use APENAS produtos e preços reais" },
+          tags: { type: "array", items: { type: "string" }, description: "Tags/categorias do post (ex: promoção, produto, engajamento)" },
+          image_prompt: { type: "string", description: "Prompt descritivo em inglês para gerar imagem" },
+          best_time: { type: "string", description: "Melhor horário para postar (ex: 11:30)" },
+        },
+        required: ["title", "caption", "tags", "image_prompt"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generate_daily_post_ideas",
+      description: "Gerar 3 ideias de posts para redes sociais baseadas nos produtos e marca reais. Use quando o usuário pedir sugestões, ideias ou inspiração para posts.",
+      parameters: {
+        type: "object",
+        properties: {
+          focus: { type: "string", description: "Foco opcional: produto, promoção, engajamento, storytelling" },
+        },
+        required: [],
+      },
+    },
+  },
 ];
 
 function getSupabaseAdmin() {
