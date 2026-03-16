@@ -24,6 +24,7 @@ const MODULES: ReplicationModule[] = [
   { key: 'checklists', label: 'Checklists', description: 'Setores, subcategorias e itens', icon: 'ClipboardCheck', color: '#f59e0b' },
   { key: 'finance', label: 'Categorias Financeiras', description: 'Árvore de receitas e despesas', icon: 'Wallet', color: '#8b5cf6' },
   { key: 'menu', label: 'Cardápio Digital', description: 'Categorias, grupos e produtos', icon: 'UtensilsCrossed', color: '#ef4444', destructive: true },
+  { key: 'rewards', label: 'Loja de Prêmios', description: 'Produtos resgatáveis por pontos', icon: 'Gift', color: '#ec4899' },
 ];
 
 interface ModuleResult {
