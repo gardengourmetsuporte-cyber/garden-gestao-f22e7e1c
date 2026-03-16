@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AppIcon } from '@/components/ui/app-icon';
+import { MenuLoadingScreen } from '@/components/digital-menu/MenuLoadingScreen';
 
 interface TableData {
   id: string;
