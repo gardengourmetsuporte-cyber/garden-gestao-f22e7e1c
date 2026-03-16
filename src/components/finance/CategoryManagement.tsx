@@ -392,10 +392,10 @@ export function CategoryManagement({
                 <Label className="text-xs text-muted-foreground mb-2 block">Prévia</Label>
                 <div className="flex items-center gap-3">
                   <div 
-                    className="w-12 h-12 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: color + '20' }}
+                    className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+                    style={{ background: `linear-gradient(135deg, ${color}, ${color}99)` }}
                   >
-                    <AppIcon name={icon} size={24} style={{ color }} />
+                    <AppIcon name={icon} size={24} className="text-white" />
                   </div>
                   <span className="font-medium">{name || 'Nome da categoria'}</span>
                 </div>
