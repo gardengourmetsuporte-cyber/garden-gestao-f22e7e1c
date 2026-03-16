@@ -41,8 +41,10 @@ export function useFabAction(action: FabAction | null, deps: any[] = []) {
   const { setFabAction, setFabActions } = useContext(FabActionContext);
 
   useEffect(() => {
-    setFabAction(action);
-    setFabActions([]);
+    if (action) {
+      setFabAction(action);
+      setFabActions([]);
+    }
     return () => { setFabAction(null); setFabActions([]); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
