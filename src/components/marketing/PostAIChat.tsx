@@ -5,6 +5,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PostData {
   title: string;
@@ -35,7 +36,7 @@ const QUICK_PROMPTS = [
   { icon: 'BarChart3', label: 'Engajamento', color: 'text-primary', bg: 'bg-primary/10', prompt: 'Crie um post interativo para engajar o público — pode ser enquete, pergunta, ou "isso ou aquilo".' },
 ];
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/management-ai`;
+// Uses supabase.functions.invoke for proper auth
 
 function getTextContent(content: MessageContent): string {
   if (typeof content === 'string') return content;
@@ -108,25 +109,16 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
         ...(m.imagePreview ? { imageUrl: m.imagePreview } : {}),
       }));
 
-      const resp = await fetch(CHAT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
+      const { data, error: fnError } = await supabase.functions.invoke('management-ai', {
+        body: {
           messages: apiMessages,
           context: { marketing_mode: true },
           unit_id: unitId,
-        }),
+        },
       });
 
-      if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.error || `Erro ${resp.status}`);
-      }
+      if (fnError) throw new Error(fnError.message || 'Erro ao chamar IA');
 
-      const data = await resp.json();
       const responseText = data.suggestion || 'Desculpe, não consegui gerar uma resposta.';
       
       // Check if response contains a marketing post (tool call result)
