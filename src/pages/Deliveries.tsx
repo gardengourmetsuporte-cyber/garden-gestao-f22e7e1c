@@ -209,6 +209,12 @@ export default function Deliveries() {
           {FILTERS.map(({ key, label, icon }) => {
             const active = statusFilter === key;
             const count = key === 'all' ? stats.total : stats[key];
+            const gradients: Record<string, string> = {
+              all: 'linear-gradient(135deg, #22C55E, #10B981)',
+              pending: 'linear-gradient(135deg, #F59E0B, #F97316)',
+              out: 'linear-gradient(135deg, #22C55E, #10B981)',
+              delivered: 'linear-gradient(135deg, #22C55E, #10B981)',
+            };
             const colors: Record<string, string> = {
               all: 'text-foreground',
               pending: 'text-amber-500',
@@ -226,7 +232,12 @@ export default function Deliveries() {
                     : "bg-card/60 border border-border/20 hover:bg-card/80"
                 )}
               >
-                <AppIcon name={icon} size={20} fill={active ? 1 : 0} className={colors[key]} />
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ background: gradients[key] }}
+                >
+                  <AppIcon name={icon} size={18} fill={active ? 1 : 0} className="text-white" />
+                </div>
                 <span className={cn("text-2xl font-black tabular-nums leading-none", colors[key])}>{count}</span>
                 <span className="text-[10px] text-muted-foreground font-medium truncate w-full text-center">{label}</span>
               </button>
