@@ -154,6 +154,19 @@ Deno.serve(async (req) => {
       upcomingInvoices,
       budgetStatus,
       preferences: (preferencesRes.data || []).map((p: any) => `${p.key} = ${p.value} (${p.category})`),
+      products: (productsRes.data || []).map((p: any) => {
+        const cat = p.category || "";
+        return `${p.name}: R$${Number(p.price).toFixed(2)}${p.is_highlight ? ' ⭐DESTAQUE' : ''}${cat ? ` [${cat}]` : ''}${p.description ? ` — ${p.description}` : ''}`;
+      }),
+      brand: brandRes.data ? {
+        tone_of_voice: brandRes.data.tone_of_voice,
+        tagline: brandRes.data.tagline,
+        colors: brandRes.data.colors,
+        instagram_url: brandRes.data.instagram_url,
+        website_url: brandRes.data.website_url,
+        institutional_phrases: brandRes.data.institutional_phrases,
+      } : null,
+      brandAssets: (assetsRes.data || []).map((a: any) => `[${a.type}] ${a.title} (tags: ${(a.tags || []).join(', ')})`),
     };
 
     // Compute context stats for UI chips
