@@ -51,11 +51,11 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
 
   // Get unique items from responses, enriched with inventory names
   const allItems = useMemo(() => {
-    const itemIds = [...new Set(responses.map((r: any) => r.item_id))];
+    const itemIds = [...new Set(responses.map((r: any) => r.item_id as string))];
     return itemIds
-      .map(id => {
+      .map((id: string) => {
         const inv = inventoryItems.find((i: any) => i.id === id);
-        return { id, name: inv?.name || id.slice(0, 8), unitType: inv?.unit_type || '' };
+        return { id: id as string, name: (inv?.name || id.slice(0, 8)) as string, unitType: (inv?.unit_type || '') as string };
       })
       .filter(item => {
         if (!search.trim()) return true;
