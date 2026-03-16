@@ -32,6 +32,8 @@ export function PriceSurveySheet({ open, onOpenChange, suppliers, onSubmit }: Pr
     try {
       const res = await onSubmit({ title, supplierIds: selectedIds, notes: notes || undefined });
       setResult(res);
+    } catch (err) {
+      console.error('Error creating survey:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -43,7 +45,7 @@ export function PriceSurveySheet({ open, onOpenChange, suppliers, onSubmit }: Pr
     const surveyUrl = `${window.location.origin}/pesquisa/${supplier.token}`;
     const message = `Olá ${supplier.supplier?.name || ''}! 🛒\n\nGostaríamos de saber seus preços atuais. Acesse o link abaixo e preencha os itens que você fornece:\n\n${surveyUrl}\n\nObrigado!`;
     const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
-    window.location.href = url;
+    window.open(url, '_blank');
   };
 
   const handleClose = () => {
