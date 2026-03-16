@@ -74,7 +74,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             {tab.icon && !hideIcons && (
               <div
                 className={cn(
-                  "w-7 h-7 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-300 shadow-sm",
+                  "w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 shadow-md",
                   !isActive && "opacity-40 saturate-0"
                 )}
                 style={{ background: tab.iconGradient || 'hsl(var(--primary))' }}
