@@ -366,6 +366,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPlan('free');
     setPlanStatus('active');
     setSubscriptionEnd(null);
+    setUnitRoleState(null);
     effectivePlanRef.current = null;
     clearCachedAuth();
   };
