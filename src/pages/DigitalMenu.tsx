@@ -1,8 +1,9 @@
-import { useState, useEffect, useLayoutEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useTheme } from 'next-themes';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useDigitalMenu, DMProduct } from '@/hooks/useDigitalMenu';
 import { useGamification } from '@/hooks/useGamification';
+import { useMenuTranslation } from '@/hooks/useMenuTranslation';
 import { MenuLanding } from '@/components/digital-menu/MenuLanding';
 import { MenuBottomNav, MenuTab } from '@/components/digital-menu/MenuBottomNav';
 import { MenuProductList } from '@/components/digital-menu/MenuProductList';
@@ -41,6 +42,32 @@ export default function DigitalMenu() {
     getProductOptionGroups, getGroupProducts,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
   } = useDigitalMenu(unitId);
+
+  const { tt, translateTexts, isTranslating, locale } = useMenuTranslation();
+
+  // Collect all translatable texts and trigger translation when data or locale changes
+  useEffect(() => {
+    if (locale === 'pt' || loading) return;
+    const texts: string[] = [];
+    categories.forEach(c => { if (c.name) texts.push(c.name); });
+    groups.forEach(g => { if (g.name) texts.push(g.name); if (g.description) texts.push(g.description); });
+    products.forEach(p => { if (p.name) texts.push(p.name); if (p.description) texts.push(p.description); });
+    if (texts.length > 0) translateTexts(texts);
+  }, [locale, loading, categories, groups, products, translateTexts]);
+
+  // Create translated data
+  const tCategories = useMemo(() =>
+    locale === 'pt' ? categories : categories.map(c => ({ ...c, name: tt(c.name) })),
+    [categories, tt, locale]
+  );
+  const tGroups = useMemo(() =>
+    locale === 'pt' ? groups : groups.map(g => ({ ...g, name: tt(g.name), description: tt(g.description) || null })),
+    [groups, tt, locale]
+  );
+  const tProducts = useMemo(() =>
+    locale === 'pt' ? products : products.map(p => ({ ...p, name: tt(p.name), description: tt(p.description) || null })),
+    [products, tt, locale]
+  );
 
   const [activeTab, setActiveTab] = useState<MenuTab>(initialTab);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
