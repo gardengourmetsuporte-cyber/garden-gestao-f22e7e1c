@@ -392,4 +392,10 @@ export const ICON_MAP: Record<string, string> = {
   EmojiEvents: 'emoji_events',
   Storefront: 'storefront',
   Casino: 'casino',
+  SportsEsports: 'sports_esports',
+  TableBar: 'table_bar',
+  AllInclusive: 'all_inclusive',
+  Restaurant: 'restaurant',
+  Newspaper: 'newspaper',
+  ScanLine: 'document_scanner',
 };
