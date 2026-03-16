@@ -1484,50 +1484,143 @@ select:focus {
   100% { background-position: -250% 0; }
 }
 
-/* ===== Copilot Chat Widget ===== */
-.copilot-bar-gradient {
-  background: linear-gradient(135deg, hsl(var(--primary) / 0.4), hsl(260 70% 50% / 0.3), hsl(330 70% 50% / 0.2));
+/* ===== Copilot Chat Widget — Modern Fluid ===== */
+.copilot-surface {
+  background: hsl(var(--card));
+  box-shadow:
+    0 0 0 1px hsl(var(--border) / 0.08),
+    0 8px 40px -12px hsl(0 0% 0% / 0.4),
+    0 2px 12px -4px hsl(var(--primary) / 0.06);
+}
+
+.copilot-avatar-ring {
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.5), hsl(260 70% 55% / 0.4), hsl(330 60% 50% / 0.3));
+}
+
+.copilot-header {
+  background: linear-gradient(180deg, hsl(var(--card)) 0%, transparent 100%);
 }
 
 .copilot-send-btn {
-  background: linear-gradient(135deg, hsl(var(--primary)), hsl(260 70% 55%));
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(155 70% 35%));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.copilot-chip {
-  background: hsl(var(--secondary));
+.copilot-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: hsl(var(--muted-foreground));
-  border: 1px solid hsl(var(--border) / 0.3);
+  transition: all 0.2s ease;
+}
+.copilot-icon-btn:hover {
+  background: hsl(var(--secondary) / 0.8);
+  color: hsl(var(--foreground));
 }
 
-.copilot-chip:hover {
-  background: hsl(var(--accent));
+.copilot-icon-btn-sm {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--muted-foreground) / 0.6);
+  transition: all 0.2s ease;
+}
+.copilot-icon-btn-sm:hover {
+  background: hsl(var(--secondary) / 0.6);
   color: hsl(var(--foreground));
-  border-color: hsl(var(--primary) / 0.3);
+}
+
+.copilot-input-bar {
+  background: hsl(var(--secondary) / 0.4);
+  border: 1px solid hsl(var(--border) / 0.06);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.copilot-input-bar:focus-within {
+  border-color: hsl(var(--primary) / 0.2);
+  background: hsl(var(--secondary) / 0.6);
+}
+
+.copilot-bubble-ai {
+  background: hsl(var(--secondary) / 0.5);
+  color: hsl(var(--foreground));
+}
+
+.copilot-bubble-user {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(155 65% 30%));
+  color: hsl(var(--primary-foreground));
+}
+
+.copilot-chip-modern {
+  border: 1px solid hsl(var(--border) / 0.08);
+  color: hsl(var(--foreground) / 0.8);
+  backdrop-filter: blur(4px);
+}
+.copilot-chip-modern:hover {
+  border-color: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
+}
+
+.copilot-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  transition: all 0.15s ease;
+}
+.copilot-menu-item:hover {
+  background: hsl(var(--secondary) / 0.8);
+}
+
+/* Message entrance */
+.copilot-msg-enter {
+  animation: copilotMsgSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes copilotMsgSlide {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Typing dots */
+.copilot-typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsl(var(--primary) / 0.5);
+  display: inline-block;
+  animation: copilotDotPulse 1.4s ease-in-out infinite;
+}
+.copilot-typing-dots span:nth-child(2) { animation-delay: 0.16s; }
+.copilot-typing-dots span:nth-child(3) { animation-delay: 0.32s; }
+
+@keyframes copilotDotPulse {
+  0%, 60%, 100% { transform: scale(0.6); opacity: 0.3; }
+  30% { transform: scale(1); opacity: 1; }
+}
+
+/* Executing spinner */
+.copilot-exec-spinner {
+  border: 2px solid hsl(var(--primary) / 0.2);
+  border-top-color: hsl(var(--primary));
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
 
 .copilot-glow-dot {
-  animation: copilotGlow 2s ease-in-out infinite;
+  animation: copilotGlow 2.5s ease-in-out infinite;
 }
 
 @keyframes copilotGlow {
-  0%, 100% { box-shadow: 0 0 4px hsl(152 69% 50% / 0.6); }
-  50% { box-shadow: 0 0 10px hsl(152 69% 50% / 0.9), 0 0 20px hsl(152 69% 50% / 0.3); }
-}
-
-.copilot-shimmer-typing {
-  background: linear-gradient(
-    90deg,
-    hsl(var(--muted)) 0%,
-    hsl(var(--primary) / 0.3) 30%,
-    hsl(260 70% 55% / 0.3) 50%,
-    hsl(var(--primary) / 0.3) 70%,
-    hsl(var(--muted)) 100%
-  );
-  background-size: 300% 100%;
-  animation: copilotShimmerType 1.8s ease-in-out infinite;
-}
-
-@keyframes copilotShimmerType {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0%, 100% { box-shadow: 0 0 4px hsl(152 69% 50% / 0.5); }
+  50% { box-shadow: 0 0 8px hsl(152 69% 50% / 0.8), 0 0 16px hsl(152 69% 50% / 0.2); }
 }

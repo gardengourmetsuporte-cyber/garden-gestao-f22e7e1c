@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
-import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useManagementAI } from '@/hooks/useManagementAI';
@@ -10,10 +9,10 @@ import mascotImg from '@/assets/garden-mascot.png';
 const CopilotMessageContent = lazy(() => import('@/components/copilot/CopilotMessageContent'));
 
 const SUGGESTIONS = [
-  { label: 'Resumo do dia', icon: 'BarChart3' },
-  { label: 'Como está meu estoque?', icon: 'Package' },
-  { label: 'Despesas pendentes', icon: 'Receipt' },
-  { label: 'Criar post marketing', icon: 'Megaphone' },
+  { label: 'Resumo do dia', icon: 'BarChart3', gradient: 'from-emerald-500/20 to-emerald-500/5' },
+  { label: 'Meu estoque', icon: 'Package', gradient: 'from-amber-500/20 to-amber-500/5' },
+  { label: 'Pendências', icon: 'Receipt', gradient: 'from-rose-500/20 to-rose-500/5' },
+  { label: 'Criar post', icon: 'Megaphone', gradient: 'from-violet-500/20 to-violet-500/5' },
 ];
 
 const ACCEPTED_FILES = 'image/*,.pdf,.doc,.docx,.csv,.xlsx,.xls,.txt,.json';
@@ -36,7 +35,6 @@ export function AICopilotWidget() {
   const [plusOpen, setPlusOpen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -44,34 +42,29 @@ export function AICopilotWidget() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-greet on first expand
   useEffect(() => {
     if (expanded && !hasGreeted && messages.length === 0) {
       sendMessage();
     }
   }, [expanded]);
 
-  // Auto-scroll messages
   useEffect(() => {
     if (expanded && messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-      setTimeout(() => {
-        widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      }, 100);
+      requestAnimationFrame(() => {
+        messagesContainerRef.current!.scrollTop = messagesContainerRef.current!.scrollHeight;
+      });
     }
   }, [messages, expanded, isLoading]);
 
-  // Focus textarea on expand
   useEffect(() => {
     if (expanded) {
       requestAnimationFrame(() => {
         widgetRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        setTimeout(() => textareaRef.current?.focus(), 300);
+        setTimeout(() => textareaRef.current?.focus(), 200);
       });
     }
   }, [expanded]);
 
-  // Auto-resize textarea
   useEffect(() => {
     const el = textareaRef.current;
     if (el) {
@@ -106,9 +99,7 @@ export function AICopilotWidget() {
 
     let imageBase64: string | undefined;
     const imgAtt = attachments.find(a => a.type === 'image');
-    if (imgAtt) {
-      imageBase64 = await fileToBase64(imgAtt.file);
-    }
+    if (imgAtt) imageBase64 = await fileToBase64(imgAtt.file);
 
     setQuestion('');
     setAttachments([]);
@@ -132,11 +123,14 @@ export function AICopilotWidget() {
     <div ref={widgetRef} className="copilot-widget-root w-full">
       {/* === COLLAPSED === */}
       {!expanded && (
-        <div className="copilot-bar-gradient rounded-2xl p-[1px] animate-fade-in">
-          <div className="bg-background rounded-2xl">
-            <form onSubmit={handleSubmit} className="flex items-center gap-3 px-4 py-3">
+        <div className="animate-fade-in">
+          <div className="copilot-surface rounded-[20px] overflow-hidden">
+            {/* Input row */}
+            <form onSubmit={handleSubmit} className="flex items-center gap-3 px-4 py-3.5">
               <div className="relative shrink-0">
-                <img src={mascotImg} alt="Copiloto" className="w-9 h-9 rounded-xl object-cover" />
+                <div className="copilot-avatar-ring w-10 h-10 rounded-[14px] p-[2px]">
+                  <img src={mascotImg} alt="Copiloto" className="w-full h-full rounded-[12px] object-cover" />
+                </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-background copilot-glow-dot" />
               </div>
               <input
@@ -144,24 +138,31 @@ export function AICopilotWidget() {
                 onChange={e => setQuestion(e.target.value)}
                 onFocus={() => setExpanded(true)}
                 placeholder="Pergunte ao Copiloto..."
-                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/50 outline-none min-w-0"
+                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/40 outline-none min-w-0 font-medium"
               />
               <button
                 type="submit"
                 disabled={isLoading || !question.trim()}
-                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 copilot-send-btn disabled:opacity-30 transition-all duration-200 active:scale-90"
+                className="copilot-send-btn w-9 h-9 rounded-xl flex items-center justify-center shrink-0 disabled:opacity-20 transition-all duration-300 active:scale-90 hover:shadow-lg hover:shadow-primary/20"
               >
-                <AppIcon name="Send" size={16} className="text-white" />
+                <AppIcon name="ArrowUp" size={16} className="text-white" />
               </button>
             </form>
-            <div className="flex gap-2 px-4 pb-3 overflow-x-auto no-scrollbar">
-              {SUGGESTIONS.map(s => (
+
+            {/* Suggestion chips */}
+            <div className="flex gap-2 px-4 pb-3.5 overflow-x-auto no-scrollbar">
+              {SUGGESTIONS.map((s, i) => (
                 <button
                   key={s.label}
                   onClick={() => handleSuggestion(s.label)}
-                  className="copilot-chip flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap transition-all duration-200 hover:scale-[1.03] active:scale-95"
+                  className={cn(
+                    "copilot-chip-modern flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11px] font-semibold whitespace-nowrap",
+                    "bg-gradient-to-r", s.gradient,
+                    "transition-all duration-300 hover:scale-[1.04] active:scale-95"
+                  )}
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <AppIcon name={s.icon} size={12} />
+                  <AppIcon name={s.icon} size={13} className="opacity-70" />
                   {s.label}
                 </button>
               ))}
@@ -172,124 +173,135 @@ export function AICopilotWidget() {
 
       {/* === EXPANDED === */}
       {expanded && (
-        <div className="copilot-bar-gradient rounded-2xl p-[1px] animate-scale-in">
-          <div className="bg-background rounded-2xl overflow-hidden flex flex-col" style={{ maxHeight: '520px' }}>
-            {/* Header */}
-            <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/20">
+        <div className="animate-scale-in">
+          <div className="copilot-surface rounded-[20px] overflow-hidden flex flex-col" style={{ maxHeight: '540px' }}>
+            {/* Header — clean, minimal */}
+            <div className="flex items-center gap-3 px-4 py-3 copilot-header">
               <div className="relative">
-                <img src={mascotImg} alt="Copiloto" className="w-8 h-8 rounded-xl object-cover" />
+                <div className="copilot-avatar-ring w-9 h-9 rounded-[12px] p-[1.5px]">
+                  <img src={mascotImg} alt="Copiloto" className="w-full h-full rounded-[11px] object-cover" />
+                </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-background" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-foreground leading-tight">Copiloto IA</p>
-                <p className="text-[10px] text-emerald-400 font-medium">Online</p>
+                <p className="text-[13px] font-bold text-foreground leading-tight tracking-tight">Copiloto</p>
+                <p className="text-[10px] text-emerald-400/80 font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                  Online
+                </p>
               </div>
-              <div className="flex items-center gap-0.5">
-                <button onClick={newConversation} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors" title="Nova conversa">
-                  <AppIcon name="Plus" size={14} className="text-muted-foreground" />
+              <div className="flex items-center gap-1">
+                <button onClick={newConversation} className="copilot-icon-btn" title="Nova conversa">
+                  <AppIcon name="MessageSquarePlus" size={15} />
                 </button>
-                <button onClick={() => setShowHistory(true)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors" title="Histórico">
-                  <AppIcon name="History" size={14} className="text-muted-foreground" />
+                <button onClick={() => setShowHistory(true)} className="copilot-icon-btn" title="Histórico">
+                  <AppIcon name="Clock" size={15} />
                 </button>
                 {messages.length > 2 && (
-                  <button onClick={clearHistory} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors" title="Limpar">
-                    <AppIcon name="Trash2" size={13} className="text-muted-foreground" />
+                  <button onClick={clearHistory} className="copilot-icon-btn" title="Limpar">
+                    <AppIcon name="Trash2" size={14} />
                   </button>
                 )}
-                <button onClick={() => setExpanded(false)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors">
-                  <AppIcon name="ChevronDown" size={15} className="text-muted-foreground" />
+                <button onClick={() => setExpanded(false)} className="copilot-icon-btn">
+                  <AppIcon name="Minus" size={15} />
                 </button>
               </div>
             </div>
 
             {/* Messages */}
-            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5 scrollbar-thin min-h-[120px] max-h-[340px]">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-3 py-2 space-y-3 scrollbar-thin min-h-[100px] max-h-[350px]">
               {messages.map((msg, i) => (
-                <div key={i} className={cn("animate-fade-in", msg.role === 'user' ? "flex justify-end" : "flex justify-start gap-2")}>
+                <div
+                  key={i}
+                  className={cn(
+                    "copilot-msg-enter",
+                    msg.role === 'user' ? "flex justify-end" : "flex justify-start gap-2.5"
+                  )}
+                  style={{ animationDelay: `${Math.min(i * 30, 150)}ms` }}
+                >
                   {msg.role === 'assistant' && (
-                    <img src={mascotImg} alt="" className="w-5 h-5 rounded-md object-cover mt-1 shrink-0" />
+                    <img src={mascotImg} alt="" className="w-6 h-6 rounded-lg object-cover mt-0.5 shrink-0 ring-1 ring-border/10" />
                   )}
                   <div className={cn(
-                    "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed",
-                    msg.role === 'assistant' ? "bg-card text-foreground rounded-tl-sm" : "bg-primary text-primary-foreground rounded-tr-sm"
+                    "max-w-[82%] text-[13px] leading-relaxed",
+                    msg.role === 'assistant'
+                      ? "copilot-bubble-ai rounded-2xl rounded-tl-lg px-3.5 py-2.5"
+                      : "copilot-bubble-user rounded-2xl rounded-tr-lg px-3.5 py-2.5"
                   )}>
                     {msg.role === 'assistant' ? (
-                      <Suspense fallback={<span className="text-xs text-muted-foreground">...</span>}>
+                      <Suspense fallback={<span className="text-xs text-muted-foreground/50">...</span>}>
                         <CopilotMessageContent content={msg.content} />
                       </Suspense>
                     ) : (
                       <>
                         {msg.imageUrl && <img src={msg.imageUrl} alt="" className="w-full max-w-[180px] rounded-xl mb-2" />}
-                        {msg.content}
+                        <span className="font-medium">{msg.content}</span>
                       </>
                     )}
                   </div>
                 </div>
               ))}
 
+              {/* Typing indicator */}
               {isLoading && (
-                <div className="flex justify-start gap-2 animate-fade-in">
-                  <img src={mascotImg} alt="" className="w-5 h-5 rounded-md object-cover mt-1 shrink-0" />
-                  <div className="bg-card rounded-2xl rounded-tl-sm px-4 py-3">
-                    <div className="flex gap-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="flex justify-start gap-2.5 copilot-msg-enter">
+                  <img src={mascotImg} alt="" className="w-6 h-6 rounded-lg object-cover mt-0.5 shrink-0 ring-1 ring-border/10" />
+                  <div className="copilot-bubble-ai rounded-2xl rounded-tl-lg px-4 py-3.5">
+                    <div className="copilot-typing-dots flex gap-1.5">
+                      <span /><span /><span />
                     </div>
                   </div>
                 </div>
               )}
 
+              {/* Executing indicator */}
               {isExecuting && (
-                <div className="flex justify-start gap-2 animate-fade-in">
-                  <img src={mascotImg} alt="" className="w-5 h-5 rounded-md object-cover mt-1 shrink-0" />
-                  <div className="bg-card rounded-2xl rounded-tl-sm px-3.5 py-2 flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                    <span className="text-[11px] text-muted-foreground">Executando...</span>
+                <div className="flex justify-start gap-2.5 copilot-msg-enter">
+                  <img src={mascotImg} alt="" className="w-6 h-6 rounded-lg object-cover mt-0.5 shrink-0 ring-1 ring-border/10" />
+                  <div className="copilot-bubble-ai rounded-2xl rounded-tl-lg px-3.5 py-2.5 flex items-center gap-2.5">
+                    <div className="copilot-exec-spinner w-3.5 h-3.5" />
+                    <span className="text-[11px] text-muted-foreground font-medium">Executando ação...</span>
                   </div>
                 </div>
               )}
-
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Attachment previews */}
             {attachments.length > 0 && (
               <div className="flex gap-2 px-4 pb-1 overflow-x-auto">
                 {attachments.map((att, idx) => (
-                  <div key={idx} className="relative shrink-0">
+                  <div key={idx} className="relative shrink-0 animate-scale-in">
                     {att.type === 'image' ? (
-                      <img src={att.preview} alt="" className="w-12 h-12 rounded-lg object-cover border border-border" />
+                      <img src={att.preview} alt="" className="w-14 h-14 rounded-xl object-cover ring-1 ring-border/20" />
                     ) : (
-                      <div className="w-12 h-12 rounded-lg bg-muted border border-border flex items-center justify-center">
-                        <AppIcon name="FileText" size={16} className="text-muted-foreground" />
+                      <div className="w-14 h-14 rounded-xl bg-secondary/60 flex items-center justify-center">
+                        <AppIcon name="FileText" size={18} className="text-muted-foreground" />
                       </div>
                     )}
-                    <button onClick={() => removeAttachment(idx)} className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center text-[8px]">✕</button>
+                    <button onClick={() => removeAttachment(idx)} className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center text-[9px] font-bold shadow-lg">✕</button>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Input */}
-            <div className="px-3 pb-3 pt-1">
-              <div className="flex items-end gap-2 bg-secondary/50 rounded-xl px-2 py-1.5">
-                {/* Plus button */}
+            {/* Input area */}
+            <div className="px-3 pb-3 pt-1.5">
+              <div className="copilot-input-bar flex items-end gap-1.5 rounded-[14px] px-1.5 py-1.5">
                 <Popover open={plusOpen} onOpenChange={setPlusOpen}>
                   <PopoverTrigger asChild>
-                    <button className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 hover:bg-muted/50 transition-colors mb-0.5">
-                      <AppIcon name="Plus" size={16} className="text-muted-foreground" />
+                    <button className="copilot-icon-btn-sm shrink-0 mb-[1px]">
+                      <AppIcon name="Plus" size={16} />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent side="top" align="start" className="w-40 p-1 rounded-xl">
-                    <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 w-full px-3 py-2 rounded-lg hover:bg-muted text-xs text-foreground">
-                      <AppIcon name="Paperclip" size={13} className="text-primary" /> Arquivo
+                  <PopoverContent side="top" align="start" className="w-44 p-1.5 rounded-[14px] border-border/20 bg-card/95 backdrop-blur-xl">
+                    <button onClick={() => { fileInputRef.current?.click(); setPlusOpen(false); }} className="copilot-menu-item">
+                      <AppIcon name="Paperclip" size={14} className="text-primary" /> Arquivo
                     </button>
-                    <button onClick={() => cameraInputRef.current?.click()} className="flex items-center gap-2 w-full px-3 py-2 rounded-lg hover:bg-muted text-xs text-foreground">
-                      <AppIcon name="Camera" size={13} className="text-primary" /> Câmera
+                    <button onClick={() => { cameraInputRef.current?.click(); setPlusOpen(false); }} className="copilot-menu-item">
+                      <AppIcon name="Camera" size={14} className="text-primary" /> Câmera
                     </button>
-                    <button onClick={() => galleryInputRef.current?.click()} className="flex items-center gap-2 w-full px-3 py-2 rounded-lg hover:bg-muted text-xs text-foreground">
-                      <AppIcon name="Image" size={13} className="text-primary" /> Galeria
+                    <button onClick={() => { galleryInputRef.current?.click(); setPlusOpen(false); }} className="copilot-menu-item">
+                      <AppIcon name="Image" size={14} className="text-primary" /> Galeria
                     </button>
                   </PopoverContent>
                 </Popover>
@@ -299,20 +311,19 @@ export function AICopilotWidget() {
                   value={question}
                   onChange={e => setQuestion(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Pergunte algo..."
+                  placeholder="Mensagem..."
                   rows={1}
-                  className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground/50 outline-none py-1.5 resize-none max-h-[100px]"
+                  className="flex-1 bg-transparent text-[13px] text-foreground placeholder:text-muted-foreground/35 outline-none py-1.5 px-1 resize-none max-h-[100px] font-medium"
                   disabled={isLoading}
                 />
 
-                <Button
+                <button
                   onClick={() => handleSubmit()}
-                  size="sm"
-                  className="h-7 w-7 p-0 rounded-lg shrink-0 mb-0.5"
                   disabled={isLoading || (!question.trim() && attachments.length === 0)}
+                  className="copilot-send-btn w-8 h-8 rounded-[10px] flex items-center justify-center shrink-0 mb-[1px] disabled:opacity-15 transition-all duration-300 active:scale-90 hover:shadow-lg hover:shadow-primary/25"
                 >
-                  <AppIcon name="ArrowUp" size={13} />
-                </Button>
+                  <AppIcon name="ArrowUp" size={14} className="text-white" />
+                </button>
               </div>
             </div>
           </div>
@@ -326,9 +337,9 @@ export function AICopilotWidget() {
 
       {/* History sheet */}
       <Sheet open={showHistory} onOpenChange={setShowHistory}>
-        <SheetContent side="bottom" className="rounded-t-2xl max-h-[60vh]">
+        <SheetContent side="bottom" className="rounded-t-[20px] max-h-[60vh]">
           <SheetHeader className="pb-3">
-            <SheetTitle className="text-sm">Histórico de Conversas</SheetTitle>
+            <SheetTitle className="text-sm font-bold">Conversas</SheetTitle>
           </SheetHeader>
           <div className="overflow-y-auto space-y-1 pb-4">
             {conversations.map(conv => (
@@ -336,16 +347,18 @@ export function AICopilotWidget() {
                 key={conv.id}
                 onClick={() => { switchConversation(conv.id); setShowHistory(false); }}
                 className={cn(
-                  "w-full text-left px-3 py-2.5 rounded-xl text-xs transition-colors",
-                  conv.id === conversationId ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"
+                  "w-full text-left px-3.5 py-3 rounded-[14px] text-xs transition-all duration-200 active:scale-[0.98]",
+                  conv.id === conversationId
+                    ? "bg-primary/10 text-primary font-semibold"
+                    : "text-foreground hover:bg-secondary/60"
                 )}
               >
-                <p className="truncate">{conv.title || 'Conversa sem título'}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(conv.created_at).toLocaleDateString('pt-BR')}</p>
+                <p className="truncate font-medium">{conv.title || 'Conversa sem título'}</p>
+                <p className="text-[10px] text-muted-foreground/60 mt-0.5">{new Date(conv.created_at).toLocaleDateString('pt-BR')}</p>
               </button>
             ))}
             {conversations.length === 0 && (
-              <p className="text-xs text-muted-foreground text-center py-8">Nenhuma conversa salva</p>
+              <p className="text-xs text-muted-foreground/50 text-center py-8">Nenhuma conversa salva</p>
             )}
           </div>
         </SheetContent>
