@@ -177,7 +177,7 @@ export default function Deliveries() {
 
   useFabActions([
     { icon: 'Camera', label: 'Scanner (Foto)', onClick: () => setSheetOpen(true), color: 'hsl(var(--primary))' },
-    { icon: 'Edit3', label: 'Manual', onClick: () => setManualSheetOpen(true), color: 'hsl(210 60% 50%)' },
+    { icon: 'edit', label: 'Manual', onClick: () => setManualSheetOpen(true), color: 'hsl(210 60% 50%)' },
   ], []);
 
   const handleConfirm = async (ocrResult: any, file: File) => {
