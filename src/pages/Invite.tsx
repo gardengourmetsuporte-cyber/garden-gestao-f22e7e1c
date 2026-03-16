@@ -34,6 +34,7 @@ export default function Invite() {
   const [invite, setInvite] = useState<InviteData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [accepting, setAccepting] = useState(false);
 
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
@@ -41,6 +42,9 @@ export default function Invite() {
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [signupDone, setSignupDone] = useState(false);
+
+  // Detect if returning from email confirmation (hash contains access_token)
+  const isReturningFromConfirmation = window.location.hash.includes('access_token');
 
   useEffect(() => {
     if (!token) {
@@ -64,7 +68,8 @@ export default function Invite() {
 
   // If user is already logged in and invite exists, auto-accept
   useEffect(() => {
-    if (user && invite && !invite.accepted_at) {
+    if (user && invite && !invite.accepted_at && !accepting) {
+      setAccepting(true);
       acceptInviteForUser(user.id, user.email || '');
     }
   }, [user, invite]);
@@ -218,6 +223,19 @@ export default function Invite() {
           <h2 className="text-xl font-bold text-foreground">{error || 'Convite inválido'}</h2>
           <p className="text-sm text-muted-foreground">O link pode ter expirado ou já foi utilizado.</p>
           <Button variant="outline" onClick={() => navigate('/')}>Ir para o início</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading while returning from email confirmation or auto-accepting
+  if (isReturningFromConfirmation || accepting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div className="text-center space-y-4 max-w-sm">
+          <div className="w-12 h-12 mx-auto border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <h2 className="text-lg font-bold text-foreground">Confirmando sua conta...</h2>
+          <p className="text-sm text-muted-foreground">Aguarde enquanto preparamos tudo para você.</p>
         </div>
       </div>
     );
