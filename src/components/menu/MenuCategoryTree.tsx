@@ -306,16 +306,26 @@ export function MenuCategoryTree({
                               <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5">
                               <div className="flex items-center gap-1">
-                                <div
-                                  className={cn("w-1 h-1 rounded-full", avail?.tablet ? "bg-primary" : "bg-muted-foreground/20")}
+                                <span
+                                  className={cn(
+                                    "text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none",
+                                    avail?.tablet ? "bg-primary/15 text-primary" : "bg-muted/60 text-muted-foreground/40 line-through"
+                                  )}
                                   title={avail?.tablet ? 'Mesa ativo' : 'Mesa inativo'}
-                                />
-                                <div
-                                  className={cn("w-1 h-1 rounded-full", avail?.delivery ? "bg-primary" : "bg-muted-foreground/20")}
+                                >
+                                  M
+                                </span>
+                                <span
+                                  className={cn(
+                                    "text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none",
+                                    avail?.delivery ? "bg-primary/15 text-primary" : "bg-muted/60 text-muted-foreground/40 line-through"
+                                  )}
                                   title={avail?.delivery ? 'Delivery ativo' : 'Delivery inativo'}
-                                />
+                                >
+                                  D
+                                </span>
                               </div>
                               <span className="text-[11px] text-muted-foreground/60 font-medium tabular-nums">{count}</span>
                             </div>
@@ -332,14 +342,20 @@ export function MenuCategoryTree({
                               <DropdownMenuItem onClick={() => {
                                 onSaveGroup({ ...grp, availability: { ...avail, tablet: !avail?.tablet } });
                               }}>
-                                <AppIcon name={avail?.tablet ? 'CheckCircle2' : 'XCircle'} size={14} className="mr-2" />
-                                Mesa {avail?.tablet ? '(ativo)' : '(inativo)'}
+                                <div className={cn("w-2 h-2 rounded-full mr-2", avail?.tablet ? "bg-primary" : "bg-muted-foreground/30")} />
+                                Mesa
+                                <span className={cn("ml-auto text-[10px] font-semibold", avail?.tablet ? "text-primary" : "text-muted-foreground")}>
+                                  {avail?.tablet ? 'ON' : 'OFF'}
+                                </span>
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => {
                                 onSaveGroup({ ...grp, availability: { ...avail, delivery: !avail?.delivery } });
                               }}>
-                                <AppIcon name={avail?.delivery ? 'CheckCircle2' : 'XCircle'} size={14} className="mr-2" />
-                                Delivery {avail?.delivery ? '(ativo)' : '(inativo)'}
+                                <div className={cn("w-2 h-2 rounded-full mr-2", avail?.delivery ? "bg-primary" : "bg-muted-foreground/30")} />
+                                Delivery
+                                <span className={cn("ml-auto text-[10px] font-semibold", avail?.delivery ? "text-primary" : "text-muted-foreground")}>
+                                  {avail?.delivery ? 'ON' : 'OFF'}
+                                </span>
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => openEditGroup(grp)}>
                                 <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
