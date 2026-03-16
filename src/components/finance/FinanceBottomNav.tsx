@@ -78,7 +78,6 @@ function FinanceTabButton({ tab, active, onTabChange }: { tab: { id: FinanceTab;
         />
         <StableNavIcon
           name={tab.icon}
-          customIcon={tab.customIcon}
           active={active}
           size={22}
           fill={1}
