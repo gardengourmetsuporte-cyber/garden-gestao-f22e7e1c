@@ -18,8 +18,8 @@ export default function TabletGames() {
     {
       id: 'snake',
       emoji: '🐍',
-      title: 'Snake Garden',
-      description: 'Coma lanches e batatas!',
+      title: 'Snake Mania',
+      description: 'Coma lanches e fique enorme!',
       color: 'from-emerald-500/20 to-green-600/20',
       border: 'border-emerald-500/30',
     },

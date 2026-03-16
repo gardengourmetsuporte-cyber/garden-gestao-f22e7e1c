@@ -346,10 +346,10 @@ export function SnakeGame({ onBack, unitId }: Props) {
   useEffect(() => {
     const resize = () => {
       if (containerRef.current) {
-        const w = containerRef.current.clientWidth - 32; // px-4 padding
+        const w = containerRef.current.clientWidth - 32;
         const h = containerRef.current.clientHeight - 16;
-        const s = Math.min(w, h, 600);
-        setCanvasSize(Math.max(Math.floor(s / GRID) * GRID, GRID * 10));
+        const maxSize = Math.min(w, h, 800); // increased max for tablets
+        setCanvasSize(Math.max(Math.floor(maxSize / GRID) * GRID, GRID * 10));
       }
     };
     resize();
@@ -370,7 +370,7 @@ export function SnakeGame({ onBack, unitId }: Props) {
         </button>
         <div className="text-center">
           <h1 className="text-base font-bold text-white flex items-center gap-1.5">
-            🐍 Snake <span className="text-emerald-400">Garden</span>
+            🐍 Snake <span className="text-emerald-400">Mania</span>
           </h1>
         </div>
         <button onClick={() => setShowRanking(true)} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
@@ -408,7 +408,7 @@ export function SnakeGame({ onBack, unitId }: Props) {
           {gameState === 'menu' && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm rounded-2xl gap-5">
               <span className="text-6xl">🐍</span>
-              <h2 className="text-2xl font-black text-white">Snake Garden</h2>
+              <h2 className="text-2xl font-black text-white">Snake Mania</h2>
               <p className="text-sm text-emerald-300/80">Coma os lanches e fique enorme!</p>
               <button
                 onClick={startGame}

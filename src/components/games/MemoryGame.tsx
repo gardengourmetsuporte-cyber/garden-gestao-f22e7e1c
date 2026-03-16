@@ -136,7 +136,7 @@ export function MemoryGame({ onBack, unitId }: Props) {
         </button>
         <div className="text-center">
           <h1 className="text-base font-bold text-white flex items-center gap-1.5">
-            🧠 Memory <span className="text-amber-400">Garden</span>
+            🧠 Memory <span className="text-amber-400">Match</span>
           </h1>
         </div>
         <button onClick={() => setShowRanking(true)} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
@@ -160,12 +160,12 @@ export function MemoryGame({ onBack, unitId }: Props) {
       </div>
 
       {/* Game area */}
-      <div className="flex-1 flex items-center justify-center px-4 relative">
-        <div className="relative w-full max-w-[500px]">
+      <div className="flex-1 flex items-center justify-center px-4 py-2 relative">
+        <div className="relative w-full max-w-[600px]">
           {gameState === 'menu' && (
             <div className="flex flex-col items-center justify-center gap-6 py-12">
               <span className="text-6xl">🧠</span>
-              <h2 className="text-2xl font-black text-white">Memory Garden</h2>
+              <h2 className="text-2xl font-black text-white">Memory Match</h2>
               <p className="text-sm text-amber-300/80">Encontre os pares de lanches!</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {CARD_ITEMS.slice(0, 6).map(e => (

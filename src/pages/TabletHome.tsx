@@ -440,9 +440,12 @@ function OrdersPanel({ unitId, mesa, onClose }: { unitId: string; mesa: string; 
 }
 
 // ─── Game Selection Panel ───
+import snakeBanner from '@/assets/game-snake-banner.jpg';
+import memoryBanner from '@/assets/game-memory-banner.jpg';
+
 const GAMES = [
-  { id: 'snake', emoji: '🐍', title: 'Snake Garden', description: 'Coma lanches e fique enorme!', gradient: 'from-emerald-600/25 to-emerald-900/40', border: 'border-emerald-500/30' },
-  { id: 'memory', emoji: '🧠', title: 'Memory Garden', description: 'Encontre os pares de lanches!', gradient: 'from-amber-600/25 to-amber-900/40', border: 'border-amber-500/30' },
+  { id: 'snake', title: 'Snake Mania', description: 'Coma lanches e fique enorme!', banner: snakeBanner, accent: 'from-emerald-600/80 to-emerald-900/90' },
+  { id: 'memory', title: 'Memory Match', description: 'Encontre os pares de lanches!', banner: memoryBanner, accent: 'from-amber-600/80 to-amber-900/90' },
 ];
 
 type ActivePanel = 'bill' | 'orders' | 'games' | null;
@@ -684,20 +687,24 @@ export default function TabletHome() {
                 </button>
                 <h2 className="text-base font-bold text-foreground">Jogos</h2>
               </div>
-              <div className="flex-1 flex items-center justify-center px-6">
-                <div className="w-full max-w-md space-y-4">
+              <div className="flex-1 overflow-y-auto px-5 py-4">
+                <div className="w-full max-w-lg mx-auto space-y-4">
                   {GAMES.map(game => (
                     <button
                       key={game.id}
                       onClick={() => { setActivePanel(null); setActiveGame(game.id); }}
-                      className={`w-full flex items-center gap-4 p-6 rounded-2xl bg-gradient-to-br ${game.gradient} border ${game.border} hover:scale-[1.01] active:scale-[0.98] transition-all`}
+                      className="w-full relative overflow-hidden rounded-2xl hover:scale-[1.01] active:scale-[0.97] transition-all group"
+                      style={{ aspectRatio: '16/9' }}
                     >
-                      <span className="text-5xl">{game.emoji}</span>
-                      <div className="text-left flex-1">
-                        <p className="text-base font-bold text-foreground">{game.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{game.description}</p>
+                      <img src={game.banner} alt={game.title} className="absolute inset-0 w-full h-full object-cover" />
+                      <div className={`absolute inset-0 bg-gradient-to-t ${game.accent}`} />
+                      <div className="absolute inset-0 flex flex-col justify-end p-5">
+                        <p className="text-xl font-black text-white drop-shadow-lg">{game.title}</p>
+                        <p className="text-sm text-white/70 mt-0.5">{game.description}</p>
                       </div>
-                      <AppIcon name="ChevronRight" size={20} className="text-muted-foreground" />
+                      <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-colors">
+                        <AppIcon name="PlayArrow" size={22} className="text-white" />
+                      </div>
                     </button>
                   ))}
                 </div>
