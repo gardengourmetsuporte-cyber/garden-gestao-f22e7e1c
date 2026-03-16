@@ -235,8 +235,8 @@ function TabletOrderList({ orders, emptyIcon, emptyTitle, emptySubtitle, onRetry
             key={order.id}
             onClick={() => onOpenOrder(order)}
             className={cn(
-              "w-full text-left rounded-2xl bg-card border p-4 space-y-2.5 transition-all active:scale-[0.98]",
-              isPending ? "border-warning/40 shadow-sm shadow-warning/10" : "border-border/30"
+              "w-full text-left rounded-2xl p-4 space-y-2.5 transition-all active:scale-[0.98]",
+              isPending ? "bg-warning/5 border border-warning/30 shadow-sm shadow-warning/10" : "bg-card/80 shadow-sm shadow-black/5"
             )}
           >
             <div className="flex items-center justify-between">
