@@ -8,10 +8,10 @@ import mascotImg from '@/assets/garden-mascot.png';
 const CopilotMessageContent = lazy(() => import('@/components/copilot/CopilotMessageContent'));
 
 const SUGGESTIONS = [
-  { label: 'Resumo do dia', icon: 'BarChart3', gradient: 'from-emerald-400 to-teal-500', bg: 'bg-emerald-500/10 hover:bg-emerald-500/20' },
-  { label: 'Meu estoque', icon: 'Package', gradient: 'from-amber-400 to-orange-500', bg: 'bg-amber-500/10 hover:bg-amber-500/20' },
-  { label: 'Pendências', icon: 'Receipt', gradient: 'from-rose-400 to-pink-500', bg: 'bg-rose-500/10 hover:bg-rose-500/20' },
-  { label: 'Criar post', icon: 'Megaphone', gradient: 'from-violet-400 to-purple-500', bg: 'bg-violet-500/10 hover:bg-violet-500/20' },
+  { label: 'Resumo do dia', icon: 'BarChart3' },
+  { label: 'Meu estoque', icon: 'Package' },
+  { label: 'Pendências', icon: 'Receipt' },
+  { label: 'Criar post', icon: 'Megaphone' },
 ];
 
 const ACCEPTED_FILES = 'image/*,.pdf,.doc,.docx,.csv,.xlsx,.xls,.txt,.json';
