@@ -27,13 +27,15 @@ export function InviteShareDialog({ open, onOpenChange }: InviteShareDialogProps
     if (!activeUnit || !user) return;
     setLoading(true);
     try {
-      // Check for existing active invite
+      // Check for existing active (non-expired, non-accepted) invite
       const { data: existing } = await supabase
         .from('invites')
-        .select('token')
+        .select('token, expires_at')
         .eq('unit_id', activeUnit.id)
         .eq('invited_by', user.id)
+        .eq('email', 'open-invite@garden.app')
         .is('accepted_at', null)
+        .gt('expires_at', new Date().toISOString())
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
