@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTheme } from "next-themes";
 import { AppIcon } from "@/components/ui/app-icon";
 import logoImg from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
