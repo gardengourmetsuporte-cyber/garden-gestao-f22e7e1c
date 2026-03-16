@@ -39,17 +39,6 @@ export function DashboardHeroFinance({ balance, pendingExpenses, isLoading }: Da
 
   return (
     <div className="animate-card-reveal space-y-3">
-      {/* Header */}
-      <div className="flex items-center justify-between border-0">
-        <span className="text-sm font-bold text-foreground">Finanças</span>
-        <button
-          onClick={() => navigate('/finance')}
-          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
-          aria-label="Ir para finanças"
-        >
-          <AppIcon name="ArrowRight" size={15} className="text-muted-foreground" />
-        </button>
-      </div>
 
       {/* === HERO BALANCE CARD === */}
       <button
