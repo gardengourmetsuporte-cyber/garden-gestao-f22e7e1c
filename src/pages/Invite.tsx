@@ -68,7 +68,8 @@ export default function Invite() {
 
   // If user is already logged in and invite exists, auto-accept
   useEffect(() => {
-    if (user && invite && !invite.accepted_at) {
+    if (user && invite && !invite.accepted_at && !accepting) {
+      setAccepting(true);
       acceptInviteForUser(user.id, user.email || '');
     }
   }, [user, invite]);
