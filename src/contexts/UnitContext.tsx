@@ -242,6 +242,7 @@ export function UnitProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!activeUnitId || !user) {
       setUserUnitRole(null);
+      setUnitRole(null);
       return;
     }
     let cancelled = false;
