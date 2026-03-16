@@ -150,8 +150,8 @@ export function FinanceHome({
           className="card-command-success p-4 text-left cursor-pointer transition-all duration-200"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-full bg-success/20 flex items-center justify-center">
-              <AppIcon name="ArrowUpCircle" size={18} className="text-success" />
+            <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+              <AppIcon name="ArrowUpCircle" size={20} className="text-white" />
             </div>
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Receitas</span>
           </div>
@@ -169,8 +169,8 @@ export function FinanceHome({
           className="card-command-danger p-4 text-left cursor-pointer transition-all duration-200"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-full bg-destructive/20 flex items-center justify-center">
-              <AppIcon name="ArrowDownCircle" size={18} className="text-destructive" />
+            <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #EF4444, #F472B6)' }}>
+              <AppIcon name="ArrowDownCircle" size={20} className="text-white" />
             </div>
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Despesas</span>
           </div>
@@ -258,8 +258,8 @@ export function FinanceHome({
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-warning/20 flex items-center justify-center">
-                <AppIcon name="AlertCircle" size={16} className="text-warning" />
+              <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+                <AppIcon name="AlertCircle" size={20} className="text-white" />
               </div>
               <span className="font-semibold text-sm text-warning">Pendências</span>
             </div>
