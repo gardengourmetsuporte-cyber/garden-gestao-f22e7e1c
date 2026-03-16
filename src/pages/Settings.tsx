@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettin
 const LoyaltySettings = lazy(() => import('@/components/settings/LoyaltySettings').then(m => ({ default: m.LoyaltySettings })));
 const AppearanceSettings = lazy(() => import('@/components/settings/AppearanceSettings').then(m => ({ default: m.AppearanceSettings })));
 const SystemBackupSettings = lazy(() => import('@/components/settings/SystemBackupSettings').then(m => ({ default: m.SystemBackupSettings })));
+const DataReplication = lazy(() => import('@/components/settings/DataReplication').then(m => ({ default: m.DataReplication })));
 interface MenuItem {
   value: string;
   icon: string;
@@ -55,6 +57,7 @@ const allMenuItems: MenuItem[] = [
   { value: 'loyalty', icon: 'Heart', label: 'Fidelidade', description: 'Regras de pontos e recompensas', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
   { value: 'audit-log', icon: 'FileText', label: 'Log de Atividades', description: 'Registro de ações no sistema', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
   { value: 'system-backup', icon: 'HardDrive', label: 'Backup Geral', description: 'Backup completo de todos os dados', variant: 'purple', section: 'Sistema', requiredPlan: 'free' },
+  { value: 'replication', icon: 'Copy', label: 'Replicar Dados', description: 'Copiar dados entre lojas', variant: 'purple', section: 'Sistema', requiredPlan: 'pro' },
 ];
 
 function SettingsFallback() {
@@ -75,6 +78,7 @@ const PLAN_LABELS: Record<PlanTier, string> = {
 
 export default function SettingsPage() {
   const { isAdmin, isSuperAdmin, hasPlan } = useAuth();
+  const { units } = useUnit();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState<string | null>(
@@ -99,6 +103,7 @@ export default function SettingsPage() {
   const menuItems = allMenuItems.filter(item => {
     if (item.value === 'plan') return true;
     if (item.value === 'units') return isSuperAdmin;
+    if (item.value === 'replication') return isAdmin && units.length > 1;
     if (item.value === 'team') return isAdmin;
     if (item.value === 'audit-log') return isAdmin;
     if (item.value === 'medals') return isAdmin;
@@ -149,6 +154,7 @@ export default function SettingsPage() {
       {activeSection === 'cardapio-digital' && <CardapioSettings />}
       {activeSection === 'loyalty' && <LoyaltySettings />}
       {activeSection === 'system-backup' && <SystemBackupSettings />}
+      {activeSection === 'replication' && <DataReplication />}
     </Suspense>
   ) : null;
 
