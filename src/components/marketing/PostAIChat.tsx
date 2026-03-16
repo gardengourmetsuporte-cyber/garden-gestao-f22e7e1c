@@ -109,25 +109,16 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
         ...(m.imagePreview ? { imageUrl: m.imagePreview } : {}),
       }));
 
-      const resp = await fetch(CHAT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
+      const { data, error: fnError } = await supabase.functions.invoke('management-ai', {
+        body: {
           messages: apiMessages,
           context: { marketing_mode: true },
           unit_id: unitId,
-        }),
+        },
       });
 
-      if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.error || `Erro ${resp.status}`);
-      }
+      if (fnError) throw new Error(fnError.message || 'Erro ao chamar IA');
 
-      const data = await resp.json();
       const responseText = data.suggestion || 'Desculpe, não consegui gerar uma resposta.';
       
       // Check if response contains a marketing post (tool call result)
