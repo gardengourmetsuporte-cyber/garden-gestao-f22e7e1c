@@ -49,15 +49,20 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
     return map;
   }, [surveySuppliers, responses]);
 
-  // Get unique items from responses
-  const allItemIds = useMemo(() => {
-    return [...new Set(responses.map((r: any) => r.item_id))];
-  }, [responses]);
-
-  // We need to figure out item names — they may come from inventory
-  // For now, use item_id as key, and try to derive names from responses context
-  // Actually we need to fetch items — let's use the suppliers' data
-  // The survey detail should ideally include items. Let's use what we have.
+  // Get unique items from responses, enriched with inventory names
+  const allItems = useMemo(() => {
+    const itemIds = [...new Set(responses.map((r: any) => r.item_id))];
+    return itemIds
+      .map(id => {
+        const inv = inventoryItems.find((i: any) => i.id === id);
+        return { id, name: inv?.name || id.slice(0, 8), unitType: inv?.unit_type || '' };
+      })
+      .filter(item => {
+        if (!search.trim()) return true;
+        return item.name.toLowerCase().includes(search.toLowerCase());
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [responses, inventoryItems, search]);
 
   const respondedSuppliers = surveySuppliers.filter((s: any) => s.status === 'responded');
   const pendingSuppliers = surveySuppliers.filter((s: any) => s.status === 'pending');
