@@ -218,7 +218,7 @@ export function BottomTabBar() {
                   (fabAction || hasMultiActions)
                     ? "bg-accent-foreground fab-contextual-glow"
                     : "bg-primary fab-button-glow",
-                  speedDialOpen && "rotate-45",
+                  (speedDialOpen || quickOpen) && "rotate-45 bg-muted-foreground shadow-none",
                   "hover:scale-[1.08] active:scale-[0.92]"
                 )}
               >
