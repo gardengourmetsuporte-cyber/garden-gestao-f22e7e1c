@@ -24,6 +24,7 @@ const MODULES: ReplicationModule[] = [
   { key: 'checklists', label: 'Checklists', description: 'Setores, subcategorias e itens', icon: 'ClipboardCheck', color: '#f59e0b' },
   { key: 'finance', label: 'Categorias Financeiras', description: 'Árvore de receitas e despesas', icon: 'Wallet', color: '#8b5cf6' },
   { key: 'menu', label: 'Cardápio Digital', description: 'Categorias, grupos e produtos', icon: 'UtensilsCrossed', color: '#ef4444', destructive: true },
+  { key: 'rewards', label: 'Loja de Prêmios', description: 'Produtos resgatáveis por pontos', icon: 'Gift', color: '#ec4899' },
 ];
 
 interface ModuleResult {
@@ -231,6 +232,24 @@ export function DataReplication() {
     return { key: 'menu', count: cats.length + grps.length + prods.length, detail: `${cats.length} categorias, ${grps.length} grupos, ${prods.length} produtos` };
   }
 
+  async function replicateRewards(source: string, target: string): Promise<ModuleResult> {
+    const { data: srcProducts } = await supabase.from('reward_products').select('*').eq('unit_id', source);
+    const { data: existingProducts } = await supabase.from('reward_products').select('name').eq('unit_id', target);
+    const existingNames = new Set((existingProducts || []).map(p => p.name.toLowerCase()));
+    let inserted = 0;
+
+    for (const p of srcProducts || []) {
+      if (existingNames.has(p.name.toLowerCase())) continue;
+      await supabase.from('reward_products').insert({
+        unit_id: target, name: p.name, description: p.description, points_cost: p.points_cost,
+        image_url: p.image_url, is_active: p.is_active, stock: p.stock,
+      });
+      inserted++;
+    }
+
+    return { key: 'rewards', count: inserted, detail: `${inserted} prêmios` };
+  }
+
   // ── Execute ──
 
   const handleReplicate = async () => {
@@ -247,6 +266,7 @@ export function DataReplication() {
         checklists: () => replicateChecklists(sourceUnitId, activeUnitId),
         finance: () => replicateFinanceCategories(sourceUnitId, activeUnitId),
         menu: () => replicateMenu(sourceUnitId, activeUnitId),
+        rewards: () => replicateRewards(sourceUnitId, activeUnitId),
       };
 
       for (const key of selected) {
