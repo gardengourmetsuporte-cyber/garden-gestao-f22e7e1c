@@ -119,7 +119,7 @@ function AnimatedCurrency({ value }: { value: number }) {
         <>
           {/* Total */}
           <div className="text-center py-2">
-            <span className="text-2xl font-black text-foreground font-display" style={{ letterSpacing: '-0.03em' }}>
+            <span className="text-2xl font-black text-white font-display" style={{ letterSpacing: '-0.03em' }}>
               <AnimatedCurrency value={summary.total} />
             </span>
             <div className="flex items-center justify-center gap-2 mt-0.5">
