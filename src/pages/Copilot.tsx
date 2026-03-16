@@ -10,12 +10,12 @@ import { AgentIntegrations } from '@/components/copilot/AgentIntegrations';
 import { AgentPreferences } from '@/components/copilot/AgentPreferences';
 
 const TABS = [
-  { key: 'personality', label: 'Personalidade', icon: <AppIcon name="Sparkles" className="w-3.5 h-3.5" />, iconGradient: 'linear-gradient(135deg, #a855f7, #7c3aed)' },
-  { key: 'knowledge', label: 'RAG', icon: <AppIcon name="BookOpen" className="w-3.5 h-3.5" />, iconGradient: 'linear-gradient(135deg, #3b82f6, #2563eb)' },
-  { key: 'tools', label: 'Tools', icon: <AppIcon name="Wrench" className="w-3.5 h-3.5" />, iconGradient: 'linear-gradient(135deg, #f59e0b, #d97706)' },
-  { key: 'permissions', label: 'Permissões', icon: <AppIcon name="Shield" className="w-3.5 h-3.5" />, iconGradient: 'linear-gradient(135deg, #22c55e, #16a34a)' },
-  { key: 'integrations', label: 'MCPs', icon: <AppIcon name="Plug" className="w-3.5 h-3.5" />, iconGradient: 'linear-gradient(135deg, #ec4899, #db2777)' },
-  { key: 'preferences', label: 'Preferências', icon: <AppIcon name="Settings" className="w-3.5 h-3.5" />, iconGradient: 'linear-gradient(135deg, #64748b, #475569)' },
+  { key: 'personality', label: 'Prompt', icon: <AppIcon name="Sparkles" className="w-3 h-3" />, iconGradient: 'linear-gradient(135deg, #a855f7, #7c3aed)' },
+  { key: 'knowledge', label: 'RAG', icon: <AppIcon name="BookOpen" className="w-3 h-3" />, iconGradient: 'linear-gradient(135deg, #3b82f6, #2563eb)' },
+  { key: 'tools', label: 'Tools', icon: <AppIcon name="Wrench" className="w-3 h-3" />, iconGradient: 'linear-gradient(135deg, #f59e0b, #d97706)' },
+  { key: 'permissions', label: 'Acesso', icon: <AppIcon name="Shield" className="w-3 h-3" />, iconGradient: 'linear-gradient(135deg, #22c55e, #16a34a)' },
+  { key: 'integrations', label: 'MCPs', icon: <AppIcon name="Plug" className="w-3 h-3" />, iconGradient: 'linear-gradient(135deg, #ec4899, #db2777)' },
+  { key: 'preferences', label: 'Config', icon: <AppIcon name="Settings" className="w-3 h-3" />, iconGradient: 'linear-gradient(135deg, #64748b, #475569)' },
 ];
 
 export default function Copilot() {
