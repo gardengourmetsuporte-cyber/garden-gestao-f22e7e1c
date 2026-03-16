@@ -64,9 +64,9 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             ref={(el) => { if (el) tabRefs.current.set(tab.key, el); }}
             onClick={() => { navigator.vibrate?.(10); onTabChange(tab.key); }}
             className={cn(
-              "relative flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl font-semibold z-10 transition-all duration-200",
+              "relative flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-xl font-semibold z-10 transition-all duration-200",
               isCompact ? "min-w-0 shrink-0 px-2 flex-1" : "flex-1 px-1",
-              "min-h-[52px]",
+              "min-h-[44px]",
               hideIcons ? "text-[11px]" : "text-[11px]",
               isActive ? 'text-primary' : 'text-muted-foreground'
             )}
