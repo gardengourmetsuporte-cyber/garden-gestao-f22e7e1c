@@ -61,6 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [planStatus, setPlanStatus] = useState<string>(cached?.planStatus ?? 'active');
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Unit-level role set by UnitContext to override global isAdmin determination
+  const [unitRole, setUnitRoleState] = useState<string | null>(null);
   const subIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchUserDataRef = useRef<(userId: string) => Promise<void>>();
   // Track whether a fetchUserData call is in-flight to prevent double calls
