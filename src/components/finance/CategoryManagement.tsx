@@ -229,16 +229,21 @@ export function CategoryManagement({
       <Sheet nested open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) resetForm(); }}>
         <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl overflow-y-auto">
           <SheetHeader className="pb-4">
-            <SheetTitle className="flex items-center gap-2">
-              {isEditing && (
-                <Button variant="ghost" size="icon" onClick={resetForm}>
-                  <AppIcon name="ArrowLeft" size={20} />
-                </Button>
-              )}
-              {isEditing 
-                ? (editingCategory ? 'Editar Categoria' : parentCategory ? `Nova Subcategoria de ${parentCategory.name}` : 'Nova Categoria') 
-                : 'Gerenciar Categorias'}
-            </SheetTitle>
+            <div className="flex items-center justify-between">
+              <SheetTitle className="flex items-center gap-2">
+                {isEditing && (
+                  <Button variant="ghost" size="icon" onClick={resetForm}>
+                    <AppIcon name="ArrowLeft" size={20} />
+                  </Button>
+                )}
+                {isEditing 
+                  ? (editingCategory ? 'Editar Categoria' : parentCategory ? `Nova Subcategoria de ${parentCategory.name}` : 'Nova Categoria') 
+                  : 'Gerenciar Categorias'}
+              </SheetTitle>
+              <Button variant="ghost" size="icon" className="shrink-0 rounded-full" onClick={() => onOpenChange(false)}>
+                <AppIcon name="X" size={18} />
+              </Button>
+            </div>
           </SheetHeader>
 
           {!isEditing ? (
