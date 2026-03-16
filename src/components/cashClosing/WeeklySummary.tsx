@@ -90,9 +90,9 @@ function AnimatedCurrency({ value }: { value: number }) {
       <div className="flex items-center justify-between">
         <button
           onClick={() => setWeekOffset(o => o - 1)}
-          className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/60 hover:bg-secondary transition-colors"
+          className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors"
         >
-          <AppIcon name="ChevronLeft" size={16} className="text-muted-foreground" />
+          <AppIcon name="ChevronLeft" size={16} className="text-white/70" />
         </button>
 
         <div className="text-center flex-1">
