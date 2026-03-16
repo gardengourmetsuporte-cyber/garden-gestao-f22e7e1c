@@ -126,7 +126,7 @@ export function usePriceSurveys() {
       responses = data || [];
     }
 
-    return { ...survey, responses } as any;
+    return { ...(survey as object), responses } as any;
   };
 
   return {
