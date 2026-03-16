@@ -39,7 +39,7 @@ export interface PriceSurveyResponse {
 
 export function usePriceSurveys() {
   const { user } = useAuth();
-  const { currentUnit } = useUnit();
+  const { activeUnitId } = useUnit();
   const qc = useQueryClient();
   const unitId = currentUnit?.id;
 
