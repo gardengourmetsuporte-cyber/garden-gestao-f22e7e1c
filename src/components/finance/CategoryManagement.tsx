@@ -307,7 +307,9 @@ export function CategoryManagement({
                               key={sub.id}
                               className="flex items-center gap-2 p-2 bg-secondary/50 rounded-lg"
                             >
-                              <AppIcon name={sub.icon} size={16} style={{ color: sub.color }} />
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ background: `linear-gradient(135deg, ${sub.color}, ${sub.color}99)` }}>
+                                <AppIcon name={sub.icon} size={14} className="text-white" />
+                              </div>
                               <span className="flex-1 text-sm">{sub.name}</span>
                               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(sub)}>
                                 <AppIcon name="Pencil" size={12} />
