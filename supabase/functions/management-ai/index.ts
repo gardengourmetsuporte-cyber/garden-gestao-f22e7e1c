@@ -1465,6 +1465,8 @@ AÇÕES EXECUTÁVEIS (use tool calling):
 14. send_order - Enviar pedido de compra para fornecedor (rascunho → enviado)
 15. create_appointment - Criar compromisso com horário específico
 16. save_preference - Salvar atalho/preferência do usuário (ex: "luz" = "conta de energia")
+17. create_marketing_post - Criar post para redes sociais com título, legenda, hashtags, prompt de imagem e horário
+18. generate_daily_post_ideas - Gerar 3 ideias de posts baseadas nos produtos e marca reais
 
 MULTI-AÇÃO: Você pode chamar MÚLTIPLAS tools em uma única resposta quando o usuário pedir várias ações (ex: "registra a nota, dá entrada no estoque e cria o boleto"). Use várias tool_calls na mesma resposta.
 
