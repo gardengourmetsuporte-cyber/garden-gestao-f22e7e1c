@@ -72,9 +72,9 @@ export default function Marketing() {
 
           <AnimatedTabs
             tabs={[
-              { key: 'today', label: 'Hoje', icon: <AppIcon name="Sparkles" size={16} /> },
-              { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={16} /> },
-              { key: 'brand', label: 'Marca', icon: <AppIcon name="Palette" size={16} /> },
+              { key: 'today', label: 'Hoje', icon: <AppIcon name="Sparkles" size={14} fill={1} />, iconGradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
+              { key: 'calendar', label: 'Calendário', icon: <AppIcon name="CalendarDays" size={14} fill={1} />, iconGradient: 'linear-gradient(135deg, #6366F1, #8B5CF6)' },
+              { key: 'brand', label: 'Marca', icon: <AppIcon name="Palette" size={14} fill={1} />, iconGradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
             ]}
             activeTab={activeTab}
             onTabChange={setActiveTab}
