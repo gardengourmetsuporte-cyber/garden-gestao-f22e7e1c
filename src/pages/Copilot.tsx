@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useManagementAI, CopilotContextStats } from '@/hooks/useManagementAI';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { cn } from '@/lib/utils';
@@ -14,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { toast } from 'sonner';
 
 function BriefingCard({ stats, contextStats, visible }: {
   stats: ReturnType<typeof useDashboardStats>['stats'];
@@ -107,6 +107,42 @@ function getActionNavigation(content: string): { label: string; href: string; ic
   return null;
 }
 
+// Attachment preview chip
+function AttachmentPreview({ file, onRemove }: { file: File; onRemove: () => void }) {
+  const isImage = file.type.startsWith('image/');
+  const [preview, setPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isImage) {
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [file, isImage]);
+
+  return (
+    <div className="relative group inline-flex items-center gap-2 rounded-xl border border-border/50 bg-secondary/60 px-2.5 py-1.5">
+      {isImage && preview ? (
+        <img src={preview} alt="" className="w-8 h-8 rounded-lg object-cover" />
+      ) : (
+        <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+          <AppIcon name="FileText" size={14} className="text-muted-foreground" />
+        </div>
+      )}
+      <div className="min-w-0 max-w-[120px]">
+        <p className="text-[11px] font-medium text-foreground truncate">{file.name}</p>
+        <p className="text-[9px] text-muted-foreground">{(file.size / 1024).toFixed(0)} KB</p>
+      </div>
+      <button
+        onClick={onRemove}
+        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <AppIcon name="X" size={10} />
+      </button>
+    </div>
+  );
+}
+
 export default function CopilotPage() {
   const navigate = useNavigate();
   const {
@@ -117,9 +153,13 @@ export default function CopilotPage() {
   const { stats } = useDashboardStats();
   const [question, setQuestion] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [showAttachMenu, setShowAttachMenu] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!hasGreeted && messages.length === 0) {
@@ -131,35 +171,66 @@ export default function CopilotPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!question.trim() || isLoading) return;
-    sendMessage(question.trim());
-    setQuestion('');
+  // Auto-resize textarea
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (ta) {
+      ta.style.height = 'auto';
+      ta.style.height = Math.min(ta.scrollHeight, 160) + 'px';
+    }
+  }, [question]);
+
+  const processFile = (file: File) => {
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error('Arquivo deve ter no máximo 10MB');
+      return;
+    }
+    setAttachedFiles(prev => [...prev, file]);
+    setShowAttachMenu(false);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || isLoading) return;
-
-    if (!file.type.startsWith('image/')) {
-      sendMessage('Envie apenas imagens (JPG, PNG, etc.)');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      sendMessage('A imagem deve ter no máximo 10MB.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      const prompt = question.trim() || 'Analise esta imagem e extraia todas as informações relevantes (valores, itens, datas, etc.)';
-      sendMessage(prompt, base64);
-      setQuestion('');
-    };
-    reader.readAsDataURL(file);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach(processFile);
     e.target.value = '';
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if ((!question.trim() && attachedFiles.length === 0) || isLoading) return;
+
+    let imageBase64: string | undefined;
+
+    // Process the first image attachment as base64
+    const imageFile = attachedFiles.find(f => f.type.startsWith('image/'));
+    if (imageFile) {
+      imageBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(imageFile);
+      });
+    }
+
+    const prompt = question.trim() || (attachedFiles.length > 0
+      ? 'Analise esta imagem e extraia todas as informações relevantes (valores, itens, datas, etc.)'
+      : '');
+
+    sendMessage(prompt, imageBase64);
+    setQuestion('');
+    setAttachedFiles([]);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
   };
 
   const handleChipClick = (text: string) => {
@@ -167,70 +238,109 @@ export default function CopilotPage() {
     sendMessage(text);
   };
 
+  // Drag & drop
+  const [isDragging, setIsDragging] = useState(false);
+  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); };
+  const handleDragLeave = () => setIsDragging(false);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    Array.from(e.dataTransfer.files).forEach(processFile);
+  };
+
   const showChips = messages.length <= 2 && !isLoading;
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-[calc(100vh-3.5rem-5rem)] lg:h-screen">
+      <div
+        className="flex flex-col h-[calc(100vh-3.5rem-5rem)] lg:h-screen"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        {/* Drag overlay */}
+        {isDragging && (
+          <div className="absolute inset-0 z-50 bg-primary/5 border-2 border-dashed border-primary/30 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-2">
+              <AppIcon name="Upload" size={32} className="text-primary" />
+              <p className="text-sm font-medium text-primary">Solte o arquivo aqui</p>
+            </div>
+          </div>
+        )}
+
         {/* Toolbar */}
-        <div className="shrink-0">
-          <div className="flex items-center justify-end gap-1 h-10 px-3">
-            {messages.length > 2 && (
-              <button
-                onClick={clearHistory}
-                className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Limpar"
-              >
-                <AppIcon name="Trash2" size={16} className="text-muted-foreground hover:text-foreground" />
-              </button>
-            )}
-            <button
-              onClick={newConversation}
-              className="p-2 rounded-xl hover:bg-secondary transition-colors"
-              title="Nova conversa"
-            >
-              <AppIcon name="Plus" size={16} className="text-muted-foreground" />
-            </button>
-            <Sheet open={showHistory} onOpenChange={setShowHistory}>
-              <SheetTrigger asChild>
-                <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
-                  <AppIcon name="Clock" size={16} className="text-muted-foreground" />
+        <div className="shrink-0 border-b border-border/10">
+          <div className="flex items-center justify-between h-12 px-4">
+            <div className="flex items-center gap-2">
+              <img src={mascotImg} alt="" className="w-6 h-6 rounded-full" />
+              <span className="text-sm font-semibold text-foreground">Copiloto IA</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            </div>
+            <div className="flex items-center gap-0.5">
+              {messages.length > 2 && (
+                <button
+                  onClick={clearHistory}
+                  className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Limpar"
+                >
+                  <AppIcon name="Trash2" size={16} className="text-muted-foreground hover:text-foreground" />
                 </button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] p-0">
-                <SheetHeader className="p-4 border-b border-border/30">
-                  <SheetTitle className="text-sm">Conversas</SheetTitle>
-                </SheetHeader>
-                <div className="overflow-y-auto max-h-[calc(100vh-80px)]">
-                  {conversations.length === 0 ? (
-                    <p className="text-xs text-muted-foreground p-4 text-center">Nenhuma conversa</p>
-                  ) : (
-                    conversations.map((conv) => (
-                      <button
-                        key={conv.id}
-                        onClick={() => {
-                          switchConversation(conv.id);
-                          setShowHistory(false);
-                        }}
-                        className={cn(
-                          "w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/50 transition-colors",
-                          conv.id === conversationId && "bg-primary/10"
-                        )}
-                      >
-                        <p className="text-sm font-medium truncate">{conv.title || 'Conversa'}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {format(new Date(conv.created_at), "dd MMM, HH:mm", { locale: ptBR })}
-                        </p>
-                      </button>
-                    ))
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
+              )}
+              <button
+                onClick={newConversation}
+                className="p-2 rounded-xl hover:bg-secondary transition-colors"
+                title="Nova conversa"
+              >
+                <AppIcon name="Plus" size={16} className="text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => navigate('/copilot/settings')}
+                className="p-2 rounded-xl hover:bg-secondary transition-colors"
+                title="Configurações"
+              >
+                <AppIcon name="Settings" size={16} className="text-muted-foreground" />
+              </button>
+              <Sheet open={showHistory} onOpenChange={setShowHistory}>
+                <SheetTrigger asChild>
+                  <button className="p-2 rounded-xl hover:bg-secondary transition-colors" title="Histórico">
+                    <AppIcon name="Clock" size={16} className="text-muted-foreground" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] p-0">
+                  <SheetHeader className="p-4 border-b border-border/30">
+                    <SheetTitle className="text-sm">Conversas</SheetTitle>
+                  </SheetHeader>
+                  <div className="overflow-y-auto max-h-[calc(100vh-80px)]">
+                    {conversations.length === 0 ? (
+                      <p className="text-xs text-muted-foreground p-4 text-center">Nenhuma conversa</p>
+                    ) : (
+                      conversations.map((conv) => (
+                        <button
+                          key={conv.id}
+                          onClick={() => {
+                            switchConversation(conv.id);
+                            setShowHistory(false);
+                          }}
+                          className={cn(
+                            "w-full text-left px-4 py-3 border-b border-border/10 hover:bg-secondary/50 transition-colors",
+                            conv.id === conversationId && "bg-primary/10"
+                          )}
+                        >
+                          <p className="text-sm font-medium truncate">{conv.title || 'Conversa'}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            {format(new Date(conv.created_at), "dd MMM, HH:mm", { locale: ptBR })}
+                          </p>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 pb-2 space-y-1 overscroll-contain">
+        <div className="flex-1 overflow-y-auto px-4 py-4 pb-2 space-y-1 overscroll-contain">
           <BriefingCard stats={stats} contextStats={contextStats} visible={messages.length <= 2} />
 
           {messages.map((msg, i) => {
@@ -244,55 +354,64 @@ export default function CopilotPage() {
               <div
                 key={i}
                 className={cn(
-                  "flex flex-col",
-                  isUser ? "items-end" : "items-start",
-                  showTail ? "mt-2" : "mt-0.5"
+                  "flex",
+                  isUser ? "justify-end" : "justify-start",
+                  showTail ? "mt-3" : "mt-0.5"
                 )}
               >
-                {msg.imageUrl && (
-                  <img
-                    src={msg.imageUrl}
-                    alt="Imagem enviada"
-                    className="max-w-[200px] max-h-[200px] rounded-2xl mb-1 object-cover"
-                  />
+                {/* Assistant avatar */}
+                {!isUser && showTail && (
+                  <img src={mascotImg} alt="" className="w-6 h-6 rounded-full mr-2 mt-1 shrink-0" />
                 )}
-                {isAction ? (
-                  <div className="max-w-[80%] space-y-1.5">
-                    <div className="rounded-2xl px-3.5 py-2.5 text-[14px] leading-relaxed bg-secondary/60 text-foreground rounded-tl-sm">
-                      <CopilotMessageContent content={displayContent} />
+                {!isUser && !showTail && <div className="w-6 mr-2 shrink-0" />}
+
+                <div className="max-w-[80%] space-y-1.5">
+                  {msg.imageUrl && (
+                    <img
+                      src={msg.imageUrl}
+                      alt="Imagem enviada"
+                      className="max-w-[200px] max-h-[200px] rounded-2xl object-cover"
+                    />
+                  )}
+                  {isAction ? (
+                    <>
+                      <div className="rounded-2xl px-3.5 py-2.5 text-[14px] leading-relaxed bg-secondary/60 text-foreground rounded-tl-sm">
+                        <CopilotMessageContent content={displayContent} />
+                      </div>
+                      {navAction && (
+                        <button
+                          onClick={() => navigate(navAction.href)}
+                          className="flex items-center gap-1.5 text-xs text-primary font-medium px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/15 transition-colors"
+                        >
+                          <AppIcon name={navAction.icon as any} size={12} />
+                          {navAction.label} →
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    <div
+                      className={cn(
+                        "px-3.5 py-2.5 text-[14px] leading-relaxed",
+                        isUser
+                          ? cn("bg-primary text-primary-foreground", showTail ? "rounded-2xl rounded-tr-sm" : "rounded-2xl")
+                          : cn("bg-secondary/60 text-foreground", showTail ? "rounded-2xl rounded-tl-sm" : "rounded-2xl")
+                      )}
+                    >
+                      {msg.role === 'assistant' ? (
+                        <CopilotMessageContent content={displayContent} />
+                      ) : (
+                        <span className="whitespace-pre-wrap">{displayContent}</span>
+                      )}
                     </div>
-                    {navAction && (
-                      <button
-                        onClick={() => navigate(navAction.href)}
-                        className="flex items-center gap-1.5 text-xs text-primary font-medium px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/15 transition-colors"
-                      >
-                        <AppIcon name={navAction.icon as any} size={12} />
-                        {navAction.label} →
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div
-                    className={cn(
-                      "max-w-[80%] px-3.5 py-2 text-[14px] leading-relaxed",
-                      isUser
-                        ? cn("bg-primary text-primary-foreground", showTail ? "rounded-2xl rounded-tr-sm" : "rounded-2xl")
-                        : cn("bg-secondary/60 text-foreground", showTail ? "rounded-2xl rounded-tl-sm" : "rounded-2xl")
-                    )}
-                  >
-                    {msg.role === 'assistant' ? (
-                      <CopilotMessageContent content={displayContent} />
-                    ) : (
-                      displayContent
-                    )}
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             );
           })}
 
           {isLoading && (
-            <div className="flex justify-start mt-1">
+            <div className="flex justify-start mt-2">
+              <img src={mascotImg} alt="" className="w-6 h-6 rounded-full mr-2 mt-1 shrink-0" />
               <div className="bg-secondary/60 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
                 {isExecuting ? (
                   <>
@@ -321,9 +440,10 @@ export default function CopilotPage() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+          multiple
           className="hidden"
-          onChange={handleImageUpload}
+          onChange={handleFileChange}
         />
         <input
           ref={cameraInputRef}
@@ -331,69 +451,94 @@ export default function CopilotPage() {
           accept="image/*"
           capture="environment"
           className="hidden"
-          onChange={handleImageUpload}
+          onChange={handleFileChange}
+        />
+        <input
+          ref={docInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+          multiple
+          className="hidden"
+          onChange={handleFileChange}
         />
 
-        {/* Input bar */}
-        <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] mb-[64px] lg:mb-0">
-          <form onSubmit={handleSubmit} className="flex gap-2 items-center">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-10 w-10 p-0 rounded-full shrink-0"
-                  disabled={isLoading}
-                >
-                  <AppIcon name="Plus" size={20} className="text-muted-foreground" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent side="top" align="start" className="w-auto p-2 rounded-2xl">
-                <div className="flex flex-col gap-1">
-                  <button
-                    type="button"
-                    onClick={() => { fileInputRef.current?.click(); }}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors text-sm"
-                  >
-                    <AppIcon name="Paperclip" size={18} className="text-muted-foreground" />
-                    <span>Arquivo</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { cameraInputRef.current?.click(); }}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors text-sm"
-                  >
-                    <AppIcon name="Camera" size={18} className="text-muted-foreground" />
-                    <span>Câmera</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { fileInputRef.current?.click(); }}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors text-sm"
-                  >
-                    <AppIcon name="Image" size={18} className="text-muted-foreground" />
-                    <span>Galeria</span>
-                  </button>
-                </div>
-              </PopoverContent>
-            </Popover>
-            <Input
+        {/* Input area — Lovable-style */}
+        <div className="shrink-0 px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))] mb-[64px] lg:mb-0 pt-1">
+          {/* Attachment previews */}
+          {attachedFiles.length > 0 && (
+            <div className="flex gap-2 flex-wrap mb-2 px-1">
+              {attachedFiles.map((file, i) => (
+                <AttachmentPreview key={i} file={file} onRemove={() => removeAttachment(i)} />
+              ))}
+            </div>
+          )}
+
+          <div className="relative rounded-2xl border border-border/40 bg-secondary/30 focus-within:border-primary/40 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+            {/* Textarea */}
+            <textarea
+              ref={textareaRef}
               value={question}
               onChange={e => setQuestion(e.target.value)}
-              placeholder="Mensagem..."
-              className="h-11 text-sm rounded-full bg-secondary/50 border-border/30"
+              onKeyDown={handleKeyDown}
+              placeholder="Pergunte algo..."
               disabled={isLoading}
+              rows={1}
+              className="w-full resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground px-4 pt-3 pb-12 rounded-2xl focus:outline-none max-h-[160px]"
             />
-            <Button
-              type="submit"
-              size="sm"
-              className="h-11 w-11 p-0 rounded-full shrink-0"
-              disabled={isLoading || !question.trim()}
-            >
-              <AppIcon name="Send" size={16} />
-            </Button>
-          </form>
+
+            {/* Bottom actions bar */}
+            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-2 pb-2 pt-1">
+              <div className="flex items-center gap-0.5">
+                <Popover open={showAttachMenu} onOpenChange={setShowAttachMenu}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="p-2 rounded-xl hover:bg-secondary/80 transition-colors"
+                      disabled={isLoading}
+                    >
+                      <AppIcon name="Plus" size={18} className="text-muted-foreground" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="top" align="start" className="w-48 p-1.5 rounded-2xl">
+                    <button
+                      type="button"
+                      onClick={() => { cameraInputRef.current?.click(); setShowAttachMenu(false); }}
+                      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors text-sm"
+                    >
+                      <AppIcon name="Camera" size={16} className="text-muted-foreground" />
+                      <span>Câmera</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { fileInputRef.current?.click(); setShowAttachMenu(false); }}
+                      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors text-sm"
+                    >
+                      <AppIcon name="Image" size={16} className="text-muted-foreground" />
+                      <span>Galeria</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { docInputRef.current?.click(); setShowAttachMenu(false); }}
+                      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors text-sm"
+                    >
+                      <AppIcon name="Paperclip" size={16} className="text-muted-foreground" />
+                      <span>Arquivo</span>
+                    </button>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <Button
+                type="button"
+                size="sm"
+                className="h-8 w-8 p-0 rounded-xl shrink-0"
+                disabled={isLoading || (!question.trim() && attachedFiles.length === 0)}
+                onClick={handleSubmit as any}
+              >
+                <AppIcon name="ArrowUp" size={16} />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </AppLayout>
