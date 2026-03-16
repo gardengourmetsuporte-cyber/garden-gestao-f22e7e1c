@@ -64,22 +64,22 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             ref={(el) => { if (el) tabRefs.current.set(tab.key, el); }}
             onClick={() => { navigator.vibrate?.(10); onTabChange(tab.key); }}
             className={cn(
-              "relative flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-xl font-semibold z-10 transition-all duration-200",
-              isCompact ? "min-w-0 shrink-0 px-2 flex-1" : "flex-1 px-1",
-              "min-h-[44px]",
-              hideIcons ? "text-[11px]" : "text-[11px]",
+              "relative flex items-center justify-center gap-1.5 py-1.5 rounded-lg font-semibold z-10 transition-all duration-200",
+              isCompact ? "min-w-0 shrink-0 px-2 flex-1" : "flex-1 px-1.5",
+              "min-h-[34px]",
+              "text-[11px]",
               isActive ? 'text-primary' : 'text-muted-foreground'
             )}
           >
             {tab.icon && !hideIcons && (
               <div
                 className={cn(
-                  "w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 shadow-sm",
+                  "w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-300",
                   !isActive && "opacity-40 saturate-0"
                 )}
                 style={{ background: tab.iconGradient || 'hsl(var(--primary))' }}
               >
-                <span className="text-white flex items-center justify-center">{tab.icon}</span>
+                <span className="text-white flex items-center justify-center [&>svg]:w-3 [&>svg]:h-3">{tab.icon}</span>
               </div>
             )}
             <span className={cn("leading-tight", isCompact ? "whitespace-nowrap" : "truncate")}>{tab.label}</span>
