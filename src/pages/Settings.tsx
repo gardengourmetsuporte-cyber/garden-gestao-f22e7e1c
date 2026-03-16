@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnit } from '@/contexts/UnitContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
