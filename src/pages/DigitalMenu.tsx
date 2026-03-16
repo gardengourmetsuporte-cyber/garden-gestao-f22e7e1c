@@ -1,8 +1,9 @@
-import { useState, useEffect, useLayoutEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useTheme } from 'next-themes';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useDigitalMenu, DMProduct } from '@/hooks/useDigitalMenu';
 import { useGamification } from '@/hooks/useGamification';
+import { useMenuTranslation } from '@/hooks/useMenuTranslation';
 import { MenuLanding } from '@/components/digital-menu/MenuLanding';
 import { MenuBottomNav, MenuTab } from '@/components/digital-menu/MenuBottomNav';
 import { MenuProductList } from '@/components/digital-menu/MenuProductList';
@@ -41,6 +42,45 @@ export default function DigitalMenu() {
     getProductOptionGroups, getGroupProducts,
     cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal, cartCount,
   } = useDigitalMenu(unitId);
+
+  const { tt, translateTexts, isTranslating, locale } = useMenuTranslation();
+
+  // Collect all translatable texts and trigger translation when data or locale changes
+  useEffect(() => {
+    if (locale === 'pt' || loading) return;
+    const texts: string[] = [];
+    categories.forEach(c => { if (c.name) texts.push(c.name); });
+    groups.forEach(g => { if (g.name) texts.push(g.name); if (g.description) texts.push(g.description); });
+    products.forEach(p => { if (p.name) texts.push(p.name); if (p.description) texts.push(p.description); });
+    if (texts.length > 0) translateTexts(texts);
+  }, [locale, loading, categories, groups, products, translateTexts]);
+
+  // Create translated data
+  const tCategories = useMemo(() =>
+    locale === 'pt' ? categories : categories.map(c => ({ ...c, name: tt(c.name) })),
+    [categories, tt, locale]
+  );
+  const tGroups = useMemo(() =>
+    locale === 'pt' ? groups : groups.map(g => ({ ...g, name: tt(g.name), description: tt(g.description) || null })),
+    [groups, tt, locale]
+  );
+  const tProducts = useMemo(() =>
+    locale === 'pt' ? products : products.map(p => ({ ...p, name: tt(p.name), description: tt(p.description) || null })),
+    [products, tt, locale]
+  );
+
+  // Translated getGroupProducts
+  const tGetGroupProducts = useMemo(() => {
+    if (locale === 'pt') return getGroupProducts;
+    const tMap = new Map<string, DMProduct[]>();
+    for (const p of tProducts) {
+      if (!p.group_id) continue;
+      const arr = tMap.get(p.group_id) ?? [];
+      arr.push(p);
+      tMap.set(p.group_id, arr);
+    }
+    return (groupId: string) => tMap.get(groupId) ?? [];
+  }, [locale, tProducts, getGroupProducts]);
 
   const [activeTab, setActiveTab] = useState<MenuTab>(initialTab);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -332,6 +372,7 @@ export default function DigitalMenu() {
       {/* Language switcher floating */}
       <div className="fixed top-3 right-3 z-50">
         <LanguageSwitcher onChange={() => forceRerender(n => n + 1)} />
+        {isTranslating && <div className="mt-1 flex justify-end"><span className="text-[9px] text-muted-foreground animate-pulse">Traduzindo...</span></div>}
       </div>
       {/* Auth modal (sheet overlay) */}
       {showAuth && (
@@ -391,19 +432,19 @@ export default function DigitalMenu() {
 
           {searchOpen && (
             <div className="px-4 md:px-8 mt-3">
-              <MenuSearch products={products} onSelectProduct={(p) => { handleProductSelect(p); setSearchOpen(false); }} />
+              <MenuSearch products={tProducts} onSelectProduct={(p) => { handleProductSelect(p); setSearchOpen(false); }} />
             </div>
           )}
 
           {/* Featured products */}
-          {products.filter(p => p.is_highlighted).length > 0 && (
+          {tProducts.filter(p => p.is_highlighted).length > 0 && (
             <div className="mt-6 px-5 md:px-8">
               <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-1.5">
                 <AppIcon name="Whatshot" size={14} className="text-primary" />
-                Destaques
+                {locale === 'pt' ? 'Destaques' : locale === 'en' ? 'Featured' : 'Destacados'}
               </h3>
               <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
-                {products.filter(p => p.is_highlighted).slice(0, 8).map(product => (
+                {tProducts.filter(p => p.is_highlighted).slice(0, 8).map(product => (
                   <button
                     key={product.id}
                     onClick={() => handleProductSelect(product)}
@@ -431,13 +472,13 @@ export default function DigitalMenu() {
           {/* Full menu inline */}
           <div className="mt-6">
             <div className="px-5 md:px-8 mb-3">
-              <h2 className="text-lg font-bold text-foreground">Cardápio</h2>
+              <h2 className="text-lg font-bold text-foreground">{locale === 'pt' ? 'Cardápio' : locale === 'en' ? 'Menu' : 'Menú'}</h2>
             </div>
             <MenuProductList
-              categories={categories}
-              groups={groups}
-              products={products}
-              getGroupProducts={getGroupProducts}
+              categories={tCategories}
+              groups={tGroups}
+              products={tProducts}
+              getGroupProducts={tGetGroupProducts}
               selectedCategory={selectedCategory}
               onSelectCategory={setSelectedCategory}
               onSelectProduct={handleProductSelect}
