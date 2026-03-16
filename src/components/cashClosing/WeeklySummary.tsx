@@ -142,13 +142,13 @@ function AnimatedCurrency({ value }: { value: number }) {
           {summary.topMethods.length > 0 && (
             <div className="grid grid-cols-2 gap-2">
               {summary.topMethods.map(m => (
-                <div key={m.key} className="flex items-center gap-2 p-2 rounded-lg bg-secondary/40">
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: m.color + '20' }}>
-                    <AppIcon name={m.icon} size={12} style={{ color: m.color }} />
+                <div key={m.key} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 border border-white/5">
+                  <div className="w-7 h-7 rounded-md flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}99)` }}>
+                    <AppIcon name={m.icon} size={13} className="text-white" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[10px] text-muted-foreground block truncate">{m.label}</span>
-                    <span className="text-xs font-bold text-foreground">
+                    <span className="text-[10px] text-white/50 block truncate">{m.label}</span>
+                    <span className="text-xs font-bold text-white">
                       {formatCurrency(m.value)}
                     </span>
                   </div>
