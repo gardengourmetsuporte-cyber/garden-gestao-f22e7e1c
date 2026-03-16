@@ -24,6 +24,7 @@ const CardapioSettings = lazy(() => import('@/components/settings/CardapioSettin
 const LoyaltySettings = lazy(() => import('@/components/settings/LoyaltySettings').then(m => ({ default: m.LoyaltySettings })));
 const AppearanceSettings = lazy(() => import('@/components/settings/AppearanceSettings').then(m => ({ default: m.AppearanceSettings })));
 const SystemBackupSettings = lazy(() => import('@/components/settings/SystemBackupSettings').then(m => ({ default: m.SystemBackupSettings })));
+const DataReplication = lazy(() => import('@/components/settings/DataReplication').then(m => ({ default: m.DataReplication })));
 interface MenuItem {
   value: string;
   icon: string;
