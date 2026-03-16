@@ -316,13 +316,13 @@ export default function InventoryPage() {
                           className="w-full flex items-center gap-3 pl-5 pr-4 py-3.5 text-left hover:bg-secondary/30 transition-colors"
                         >
                           <div
-                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                            style={{ background: `${categoryColor}15` }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg"
+                            style={{ background: `linear-gradient(135deg, ${categoryColor}, ${categoryColor}99)` }}
                           >
                             <AppIcon
                               name={category?.icon || 'Package'}
                               size={20}
-                              style={{ color: categoryColor }}
+                              className="text-white"
                             />
                           </div>
                           <div className="flex-1 min-w-0">

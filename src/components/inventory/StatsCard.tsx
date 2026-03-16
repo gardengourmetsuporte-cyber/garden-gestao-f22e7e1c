@@ -10,27 +10,14 @@ interface StatsCardProps {
   onClick?: () => void;
 }
 
-const variantStyles = {
-  default: {
-    iconBg: 'bg-primary/15',
-    iconColor: 'text-primary',
-  },
-  success: {
-    iconBg: 'bg-success/15',
-    iconColor: 'text-success',
-  },
-  warning: {
-    iconBg: 'bg-warning/15',
-    iconColor: 'text-warning',
-  },
-  destructive: {
-    iconBg: 'bg-destructive/15',
-    iconColor: 'text-destructive',
-  },
+const variantGradients: Record<string, string> = {
+  default: 'linear-gradient(135deg, #22C55E, #10B981)',
+  success: 'linear-gradient(135deg, #22C55E, #10B981)',
+  warning: 'linear-gradient(135deg, #F59E0B, #F97316)',
+  destructive: 'linear-gradient(135deg, #EF4444, #F472B6)',
 };
 
 export function StatsCard({ title, value, icon, variant = 'default', onClick }: StatsCardProps) {
-  const styles = variantStyles[variant];
   const numericValue = typeof value === 'number' ? value : null;
   const animatedValue = useCountUp(numericValue ?? 0);
 
@@ -41,8 +28,11 @@ export function StatsCard({ title, value, icon, variant = 'default', onClick }: 
     >
       <div className="flex items-center justify-between mb-2 relative z-10">
         <p className="text-[11px] font-medium text-muted-foreground leading-tight uppercase tracking-wide">{title}</p>
-        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center transition-colors", styles.iconBg)}>
-          <AppIcon name={icon} size={16} className={styles.iconColor} />
+        <div
+          className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg"
+          style={{ background: variantGradients[variant] }}
+        >
+          <AppIcon name={icon} size={16} className="text-white" />
         </div>
       </div>
       <p className="text-2xl font-extrabold text-foreground" style={{ letterSpacing: '-0.03em' }}>
