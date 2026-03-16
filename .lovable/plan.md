@@ -1,50 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-# Reestruturação do Módulo Copilot — Hub de Gestão do Agente
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-## Situação Atual
-- `/copilot` = Tela de chat (vai continuar igual)
-- `/copilot/settings` = Configurações com 4 abas (Prompt, RAG, Tools, MCPs)
-- O chat no dashboard (widget) já existe e permanece
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-## O que muda
+---
 
-A página `/copilot/settings` será transformada em um **Hub completo de gestão do agente** com mais seções e visual mais rico. O chat permanece **apenas** no `/copilot` e no widget do dashboard.
+## Bloco de Relatórios Avançados ✅
 
-### Nova estrutura de abas (6 abas → scroll horizontal no mobile):
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-| Aba | Conteúdo | Status |
-|-----|----------|--------|
-| **Personalidade** | Nome do agente, tom de voz, prompt de sistema, avatar | Já existe (AgentPromptEditor), será melhorado |
-| **Conhecimento** | Base RAG com artigos, regras e políticas | Já existe (CopilotKnowledgeBase) |
-| **Ferramentas** | Toggle das 16 capacidades do agente | Já existe (AgentToolsManager) |
-| **Permissões** | Quem pode usar o Copilot, níveis de acesso por papel | **Novo** |
-| **Integrações** | WhatsApp, n8n, Zapier, iFood | Já existe (AgentIntegrations) |
-| **Preferências** | Idioma, limites de resposta, horário ativo, notificações | **Novo** |
+## Dashboard Analytics ✅
 
-### Detalhes das novas seções
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-**Permissões** — Controla quem na equipe pode interagir com o Copilot:
-- Toggle global (ativar/desativar copilot para a unidade)
-- Lista de papéis (admin, gerente, operador) com switch de acesso
-- Opção de restringir ferramentas destrutivas (ex: criar transação) apenas para admins
+## Operacional ✅
 
-**Preferências** — Configurações gerais do comportamento:
-- Idioma de resposta (PT-BR padrão)
-- Tamanho máximo de resposta (curta/média/detalhada)
-- Horário ativo (ex: apenas durante expediente)
-- Toggle de auto-greeting na abertura
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-### Mudanças técnicas
+## CRM / Clientes ✅
 
-1. **`src/pages/CopilotSettings.tsx`** — Redesenhar com as 6 abas usando ícones circulares coloridos (padrão novo do projeto) e scroll horizontal
-2. **`src/components/copilot/AgentPermissions.tsx`** — Novo componente para controle de acesso
-3. **`src/components/copilot/AgentPreferences.tsx`** — Novo componente para preferências gerais
-4. **`src/hooks/useCopilotConfig.ts`** — Expandir o tipo `CopilotAgentConfig` para incluir novos campos (permissions, preferences)
-5. **Migração SQL** — Adicionar colunas à tabela `copilot_agent_config`: `allowed_roles text[]`, `restrict_destructive_tools boolean`, `max_response_length text`, `active_hours jsonb`, `auto_greet boolean`, `language text`
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-### Visual
-- Header com gradiente e mascote
-- Abas com ícones circulares coloridos (mesmo padrão do AnimatedTabs)
-- Cards organizados por seção com visual consistente
+## Funcionários ✅
 
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)

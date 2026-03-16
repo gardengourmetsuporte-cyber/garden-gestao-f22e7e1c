@@ -949,30 +949,48 @@ export type Database = {
       }
       copilot_agent_config: {
         Row: {
+          active_hours: Json | null
           agent_name: string | null
+          allowed_roles: string[] | null
+          auto_greet: boolean | null
           created_at: string | null
           enabled_tools: string[] | null
           id: string
+          language: string | null
+          max_response_length: string | null
+          restrict_destructive_tools: boolean | null
           system_prompt: string | null
           tone_of_voice: string | null
           unit_id: string
           updated_at: string | null
         }
         Insert: {
+          active_hours?: Json | null
           agent_name?: string | null
+          allowed_roles?: string[] | null
+          auto_greet?: boolean | null
           created_at?: string | null
           enabled_tools?: string[] | null
           id?: string
+          language?: string | null
+          max_response_length?: string | null
+          restrict_destructive_tools?: boolean | null
           system_prompt?: string | null
           tone_of_voice?: string | null
           unit_id: string
           updated_at?: string | null
         }
         Update: {
+          active_hours?: Json | null
           agent_name?: string | null
+          allowed_roles?: string[] | null
+          auto_greet?: boolean | null
           created_at?: string | null
           enabled_tools?: string[] | null
           id?: string
+          language?: string | null
+          max_response_length?: string | null
+          restrict_destructive_tools?: boolean | null
           system_prompt?: string | null
           tone_of_voice?: string | null
           unit_id?: string
