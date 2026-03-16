@@ -172,32 +172,30 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
 
         {/* Overdue alerts */}
         {stats.overdue.length > 0 && (
-          <div className="space-y-1.5">
-            {stats.overdue.slice(0, 3).map(task => (
+          <div className="space-y-0.5">
+            {stats.overdue.slice(0, 5).map(task => (
               <div
                 key={task.id}
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-destructive/5 border border-destructive/15"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-secondary/30 transition-colors"
               >
-                <AppIcon name="AlertCircle" size={16} className="text-destructive shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{task.title}</p>
-                  <p className="text-[11px] text-destructive/80">
-                    Atrasada há {overdueDays(task.due_date!)} dia{overdueDays(task.due_date!) > 1 ? 's' : ''}
-                  </p>
-                </div>
-                <div className={cn(
-                  "px-2 py-0.5 rounded-md text-[10px] font-bold uppercase",
-                  task.priority === 'high' ? 'bg-destructive/15 text-destructive' :
-                    task.priority === 'medium' ? 'bg-warning/15 text-warning' :
-                      'bg-muted text-muted-foreground'
+                <span className="w-1.5 h-1.5 rounded-full bg-destructive shrink-0" />
+                <p className="text-xs text-foreground truncate flex-1">{task.title}</p>
+                <span className="text-[10px] text-muted-foreground shrink-0">
+                  {overdueDays(task.due_date!)}d
+                </span>
+                <span className={cn(
+                  "text-[9px] font-semibold uppercase shrink-0",
+                  task.priority === 'high' ? 'text-destructive' :
+                    task.priority === 'medium' ? 'text-warning' :
+                      'text-muted-foreground'
                 )}>
-                  {task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Média' : 'Baixa'}
-                </div>
+                  {task.priority === 'high' ? '↑' : task.priority === 'medium' ? '—' : '↓'}
+                </span>
               </div>
             ))}
-            {stats.overdue.length > 3 && (
-              <p className="text-[11px] text-destructive/60 text-center">
-                +{stats.overdue.length - 3} tarefa{stats.overdue.length - 3 > 1 ? 's' : ''} atrasada{stats.overdue.length - 3 > 1 ? 's' : ''}
+            {stats.overdue.length > 5 && (
+              <p className="text-[10px] text-muted-foreground text-center pt-0.5">
+                +{stats.overdue.length - 5} atrasada{stats.overdue.length - 5 > 1 ? 's' : ''}
               </p>
             )}
           </div>
