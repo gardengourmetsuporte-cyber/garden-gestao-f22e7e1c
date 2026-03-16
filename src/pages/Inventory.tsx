@@ -292,7 +292,7 @@ export default function InventoryPage() {
                 ) : (
                   sortedCategories.map((categoryName, catIndex) => {
                     const categoryItems = filteredByCategory[categoryName];
-                    const isCollapsed = !expandedCategories.has(categoryName);
+                    const isCollapsed = search.trim() ? false : !expandedCategories.has(categoryName);
                     const category = categories.find(c => c.name === categoryName);
                     const categoryColor = category?.color || '#6b7280';
 
