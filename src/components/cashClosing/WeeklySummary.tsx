@@ -105,9 +105,9 @@ function AnimatedCurrency({ value }: { value: number }) {
         <button
           onClick={() => setWeekOffset(o => o + 1)}
           disabled={summary.isCurrentWeek}
-          className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/60 hover:bg-secondary transition-colors disabled:opacity-30 disabled:pointer-events-none"
+          className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-30 disabled:pointer-events-none"
         >
-          <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+          <AppIcon name="ChevronRight" size={16} className="text-white/70" />
         </button>
       </div>
 
