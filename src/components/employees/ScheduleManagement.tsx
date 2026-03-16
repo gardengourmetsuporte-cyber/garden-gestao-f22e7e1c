@@ -91,7 +91,7 @@ export function ScheduleManagement() {
         <h3 className="font-semibold">Folgas Programadas</h3>
         {Object.entries(groupedSchedules).length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            <AppIcon name="CalendarOff" size={40} className="mx-auto mb-2 opacity-40" />
+            <AppIcon name="event_busy" size={40} className="mx-auto mb-2 opacity-40" />
             <p className="text-sm">Nenhuma folga programada</p>
           </div>
         ) : (
