@@ -148,16 +148,36 @@ export function PendingOrdersWidget() {
                   {/* Item list */}
                   {order.order_items && order.order_items.length > 0 && (
                     <div className="space-y-1.5 max-h-[180px] overflow-y-auto">
-                      {order.order_items.map((oi: any) => (
-                        <div key={oi.id} className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-secondary/30">
-                          <span className="text-xs text-foreground truncate flex-1 min-w-0">
-                            {oi.item?.name || 'Item'}
-                          </span>
-                          <span className="text-xs font-semibold text-muted-foreground shrink-0 ml-2">
-                            {oi.quantity} {oi.item?.unit_type || 'un'}
-                          </span>
-                        </div>
-                      ))}
+                      {order.order_items.map((oi: any) => {
+                        const price = oi.unit_price || 0;
+                        const total = price * oi.quantity;
+                        return (
+                          <div key={oi.id} className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-secondary/30">
+                            <span className="text-xs text-foreground truncate flex-1 min-w-0">
+                              {oi.item?.name || 'Item'}
+                            </span>
+                            <div className="flex items-center gap-2 shrink-0 ml-2">
+                              <span className="text-xs text-muted-foreground">
+                                {oi.quantity} {oi.item?.unit_type || 'un'}
+                              </span>
+                              {price > 0 && (
+                                <span className="text-xs font-semibold text-foreground">
+                                  R$ {total.toFixed(2)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {(() => {
+                        const orderTotal = order.order_items.reduce((sum: number, oi: any) => sum + (oi.unit_price || 0) * oi.quantity, 0);
+                        return orderTotal > 0 ? (
+                          <div className="flex items-center justify-between pt-1.5 border-t border-border/30 px-2">
+                            <span className="text-xs font-bold text-foreground">Total</span>
+                            <span className="text-xs font-bold text-primary">R$ {orderTotal.toFixed(2)}</span>
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
                   )}
 

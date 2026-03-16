@@ -1,47 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-## Plano: Atualização automática de preços + Valor no rascunho + Explicação do Contestar
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-### O que será feito
-
-**1. Adicionar coluna `unit_price` na tabela `order_items`**
-- Atualmente `order_items` não possui preço unitário. Será adicionada a coluna `unit_price numeric default 0`.
-- Quando os pedidos forem gerados pela cotação (`resolveQuotation`), o preço vencedor será salvo em cada `order_item`.
-
-**2. Atualizar preços do estoque automaticamente ao gerar pedidos**
-- Ao resolver a cotação, para cada item vencedor, o `unit_price` do `inventory_items` será atualizado com o preço da cotação vencedora.
-- Isso já dispara o trigger existente `record_price_change` que registra o histórico de preços (`supplier_price_history`).
-
-**3. Exibir valor no rascunho do pedido**
-- A listagem de rascunhos e a tela de detalhes do pedido passarão a exibir o preço unitário e total de cada item.
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
 ---
 
-### Como funciona o "Contestar"
+## Bloco de Relatórios Avançados ✅
 
-O botão **Contestar** serve para quando você discorda dos preços enviados por um fornecedor e quer pedir que ele revise. O fluxo é:
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-1. Você clica em **Contestar** ao lado do fornecedor na tela de comparação
-2. O status do fornecedor muda para **"Contestada"** e a cotação inteira fica com status **"Contestada"**
-3. O fornecedor, ao acessar o link público novamente, vê que precisa **revisar os preços** — os itens contestados ficam destacados em laranja
-4. Ele pode enviar novos preços (round 2, 3, etc.)
-5. Quando o fornecedor reenvia, o status volta para **"Respondeu"** e você pode comparar novamente
-6. Você pode contestar quantas vezes quiser antes de resolver a cotação
+## Dashboard Analytics ✅
 
-Atualmente a contestação é aplicada ao fornecedor inteiro. Seria possível no futuro selecionar itens específicos para contestar.
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
----
+## Operacional ✅
 
-### Alterações técnicas
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-**Migração SQL:**
-- `ALTER TABLE order_items ADD COLUMN unit_price numeric DEFAULT 0`
+## CRM / Clientes ✅
 
-**`src/hooks/useQuotations.ts` — `resolveQuotation`:**
-- Ao montar os winners, buscar o `unit_price` do preço vencedor
-- Ao inserir `order_items`, incluir o `unit_price`
-- Após gerar pedidos, atualizar `inventory_items.unit_price` para cada item vencedor
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-**UI dos pedidos (rascunhos):**
-- Exibir preço unitário e total (`qty × unit_price`) na listagem de itens do pedido
+## Funcionários ✅
 
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)

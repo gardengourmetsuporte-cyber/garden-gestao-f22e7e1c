@@ -4196,6 +4196,7 @@ export type Database = {
           order_id: string
           quantity: number
           unit_id: string | null
+          unit_price: number | null
         }
         Insert: {
           created_at?: string
@@ -4205,6 +4206,7 @@ export type Database = {
           order_id: string
           quantity?: number
           unit_id?: string | null
+          unit_price?: number | null
         }
         Update: {
           created_at?: string
@@ -4214,6 +4216,7 @@ export type Database = {
           order_id?: string
           quantity?: number
           unit_id?: string | null
+          unit_price?: number | null
         }
         Relationships: [
           {
