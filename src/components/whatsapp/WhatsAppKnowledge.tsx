@@ -25,7 +25,7 @@ const SUGGESTIONS = [
 
 export function WhatsAppKnowledge() {
   const { activeUnitId } = useUnit();
-  const { articles, isLoading, upsertArticle, deleteArticle, toggleActive } = useWhatsAppKnowledge();
+  const { articles, isLoading, upsertArticle, deleteArticle, toggleActive } = useUnifiedKnowledge();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<WhatsAppKnowledgeArticle> | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
