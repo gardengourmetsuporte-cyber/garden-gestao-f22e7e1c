@@ -420,6 +420,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isFree,
         hasPlan,
         setEffectivePlan,
+        setUnitRole,
         refreshSubscription,
         refreshUserData,
         signIn,
