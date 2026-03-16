@@ -1335,6 +1335,9 @@ export type Database = {
           id: string
           mesa: string | null
           rating: number
+          rating_ambiente: number | null
+          rating_atendimento: number | null
+          rating_comida: number | null
           unit_id: string
         }
         Insert: {
@@ -1345,6 +1348,9 @@ export type Database = {
           id?: string
           mesa?: string | null
           rating: number
+          rating_ambiente?: number | null
+          rating_atendimento?: number | null
+          rating_comida?: number | null
           unit_id: string
         }
         Update: {
@@ -1355,6 +1361,9 @@ export type Database = {
           id?: string
           mesa?: string | null
           rating?: number
+          rating_ambiente?: number | null
+          rating_atendimento?: number | null
+          rating_comida?: number | null
           unit_id?: string
         }
         Relationships: [
