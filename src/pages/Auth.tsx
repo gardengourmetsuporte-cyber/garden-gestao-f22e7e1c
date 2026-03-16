@@ -113,36 +113,32 @@ function BrandPanel() {
 function MobileBrandHeader() {
   return (
     <div
-      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full bg-background"
+      className="relative flex lg:hidden flex-col items-center justify-center min-h-[52vh] px-6 overflow-hidden w-full"
       style={{
         paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
       }}
     >
-      {/* Subtle border top separator indicating header */}
-      <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-foreground/5 to-transparent" />
-
-      {/* Animated glow orbs - Emerald Theme */}
+      {/* Gradient background layers - matching dashboard context bar */}
       <div
-        className="absolute top-[15%] left-[20%] w-[250px] h-[250px] rounded-full blur-[100px] opacity-20 pointer-events-none"
+        className="absolute inset-0"
         style={{
-          background: 'hsl(var(--primary))',
-          animation: 'float-orb-1 8s ease-in-out infinite',
-        }}
-      />
-      <div
-        className="absolute bottom-[20%] right-[15%] w-[200px] h-[200px] rounded-full blur-[80px] opacity-15 pointer-events-none"
-        style={{
-          background: 'hsl(var(--primary))',
-          animation: 'float-orb-2 10s ease-in-out infinite',
+          background: `
+            radial-gradient(ellipse 120% 80% at 100% 0%, hsl(var(--primary) / 0.7) 0%, transparent 60%),
+            radial-gradient(ellipse 80% 100% at 0% 100%, hsl(var(--primary) / 0.35) 0%, transparent 60%),
+            linear-gradient(165deg, hsl(var(--primary) / 0.28) 0%, hsl(var(--primary) / 0.12) 50%, hsl(var(--background)) 100%)
+          `,
         }}
       />
 
-      {/* Grid pattern */}
+      {/* Subtle grid pattern overlay */}
       <div
-        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
+          backgroundImage: `
+            linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)
+          `,
+          backgroundSize: '32px 32px',
         }}
       />
 
@@ -178,9 +174,9 @@ function MobileBrandHeader() {
               key={label}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium"
               style={{
-                background: 'hsl(var(--primary) / 0.1)',
+                background: 'hsl(var(--primary) / 0.12)',
                 color: 'hsl(var(--primary))',
-                border: '1px solid hsl(var(--primary) / 0.15)',
+                border: '1px solid hsl(var(--primary) / 0.2)',
               }}
             >
               <AppIcon name={icon} size={12} />
@@ -190,7 +186,7 @@ function MobileBrandHeader() {
         </div>
 
         {/* Social proof */}
-        <div className="flex items-center justify-center gap-5 text-foreground/20 text-[10px] mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
+        <div className="flex items-center justify-center gap-5 text-foreground/30 text-[10px] mt-2 animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_0.55s_both]">
           <div className="flex items-center gap-1">
             <AppIcon name="Shield" size={12} />
             <span>Dados seguros</span>
@@ -203,9 +199,8 @@ function MobileBrandHeader() {
         </div>
       </div>
 
-      {/* Bottom overlay blending mask into page content */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-6 bg-background rounded-t-3xl" />
+      {/* Bottom curve blending into white form area */}
+      <div className="absolute bottom-0 left-0 right-0 h-8 bg-background rounded-t-[28px]" />
     </div>
   );
 }
