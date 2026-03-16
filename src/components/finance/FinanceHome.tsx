@@ -150,8 +150,8 @@ export function FinanceHome({
           className="card-command-success p-4 text-left cursor-pointer transition-all duration-200"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-full bg-success/20 flex items-center justify-center">
-              <AppIcon name="ArrowUpCircle" size={18} className="text-success" />
+            <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #22C55E, #10B981)' }}>
+              <AppIcon name="ArrowUpCircle" size={20} className="text-white" />
             </div>
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Receitas</span>
           </div>
