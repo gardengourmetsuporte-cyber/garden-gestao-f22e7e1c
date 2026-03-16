@@ -113,7 +113,7 @@ function AnimatedCurrency({ value }: { value: number }) {
 
       {summary.count === 0 ? (
         <div className="text-center py-4">
-          <p className="text-sm text-muted-foreground">Nenhum fechamento nesta semana</p>
+          <p className="text-sm text-white/50">Nenhum fechamento nesta semana</p>
         </div>
       ) : (
         <>
