@@ -228,6 +228,19 @@ export default function Invite() {
     );
   }
 
+  // Show loading while returning from email confirmation or auto-accepting
+  if (isReturningFromConfirmation || accepting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div className="text-center space-y-4 max-w-sm">
+          <div className="w-12 h-12 mx-auto border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <h2 className="text-lg font-bold text-foreground">Confirmando sua conta...</h2>
+          <p className="text-sm text-muted-foreground">Aguarde enquanto preparamos tudo para você.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (signupDone) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-6">
