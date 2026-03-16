@@ -64,28 +64,28 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             ref={(el) => { if (el) tabRefs.current.set(tab.key, el); }}
             onClick={() => { navigator.vibrate?.(10); onTabChange(tab.key); }}
             className={cn(
-              "relative flex items-center justify-center gap-1 py-2 rounded-xl font-semibold z-10 transition-all duration-200",
+              "relative flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl font-semibold z-10 transition-all duration-200",
               isCompact ? "min-w-0 shrink-0 px-2 flex-1" : "flex-1 px-1",
-              "min-h-[40px]",
-              hideIcons ? "text-[11px]" : "text-xs",
+              "min-h-[52px]",
+              hideIcons ? "text-[11px]" : "text-[11px]",
               isActive ? 'text-primary' : 'text-muted-foreground'
             )}
           >
             {tab.icon && !hideIcons && (
               <div
                 className={cn(
-                  "w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 shadow-sm",
-                  !isActive && "opacity-50 saturate-0"
+                  "w-7 h-7 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-300 shadow-sm",
+                  !isActive && "opacity-40 saturate-0"
                 )}
                 style={{ background: tab.iconGradient || 'hsl(var(--primary))' }}
               >
                 <span className="text-white flex items-center justify-center">{tab.icon}</span>
               </div>
             )}
-            <span className={cn(isCompact ? "whitespace-nowrap" : "truncate")}>{tab.label}</span>
+            <span className={cn("leading-tight", isCompact ? "whitespace-nowrap" : "truncate")}>{tab.label}</span>
             {tab.badge !== undefined && tab.badge > 0 && (
               <span className={cn(
-                "min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0",
+                "absolute top-1.5 right-1/2 translate-x-4 min-w-[16px] h-[16px] px-1 rounded-full text-[9px] font-bold flex items-center justify-center shrink-0",
                 isActive
                   ? "bg-primary/15 text-primary"
                   : "bg-muted text-muted-foreground"
