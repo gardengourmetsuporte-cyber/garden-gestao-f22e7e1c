@@ -315,9 +315,6 @@ export default function Agenda() {
         </div>
       ) : (
         <>
-
-          {listMode === 'grouped' ? <GroupedListContent /> : <FlatListContent />}
-
           {listMode === 'grouped' ? <GroupedListContent /> : <FlatListContent />}
         </>
       )}
