@@ -27,7 +27,10 @@ export function UnifiedDateStrip({
     if (!container) return;
     const selectedIdx = days.findIndex(d => isSameDay(d, selectedDate));
     if (selectedIdx < 0) return;
-    const btnCenter = 16 + selectedIdx * 56 + 24;
+    const itemWidth = 48;
+    const gap = 6;
+    const padding = 16;
+    const btnCenter = padding + selectedIdx * (itemWidth + gap) + itemWidth / 2;
     const scrollLeft = btnCenter - container.clientWidth / 2;
     container.scrollTo({ left: Math.max(0, scrollLeft), behavior: 'smooth' });
   }, [selectedDate, days]);
