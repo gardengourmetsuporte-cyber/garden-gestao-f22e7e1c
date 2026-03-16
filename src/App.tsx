@@ -300,7 +300,7 @@ function AuthenticatedRoutes() {
           <Route path="/pdv" element={<ProtectedRoute><PDV /></ProtectedRoute>} />
           <Route path="/profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/copilot" element={<ProtectedRoute><Copilot /></ProtectedRoute>} />
-          <Route path="/copilot/settings" element={<ProtectedRoute><CopilotSettings /></ProtectedRoute>} />
+          <Route path="/copilot/settings" element={<Navigate to="/copilot" replace />} />
           <Route path="/gamification" element={<Navigate to="/cardapio" replace />} />
           <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
           <Route path="/calendar" element={<ProtectedRoute><CalendarFull /></ProtectedRoute>} />
