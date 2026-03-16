@@ -1159,6 +1159,50 @@ async function executeSavePreference(
 }
 
 // ──────────────────────────────────────────────
+// Tool: create_marketing_post (returns structured data)
+// ──────────────────────────────────────────────
+async function executeCreateMarketingPost(
+  args: Record<string, unknown>,
+  _userId: string,
+  _unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const title = String(args.title || '');
+  const caption = String(args.caption || '');
+  const tags = (args.tags as string[]) || [];
+  const imagePrompt = String(args.image_prompt || '');
+  const bestTime = args.best_time ? String(args.best_time) : '';
+
+  const lines = [
+    `[ACTION] ✅ **Post de marketing criado!**`,
+    '',
+    `📌 **${title}**`,
+    '',
+    caption,
+    '',
+    `🏷️ Tags: ${tags.join(', ')}`,
+    `🎨 Prompt de imagem: ${imagePrompt}`,
+  ];
+  if (bestTime) lines.push(`⏰ Melhor horário: ${bestTime}`);
+
+  return { success: true, message: lines.join('\n') };
+}
+
+// ──────────────────────────────────────────────
+// Tool: generate_daily_post_ideas
+// ──────────────────────────────────────────────
+async function generateDailyPostIdeas(
+  args: Record<string, unknown>,
+  _userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  // This tool just returns a marker — the AI will generate the ideas in its text response
+  return {
+    success: true,
+    message: `[ACTION] ✅ Ideias de posts geradas com base nos produtos e marca reais. Confira acima!`,
+  };
+}
+
+// ──────────────────────────────────────────────
 // Tool dispatcher
 // ──────────────────────────────────────────────
 async function executeTool(
@@ -1186,7 +1230,7 @@ async function executeTool(
       return executeRegisterEmployeePayment(args, userId, unitId);
     case "mark_closing_validated":
       return executeMarkClosingValidated(args, userId, unitId);
-    // New tools
+    // Level 3 tools
     case "update_transaction":
       return executeUpdateTransaction(args, userId, unitId);
     case "create_supplier_invoice":
@@ -1201,6 +1245,11 @@ async function executeTool(
       return executeCreateAppointment(args, userId, unitId);
     case "save_preference":
       return executeSavePreference(args, userId, unitId);
+    // Marketing tools
+    case "create_marketing_post":
+      return executeCreateMarketingPost(args, userId, unitId);
+    case "generate_daily_post_ideas":
+      return generateDailyPostIdeas(args, userId, unitId);
     default:
       return { success: false, message: `Função "${name}" não reconhecida.` };
   }
