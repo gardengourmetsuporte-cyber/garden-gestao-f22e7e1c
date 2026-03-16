@@ -136,7 +136,7 @@ export function MemoryGame({ onBack, unitId }: Props) {
         </button>
         <div className="text-center">
           <h1 className="text-base font-bold text-white flex items-center gap-1.5">
-            🧠 Memory <span className="text-amber-400">Garden</span>
+            🧠 Memory <span className="text-amber-400">Match</span>
           </h1>
         </div>
         <button onClick={() => setShowRanking(true)} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">

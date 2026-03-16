@@ -346,10 +346,10 @@ export function SnakeGame({ onBack, unitId }: Props) {
   useEffect(() => {
     const resize = () => {
       if (containerRef.current) {
-        const w = containerRef.current.clientWidth - 32; // px-4 padding
+        const w = containerRef.current.clientWidth - 32;
         const h = containerRef.current.clientHeight - 16;
-        const s = Math.min(w, h, 600);
-        setCanvasSize(Math.max(Math.floor(s / GRID) * GRID, GRID * 10));
+        const maxSize = Math.min(w, h, 800); // increased max for tablets
+        setCanvasSize(Math.max(Math.floor(maxSize / GRID) * GRID, GRID * 10));
       }
     };
     resize();
