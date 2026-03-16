@@ -69,6 +69,19 @@ export default function DigitalMenu() {
     [products, tt, locale]
   );
 
+  // Translated getGroupProducts
+  const tGetGroupProducts = useMemo(() => {
+    if (locale === 'pt') return getGroupProducts;
+    const tMap = new Map<string, DMProduct[]>();
+    for (const p of tProducts) {
+      if (!p.group_id) continue;
+      const arr = tMap.get(p.group_id) ?? [];
+      arr.push(p);
+      tMap.set(p.group_id, arr);
+    }
+    return (groupId: string) => tMap.get(groupId) ?? [];
+  }, [locale, tProducts, getGroupProducts]);
+
   const [activeTab, setActiveTab] = useState<MenuTab>(initialTab);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<DMProduct | null>(null);
