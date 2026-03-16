@@ -73,10 +73,10 @@ export default function RewardsPage() {
 
             {/* Progress to next prize */}
             {nextPrize && balance < nextPrize.points_cost && (
-              <div className="space-y-2 pt-3 border-t border-border/30">
+              <div className="space-y-2 pt-3 border-t border-white/10">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Próximo: {nextPrize.name}</span>
-                  <span className="font-bold text-foreground">{balance}/{nextPrize.points_cost}</span>
+                  <span className="text-white/60">Próximo: {nextPrize.name}</span>
+                  <span className="font-bold text-white">{balance}/{nextPrize.points_cost}</span>
                 </div>
                 <Progress value={progressPercent} className="h-2" />
               </div>
