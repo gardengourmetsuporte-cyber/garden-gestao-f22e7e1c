@@ -234,7 +234,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
                 key={ch.id}
                 onClick={() => setChannel(ch.id)}
                 className={cn(
-                  "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all active:scale-[0.97]",
+                  "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all active:scale-[0.97] outline-none focus-visible:ring-0",
                   active
                     ? "bg-primary/15 text-primary"
                     : "bg-secondary/40 text-muted-foreground"
@@ -244,7 +244,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
                 {count > 0 && (
                   <span className={cn(
                     "min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold rounded-full",
-                    active ? "bg-background/20 text-background" : "bg-primary/15 text-primary"
+                    active ? "bg-primary/25 text-primary" : "bg-muted/60 text-muted-foreground"
                   )}>
                     {count}
                   </span>
