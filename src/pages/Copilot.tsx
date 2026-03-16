@@ -337,26 +337,47 @@ export default function CopilotPage() {
         {/* Input bar */}
         <div className="shrink-0 border-t border-border/20 bg-card/60 backdrop-blur-sm px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] mb-[64px] lg:mb-0">
           <form onSubmit={handleSubmit} className="flex gap-2 items-center">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-10 w-10 p-0 rounded-full shrink-0"
-              disabled={isLoading}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <AppIcon name="Paperclip" size={18} className="text-muted-foreground" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-10 w-10 p-0 rounded-full shrink-0"
-              disabled={isLoading}
-              onClick={() => cameraInputRef.current?.click()}
-            >
-              <AppIcon name="Camera" size={18} className="text-muted-foreground" />
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-10 w-10 p-0 rounded-full shrink-0"
+                  disabled={isLoading}
+                >
+                  <AppIcon name="Plus" size={20} className="text-muted-foreground" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent side="top" align="start" className="w-auto p-2 rounded-2xl">
+                <div className="flex flex-col gap-1">
+                  <button
+                    type="button"
+                    onClick={() => { fileInputRef.current?.click(); }}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors text-sm"
+                  >
+                    <AppIcon name="Paperclip" size={18} className="text-muted-foreground" />
+                    <span>Arquivo</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { cameraInputRef.current?.click(); }}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors text-sm"
+                  >
+                    <AppIcon name="Camera" size={18} className="text-muted-foreground" />
+                    <span>Câmera</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { fileInputRef.current?.click(); }}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-secondary transition-colors text-sm"
+                  >
+                    <AppIcon name="Image" size={18} className="text-muted-foreground" />
+                    <span>Galeria</span>
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>
             <Input
               value={question}
               onChange={e => setQuestion(e.target.value)}
