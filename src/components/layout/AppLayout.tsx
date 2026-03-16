@@ -107,7 +107,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                       "rounded-full overflow-hidden flex items-center justify-center shrink-0 transition-all duration-500",
                       !isScrolled ? "w-6 h-6" : "w-8 h-8"
                     )}>
-                      <div className="w-full h-full rounded-full overflow-hidden bg-foreground flex items-center justify-center">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-card dark:bg-foreground flex items-center justify-center border border-border/30 dark:border-0">
                         <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={customLogo || gardenLogo} fetchPriority="high" decoding="async" />
                       </div>
                     </div>
