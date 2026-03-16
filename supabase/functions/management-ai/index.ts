@@ -1514,9 +1514,10 @@ ${dataSnapshot}${preferencesBlock}${knowledgeBlock}`;
     }
 
     if (!conversationHistory || conversationHistory.length === 0) {
+      const timeGreeting = context?.timeOfDay === 'manhã' ? 'Bom dia!' : context?.timeOfDay === 'tarde' ? 'Boa tarde!' : 'Boa noite!';
       aiMessages.push({
         role: "user",
-        content: "Saudação curta (1 linha) + saldo total das contas + saldo do mês. Se tiver alerta urgente, mencione EM UMA FRASE. Nada mais.",
+        content: `${timeGreeting} (saudação automática — responda com 1 frase curta de boas-vindas + no máximo 1 dado relevante ao momento do dia. NÃO liste saldo, estoque ou métricas a menos que sejam urgentes.)`,
       });
     }
 
