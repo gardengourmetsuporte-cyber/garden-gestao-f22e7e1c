@@ -277,21 +277,21 @@ export default function CardapioHub() {
                      key={tab.id}
                      onClick={() => setCardapioTab(tab.id)}
                      className={cn(
-                       "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-medium transition-all",
-                       cardapioTab === tab.id
-                         ? "bg-foreground text-background backdrop-blur-md"
-                         : "text-muted-foreground hover:text-foreground"
-                     )}
-                   >
-                     <span className="truncate">{tab.label}</span>
-                     {tab.count !== undefined && (
-                       <span className={cn(
-                         "text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0",
-                         cardapioTab === tab.id ? "bg-background/20 text-background" : "bg-primary/10 text-primary"
-                       )}>
-                         {tab.count}
-                       </span>
-                     )}
+                        "flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-medium transition-all",
+                        cardapioTab === tab.id
+                          ? "bg-primary/15 text-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <span className="truncate">{tab.label}</span>
+                      {tab.count !== undefined && (
+                        <span className={cn(
+                          "text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0",
+                          cardapioTab === tab.id ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                        )}>
+                          {tab.count}
+                        </span>
+                      )}
                    </button>
                  ))}
                </div>
