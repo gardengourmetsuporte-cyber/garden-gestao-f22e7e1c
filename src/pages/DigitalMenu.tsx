@@ -478,7 +478,7 @@ export default function DigitalMenu() {
               categories={tCategories}
               groups={tGroups}
               products={tProducts}
-              getGroupProducts={getGroupProducts}
+              getGroupProducts={tGetGroupProducts}
               selectedCategory={selectedCategory}
               onSelectCategory={setSelectedCategory}
               onSelectProduct={handleProductSelect}
