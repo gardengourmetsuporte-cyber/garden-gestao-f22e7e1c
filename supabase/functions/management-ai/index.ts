@@ -284,6 +284,39 @@ const TOOLS = [
       },
     },
   },
+  // ── MARKETING TOOLS ──
+  {
+    type: "function",
+    function: {
+      name: "create_marketing_post",
+      description: "Criar um post estruturado para redes sociais (Instagram, Facebook, etc.) com título, legenda, hashtags, prompt de imagem e horário ideal. Use quando o usuário pedir para criar, gerar ou montar um post de marketing.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "Título curto do post" },
+          caption: { type: "string", description: "Legenda completa pronta para Instagram com hashtags — use APENAS produtos e preços reais" },
+          tags: { type: "array", items: { type: "string" }, description: "Tags/categorias do post (ex: promoção, produto, engajamento)" },
+          image_prompt: { type: "string", description: "Prompt descritivo em inglês para gerar imagem" },
+          best_time: { type: "string", description: "Melhor horário para postar (ex: 11:30)" },
+        },
+        required: ["title", "caption", "tags", "image_prompt"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "generate_daily_post_ideas",
+      description: "Gerar 3 ideias de posts para redes sociais baseadas nos produtos e marca reais. Use quando o usuário pedir sugestões, ideias ou inspiração para posts.",
+      parameters: {
+        type: "object",
+        properties: {
+          focus: { type: "string", description: "Foco opcional: produto, promoção, engajamento, storytelling" },
+        },
+        required: [],
+      },
+    },
+  },
 ];
 
 function getSupabaseAdmin() {
@@ -1126,6 +1159,50 @@ async function executeSavePreference(
 }
 
 // ──────────────────────────────────────────────
+// Tool: create_marketing_post (returns structured data)
+// ──────────────────────────────────────────────
+async function executeCreateMarketingPost(
+  args: Record<string, unknown>,
+  _userId: string,
+  _unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  const title = String(args.title || '');
+  const caption = String(args.caption || '');
+  const tags = (args.tags as string[]) || [];
+  const imagePrompt = String(args.image_prompt || '');
+  const bestTime = args.best_time ? String(args.best_time) : '';
+
+  const lines = [
+    `[ACTION] ✅ **Post de marketing criado!**`,
+    '',
+    `📌 **${title}**`,
+    '',
+    caption,
+    '',
+    `🏷️ Tags: ${tags.join(', ')}`,
+    `🎨 Prompt de imagem: ${imagePrompt}`,
+  ];
+  if (bestTime) lines.push(`⏰ Melhor horário: ${bestTime}`);
+
+  return { success: true, message: lines.join('\n') };
+}
+
+// ──────────────────────────────────────────────
+// Tool: generate_daily_post_ideas
+// ──────────────────────────────────────────────
+async function generateDailyPostIdeas(
+  args: Record<string, unknown>,
+  _userId: string,
+  unitId: string | null
+): Promise<{ success: boolean; message: string }> {
+  // This tool just returns a marker — the AI will generate the ideas in its text response
+  return {
+    success: true,
+    message: `[ACTION] ✅ Ideias de posts geradas com base nos produtos e marca reais. Confira acima!`,
+  };
+}
+
+// ──────────────────────────────────────────────
 // Tool dispatcher
 // ──────────────────────────────────────────────
 async function executeTool(
@@ -1153,7 +1230,7 @@ async function executeTool(
       return executeRegisterEmployeePayment(args, userId, unitId);
     case "mark_closing_validated":
       return executeMarkClosingValidated(args, userId, unitId);
-    // New tools
+    // Level 3 tools
     case "update_transaction":
       return executeUpdateTransaction(args, userId, unitId);
     case "create_supplier_invoice":
@@ -1168,6 +1245,11 @@ async function executeTool(
       return executeCreateAppointment(args, userId, unitId);
     case "save_preference":
       return executeSavePreference(args, userId, unitId);
+    // Marketing tools
+    case "create_marketing_post":
+      return executeCreateMarketingPost(args, userId, unitId);
+    case "generate_daily_post_ideas":
+      return generateDailyPostIdeas(args, userId, unitId);
     default:
       return { success: false, message: `Função "${name}" não reconhecida.` };
   }
@@ -1330,6 +1412,16 @@ serve(async (req) => {
     if (context?.budgetStatus?.length) {
       dataLines.push(`\n🎯 ORÇAMENTO vs REALIZADO:\n${context.budgetStatus.join('\n')}`);
     }
+    if (context?.products?.length) {
+      dataLines.push(`\n🍽️ PRODUTOS DO CARDÁPIO (${context.products.length} itens):\n${context.products.join('\n')}`);
+    }
+    if (context?.brand) {
+      const b = context.brand;
+      dataLines.push(`\n🎨 IDENTIDADE DE MARCA:\n- Tom de voz: ${b.tone_of_voice || 'não definido'}\n- Tagline: ${b.tagline || 'não definida'}\n- Instagram: ${b.instagram_url || 'não informado'}\n- Site: ${b.website_url || 'não informado'}\n- Frases: ${JSON.stringify(b.institutional_phrases || [])}`);
+    }
+    if (context?.brandAssets?.length) {
+      dataLines.push(`\n📸 ASSETS VISUAIS:\n${context.brandAssets.join('\n')}`);
+    }
 
     const dataSnapshot = dataLines.length > 0 ? dataLines.join('\n') : 'Dados ainda carregando...';
 
@@ -1373,6 +1465,8 @@ AÇÕES EXECUTÁVEIS (use tool calling):
 14. send_order - Enviar pedido de compra para fornecedor (rascunho → enviado)
 15. create_appointment - Criar compromisso com horário específico
 16. save_preference - Salvar atalho/preferência do usuário (ex: "luz" = "conta de energia")
+17. create_marketing_post - Criar post para redes sociais com título, legenda, hashtags, prompt de imagem e horário
+18. generate_daily_post_ideas - Gerar 3 ideias de posts baseadas nos produtos e marca reais
 
 MULTI-AÇÃO: Você pode chamar MÚLTIPLAS tools em uma única resposta quando o usuário pedir várias ações (ex: "registra a nota, dá entrada no estoque e cria o boleto"). Use várias tool_calls na mesma resposta.
 

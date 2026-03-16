@@ -13,6 +13,7 @@ const SUGGESTIONS = [
   { label: 'Resumo do dia', icon: 'BarChart3' },
   { label: 'Como está meu estoque?', icon: 'Package' },
   { label: 'Despesas pendentes', icon: 'Receipt' },
+  { label: 'Criar post marketing', icon: 'Megaphone' },
 ];
 
 const ACCEPTED_FILES = 'image/*,.pdf,.doc,.docx,.csv,.xlsx,.xls,.txt,.json';

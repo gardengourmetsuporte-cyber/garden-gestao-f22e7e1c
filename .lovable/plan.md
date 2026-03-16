@@ -1,69 +1,79 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-# Plano: Unificar toda IA em um único Copiloto
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-## Situação Atual
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-O sistema possui **7+ IAs separadas**, cada uma com seu próprio edge function e contexto isolado:
+---
 
-```text
-┌─────────────────────────────────────────────────┐
-│  management-ai        → Copilot (16 tools)      │
-│  marketing-post-chat  → Chat de Marketing       │
-│  marketing-daily-suggestions → Feed diário       │
-│  marketing-suggestions → Sugestões automáticas   │
-│  ai-insights          → Insights do Dashboard    │
-│  finance-categorize   → Categorização financeira │
-│  whatsapp-webhook     → IA do WhatsApp           │
-└─────────────────────────────────────────────────┘
-```
+## Bloco de Relatórios Avançados ✅
 
-## Objetivo
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-Um único Copiloto (`management-ai`) com **acesso total ao banco de dados** e capacidades expandidas, incluindo marketing. O widget `AICopilotWidget` na tela inicial passa a ser o ponto central de toda interação com IA.
+## Dashboard Analytics ✅
 
-## Mudanças Planejadas
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-### 1. Expandir `management-ai` com ferramentas de Marketing
+## Operacional ✅
 
-Adicionar 2 novas tools ao edge function `management-ai`:
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-- **`create_marketing_post`** — Criar post para redes sociais com título, legenda, hashtags, image prompt e horário ideal. Busca produtos reais (`tablet_products`), identidade de marca (`brand_identity`), assets (`brand_assets`) e receitas para contexto.
-- **`generate_daily_post_ideas`** — Gerar 3 sugestões de posts baseadas nos produtos reais e dados da marca.
+## CRM / Clientes ✅
 
-O system prompt do `management-ai` será expandido para incluir o contexto de marketing (produtos do cardápio, identidade de marca, assets visuais) no bloco de dados.
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-### 2. Expandir o contexto (`copilot-context`)
+## Funcionários ✅
 
-Modificar o edge function `copilot-context` para também retornar:
-- Produtos do cardápio (`tablet_products`) — nome, preço, categoria, destaque
-- Identidade de marca (`brand_identity`) — tom de voz, tagline, cores, redes sociais
-- Assets visuais (`brand_assets`) — títulos e tipos disponíveis
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
-### 3. Atualizar `PostAIChat` do Marketing
+## Cardápio Digital ✅
 
-O componente `PostAIChat` (usado no `PostSheet`) será refatorado para usar o `management-ai` em vez do `marketing-post-chat`. Isso garante que ao criar posts dentro do módulo de Marketing, o mesmo Copiloto responde, com os mesmos dados e comportamento.
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
 
-### 4. Manter edge functions especializadas como estão (por ora)
+## Sistema / UX ✅
 
-Os edge functions `marketing-daily-suggestions`, `ai-insights`, `finance-categorize` e `whatsapp-webhook` continuam existindo para seus fluxos automáticos (não são chat interativo). A unificação foca na **experiência de chat/interação** — um único Copiloto que sabe fazer tudo.
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
 
-## Arquivos a Editar
+## Multi-Unit ✅
 
-| Arquivo | Mudança |
-|---|---|
-| `supabase/functions/management-ai/index.ts` | +2 tools de marketing, contexto de marca/produtos no prompt |
-| `supabase/functions/copilot-context/index.ts` | +queries de produtos, marca e assets |
-| `src/components/marketing/PostAIChat.tsx` | Usar `management-ai` via supabase.functions.invoke |
-| `src/components/dashboard/AICopilotWidget.tsx` | Adicionar chip de sugestão "Criar post" |
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
 
-## Resultado Final
+## NPS / Avaliações ✅
 
-O usuário pode, de qualquer lugar, conversar com o mesmo Copiloto e pedir:
-- "Cria um post de promoção do X-Burguer" (marketing)
-- "Registra despesa de R$500 de energia" (financeiro)
-- "Como tá meu estoque?" (inventário)
-- "Agenda reunião às 14h" (agenda)
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
 
-Tudo no mesmo chat, mesmo contexto, mesma IA.
+## Estoque Avançado ✅
 
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)

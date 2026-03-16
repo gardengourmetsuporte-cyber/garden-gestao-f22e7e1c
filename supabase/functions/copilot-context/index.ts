@@ -75,6 +75,7 @@ Deno.serve(async (req) => {
       suppliersRes, recentTxRes, tasksRes, employeePaymentsRes,
       allMonthTxRes, checklistItemsRes, checklistCompletionsRes,
       supplierInvoicesRes, budgetsRes, budgetSpentRes, preferencesRes,
+      productsRes, brandRes, assetsRes,
     ] = await Promise.all([
       sb.from("finance_accounts").select("name, type, balance").eq("unit_id", unit_id).eq("is_active", true),
       sb.from("finance_transactions").select("amount").eq("user_id", userId).eq("unit_id", unit_id).eq("type", "income").eq("is_paid", true).gte("date", monthStart).lte("date", monthEnd),
@@ -95,6 +96,9 @@ Deno.serve(async (req) => {
       sb.from("finance_budgets").select("planned_amount, category:finance_categories(id, name)").eq("unit_id", unit_id).eq("user_id", userId).eq("month", now.getMonth() + 1).eq("year", now.getFullYear()),
       sb.from("finance_transactions").select("amount, category_id").eq("user_id", userId).eq("unit_id", unit_id).in("type", ["expense", "credit_card"]).eq("is_paid", true).gte("date", monthStart).lte("date", monthEnd),
       sb.from("copilot_preferences").select("key, value, category").eq("user_id", userId).limit(50),
+      sb.from("tablet_products").select("name, description, price, image_url, is_highlight, category, is_active").eq("unit_id", unit_id).eq("is_active", true).limit(50),
+      sb.from("brand_identity").select("*").eq("unit_id", unit_id).maybeSingle(),
+      sb.from("brand_assets").select("title, type, tags, file_url").eq("unit_id", unit_id).limit(10),
     ]);
 
     // Process data
@@ -150,6 +154,19 @@ Deno.serve(async (req) => {
       upcomingInvoices,
       budgetStatus,
       preferences: (preferencesRes.data || []).map((p: any) => `${p.key} = ${p.value} (${p.category})`),
+      products: (productsRes.data || []).map((p: any) => {
+        const cat = p.category || "";
+        return `${p.name}: R$${Number(p.price).toFixed(2)}${p.is_highlight ? ' ⭐DESTAQUE' : ''}${cat ? ` [${cat}]` : ''}${p.description ? ` — ${p.description}` : ''}`;
+      }),
+      brand: brandRes.data ? {
+        tone_of_voice: brandRes.data.tone_of_voice,
+        tagline: brandRes.data.tagline,
+        colors: brandRes.data.colors,
+        instagram_url: brandRes.data.instagram_url,
+        website_url: brandRes.data.website_url,
+        institutional_phrases: brandRes.data.institutional_phrases,
+      } : null,
+      brandAssets: (assetsRes.data || []).map((a: any) => `[${a.type}] ${a.title} (tags: ${(a.tags || []).join(', ')})`),
     };
 
     // Compute context stats for UI chips
