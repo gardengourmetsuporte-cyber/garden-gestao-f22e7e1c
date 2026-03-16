@@ -370,7 +370,7 @@ export function SnakeGame({ onBack, unitId }: Props) {
         </button>
         <div className="text-center">
           <h1 className="text-base font-bold text-white flex items-center gap-1.5">
-            🐍 Snake <span className="text-emerald-400">Garden</span>
+            🐍 Snake <span className="text-emerald-400">Mania</span>
           </h1>
         </div>
         <button onClick={() => setShowRanking(true)} className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
