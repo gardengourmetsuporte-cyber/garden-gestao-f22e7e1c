@@ -106,6 +106,12 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
     let isToolCall = false;
 
     try {
+      const apiMessages = newMessages.map(m => ({
+        role: m.role,
+        content: typeof m.content === 'string' ? m.content : m.content,
+        ...(m.imagePreview ? { imageUrl: m.imagePreview } : {}),
+      }));
+
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
@@ -113,8 +119,9 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
+          messages: apiMessages,
+          context: { marketing_mode: true },
           unit_id: unitId,
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
         }),
       });
 
