@@ -850,7 +850,7 @@ export default function OrdersPage() {
           onDelete={handleDeleteProfile}
           isNew={isNewSupplier}
           onDeleteOrder={deleteOrder}
-          onUpdateOrderStatus={updateOrderStatus}
+          onUpdateOrderStatus={async (id, status) => { await updateOrderStatus(id, status as any); }}
           onDeleteInvoice={deleteInvoice}
           onMarkInvoicePaid={async (id) => {
             // Simple mark as paid without selecting account
