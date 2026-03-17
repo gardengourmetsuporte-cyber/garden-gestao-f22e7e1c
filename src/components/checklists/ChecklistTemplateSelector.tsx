@@ -146,7 +146,6 @@ export function ChecklistTemplateSelector({ onManual, onDone }: Props) {
                     color={isSelected ? 'primary' : 'muted'}
                     size="md"
                   />
-                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-foreground">{template.name}</h3>
