@@ -43,8 +43,8 @@ export function QuotationList({ suppliers }: Props) {
     <div className="space-y-4">
       <AnimatedTabs
         tabs={[
-          { key: 'traditional', label: 'Cotação Tradicional', icon: <AppIcon name="Scale" size={16} /> },
-          { key: 'global', label: 'Pesquisa Global', icon: <AppIcon name="SearchCheck" size={16} /> },
+          { key: 'traditional', label: 'Cotações', icon: <AppIcon name="Scale" size={16} /> },
+          { key: 'global', label: 'Pesquisa Global', icon: <AppIcon name="search" size={16} /> },
         ]}
         activeTab={subTab}
         onTabChange={(key) => setSubTab(key as SubTab)}
