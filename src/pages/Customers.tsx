@@ -4,6 +4,7 @@ import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CustomerCard } from '@/components/customers/CustomerCard';
 import { CustomerSheet } from '@/components/customers/CustomerSheet';

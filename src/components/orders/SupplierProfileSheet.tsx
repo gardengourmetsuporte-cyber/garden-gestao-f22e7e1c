@@ -232,7 +232,7 @@ export function SupplierProfileSheet({
                   { label: 'Pedidos', value: stats.totalOrders, icon: 'ShoppingCart', gradient: 'blue' as const },
                   { label: 'Recebidos', value: stats.totalReceived, icon: 'PackageCheck', gradient: 'emerald' as const },
                   { label: 'Total Faturado', value: `R$ ${stats.totalInvoiced.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, icon: 'DollarSign', gradient: 'amber' as const },
-                  { label: 'Contas Pendentes', value: stats.pendingInvoices, icon: 'AlertCircle', gradient: (stats.pendingInvoices > 0 ? 'red' : 'muted') as const },
+                  { label: 'Contas Pendentes', value: stats.pendingInvoices, icon: 'AlertCircle', gradient: (stats.pendingInvoices > 0 ? 'red' : 'muted') as GradientIconColor },
                 ].map(stat => (
                   <div key={stat.label} className="p-3 rounded-2xl bg-card border border-border">
                     <div className="flex items-center gap-2 mb-1">
