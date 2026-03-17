@@ -32,7 +32,7 @@ import { AppIcon } from '@/components/ui/app-icon';
  }
  
  export function CashClosingDetail({ closing, isAdmin, onClose }: Props) {
-   const { approveClosing, markDivergent, deleteClosing, updateClosing } = useCashClosing();
+   const { approveClosing, markDivergent, deleteClosing, updateClosing, integrateWithFinancial } = useCashClosing();
    const [isApproving, setIsApproving] = useState(false);
    const [isMarkingDivergent, setIsMarkingDivergent] = useState(false);
    const [showDivergentDialog, setShowDivergentDialog] = useState(false);
@@ -530,11 +530,27 @@ import { AppIcon } from '@/components/ui/app-icon';
                    </p>
                  </div>
                </div>
-               {closing.financial_integrated && (
-                 <p className="text-xs text-success mt-2">
-                   ✓ Integrado ao módulo financeiro
-                 </p>
-               )}
+                {closing.financial_integrated ? (
+                  <p className="text-xs text-success mt-2">
+                    ✓ Integrado ao módulo financeiro
+                  </p>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-2 gap-2"
+                    onClick={async () => {
+                      try {
+                        await integrateWithFinancial(closing);
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }}
+                  >
+                    <AppIcon name="Link" size={14} />
+                    Integrar ao financeiro
+                  </Button>
+                )}
              </CardContent>
            </Card>
          )}

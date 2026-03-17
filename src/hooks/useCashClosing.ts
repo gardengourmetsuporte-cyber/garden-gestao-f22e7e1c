@@ -100,7 +100,7 @@ export function useCashClosing() {
           delivery_amount: formData.delivery_amount, signed_account_amount: formData.signed_account_amount || 0, cash_difference: formData.cash_difference,
           receipt_url: formData.receipt_url || '', notes: formData.notes,
           expenses: formData.expenses || [], user_id: user!.id,
-          financial_integrated: true, // Mark as integrated immediately
+          financial_integrated: false, // Will be set to true after successful integration
         } as any)
         .select()
         .single();
@@ -112,20 +112,26 @@ export function useCashClosing() {
       return data;
     },
     onSuccess: async (data: any) => {
+      let integrationOk = false;
       // Integrate with financial immediately after creating
       if (data) {
         try {
           await integrateWithFinancial(data as CashClosing);
+          integrationOk = true;
         } catch (err) {
           console.error('Financial integration error:', err);
-          // Don't fail the closing if financial integration fails
+          toast.error('Fechamento criado, mas a integração financeira falhou. Tente integrar manualmente.');
         }
       }
       invalidate();
       // Invalidate finance queries to refresh dashboard
       queryClient.invalidateQueries({ queryKey: ['finance'] });
       queryClient.invalidateQueries({ queryKey: ['finance-transactions'] });
-      toast.success('Fechamento de caixa enviado e lançamentos criados! ✅');
+      if (integrationOk) {
+        toast.success('Fechamento de caixa enviado e lançamentos criados! ✅');
+      } else if (!data) {
+        toast.success('Fechamento de caixa enviado!');
+      }
     },
     onError: (err: Error) => {
       console.error('Cash closing error:', err);
@@ -565,6 +571,7 @@ export function useCashClosing() {
     closings, isLoading, uploadReceipt,
     createClosing, approveClosing, markDivergent,
     deleteClosing, updateClosing, checkChecklistCompleted,
+    integrateWithFinancial,
     refetch: invalidate,
   };
 }
