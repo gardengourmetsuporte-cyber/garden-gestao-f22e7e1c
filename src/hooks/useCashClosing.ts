@@ -112,20 +112,26 @@ export function useCashClosing() {
       return data;
     },
     onSuccess: async (data: any) => {
+      let integrationOk = false;
       // Integrate with financial immediately after creating
       if (data) {
         try {
           await integrateWithFinancial(data as CashClosing);
+          integrationOk = true;
         } catch (err) {
           console.error('Financial integration error:', err);
-          // Don't fail the closing if financial integration fails
+          toast.error('Fechamento criado, mas a integração financeira falhou. Tente integrar manualmente.');
         }
       }
       invalidate();
       // Invalidate finance queries to refresh dashboard
       queryClient.invalidateQueries({ queryKey: ['finance'] });
       queryClient.invalidateQueries({ queryKey: ['finance-transactions'] });
-      toast.success('Fechamento de caixa enviado e lançamentos criados! ✅');
+      if (integrationOk) {
+        toast.success('Fechamento de caixa enviado e lançamentos criados! ✅');
+      } else if (!data) {
+        toast.success('Fechamento de caixa enviado!');
+      }
     },
     onError: (err: Error) => {
       console.error('Cash closing error:', err);
