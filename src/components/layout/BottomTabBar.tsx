@@ -36,14 +36,14 @@ const CARDAPIO_TABS: TabDef[] = [
 const HIDDEN_ROUTES = ['/finance', '/personal-finance'];
 
 // Modules to use as fallback when pinned tabs aren't accessible
-const FALLBACK_MODULE_KEYS = ['checklists', 'finance', 'ranking', 'inventory', 'employees', 'agenda', 'rewards'];
+const FALLBACK_MODULE_KEYS = ['checklists', 'deliveries', 'ranking', 'inventory', 'employees', 'agenda', 'rewards', 'finance'];
 
 export function BottomTabBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { activeUnit } = useUnit();
   const { hasAccess } = useUserModules();
-  const { pinnedTabs } = useBottomBarTabs();
+  const { pinnedTabs, isCustomized } = useBottomBarTabs();
   const { fabAction, fabActions } = useFabContext();
   const { plan } = useAuth();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -56,34 +56,52 @@ export function BottomTabBar() {
 
   const isCardapioRoute = location.pathname.startsWith('/cardapio');
 
-  // Build resolved tabs — always exactly 4 tabs (Home + 3 pinned)
+  const isTabLocked = (tab: TabDef): boolean => {
+    const basePath = tab.path.split('?')[0];
+    const moduleKey = getModuleKeyFromRoute(basePath) || tab.moduleKey;
+    if (!moduleKey || moduleKey === 'dashboard') return false;
+    // Check plan
+    const required = MODULE_REQUIRED_PLAN[moduleKey];
+    if (required && !planSatisfies(plan, required)) return true;
+    // Check module access level
+    if (!hasAccess(moduleKey)) return true;
+    return false;
+  };
+
+  // Build resolved tabs — always exactly 4 tabs (Home + 3 pinned/fallback)
   const resolvedTabs: TabDef[] = [];
 
   if (isCardapioRoute) {
     resolvedTabs.push(...CARDAPIO_TABS);
   } else {
     resolvedTabs.push(HOME_TAB);
-    // Add pinned tabs (always show them, regardless of access — locked state handled visually)
+
+    // Add pinned tabs. If user never customized tabs, don't force locked modules.
     for (const pt of pinnedTabs) {
-      if (resolvedTabs.length < 3) {
-        resolvedTabs.push(pt);
-      }
+      if (resolvedTabs.length >= 3) break;
+      if (!isCustomized && isTabLocked(pt as TabDef)) continue;
+      resolvedTabs.push(pt as TabDef);
     }
-    // Fill remaining slots with fallback modules to guarantee 4 tabs
+
+    // Fill remaining slots with accessible fallback modules
     if (resolvedTabs.length < 3) {
       for (const key of FALLBACK_MODULE_KEYS) {
         if (resolvedTabs.length >= 3) break;
         if (resolvedTabs.some(t => t.moduleKey === key)) continue;
         const mod = ALL_MODULES.find(m => m.key === key);
         if (!mod) continue;
-        resolvedTabs.push({
+
+        const candidate: TabDef = {
           key: mod.key,
           icon: mod.icon,
           customIcon: mod.customIcon,
           label: mod.label,
           path: mod.route,
           moduleKey: mod.key,
-        });
+        };
+
+        if (isTabLocked(candidate)) continue;
+        resolvedTabs.push(candidate);
       }
     }
   }
@@ -109,24 +127,11 @@ export function BottomTabBar() {
       return false;
     }
     if (isCardapioRoute && path === '/cardapio') {
-      // "Início" tab: active when no tab/section params
       const currentTab = new URLSearchParams(location.search).get('tab');
       const currentSection = new URLSearchParams(location.search).get('section');
       return location.pathname === '/cardapio' && !currentTab && !currentSection;
     }
     return location.pathname.startsWith(path);
-  };
-
-  const isTabLocked = (tab: TabDef): boolean => {
-    const basePath = tab.path.split('?')[0];
-    const moduleKey = getModuleKeyFromRoute(basePath) || tab.moduleKey;
-    if (!moduleKey || moduleKey === 'dashboard') return false;
-    // Check plan
-    const required = MODULE_REQUIRED_PLAN[moduleKey];
-    if (required && !planSatisfies(plan, required)) return true;
-    // Check module access level
-    if (!hasAccess(moduleKey)) return true;
-    return false;
   };
 
   if (isHidden) return null;

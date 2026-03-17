@@ -1,11 +1,8 @@
 import { useCallback, useSyncExternalStore } from 'react';
 import { ALL_MODULES } from '@/lib/modules';
-import { useUserModules } from '@/hooks/useAccessLevels';
 
 const STORAGE_KEY = 'bottombar-pinned-tabs';
 const DEFAULT_KEYS = ['checklists', 'finance'];
-// Preferred order for auto-selecting tabs the user has access to
-const PREFERRED_ORDER = ['checklists', 'deliveries', 'finance', 'ranking', 'inventory', 'employees', 'agenda', 'rewards', 'cash-closing'];
 const PINNED_COUNT = 2;
 
 export interface BottomTabDef {
@@ -62,7 +59,9 @@ function notify() {
 
 function subscribe(cb: () => void) {
   _listeners.add(cb);
-  return () => { _listeners.delete(cb); };
+  return () => {
+    _listeners.delete(cb);
+  };
 }
 
 function getSnapshot() {
@@ -70,25 +69,8 @@ function getSnapshot() {
 }
 
 export function useBottomBarTabs() {
-  const storedKeys = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-  const { hasAccess } = useUserModules();
+  const pinnedKeys = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   const isCustomized = hasCustomPinnedTabs();
-
-  // If user hasn't customized tabs, pick the best defaults based on their access
-  let pinnedKeys = storedKeys;
-  if (!isCustomized) {
-    const accessibleKeys: string[] = [];
-    for (const key of PREFERRED_ORDER) {
-      if (accessibleKeys.length >= PINNED_COUNT) break;
-      if (hasAccess(key)) {
-        accessibleKeys.push(key);
-      }
-    }
-    // If we found enough accessible modules, use them; otherwise fall back to defaults
-    if (accessibleKeys.length >= PINNED_COUNT) {
-      pinnedKeys = accessibleKeys.slice(0, PINNED_COUNT);
-    }
-  }
 
   const pinnedTabs: BottomTabDef[] = pinnedKeys
     .map(resolveTab)
@@ -107,5 +89,5 @@ export function useBottomBarTabs() {
     notify();
   }, []);
 
-  return { pinnedTabs, pinnedKeys, setPinnedTabs };
+  return { pinnedTabs, pinnedKeys, isCustomized, setPinnedTabs };
 }
