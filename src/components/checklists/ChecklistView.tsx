@@ -169,6 +169,13 @@ export function ChecklistView({
   } | null>(null);
   // Photo viewer
   const [viewingPhotoUrl, setViewingPhotoUrl] = useState<string | null>(null);
+  // Production sheet state
+  const [productionSheetOpen, setProductionSheetOpen] = useState(false);
+  const [pendingProductionAction, setPendingProductionAction] = useState<{
+    itemId: string; points: number; configuredPoints: number;
+    completedByUserId?: string; buttonElement?: HTMLElement;
+    linkedInventoryItemId: string; itemName: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!activeUnitId) return;
