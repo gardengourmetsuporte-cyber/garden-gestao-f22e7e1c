@@ -849,6 +849,18 @@ export default function OrdersPage() {
           onSave={handleSaveProfile}
           onDelete={handleDeleteProfile}
           isNew={isNewSupplier}
+          onDeleteOrder={deleteOrder}
+          onUpdateOrderStatus={updateOrderStatus}
+          onDeleteInvoice={deleteInvoice}
+          onMarkInvoicePaid={async (id) => {
+            // Simple mark as paid without selecting account
+            const { error } = await supabase
+              .from('supplier_invoices')
+              .update({ is_paid: true, paid_at: new Date().toISOString() })
+              .eq('id', id);
+            if (error) { toast.error('Erro ao pagar'); throw error; }
+            toast.success('Conta marcada como paga!');
+          }}
         />
 
         {/* Sheets */}
