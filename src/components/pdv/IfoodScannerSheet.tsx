@@ -22,9 +22,9 @@ interface Props {
 }
 
 export function IfoodScannerSheet({ open, onOpenChange, state, result, error, onScan, onConfirm, onReset, onUpdateResult }: Props) {
-  const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const handleFile = (f: File) => {
     setPreview(URL.createObjectURL(f));
