@@ -269,7 +269,6 @@ export function SupplierProfileSheet({
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {orderItems.length} itens
-                                {order.total_amount ? ` · R$ ${Number(order.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : ''}
                               </p>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
