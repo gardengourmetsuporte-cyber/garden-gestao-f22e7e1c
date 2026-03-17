@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PriceSurvey, usePriceSurveys } from '@/hooks/usePriceSurveys';
