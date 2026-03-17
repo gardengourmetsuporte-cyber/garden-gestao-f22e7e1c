@@ -49,7 +49,6 @@ export default function PriceSurveyPublic() {
         if (!res.ok) throw new Error(data.error);
         setSurveyData(data);
 
-        // Initialize responses from existing or last prices
         const initial: Record<string, ItemResponse> = {};
         (data.items || []).forEach((item: SurveyItem) => {
           const existing = data.existingResponses?.find((r: any) => r.item_id === item.id);
@@ -157,18 +156,18 @@ export default function PriceSurveyPublic() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="text-center space-y-3">
-          <AppIcon name="AlertCircle" size={48} className="text-red-500 mx-auto" />
-          <p className="text-lg font-semibold text-gray-800">{error}</p>
+          <AppIcon name="AlertCircle" size={48} className="text-destructive mx-auto" />
+          <p className="text-lg font-semibold text-foreground">{error}</p>
         </div>
       </div>
     );
@@ -176,13 +175,13 @@ export default function PriceSurveyPublic() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="text-center space-y-4 max-w-sm">
-          <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center">
-            <AppIcon name="Check" size={32} className="text-green-600" />
+          <div className="w-16 h-16 mx-auto bg-primary/15 rounded-full flex items-center justify-center">
+            <AppIcon name="Check" size={32} className="text-primary" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900">Respostas Enviadas!</h2>
-          <p className="text-gray-500">Obrigado por participar da pesquisa de preços.</p>
+          <h2 className="text-xl font-bold text-foreground">Respostas Enviadas!</h2>
+          <p className="text-muted-foreground">Obrigado por participar da pesquisa de preços.</p>
           <Button variant="outline" onClick={() => setSubmitted(false)}>
             Editar Respostas
           </Button>
@@ -192,22 +191,22 @@ export default function PriceSurveyPublic() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-28">
+    <div className="min-h-screen bg-background pb-28">
       {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10 px-4 py-3 space-y-3">
+      <div className="bg-card border-b border-border sticky top-0 z-10 px-4 py-3 space-y-3">
         <div>
-          <h1 className="text-lg font-bold text-gray-900">{surveyData?.survey?.title || 'Pesquisa de Preços'}</h1>
-          <p className="text-sm text-gray-500">{surveyData?.supplier?.name}</p>
+          <h1 className="text-lg font-bold text-foreground">{surveyData?.survey?.title || 'Pesquisa de Preços'}</h1>
+          <p className="text-sm text-muted-foreground">{surveyData?.supplier?.name}</p>
         </div>
 
         {/* Search */}
         <div className="relative">
-          <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <AppIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar item..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="pl-9 h-9 bg-gray-50 border-gray-200"
+            className="pl-9 h-9"
           />
         </div>
 
@@ -217,7 +216,7 @@ export default function PriceSurveyPublic() {
             onClick={() => setActiveCategory(null)}
             className={cn(
               "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-              !activeCategory ? "bg-green-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              !activeCategory ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
             )}
           >
             Todos ({items.length})
@@ -231,7 +230,7 @@ export default function PriceSurveyPublic() {
                 onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
                 className={cn(
                   "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-                  activeCategory === cat.id ? "bg-green-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  activeCategory === cat.id ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                 )}
               >
                 {cat.name} ({count})
@@ -258,10 +257,10 @@ export default function PriceSurveyPublic() {
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: group.category?.color || '#94a3b8' }}
               />
-              <span className="text-sm font-semibold text-gray-700">
+              <span className="text-sm font-semibold text-foreground">
                 {group.category?.name || 'Sem Categoria'}
               </span>
-              <span className="text-xs text-gray-400">({group.items.length})</span>
+              <span className="text-xs text-muted-foreground">({group.items.length})</span>
             </div>
 
             <div className="space-y-2">
@@ -271,14 +270,14 @@ export default function PriceSurveyPublic() {
                   <div
                     key={item.id}
                     className={cn(
-                      "bg-white rounded-xl p-3 border transition-colors",
-                      r.has_item ? "border-green-200 bg-green-50/30" : "border-gray-100"
+                      "bg-card rounded-xl p-3 border transition-colors",
+                      r.has_item ? "border-primary/40 bg-primary/5" : "border-border"
                     )}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
-                        <p className="text-xs text-gray-400">{item.unit_type}</p>
+                        <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">{item.unit_type}</p>
                       </div>
                       <Switch
                         checked={r.has_item}
@@ -289,7 +288,7 @@ export default function PriceSurveyPublic() {
                     {r.has_item && (
                       <div className="flex gap-2 animate-fade-in">
                         <div className="flex-1">
-                          <label className="text-[10px] text-gray-500 uppercase font-medium">Preço (R$)</label>
+                          <label className="text-[10px] text-muted-foreground uppercase font-medium">Preço (R$)</label>
                           <Input
                             type="number"
                             inputMode="decimal"
@@ -301,7 +300,7 @@ export default function PriceSurveyPublic() {
                           />
                         </div>
                         <div className="flex-1">
-                          <label className="text-[10px] text-gray-500 uppercase font-medium">Marca</label>
+                          <label className="text-[10px] text-muted-foreground uppercase font-medium">Marca</label>
                           <Input
                             placeholder="Opcional"
                             value={r.brand}
@@ -319,7 +318,7 @@ export default function PriceSurveyPublic() {
         ))}
 
         {filteredItems.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-12 text-muted-foreground">
             <AppIcon name="Search" size={40} className="mx-auto mb-2 opacity-50" />
             <p>Nenhum item encontrado</p>
           </div>
@@ -327,20 +326,20 @@ export default function PriceSurveyPublic() {
       </div>
 
       {/* Bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t px-4 py-3 z-20">
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-20">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-muted-foreground">
             {answeredCount} de {items.length} itens com preço
           </span>
-          <div className="h-2 flex-1 mx-3 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-2 flex-1 mx-3 bg-secondary rounded-full overflow-hidden">
             <div
-              className="h-full bg-green-500 rounded-full transition-all"
+              className="h-full bg-primary rounded-full transition-all"
               style={{ width: `${items.length > 0 ? (answeredCount / items.length) * 100 : 0}%` }}
             />
           </div>
         </div>
         <Button
-          className="w-full bg-green-600 hover:bg-green-700 text-white"
+          className="w-full"
           disabled={submitting}
           onClick={handleSubmit}
         >
