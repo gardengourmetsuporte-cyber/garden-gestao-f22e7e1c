@@ -41,27 +41,14 @@ export function QuotationList({ suppliers }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Sub-tab toggle */}
-      <div className="flex gap-2 p-1 bg-secondary/50 rounded-xl">
-        {([
-          { key: 'traditional' as SubTab, label: 'Cotação Tradicional', icon: 'Scale' },
-          { key: 'global' as SubTab, label: 'Pesquisa Global', icon: 'SearchCheck' },
-        ]).map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setSubTab(tab.key)}
-            className={cn(
-              'flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-medium transition-all duration-200',
-              subTab === tab.key
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            <AppIcon name={tab.icon} size={16} />
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <AnimatedTabs
+        tabs={[
+          { key: 'traditional', label: 'Cotação Tradicional', icon: <AppIcon name="Scale" size={16} /> },
+          { key: 'global', label: 'Pesquisa Global', icon: <AppIcon name="SearchCheck" size={16} /> },
+        ]}
+        activeTab={subTab}
+        onTabChange={(key) => setSubTab(key as SubTab)}
+      />
 
       {subTab === 'traditional' ? (
         <div className="space-y-4 animate-fade-in">
