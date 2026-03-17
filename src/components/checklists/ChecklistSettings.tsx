@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUnit } from '@/contexts/UnitContext';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Switch } from '@/components/ui/switch';
 import {
