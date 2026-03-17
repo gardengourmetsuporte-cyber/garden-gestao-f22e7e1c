@@ -17,19 +17,20 @@ export interface PriceTrackingItem {
 export type PriceFilter = 'all' | 'up' | 'down';
 
 export function usePriceTracking() {
-  const { currentUnit } = useUnit();
-  const unitId = currentUnit?.id;
+  const { activeUnit } = useUnit();
+  const unitId = activeUnit?.id;
 
   return useQuery({
     queryKey: ['price-tracking', unitId],
     enabled: !!unitId,
     queryFn: async (): Promise<PriceTrackingItem[]> => {
-      // Fetch items with price > 0
+      // Fetch items with price > 0, join category name
       const { data: items, error: itemsErr } = await supabase
         .from('inventory_items')
-        .select('id, name, category, unit_type, unit_price, supplier_id')
+        .select('id, name, category_id, unit_type, unit_price, supplier_id, categories!inventory_items_category_id_fkey(name)')
         .eq('unit_id', unitId!)
         .gt('unit_price', 0)
+        .is('deleted_at', null)
         .order('name');
 
       if (itemsErr) throw itemsErr;
@@ -83,10 +84,12 @@ export function usePriceTracking() {
           ? ((currentPrice - previousPrice) / previousPrice) * 100
           : null;
 
+        const categoryName = (item.categories as any)?.name || '';
+
         return {
           id: item.id,
           name: item.name,
-          category: item.category || '',
+          category: categoryName,
           unit_type: item.unit_type || '',
           current_price: currentPrice,
           previous_price: previousPrice,
