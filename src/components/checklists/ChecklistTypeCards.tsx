@@ -215,3 +215,64 @@ export function ChecklistBonusCard({
     </button>
   );
 }
+
+interface ProductionCardProps {
+  isSelected: boolean;
+  onSelect: () => void;
+  productionCount: number;
+  completedCount: number;
+}
+
+export function ChecklistProductionCard({
+  isSelected, onSelect, productionCount, completedCount,
+}: ProductionCardProps) {
+  if (productionCount === 0) return null;
+  const percent = productionCount > 0 ? Math.round((completedCount / productionCount) * 100) : 0;
+
+  return (
+    <button
+      onClick={onSelect}
+      className={cn(
+        "relative w-full overflow-hidden rounded-2xl p-5 text-left transition-all duration-300",
+        isSelected
+          ? "bg-gradient-to-r from-amber-600/20 to-orange-600/15 ring-1 ring-amber-500/30 scale-[1.01] shadow-xl"
+          : "bg-card hover:shadow-lg"
+      )}
+      style={!isSelected ? { border: '1px solid hsl(38 60% 45% / 0.15)' } : undefined}
+    >
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg"
+          style={{ background: 'linear-gradient(135deg, hsl(38 92% 50%), hsl(25 95% 45%))' }}>
+          <AppIcon name="soup_kitchen" size={22} fill={1} className="text-white" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-black font-display text-foreground" style={{ letterSpacing: '-0.02em' }}>Produção</h3>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{
+              color: isSelected ? 'hsl(38 92% 70%)' : 'hsl(38 92% 55%)',
+              background: isSelected ? 'hsl(38 92% 50% / 0.2)' : 'hsl(38 92% 50% / 0.12)',
+            }}>
+              {completedCount}/{productionCount}
+            </span>
+          </div>
+          <p className="text-xs mt-0.5 text-muted-foreground">
+            {percent === 100 ? 'Toda produção concluída ✓' : `Itens de preparo e produção · ${percent}%`}
+          </p>
+        </div>
+        <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
+      </div>
+      {/* Progress bar */}
+      {productionCount > 0 && (
+        <div className="mt-3 h-1.5 bg-muted/50 rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${percent}%`,
+              background: 'linear-gradient(90deg, hsl(38 92% 50%), hsl(25 95% 53%))',
+            }}
+          />
+        </div>
+      )}
+    </button>
+  );
+}
