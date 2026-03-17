@@ -351,9 +351,22 @@ export default function OrdersPage() {
                           style={{ animationDelay: `${index * 30}ms` }}
                         >
                           <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, [supplier.id]: open }))}>
-                            <div className="flex items-center gap-3 p-4">
+                            <div className="flex items-center gap-3 p-3">
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); handleOpenProfile(supplier); }}
+                                className={cn(
+                                  "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 active:scale-95 transition-all",
+                                  (supplier as any).delivery_frequency === 'daily' ? "bg-primary/15" : "bg-secondary"
+                                )}
+                              >
+                                <AppIcon name="Truck" size={20} className={cn(
+                                  (supplier as any).delivery_frequency === 'daily' ? "text-primary" : "text-muted-foreground"
+                                )} />
+                              </button>
+
                               <CollapsibleTrigger
-                                className="flex items-center gap-3 min-w-0 flex-1 text-left"
+                                className="flex-1 min-w-0 text-left"
                                 onClick={(e) => {
                                   if (lowItems.length === 0) {
                                     e.preventDefault();
@@ -361,63 +374,50 @@ export default function OrdersPage() {
                                   }
                                 }}
                               >
-                                <button
-                                  type="button"
-                                  onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleOpenProfile(supplier); }}
-                                  className={cn(
-                                    "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 active:scale-95 transition-all",
-                                    (supplier as any).delivery_frequency === 'daily' ? "bg-primary/15" : "bg-secondary"
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="font-semibold text-foreground text-sm">{supplier.name}</span>
+                                  {lowItems.length > 0 && (
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-warning/15 text-warning font-semibold shrink-0">
+                                      {lowItems.length} baixo{lowItems.length !== 1 ? 's' : ''}
+                                    </span>
                                   )}
-                                >
-                                  <AppIcon name="Truck" size={20} className={cn(
-                                    (supplier as any).delivery_frequency === 'daily' ? "text-primary" : "text-muted-foreground"
-                                  )} />
-                                </button>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-foreground truncate">{supplier.name}</span>
-                                    {(supplier as any).delivery_frequency === 'daily' && (
-                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold shrink-0">Diário</span>
-                                    )}
-                                    {lowItems.length > 0 && (
-                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-warning/15 text-warning font-semibold shrink-0">
-                                        {lowItems.length} baixo{lowItems.length !== 1 ? 's' : ''}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center gap-3 mt-0.5">
-                                    {supplier.phone && (
-                                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                        <AppIcon name="Phone" size={11} />
-                                        {supplier.phone}
-                                        {hasWa && <span className="text-success">✓</span>}
-                                      </span>
-                                    )}
-                                    {supplierOrderCount > 0 && (
-                                      <span className="text-xs text-muted-foreground">
-                                        {supplierOrderCount} pedido{supplierOrderCount !== 1 ? 's' : ''}
-                                      </span>
-                                    )}
-                                  </div>
                                 </div>
-                                {lowItems.length > 0 ? (
-                                  <AppIcon name="ChevronDown" size={16} className={cn(
-                                    "text-muted-foreground transition-transform duration-200 shrink-0",
-                                    isExpanded && "rotate-180"
-                                  )} />
-                                ) : (
-                                  <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
-                                )}
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  {supplier.phone && (
+                                    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                                      <AppIcon name="Phone" size={10} />
+                                      {supplier.phone}
+                                      {hasWa && <span className="text-success text-[10px]">✓</span>}
+                                    </span>
+                                  )}
+                                  {supplierOrderCount > 0 && (
+                                    <span className="text-[11px] text-muted-foreground">
+                                      {supplierOrderCount} pedido{supplierOrderCount !== 1 ? 's' : ''}
+                                    </span>
+                                  )}
+                                </div>
                               </CollapsibleTrigger>
+
                               {lowItems.length > 0 && (
-                                <Button
-                                  size="sm"
-                                  onClick={(e) => { e.stopPropagation(); handleOpenOrder(supplier); }}
-                                  className="gap-1.5 rounded-xl shrink-0"
-                                >
-                                  <AppIcon name="Plus" size={16} />
-                                  Pedir
-                                </Button>
+                                <>
+                                  <CollapsibleTrigger className="shrink-0 p-1">
+                                    <AppIcon name="ChevronDown" size={16} className={cn(
+                                      "text-muted-foreground transition-transform duration-200",
+                                      isExpanded && "rotate-180"
+                                    )} />
+                                  </CollapsibleTrigger>
+                                  <Button
+                                    size="sm"
+                                    onClick={(e) => { e.stopPropagation(); handleOpenOrder(supplier); }}
+                                    className="gap-1 rounded-xl shrink-0 h-9 px-3 text-xs"
+                                  >
+                                    <AppIcon name="Plus" size={14} />
+                                    Pedir
+                                  </Button>
+                                </>
+                              )}
+                              {lowItems.length === 0 && (
+                                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
                               )}
                             </div>
 
