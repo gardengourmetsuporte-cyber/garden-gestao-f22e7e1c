@@ -34,6 +34,7 @@ import { AppIcon } from '@/components/ui/app-icon';
  export function CashClosingDetail({ closing, isAdmin, onClose }: Props) {
    const { approveClosing, markDivergent, deleteClosing, updateClosing, integrateWithFinancial } = useCashClosing();
    const [isApproving, setIsApproving] = useState(false);
+   const [isIntegrating, setIsIntegrating] = useState(false);
    const [isMarkingDivergent, setIsMarkingDivergent] = useState(false);
    const [showDivergentDialog, setShowDivergentDialog] = useState(false);
    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -535,21 +536,25 @@ import { AppIcon } from '@/components/ui/app-icon';
                     ✓ Integrado ao módulo financeiro
                   </p>
                 ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="mt-2 gap-2"
-                    onClick={async () => {
-                      try {
-                        await integrateWithFinancial(closing);
-                      } catch (err) {
-                        console.error(err);
-                      }
-                    }}
-                  >
-                    <AppIcon name="Link" size={14} />
-                    Integrar ao financeiro
-                  </Button>
+                   <Button
+                     size="sm"
+                     variant="outline"
+                     className="mt-2 gap-2"
+                     disabled={isIntegrating}
+                     onClick={async () => {
+                       setIsIntegrating(true);
+                       try {
+                         await integrateWithFinancial(closing);
+                       } catch (err) {
+                         console.error(err);
+                       } finally {
+                         setIsIntegrating(false);
+                       }
+                     }}
+                   >
+                     <AppIcon name="Link" size={14} />
+                     {isIntegrating ? 'Integrando...' : 'Integrar ao financeiro'}
+                   </Button>
                 )}
              </CardContent>
            </Card>
