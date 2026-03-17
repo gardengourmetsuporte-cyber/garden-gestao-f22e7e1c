@@ -8,6 +8,7 @@ import { QuotationDetail } from './QuotationDetail';
 import { PriceSurveyList } from './PriceSurveyList';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Supplier } from '@/types/database';
+import { AnimatedTabs } from '@/components/ui/animated-tabs';
 
 const statusConfig: Record<string, { label: string; variant: string; icon: string }> = {
   draft: { label: 'Rascunho', variant: 'muted', icon: 'Clock' },
