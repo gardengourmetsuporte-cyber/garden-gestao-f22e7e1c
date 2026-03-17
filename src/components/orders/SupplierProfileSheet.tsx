@@ -183,9 +183,7 @@ export function SupplierProfileSheet({
             <div className="space-y-5">
               {/* Header info */}
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <AppIcon name="Truck" size={28} className="text-primary" />
-                </div>
+                <GradientIcon name="Truck" color="primary" size="lg" />
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-bold text-foreground truncate">{supplier?.name}</h3>
                   <div className="flex items-center gap-3 mt-1 flex-wrap">
