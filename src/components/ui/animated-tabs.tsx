@@ -74,7 +74,7 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             {tab.icon && !hideIcons && (
               <span
                 className={cn(
-                  "flex items-center justify-center shrink-0 transition-all duration-300 [&>svg]:w-4 [&>svg]:h-4",
+                  "flex items-center justify-center shrink-0 w-4 h-4 transition-all duration-300",
                   isActive ? "text-primary" : "text-muted-foreground opacity-50"
                 )}
               >
