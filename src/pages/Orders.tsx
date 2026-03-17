@@ -33,7 +33,7 @@ export default function OrdersPage() {
   const { items, registerMovement } = useInventoryDB();
   const { suppliers, addSupplier, updateSupplier, deleteSupplier } = useSuppliers();
   const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
-  const { addInvoice, invoices } = useSupplierInvoices();
+  const { addInvoice, invoices, deleteInvoice, payInvoiceWithTransaction } = useSupplierInvoices();
   const { createQuotation } = useQuotations();
   const { items: shoppingListItems, removeFromList, clearList, isLoading: shoppingListLoading } = useShoppingList();
 
@@ -849,6 +849,18 @@ export default function OrdersPage() {
           onSave={handleSaveProfile}
           onDelete={handleDeleteProfile}
           isNew={isNewSupplier}
+          onDeleteOrder={deleteOrder}
+          onUpdateOrderStatus={async (id, status) => { await updateOrderStatus(id, status as any); }}
+          onDeleteInvoice={deleteInvoice}
+          onMarkInvoicePaid={async (id) => {
+            // Simple mark as paid without selecting account
+            const { error } = await supabase
+              .from('supplier_invoices')
+              .update({ is_paid: true, paid_at: new Date().toISOString() })
+              .eq('id', id);
+            if (error) { toast.error('Erro ao pagar'); throw error; }
+            toast.success('Conta marcada como paga!');
+          }}
         />
 
         {/* Sheets */}
