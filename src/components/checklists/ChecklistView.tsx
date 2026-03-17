@@ -527,7 +527,78 @@ export function ChecklistView({
         </div>
       )}
 
-      {/* Sectors (non-bonus) */}
+      {/* Production: Flat list of production items */}
+      {isProduction && allProductionItems.length === 0 && (
+        <div className="card-command p-8 text-center">
+          <p className="text-muted-foreground text-sm">
+            Nenhum item de produção disponível.
+          </p>
+        </div>
+      )}
+      {isProduction && allProductionItems.length > 0 && (
+        <div className="space-y-1.5">
+          {allProductionItems.map((item, itemIndex) => {
+            const completed = isItemCompletedOptimistic(item.id);
+            const completion = completions.find(c => c.item_id === item.id);
+            const canToggle = canToggleItem(completion, completed);
+            const configuredPoints = item.points ?? 1;
+            const isJustCompleted = recentlyCompleted.has(item.id);
+
+            return (
+              <button
+                key={item.id}
+                onClick={(e) => {
+                  if (!canToggle) return;
+                  handleComplete(item.id, configuredPoints, configuredPoints, currentUserId, e.currentTarget as HTMLElement);
+                }}
+                disabled={!canToggle}
+                className={cn(
+                  "w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all duration-300",
+                  completed
+                    ? "bg-success/5 border-success/20"
+                    : "card-stat-holo",
+                  isJustCompleted && "animate-scale-in",
+                  !canToggle && !completed && "opacity-50"
+                )}
+                style={{ animationDelay: `${itemIndex * 50}ms` }}
+              >
+                <div className={cn(
+                  "w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all",
+                  completed ? "bg-success border-success" : "border-muted-foreground/30"
+                )}>
+                  {completed && <AppIcon name="check" size={14} className="text-success-foreground" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    "text-sm font-medium transition-colors",
+                    completed ? "text-success line-through" : "text-foreground"
+                  )}>
+                    {item.name}
+                  </p>
+                  {item.description && (
+                    <p className="text-[11px] text-muted-foreground truncate">{item.description}</p>
+                  )}
+                </div>
+                <AppIcon name="soup_kitchen" size={16} className={cn(
+                  "shrink-0",
+                  completed ? "text-success" : "text-amber-500"
+                )} />
+                {configuredPoints > 0 && (
+                  <div className={cn(
+                    "px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-0.5 shrink-0",
+                    completed ? "bg-success/10 text-success" : "bg-amber-500/10 text-amber-500"
+                  )}>
+                    <AppIcon name="bolt" size={12} />
+                    {configuredPoints}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Sectors (non-bonus, non-production) */}
       {!isBonus && filteredSectors.length === 0 && (
         <div className="card-command p-8 text-center">
           <p className="text-muted-foreground text-sm">
