@@ -141,11 +141,11 @@ export function ChecklistTemplateSelector({ onManual, onDone }: Props) {
                       <AppIcon name="Check" size={12} className="text-primary-foreground" />
                     </div>
                   )}
-                  <div className={cn(
-                    "w-11 h-11 rounded-xl flex items-center justify-center shrink-0",
-                    isSelected ? "bg-primary/20" : "bg-muted"
-                  )}>
-                    <AppIcon name={template.icon} size={22} className={isSelected ? "text-primary" : "text-muted-foreground"} />
+                  <GradientIcon
+                    name={template.icon}
+                    color={isSelected ? 'primary' : 'muted'}
+                    size="md"
+                  />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
