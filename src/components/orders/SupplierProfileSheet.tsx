@@ -228,16 +228,14 @@ export function SupplierProfileSheet({
               {/* Stats grid */}
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Pedidos', value: stats.totalOrders, icon: 'ShoppingCart', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-                  { label: 'Recebidos', value: stats.totalReceived, icon: 'PackageCheck', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-                  { label: 'Total Faturado', value: `R$ ${stats.totalInvoiced.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, icon: 'DollarSign', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-                  { label: 'Contas Pendentes', value: stats.pendingInvoices, icon: 'AlertCircle', color: stats.pendingInvoices > 0 ? 'text-red-400' : 'text-muted-foreground', bg: stats.pendingInvoices > 0 ? 'bg-red-500/10' : 'bg-muted' },
+                  { label: 'Pedidos', value: stats.totalOrders, icon: 'ShoppingCart', gradient: 'blue' as const },
+                  { label: 'Recebidos', value: stats.totalReceived, icon: 'PackageCheck', gradient: 'emerald' as const },
+                  { label: 'Total Faturado', value: `R$ ${stats.totalInvoiced.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, icon: 'DollarSign', gradient: 'amber' as const },
+                  { label: 'Contas Pendentes', value: stats.pendingInvoices, icon: 'AlertCircle', gradient: (stats.pendingInvoices > 0 ? 'red' : 'muted') as const },
                 ].map(stat => (
                   <div key={stat.label} className="p-3 rounded-2xl bg-card border border-border">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", stat.bg)}>
-                        <AppIcon name={stat.icon} size={14} className={stat.color} />
-                      </div>
+                      <GradientIcon name={stat.icon} color={stat.gradient} size="sm" iconSize={14} />
                       <span className="text-[11px] text-muted-foreground">{stat.label}</span>
                     </div>
                     <p className="text-lg font-bold text-foreground">{stat.value}</p>
