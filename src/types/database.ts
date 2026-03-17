@@ -122,6 +122,7 @@ export interface ChecklistItem {
   deleted_at: string | null;
   points: number;
   requires_photo: boolean;
+  linked_inventory_item_id: string | null;
   created_at: string;
   updated_at: string;
   subcategory?: ChecklistSubcategory;
