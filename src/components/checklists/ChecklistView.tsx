@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { ActiveTimer, ItemTimeStats } from '@/hooks/checklists/useChecklistTimer';
 import { TimerBadge, TimerStatsIndicator } from '@/components/checklists/TimerBadge';
 import { PinDialog } from '@/components/checklists/PinDialog';
+import { ProductionCompletionSheet } from '@/components/checklists/ProductionCompletionSheet';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
