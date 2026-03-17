@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 import { QuotationList } from '@/components/orders/QuotationList';
 import { useShoppingList } from '@/hooks/useShoppingList';
 import { SupplierProfileSheet } from '@/components/orders/SupplierProfileSheet';
-import { ProductionTab } from '@/components/orders/ProductionTab';
+
 import { useFabAction } from '@/contexts/FabActionContext';
 import { normalizePhone } from '@/lib/normalizePhone';
 
@@ -46,7 +46,7 @@ export default function OrdersPage() {
   const [orderForInvoice, setOrderForInvoice] = useState<Order | null>(null);
   const [smartReceivingOpen, setSmartReceivingOpen] = useState(false);
   const [smartReceivingOrder, setSmartReceivingOrder] = useState<Order | null>(null);
-  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list' | 'suppliers' | 'production'>('to-order');
+  const [orderTab, setOrderTab] = useState<'to-order' | 'orders' | 'quotations' | 'shopping-list' | 'suppliers'>('to-order');
   const [expandedSuppliers, setExpandedSuppliers] = useState<Record<string, boolean>>({});
   const [cotationStep, setCotationStep] = useState(false);
   const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
@@ -276,11 +276,11 @@ export default function OrdersPage() {
               { key: 'orders' as const, label: 'Pedidos', icon: 'ClipboardList', badge: pendingOrders.length || undefined, gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
               { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, gradient: 'linear-gradient(135deg, #8B5CF6, #EC4899)' },
               { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: undefined, gradient: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' },
-              { key: 'production' as const, label: 'Produção', icon: 'ChefHat', badge: undefined, gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
+              
             ];
 
             return (
-              <div className="grid grid-cols-3 gap-2 lg:grid-cols-6 lg:gap-3">
+              <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-3">
                 {tabs.map(tab => {
                   const isActive = orderTab === tab.key;
                   return (
@@ -800,8 +800,6 @@ export default function OrdersPage() {
               </div>
             )}
 
-            {/* Produção Tab */}
-            {orderTab === 'production' && <ProductionTab />}
           </div>
         </div>
 

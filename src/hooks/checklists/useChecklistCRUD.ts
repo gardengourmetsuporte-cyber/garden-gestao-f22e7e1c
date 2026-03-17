@@ -80,6 +80,7 @@ export function useChecklistCRUD({ sectors, sectorsKey, activeUnitId, invalidate
     frequency?: 'daily' | 'weekly' | 'monthly';
     checklist_type?: ChecklistType; points?: number;
     requires_photo?: boolean;
+    linked_inventory_item_id?: string | null;
   }) => {
     const { data, error } = await supabase
       .from('checklist_items')
@@ -88,6 +89,7 @@ export function useChecklistCRUD({ sectors, sectorsKey, activeUnitId, invalidate
         description: item.description, frequency: item.frequency || 'daily',
         checklist_type: item.checklist_type || 'abertura', points: item.points ?? 1,
         requires_photo: item.requires_photo ?? false,
+        linked_inventory_item_id: item.linked_inventory_item_id || null,
         unit_id: activeUnitId,
       } as any)
       .select().single();

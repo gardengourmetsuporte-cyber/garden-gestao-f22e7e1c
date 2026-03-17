@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { ActiveTimer, ItemTimeStats } from '@/hooks/checklists/useChecklistTimer';
 import { TimerBadge, TimerStatsIndicator } from '@/components/checklists/TimerBadge';
 import { PinDialog } from '@/components/checklists/PinDialog';
+import { ProductionCompletionSheet } from '@/components/checklists/ProductionCompletionSheet';
 
 interface ChecklistViewProps {
   sectors: ChecklistSector[];
@@ -168,6 +169,13 @@ export function ChecklistView({
   } | null>(null);
   // Photo viewer
   const [viewingPhotoUrl, setViewingPhotoUrl] = useState<string | null>(null);
+  // Production sheet state
+  const [productionSheetOpen, setProductionSheetOpen] = useState(false);
+  const [pendingProductionAction, setPendingProductionAction] = useState<{
+    itemId: string; points: number; configuredPoints: number;
+    completedByUserId?: string; buttonElement?: HTMLElement;
+    linkedInventoryItemId: string; itemName: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!activeUnitId) return;
@@ -258,6 +266,24 @@ export function ChecklistView({
   }, [isItemCompleted, optimisticToggles]);
 
   const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean) => {
+    // Check if item has linked inventory item (production) and is not being unchecked or skipped
+    if (!isSkipped) {
+      const linkedItem = sectors.flatMap(s =>
+        (s.subcategories || []).flatMap(sub =>
+          (sub.items || []).filter(i => i.id === itemId && (i as any).linked_inventory_item_id)
+        )
+      )[0];
+      if (linkedItem && (linkedItem as any).linked_inventory_item_id) {
+        setPendingProductionAction({
+          itemId, points, configuredPoints, completedByUserId, buttonElement,
+          linkedInventoryItemId: (linkedItem as any).linked_inventory_item_id,
+          itemName: linkedItem.name,
+        });
+        setProductionSheetOpen(true);
+        return;
+      }
+    }
+
     // Check if item requires photo and is not being unchecked or skipped
     if (!isSkipped) {
       const itemRequiresPhoto = sectors.some(s => 
@@ -1451,6 +1477,7 @@ export function ChecklistView({
                                     <div className="flex items-center gap-1.5">
                                       <p className="font-semibold text-sm text-foreground truncate">{item.name}</p>
                                       {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                      {(item as any).linked_inventory_item_id && <AppIcon name="precision_manufacturing" size={14} className="text-primary shrink-0" />}
                                     </div>
                                     {item.description && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{item.description}</p>}
                                     {stdActiveTimer && (
@@ -1659,6 +1686,25 @@ export function ChecklistView({
             setPinDialogOpen(false);
             setPendingTimerItemId(null);
             return true;
+          }}
+        />
+      )}
+
+      {/* Production Completion Sheet */}
+      {pendingProductionAction && (
+        <ProductionCompletionSheet
+          open={productionSheetOpen}
+          onOpenChange={(open) => {
+            setProductionSheetOpen(open);
+            if (!open) setPendingProductionAction(null);
+          }}
+          inventoryItemId={pendingProductionAction.linkedInventoryItemId}
+          checklistItemName={pendingProductionAction.itemName}
+          onConfirm={() => {
+            const { itemId, points, configuredPoints, completedByUserId, buttonElement } = pendingProductionAction;
+            setProductionSheetOpen(false);
+            setPendingProductionAction(null);
+            executeComplete(itemId, points, configuredPoints, completedByUserId, buttonElement);
           }}
         />
       )}

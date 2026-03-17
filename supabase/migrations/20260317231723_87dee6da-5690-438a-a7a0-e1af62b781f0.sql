@@ -1,0 +1,1 @@
+ALTER TABLE public.checklist_items ADD COLUMN linked_inventory_item_id UUID REFERENCES public.inventory_items(id) ON DELETE SET NULL;

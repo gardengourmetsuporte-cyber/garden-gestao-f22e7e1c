@@ -1,57 +1,88 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-# Plano: Integrar Produção no Checklist com entrada automática no estoque
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-## Resumo
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-Remover o módulo "Produção" da página de Fornecedores/Pedidos e integrá-lo ao Checklist. Itens de checklist poderão ser vinculados a itens de estoque (da categoria Produção). Ao completar o item no checklist, o usuário informa a quantidade produzida e o sistema dá entrada automática no estoque + registra a produção.
+---
 
-## Mudanças no Banco de Dados
+## Bloco de Relatórios Avançados ✅
 
-1. **Adicionar coluna `linked_inventory_item_id`** na tabela `checklist_items`:
-   - `linked_inventory_item_id UUID REFERENCES inventory_items(id) ON DELETE SET NULL`
-   - Quando preenchido, ao completar o item, abre um input de quantidade para registrar produção
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-2. **Nenhuma tabela nova necessária** — reutiliza `stock_movements` e `production_orders` existentes
+## Dashboard Analytics ✅
 
-## Mudanças no Frontend
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-### 1. Remover Produção da página de Pedidos (`src/pages/Orders.tsx`)
-- Remover tab "Produção" do grid de navegação (volta para 5 tabs: Sugestões, Lista, Pedidos, Cotações, Fornecedores)
-- Remover import do `ProductionTab`
-- Ajustar grid de 3x2 para 3+2 ou manter 3 colunas
+## Operacional ✅
 
-### 2. Modificar o ChecklistView para suportar itens de produção
-- No `ChecklistView.tsx`, quando um item tem `linked_inventory_item_id`, ao clicar para completar:
-  - Abrir um Sheet/modal pedindo a **quantidade produzida**
-  - Mostrar estoque atual e mínimo do item vinculado
-  - Ao confirmar: registrar a conclusão do checklist (com pontos) + criar `stock_movement` de entrada + registrar `production_order`
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-### 3. Configuração de itens (modo admin/settings)
-- No formulário de criação/edição de checklist items, adicionar campo opcional "Vincular item de estoque"
-  - Dropdown com itens da categoria "Produção" do inventário
-  - Quando vinculado, o item no checklist mostra um badge indicando que é item de produção
+## CRM / Clientes ✅
 
-### 4. Visual no checklist
-- Itens de produção mostram um ícone de "ChefHat" ou badge "Produção"
-- Ao completar, em vez de toggle simples, abre sheet com:
-  - Nome do item de estoque
-  - Estoque atual / mínimo
-  - Input de quantidade
-  - Botão confirmar (dá pontos + entrada no estoque)
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-## Detalhes Técnicos
+## Funcionários ✅
 
-- A lógica de `handleToggleItem` no `useChecklistPage.ts` será estendida para verificar se o item tem `linked_inventory_item_id`
-- Se sim, o ChecklistView intercepta o clique e abre o sheet de produção antes de chamar `onToggleItem`
-- Após confirmar quantidade, chama `onToggleItem` normalmente (para pontos/completion) e em paralelo faz insert em `stock_movements` e `production_orders`
-- O hook `useProductionOrders` pode ser mantido para a parte de histórico/consulta no estoque, mas removido da página de Pedidos
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
-## Arquivos afetados
-- `src/pages/Orders.tsx` — remover tab Produção
-- `src/components/checklists/ChecklistView.tsx` — adicionar sheet de produção ao completar
-- `src/hooks/checklists/useChecklistPage.ts` — passar info de inventory items vinculados
-- `src/hooks/checklists/useChecklistCRUD.ts` — suportar `linked_inventory_item_id` no addItem/updateItem
-- `src/components/checklists/ChecklistSettings.tsx` — adicionar campo de vínculo com estoque no form de item
-- Migration SQL — adicionar coluna `linked_inventory_item_id`
+## Cardápio Digital ✅
 
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
+
+## Produção Integrada ao Checklist ✅
+
+- Itens de checklist vinculados a itens de estoque (categoria Produção)
+- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
+- Entrada automática no estoque + registro de produção
+- Badge visual de produção nos itens vinculados
+- Configuração de vínculo no admin de checklists
+- Removido módulo Produção da página de Pedidos

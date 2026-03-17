@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUnit } from '@/contexts/UnitContext';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -114,8 +116,8 @@ interface ChecklistSettingsProps {
   onUpdateSubcategory: (id: string, data: { name?: string }) => Promise<void>;
   onDeleteSubcategory: (id: string) => Promise<void>;
   onReorderSubcategories?: (sectorId: string, orderedIds: string[]) => Promise<void>;
-  onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean }) => Promise<void>;
-  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean; subcategory_id?: string }) => Promise<void>;
+  onAddItem: (data: { subcategory_id: string; name: string; description?: string; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean; linked_inventory_item_id?: string | null }) => Promise<void>;
+  onUpdateItem: (id: string, data: { name?: string; description?: string; is_active?: boolean; frequency?: ItemFrequency; checklist_type?: ChecklistType; points?: number; requires_photo?: boolean; subcategory_id?: string; linked_inventory_item_id?: string | null }) => Promise<void>;
   onDeleteItem: (id: string) => Promise<void>;
   onReorderItems?: (subcategoryId: string, orderedIds: string[]) => Promise<void>;
 }
@@ -214,6 +216,23 @@ export function ChecklistSettings({
   const [itemChecklistType, setItemChecklistType] = useState<ChecklistType>('abertura');
   const [itemPoints, setItemPoints] = useState<number>(1);
   const [itemRequiresPhoto, setItemRequiresPhoto] = useState(false);
+  const [itemLinkedInventoryItemId, setItemLinkedInventoryItemId] = useState<string | null>(null);
+  const [inventoryPickerOpen, setInventoryPickerOpen] = useState(false);
+  const [productionInventoryItems, setProductionInventoryItems] = useState<{ id: string; name: string; unit_type: string }[]>([]);
+
+  const { activeUnitId } = useUnit();
+
+  // Fetch inventory items from "Produção" category
+  useEffect(() => {
+    if (!activeUnitId) return;
+    (async () => {
+      const { data: cats } = await supabase.from('categories').select('id').ilike('name', 'Produção').eq('unit_id', activeUnitId);
+      if (!cats || cats.length === 0) { setProductionInventoryItems([]); return; }
+      const catIds = cats.map(c => c.id);
+      const { data: items } = await supabase.from('inventory_items').select('id, name, unit_type').in('category_id', catIds).eq('unit_id', activeUnitId).order('name');
+      setProductionInventoryItems(items || []);
+    })();
+  }, [activeUnitId]);
 
   const sensors = useSensors(
     useSensor(TouchSensor, {
@@ -363,6 +382,7 @@ export function ChecklistSettings({
       setItemChecklistType(item.checklist_type || selectedType);
       setItemPoints(item.points ?? 1);
       setItemRequiresPhoto((item as any).requires_photo ?? false);
+      setItemLinkedInventoryItemId((item as any).linked_inventory_item_id || null);
     } else {
       setEditingItem(null);
       setItemName('');
@@ -371,6 +391,7 @@ export function ChecklistSettings({
       setItemChecklistType(selectedType);
       setItemPoints(selectedType === 'bonus' ? 5 : 1);
       setItemRequiresPhoto(false);
+      setItemLinkedInventoryItemId(null);
     }
     setItemSheetOpen(true);
   };
@@ -386,6 +407,7 @@ export function ChecklistSettings({
         checklist_type: itemChecklistType,
         points: itemPoints,
         requires_photo: itemRequiresPhoto,
+        linked_inventory_item_id: itemLinkedInventoryItemId || null,
       };
       // If subcategory changed, include it
       if (selectedSubcategoryId && selectedSubcategoryId !== editingItem.subcategory_id) {
@@ -401,6 +423,7 @@ export function ChecklistSettings({
         checklist_type: itemChecklistType,
         points: itemPoints,
         requires_photo: itemRequiresPhoto,
+        linked_inventory_item_id: itemLinkedInventoryItemId || null,
       });
     }
     setItemSheetOpen(false);
@@ -1018,6 +1041,40 @@ export function ChecklistSettings({
                 );
               })()}
             </div>
+
+            {/* Link to Inventory (Production) */}
+            {productionInventoryItems.length > 0 && (
+              <div className="space-y-2">
+                <Label>Vincular item de estoque (Produção)</Label>
+                <button
+                  type="button"
+                  onClick={() => setInventoryPickerOpen(true)}
+                  className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <AppIcon name="precision_manufacturing" size={16} className={itemLinkedInventoryItemId ? "text-primary" : "text-muted-foreground"} />
+                    <span className={itemLinkedInventoryItemId ? "text-foreground" : "text-muted-foreground"}>
+                      {itemLinkedInventoryItemId
+                        ? productionInventoryItems.find(i => i.id === itemLinkedInventoryItemId)?.name || 'Item selecionado'
+                        : 'Nenhum (sem produção)'}
+                    </span>
+                  </div>
+                  <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <ListPicker
+                  nested
+                  open={inventoryPickerOpen}
+                  onOpenChange={setInventoryPickerOpen}
+                  title="Item de Estoque"
+                  items={[
+                    { id: '', label: 'Nenhum' },
+                    ...productionInventoryItems.map(i => ({ id: i.id, label: `${i.name} (${i.unit_type})` })),
+                  ]}
+                  selectedId={itemLinkedInventoryItemId || ''}
+                  onSelect={(id) => setItemLinkedInventoryItemId(id || null)}
+                />
+              </div>
+            )}
 
             {/* Requires Photo */}
             <div className="flex items-center justify-between p-3 rounded-xl border border-border/40 bg-secondary/30">

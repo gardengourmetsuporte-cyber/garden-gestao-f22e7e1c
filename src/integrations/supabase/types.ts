@@ -697,6 +697,7 @@ export type Database = {
           frequency: string
           id: string
           is_active: boolean
+          linked_inventory_item_id: string | null
           name: string
           points: number
           requires_photo: boolean
@@ -713,6 +714,7 @@ export type Database = {
           frequency?: string
           id?: string
           is_active?: boolean
+          linked_inventory_item_id?: string | null
           name: string
           points?: number
           requires_photo?: boolean
@@ -729,6 +731,7 @@ export type Database = {
           frequency?: string
           id?: string
           is_active?: boolean
+          linked_inventory_item_id?: string | null
           name?: string
           points?: number
           requires_photo?: boolean
@@ -738,6 +741,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "checklist_items_linked_inventory_item_id_fkey"
+            columns: ["linked_inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "checklist_items_subcategory_id_fkey"
             columns: ["subcategory_id"]
