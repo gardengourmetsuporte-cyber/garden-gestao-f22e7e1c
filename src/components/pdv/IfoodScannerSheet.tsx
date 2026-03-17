@@ -7,7 +7,7 @@ import { Camera, Upload, Loader2, User, MapPin, Hash, Package, DollarSign, Credi
 import type { IfoodScanResult, IfoodOrderItem } from '@/hooks/useIfoodScanner';
 import { formatCurrency } from '@/lib/format';
 import { takeNativePhoto } from '@/lib/native-camera';
-import { isNative } from '@/lib/native';
+import { InBrowserCamera } from '@/components/ui/InBrowserCamera';
 
 interface Props {
   open: boolean;
