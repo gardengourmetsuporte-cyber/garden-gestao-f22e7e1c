@@ -426,6 +426,13 @@ export function ChecklistView({
     ) || []
   ) : [];
 
+  // For production: collect all items with linked_inventory_item_id
+  const allProductionItems = isProduction ? sectors.flatMap(sector =>
+    sector.subcategories?.flatMap(sub =>
+      (sub.items || []).filter(i => i.is_active && (i as any).linked_inventory_item_id)
+    ) || []
+  ) : [];
+
   const filteredSectors = sectors.filter(sector => {
     const hasActiveItems = sector.subcategories?.some(sub =>
       sub.items?.some(i => i.is_active && (i as any).checklist_type === checklistType)
