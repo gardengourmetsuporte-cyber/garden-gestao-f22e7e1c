@@ -14,7 +14,7 @@ export type GradientIconColor =
   | 'orange'
   | 'muted';
 
-const GRADIENT_MAP: Record<GradientIconColor, { gradient: string; shadow: string }> = {
+const GRADIENT_MAP: Record<GradientIconColor, { gradient: string; shadow: string; iconClass?: string }> = {
   primary: {
     gradient: 'linear-gradient(135deg, hsl(142 71% 45%), hsl(152 76% 36%))',
     shadow: '0 4px 12px -2px hsla(142, 71%, 45%, 0.35)',
@@ -54,6 +54,7 @@ const GRADIENT_MAP: Record<GradientIconColor, { gradient: string; shadow: string
   muted: {
     gradient: 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--secondary)))',
     shadow: 'none',
+    iconClass: 'text-muted-foreground',
   },
 };
 
@@ -80,7 +81,7 @@ export const GradientIcon = memo(function GradientIcon({
   iconSize,
   className,
 }: GradientIconProps) {
-  const { gradient, shadow } = GRADIENT_MAP[color];
+  const config = GRADIENT_MAP[color];
   const { container, icon } = SIZE_MAP[size];
 
   return (
@@ -92,11 +93,11 @@ export const GradientIcon = memo(function GradientIcon({
       style={{
         width: container,
         height: container,
-        background: gradient,
-        boxShadow: shadow,
+        background: config.gradient,
+        boxShadow: config.shadow,
       }}
     >
-      <AppIcon name={name} size={iconSize ?? icon} className="text-white" />
+      <AppIcon name={name} size={iconSize ?? icon} className={config.iconClass || 'text-white'} />
     </div>
   );
 });
