@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useFinanceCategorize } from './useFinanceCategorize';
 import { useAuth } from '@/contexts/AuthContext';

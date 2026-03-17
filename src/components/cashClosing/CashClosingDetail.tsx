@@ -535,21 +535,25 @@ import { AppIcon } from '@/components/ui/app-icon';
                     ✓ Integrado ao módulo financeiro
                   </p>
                 ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="mt-2 gap-2"
-                    onClick={async () => {
-                      try {
-                        await integrateWithFinancial(closing);
-                      } catch (err) {
-                        console.error(err);
-                      }
-                    }}
-                  >
-                    <AppIcon name="Link" size={14} />
-                    Integrar ao financeiro
-                  </Button>
+                   <Button
+                     size="sm"
+                     variant="outline"
+                     className="mt-2 gap-2"
+                     disabled={isIntegrating}
+                     onClick={async () => {
+                       setIsIntegrating(true);
+                       try {
+                         await integrateWithFinancial(closing);
+                       } catch (err) {
+                         console.error(err);
+                       } finally {
+                         setIsIntegrating(false);
+                       }
+                     }}
+                   >
+                     <AppIcon name="Link" size={14} />
+                     {isIntegrating ? 'Integrando...' : 'Integrar ao financeiro'}
+                   </Button>
                 )}
              </CardContent>
            </Card>
