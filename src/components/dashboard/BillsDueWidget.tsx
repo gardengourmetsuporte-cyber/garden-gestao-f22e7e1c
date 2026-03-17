@@ -77,10 +77,13 @@ function GroupedView({ bills }: { bills: BillDueSoon[] }) {
               type="button"
             >
               <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: group.color + '18' }}
+                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                style={{
+                  background: `linear-gradient(135deg, ${group.color}, ${group.color}cc)`,
+                  boxShadow: `0 3px 8px -2px ${group.color}40`,
+                }}
               >
-                <AppIcon name={group.icon} size={15} style={{ color: group.color }} />
+                <AppIcon name={group.icon} size={14} className="text-white" />
               </div>
               <div className="flex-1 min-w-0 ml-3 text-left">
                 <span className="text-[13px] font-semibold text-foreground truncate block">{group.name}</span>
