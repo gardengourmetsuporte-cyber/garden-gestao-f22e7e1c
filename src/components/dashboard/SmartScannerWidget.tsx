@@ -3,6 +3,8 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { SmartScannerSheet } from './SmartScannerSheet';
 import { useSmartScanner } from '@/hooks/useSmartScanner';
 import scannerHero from '@/assets/scanner-hero.png';
+import { takeNativePhoto } from '@/lib/native-camera';
+import { isNative } from '@/lib/native';
 
 export function SmartScannerWidget() {
   const cameraRef = useRef<HTMLInputElement>(null);
