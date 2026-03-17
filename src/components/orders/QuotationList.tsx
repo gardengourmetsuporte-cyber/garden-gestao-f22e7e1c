@@ -7,6 +7,7 @@ import { QuotationSheet } from './QuotationSheet';
 import { QuotationDetail } from './QuotationDetail';
 import { PriceSurveyList } from './PriceSurveyList';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { Supplier } from '@/types/database';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 
@@ -80,21 +81,16 @@ export function QuotationList({ suppliers }: Props) {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className={cn(
-                          "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                          status.variant === 'success' ? 'bg-success/15' :
-                          status.variant === 'warning' ? 'bg-warning/15' :
-                          status.variant === 'primary' ? 'bg-primary/15' :
-                          'bg-secondary'
-                        )}>
-                          <AppIcon name="Scale" className={cn(
-                            "w-5 h-5",
-                            status.variant === 'success' ? 'text-success' :
-                            status.variant === 'warning' ? 'text-warning' :
-                            status.variant === 'primary' ? 'text-primary' :
-                            'text-muted-foreground'
-                          )} />
-                        </div>
+                        <GradientIcon
+                          name="Scale"
+                          color={
+                            status.variant === 'success' ? 'emerald' :
+                            status.variant === 'warning' ? 'amber' :
+                            status.variant === 'primary' ? 'primary' :
+                            'muted'
+                          }
+                          size="md"
+                        />
                         <div className="min-w-0">
                           <p className="font-semibold text-foreground truncate text-sm">
                             {q.title || `Cotação #${q.id.slice(0, 6)}`}

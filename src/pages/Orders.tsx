@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { EmptyState } from '@/components/ui/empty-state';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -355,14 +356,13 @@ export default function OrdersPage() {
                               <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); handleOpenProfile(supplier); }}
-                                className={cn(
-                                  "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 active:scale-95 transition-all",
-                                  (supplier as any).delivery_frequency === 'daily' ? "bg-primary/15" : "bg-secondary"
-                                )}
+                                className="shrink-0 active:scale-95 transition-all"
                               >
-                                <AppIcon name="Truck" size={20} className={cn(
-                                  (supplier as any).delivery_frequency === 'daily' ? "text-primary" : "text-muted-foreground"
-                                )} />
+                                <GradientIcon
+                                  name="Truck"
+                                  color={(supplier as any).delivery_frequency === 'daily' ? 'primary' : 'muted'}
+                                  size="md"
+                                />
                               </button>
 
                               <CollapsibleTrigger
@@ -461,10 +461,8 @@ export default function OrdersPage() {
                           open={expandedSuppliers['no-supplier'] ?? false}
                           onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, ['no-supplier']: open }))}
                         >
-                          <CollapsibleTrigger className="w-full flex items-center gap-3 p-4 text-left">
-                            <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-muted">
-                              <AppIcon name="Package" size={20} className="text-muted-foreground" />
-                            </div>
+                           <CollapsibleTrigger className="w-full flex items-center gap-3 p-4 text-left">
+                            <GradientIcon name="Package" color="muted" size="md" />
                             <div className="flex-1 min-w-0">
                               <span className="font-semibold text-foreground">Sem Fornecedor</span>
                               <p className="text-xs text-muted-foreground">
@@ -607,9 +605,7 @@ export default function OrdersPage() {
                                <CollapsibleTrigger className="w-full text-left">
                                  <div className="flex items-center justify-between p-4">
                                    <div className="flex items-center gap-3 min-w-0">
-                                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                                        <AppIcon name="ShoppingCart" size={20} className="text-primary" />
-                                    </div>
+                                      <GradientIcon name="ShoppingCart" color="primary" size="md" />
                                     <div className="min-w-0">
                                       <p className="font-semibold font-display text-foreground truncate">{order.supplier?.name}</p>
                                       <p className="text-xs text-muted-foreground">
@@ -736,15 +732,11 @@ export default function OrdersPage() {
                                <CollapsibleTrigger className="w-full text-left">
                                  <div className="flex items-center justify-between p-4">
                                    <div className="flex items-center gap-3 min-w-0">
-                                     <div className={cn(
-                                      "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                                      order.status === 'received' ? "bg-success/10" : "bg-destructive/10"
-                                    )}>
-                                      {order.status === 'received'
-                                        ? <AppIcon name="PackageCheck" size={20} className="text-success" />
-                                        : <AppIcon name="ShoppingCart" size={20} className="text-destructive" />
-                                      }
-                                    </div>
+                                     <GradientIcon
+                                       name={order.status === 'received' ? 'PackageCheck' : 'ShoppingCart'}
+                                       color={order.status === 'received' ? 'emerald' : 'red'}
+                                       size="md"
+                                     />
                                     <div className="min-w-0">
                                       <p className="font-semibold text-foreground truncate">{order.supplier?.name}</p>
                                       <p className="text-xs text-muted-foreground">

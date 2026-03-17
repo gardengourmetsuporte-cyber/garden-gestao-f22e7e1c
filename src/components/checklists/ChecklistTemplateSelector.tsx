@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { CHECKLIST_TEMPLATES, ChecklistTemplate } from '@/lib/checklistTemplates';
@@ -140,12 +141,11 @@ export function ChecklistTemplateSelector({ onManual, onDone }: Props) {
                       <AppIcon name="Check" size={12} className="text-primary-foreground" />
                     </div>
                   )}
-                  <div className={cn(
-                    "w-11 h-11 rounded-xl flex items-center justify-center shrink-0",
-                    isSelected ? "bg-primary/20" : "bg-muted"
-                  )}>
-                    <AppIcon name={template.icon} size={22} className={isSelected ? "text-primary" : "text-muted-foreground"} />
-                  </div>
+                  <GradientIcon
+                    name={template.icon}
+                    color={isSelected ? 'primary' : 'muted'}
+                    size="md"
+                  />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-foreground">{template.name}</h3>

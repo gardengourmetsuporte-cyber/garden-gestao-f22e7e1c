@@ -30,13 +30,16 @@ export function ObligationChecklistCard({ template, obligation, onClick }: Props
 
       {/* Check circle */}
       <div
-        className={cn(
-          'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors',
-        )}
-        style={{ backgroundColor: isCompleted ? cat.color + '20' : 'hsl(var(--secondary))' }}
+        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors"
+        style={{
+          background: isCompleted
+            ? `linear-gradient(135deg, ${cat.color}, ${cat.color}cc)`
+            : 'hsl(var(--secondary))',
+          boxShadow: isCompleted ? `0 4px 12px -2px ${cat.color}50` : 'none',
+        }}
       >
         {isCompleted ? (
-          <AppIcon name="CheckCircle2" size={22} style={{ color: cat.color }} />
+          <AppIcon name="CheckCircle2" size={22} className="text-white" />
         ) : (
           <AppIcon name={template.icon as any} size={20} className="text-muted-foreground" />
         )}

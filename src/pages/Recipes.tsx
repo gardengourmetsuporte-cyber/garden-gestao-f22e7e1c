@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { useFabAction } from '@/contexts/FabActionContext';
 import { Input } from '@/components/ui/input';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -163,13 +164,16 @@ export default function Recipes() {
                 <Collapsible open={isOpen} onOpenChange={() => toggleCategory(catId)}>
                   <CollapsibleTrigger className="w-full flex items-center gap-3 pl-5 pr-4 py-3.5 text-left hover:bg-secondary/30 transition-colors">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: `${catColor}15` }}
+                      className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                      style={{
+                        background: `linear-gradient(135deg, ${catColor}, ${catColor}cc)`,
+                        boxShadow: `0 4px 12px -2px ${catColor}50`,
+                      }}
                     >
                       <AppIcon
                         name={group.category?.icon || 'ChefHat'}
-                        size={20}
-                        style={{ color: catColor }}
+                        size={18}
+                        className="text-white"
                       />
                     </div>
                     <div className="flex-1 min-w-0">

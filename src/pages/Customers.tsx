@@ -4,6 +4,7 @@ import { DesktopActionBar } from '@/components/layout/DesktopActionBar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CustomerCard } from '@/components/customers/CustomerCard';
 import { CustomerSheet } from '@/components/customers/CustomerSheet';
@@ -124,9 +125,7 @@ export default function Customers() {
         {/* Stats cards */}
         <div className="card-surface rounded-2xl overflow-hidden">
           <div className="flex items-center gap-3 px-4 py-3.5">
-            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
-              <AppIcon name="Users" size={20} className="text-primary" />
-            </div>
+            <GradientIcon name="Users" color="primary" size="md" />
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-foreground">{stats.total} clientes</p>
               <p className="text-[11px] text-muted-foreground">
