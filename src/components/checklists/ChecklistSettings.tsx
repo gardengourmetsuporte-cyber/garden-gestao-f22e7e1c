@@ -1042,6 +1042,40 @@ export function ChecklistSettings({
               })()}
             </div>
 
+            {/* Link to Inventory (Production) */}
+            {productionInventoryItems.length > 0 && (
+              <div className="space-y-2">
+                <Label>Vincular item de estoque (Produção)</Label>
+                <button
+                  type="button"
+                  onClick={() => setInventoryPickerOpen(true)}
+                  className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <AppIcon name="precision_manufacturing" size={16} className={itemLinkedInventoryItemId ? "text-primary" : "text-muted-foreground"} />
+                    <span className={itemLinkedInventoryItemId ? "text-foreground" : "text-muted-foreground"}>
+                      {itemLinkedInventoryItemId
+                        ? productionInventoryItems.find(i => i.id === itemLinkedInventoryItemId)?.name || 'Item selecionado'
+                        : 'Nenhum (sem produção)'}
+                    </span>
+                  </div>
+                  <AppIcon name="ChevronDown" className="w-4 h-4 text-muted-foreground" />
+                </button>
+                <ListPicker
+                  nested
+                  open={inventoryPickerOpen}
+                  onOpenChange={setInventoryPickerOpen}
+                  title="Item de Estoque"
+                  items={[
+                    { id: '', label: 'Nenhum' },
+                    ...productionInventoryItems.map(i => ({ id: i.id, label: `${i.name} (${i.unit_type})` })),
+                  ]}
+                  selectedId={itemLinkedInventoryItemId || ''}
+                  onSelect={(id) => setItemLinkedInventoryItemId(id || null)}
+                />
+              </div>
+            )}
+
             {/* Requires Photo */}
             <div className="flex items-center justify-between p-3 rounded-xl border border-border/40 bg-secondary/30">
               <div className="flex items-center gap-2">
