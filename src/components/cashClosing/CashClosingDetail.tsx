@@ -32,7 +32,7 @@ import { AppIcon } from '@/components/ui/app-icon';
  }
  
  export function CashClosingDetail({ closing, isAdmin, onClose }: Props) {
-   const { approveClosing, markDivergent, deleteClosing, updateClosing } = useCashClosing();
+   const { approveClosing, markDivergent, deleteClosing, updateClosing, integrateWithFinancial } = useCashClosing();
    const [isApproving, setIsApproving] = useState(false);
    const [isMarkingDivergent, setIsMarkingDivergent] = useState(false);
    const [showDivergentDialog, setShowDivergentDialog] = useState(false);
