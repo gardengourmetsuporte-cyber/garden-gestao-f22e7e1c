@@ -61,6 +61,7 @@ export function IfoodScannerSheet({ open, onOpenChange, state, result, error, on
   const showDone = state === 'done';
 
   return (
+    <>
     <Sheet open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
       <SheetContent side="bottom" className="h-[92vh] rounded-t-2xl overflow-y-auto">
         <SheetHeader>
