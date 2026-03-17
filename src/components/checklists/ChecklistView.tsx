@@ -1688,6 +1688,25 @@ export function ChecklistView({
           }}
         />
       )}
+
+      {/* Production Completion Sheet */}
+      {pendingProductionAction && (
+        <ProductionCompletionSheet
+          open={productionSheetOpen}
+          onOpenChange={(open) => {
+            setProductionSheetOpen(open);
+            if (!open) setPendingProductionAction(null);
+          }}
+          inventoryItemId={pendingProductionAction.linkedInventoryItemId}
+          checklistItemName={pendingProductionAction.itemName}
+          onConfirm={() => {
+            const { itemId, points, configuredPoints, completedByUserId, buttonElement } = pendingProductionAction;
+            setProductionSheetOpen(false);
+            setPendingProductionAction(null);
+            executeComplete(itemId, points, configuredPoints, completedByUserId, buttonElement);
+          }}
+        />
+      )}
     </div>
   );
 }
