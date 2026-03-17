@@ -4,16 +4,16 @@ import { isNative, platform } from './native';
  * Takes a photo using the Capacitor Camera plugin on native platforms.
  *
  * Important Android behavior:
- * Opening the external native camera activity may cause low-memory WebView
- * process death on some devices, which looks like "app reload to home".
- * To keep state (e.g. OCR sheet), we intentionally skip native camera on
- * Android and let callers use the in-browser camera fallback.
+ * Opening external native activities (camera/gallery picker) may cause low-memory
+ * WebView process death on some devices, which looks like "app reload to home".
+ * To keep state (e.g. OCR sheet), we skip native media picking on Android and
+ * let callers use in-browser camera/file input fallback.
  */
 export async function takeNativePhoto(source: 'camera' | 'gallery' = 'camera'): Promise<File | null> {
   if (!isNative) return null;
 
   // Keep flow inside WebView on Android to avoid losing React state.
-  if (platform === 'android' && source === 'camera') return null;
+  if (platform === 'android') return null;
 
   try {
     const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');

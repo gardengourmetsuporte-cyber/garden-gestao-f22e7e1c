@@ -113,13 +113,75 @@ export function useDeliveries() {
     });
   }, []);
 
+  // Downscale/compress image before OCR to reduce memory pressure on low-end Android
+  const optimizeImageForOcr = useCallback(async (file: File): Promise<File> => {
+    if (!file.type.startsWith('image/')) return file;
+
+    return new Promise((resolve) => {
+      const imageUrl = URL.createObjectURL(file);
+      const img = new Image();
+
+      img.onload = () => {
+        try {
+          const maxDimension = 1600;
+          const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
+          const targetWidth = Math.max(1, Math.round(img.width * scale));
+          const targetHeight = Math.max(1, Math.round(img.height * scale));
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            URL.revokeObjectURL(imageUrl);
+            resolve(file);
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+          canvas.toBlob(
+            (blob) => {
+              URL.revokeObjectURL(imageUrl);
+              if (!blob) {
+                resolve(file);
+                return;
+              }
+
+              const compressedFile = new File(
+                [blob],
+                `${file.name.replace(/\.[^.]+$/, '')}.jpg`,
+                { type: 'image/jpeg' }
+              );
+              resolve(compressedFile);
+            },
+            'image/jpeg',
+            0.82
+          );
+        } catch {
+          URL.revokeObjectURL(imageUrl);
+          resolve(file);
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(imageUrl);
+        resolve(file);
+      };
+
+      img.src = imageUrl;
+    });
+  }, []);
+
   // Process image with AI OCR
   const processImage = useCallback(async (file: File): Promise<OcrDeliveryResult> => {
     setIsProcessing(true);
     try {
-      const base64 = await fileToBase64(file);
+      const optimizedFile = await optimizeImageForOcr(file);
+      const base64 = await fileToBase64(optimizedFile);
       const { data, error } = await supabase.functions.invoke('delivery-ocr', {
-        body: { image_base64: base64, image_type: file.type },
+        body: { image_base64: base64, image_type: optimizedFile.type || file.type },
       });
       if (error) throw error;
       if (!data?.success) throw new Error(data?.error || 'Erro no processamento');
@@ -127,7 +189,7 @@ export function useDeliveries() {
     } finally {
       setIsProcessing(false);
     }
-  }, [fileToBase64]);
+  }, [fileToBase64, optimizeImageForOcr]);
 
   // Upload photo to storage
   const uploadPhoto = useCallback(async (file: File): Promise<string> => {
