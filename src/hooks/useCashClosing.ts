@@ -100,7 +100,7 @@ export function useCashClosing() {
           delivery_amount: formData.delivery_amount, signed_account_amount: formData.signed_account_amount || 0, cash_difference: formData.cash_difference,
           receipt_url: formData.receipt_url || '', notes: formData.notes,
           expenses: formData.expenses || [], user_id: user!.id,
-          financial_integrated: true, // Mark as integrated immediately
+          financial_integrated: false, // Will be set to true after successful integration
         } as any)
         .select()
         .single();
