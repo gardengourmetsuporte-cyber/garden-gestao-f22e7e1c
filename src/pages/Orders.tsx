@@ -359,14 +359,18 @@ export default function OrdersPage() {
                                   }
                                 }}
                               >
-                                <div className={cn(
-                                  "w-11 h-11 rounded-xl flex items-center justify-center shrink-0",
-                                  (supplier as any).delivery_frequency === 'daily' ? "bg-primary/15" : "bg-secondary"
-                                )}>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleOpenProfile(supplier); }}
+                                  className={cn(
+                                    "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 active:scale-95 transition-all",
+                                    (supplier as any).delivery_frequency === 'daily' ? "bg-primary/15" : "bg-secondary"
+                                  )}
+                                >
                                   <AppIcon name="Truck" size={20} className={cn(
                                     (supplier as any).delivery_frequency === 'daily' ? "text-primary" : "text-muted-foreground"
                                   )} />
-                                </div>
+                                </button>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2">
                                     <span className="font-semibold text-foreground truncate">{supplier.name}</span>
