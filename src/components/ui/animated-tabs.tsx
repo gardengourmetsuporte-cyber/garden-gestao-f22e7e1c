@@ -72,15 +72,14 @@ export function AnimatedTabs({ tabs, activeTab, onTabChange, className }: Animat
             )}
           >
             {tab.icon && !hideIcons && (
-              <div
+              <span
                 className={cn(
-                  "w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-300",
-                  !isActive && "opacity-40 saturate-0"
+                  "flex items-center justify-center shrink-0 transition-all duration-300 [&>svg]:w-4 [&>svg]:h-4",
+                  isActive ? "text-primary" : "text-muted-foreground opacity-50"
                 )}
-                style={{ background: tab.iconGradient || 'hsl(var(--primary))' }}
               >
-                <span className="text-white flex items-center justify-center [&>svg]:w-3 [&>svg]:h-3">{tab.icon}</span>
-              </div>
+                {tab.icon}
+              </span>
             )}
             <span className={cn("leading-tight", isCompact ? "whitespace-nowrap" : "truncate")}>{tab.label}</span>
             {tab.badge !== undefined && tab.badge > 0 && (
