@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon, type GradientIconColor } from '@/components/ui/gradient-icon';
 import { Supplier, Order } from '@/types/database';
 import { SupplierInvoice } from '@/types/supplier';
 import { cn } from '@/lib/utils';
