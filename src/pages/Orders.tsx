@@ -604,9 +604,7 @@ export default function OrdersPage() {
                                <CollapsibleTrigger className="w-full text-left">
                                  <div className="flex items-center justify-between p-4">
                                    <div className="flex items-center gap-3 min-w-0">
-                                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                                        <AppIcon name="ShoppingCart" size={20} className="text-primary" />
-                                    </div>
+                                      <GradientIcon name="ShoppingCart" color="primary" size="md" />
                                     <div className="min-w-0">
                                       <p className="font-semibold font-display text-foreground truncate">{order.supplier?.name}</p>
                                       <p className="text-xs text-muted-foreground">
