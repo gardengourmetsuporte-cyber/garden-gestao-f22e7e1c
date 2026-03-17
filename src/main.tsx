@@ -20,20 +20,14 @@ import "./index.css";
     }
   };
 
-  // Fallback para navegadores com bug no <link media="print" onload>
-  if (!document.getElementById('material-symbols-runtime-fallback')) {
-    const fallbackLink = document.createElement('link');
-    fallbackLink.id = 'material-symbols-runtime-fallback';
-    fallbackLink.rel = 'stylesheet';
-    fallbackLink.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap';
-    document.head.appendChild(fallbackLink);
-  }
+  // Fallback: ensure material-font-ready is always set
+  // The font loads via <link rel="stylesheet"> in index.html directly now
 
   if ('fonts' in document) {
     document.fonts.ready.then(tryMarkReady).catch(() => {});
     document.fonts.load(fontQuery).then(tryMarkReady).catch(() => {});
-    // Fail-safe: nunca deixar ícones invisíveis mesmo se a checagem da fonte falhar
-    setTimeout(markReady, 1200);
+    // Fail-safe: never leave icons invisible
+    setTimeout(markReady, 800);
     return;
   }
 
