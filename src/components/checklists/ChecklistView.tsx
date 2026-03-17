@@ -606,7 +606,7 @@ export function ChecklistView({
           </p>
         </div>
       )}
-      {!isBonus && filteredSectors.map((sector, sectorIndex) => {
+      {!isBonus && !isProduction && filteredSectors.map((sector, sectorIndex) => {
         const isExpanded = expandedSectors.has(sector.id);
         const progress = getCompletionProgress(sector.id);
         const sectorComplete = progress.total > 0 && progress.completed === progress.total;
