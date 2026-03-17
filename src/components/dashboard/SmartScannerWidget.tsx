@@ -86,7 +86,7 @@ export function SmartScannerWidget() {
       </div>
 
       {!isNative && <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />}
-      <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+      {!isNative && <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />}
 
       <SmartScannerSheet
         open={sheetOpen}
