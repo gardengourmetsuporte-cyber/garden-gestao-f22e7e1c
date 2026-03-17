@@ -164,7 +164,7 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
       <SheetContent className="flex flex-col">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <img src="/icons/whatsapp.png" alt="" className="w-5 h-5" />
+            <img src="/icons/whatsapp.png" alt="" className="w-5 h-5 dark:invert" />
             Lembrar Equipe
           </SheetTitle>
         </SheetHeader>
