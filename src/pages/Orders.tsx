@@ -579,6 +579,9 @@ export default function OrdersPage() {
             {/* Cotações Tab */}
             {orderTab === 'quotations' && <QuotationList suppliers={suppliers} />}
 
+            {/* Preços Tab */}
+            {orderTab === 'prices' && <PriceTrackingTab />}
+
             {/* Histórico Tab */}
             {orderTab === 'orders' && (
               orders.length === 0 ? (
