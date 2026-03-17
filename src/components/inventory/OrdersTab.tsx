@@ -153,7 +153,7 @@ export function OrdersTab({
       toast.error('Pedido enviado mas houve erro ao atualizar o status');
     }
     
-    window.location.href = whatsappUrl;
+    window.open(whatsappUrl, '_blank');
   };
 
   const getStatusBadge = (status: Order['status']) => {

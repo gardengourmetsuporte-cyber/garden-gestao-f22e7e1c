@@ -198,7 +198,7 @@ export default function OrdersPage() {
     const message = `📦 *Pedido de Compra*\n\nOlá! Gostaria de fazer o seguinte pedido:\n\n${itemsList}${totalLine}\n\n${order.notes ? `Obs: ${order.notes}\n\n` : ''}Por favor, confirme o recebimento. Obrigado!`;
     const phone = formatPhoneForWhatsApp(order.supplier!.phone);
     const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
-    window.location.href = url;
+    window.open(url, '_blank');
   };
 
   const handleSendWhatsApp = async (order: Order) => {
