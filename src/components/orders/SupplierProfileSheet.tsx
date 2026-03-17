@@ -301,29 +301,27 @@ export function SupplierProfileSheet({
                               )}
 
                               {/* Action buttons */}
-                              <div className="flex gap-1.5 flex-wrap">
-                                {onViewOrder && (
+                              <div className="flex items-center gap-2 pt-1">
+                                {order.status === 'sent' && hasWhatsApp && (
                                   <Button
                                     size="sm"
-                                    variant="outline"
-                                    className="h-8 rounded-lg gap-1 text-xs"
-                                    onClick={() => onViewOrder(order)}
+                                    className="h-8 rounded-xl gap-1.5 text-xs bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)] text-white flex-1"
+                                    onClick={() => handleWhatsApp()}
                                   >
-                                    <AppIcon name="Eye" size={13} />
-                                    Ver
+                                    <AppIcon name="MessageCircle" size={14} />
+                                    Reenviar
                                   </Button>
                                 )}
                                 {order.status === 'draft' && onUpdateOrderStatus && (
                                   <Button
                                     size="sm"
-                                    variant="outline"
-                                    className="h-8 rounded-lg gap-1 text-xs text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
+                                    className="h-8 rounded-xl gap-1.5 text-xs bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)] text-white flex-1"
                                     onClick={async () => {
                                       await onUpdateOrderStatus(order.id, 'sent');
                                       toast.success('Pedido marcado como enviado');
                                     }}
                                   >
-                                    <AppIcon name="Send" size={13} />
+                                    <AppIcon name="Send" size={14} />
                                     Enviar
                                   </Button>
                                 )}
@@ -331,42 +329,39 @@ export function SupplierProfileSheet({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="h-8 rounded-lg gap-1 text-xs text-success border-success/30 hover:bg-success/10"
+                                    className="h-8 rounded-xl gap-1.5 text-xs border-success/30 text-success hover:bg-success/10 flex-1"
                                     onClick={async () => {
                                       await onUpdateOrderStatus(order.id, 'received');
                                       toast.success('Pedido marcado como recebido');
                                     }}
                                   >
-                                    <AppIcon name="PackageCheck" size={13} />
+                                    <AppIcon name="PackageCheck" size={14} />
                                     Receber
                                   </Button>
                                 )}
-                                {(order.status === 'draft' || order.status === 'sent') && onUpdateOrderStatus && (
+                                {onViewOrder && (
                                   <Button
                                     size="sm"
-                                    variant="ghost"
-                                    className="h-8 rounded-lg gap-1 text-xs text-warning hover:bg-warning/10"
-                                    onClick={async () => {
-                                      await onUpdateOrderStatus(order.id, 'cancelled');
-                                      toast.success('Pedido cancelado');
-                                    }}
+                                    variant="outline"
+                                    className="h-8 rounded-xl gap-1.5 text-xs flex-1"
+                                    onClick={() => onViewOrder(order)}
                                   >
-                                    <AppIcon name="XCircle" size={13} />
-                                    Cancelar
+                                    <AppIcon name="Eye" size={14} />
+                                    Ver
                                   </Button>
                                 )}
                                 {onDeleteOrder && (
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="h-8 rounded-lg gap-1 text-xs text-destructive hover:bg-destructive/10 ml-auto"
+                                    className="h-8 w-8 rounded-xl p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
                                     onClick={() => setConfirmDelete({
                                       type: 'order',
                                       id: order.id,
                                       label: `Pedido de ${new Date(order.created_at).toLocaleDateString('pt-BR')}`,
                                     })}
                                   >
-                                    <AppIcon name="Trash2" size={13} />
+                                    <AppIcon name="Trash2" size={14} />
                                   </Button>
                                 )}
                               </div>
