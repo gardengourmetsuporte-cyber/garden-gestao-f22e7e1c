@@ -7,6 +7,7 @@ import { QuotationSheet } from './QuotationSheet';
 import { QuotationDetail } from './QuotationDetail';
 import { PriceSurveyList } from './PriceSurveyList';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { Supplier } from '@/types/database';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 
