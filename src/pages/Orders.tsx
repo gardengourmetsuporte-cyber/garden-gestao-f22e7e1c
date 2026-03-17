@@ -21,7 +21,6 @@ import { SmartReceivingSheet } from '@/components/inventory/SmartReceivingSheet'
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { QuotationList } from '@/components/orders/QuotationList';
-import { PriceSurveyList } from '@/components/orders/PriceSurveyList';
 import { useShoppingList } from '@/hooks/useShoppingList';
 import { SupplierProfileSheet } from '@/components/orders/SupplierProfileSheet';
 import { ProductionTab } from '@/components/orders/ProductionTab';
