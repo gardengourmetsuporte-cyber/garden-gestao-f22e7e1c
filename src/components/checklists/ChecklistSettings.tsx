@@ -382,6 +382,7 @@ export function ChecklistSettings({
       setItemChecklistType(item.checklist_type || selectedType);
       setItemPoints(item.points ?? 1);
       setItemRequiresPhoto((item as any).requires_photo ?? false);
+      setItemLinkedInventoryItemId((item as any).linked_inventory_item_id || null);
     } else {
       setEditingItem(null);
       setItemName('');
@@ -390,6 +391,7 @@ export function ChecklistSettings({
       setItemChecklistType(selectedType);
       setItemPoints(selectedType === 'bonus' ? 5 : 1);
       setItemRequiresPhoto(false);
+      setItemLinkedInventoryItemId(null);
     }
     setItemSheetOpen(true);
   };
