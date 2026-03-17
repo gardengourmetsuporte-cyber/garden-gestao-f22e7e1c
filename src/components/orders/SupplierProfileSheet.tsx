@@ -463,17 +463,16 @@ export function SupplierProfileSheet({
                               </div>
 
                               {/* Action buttons */}
-                              <div className="flex gap-1.5 flex-wrap">
+                              <div className="flex items-center gap-2 pt-1">
                                 {!inv.is_paid && onMarkInvoicePaid && (
                                   <Button
                                     size="sm"
-                                    variant="outline"
-                                    className="h-8 rounded-lg gap-1 text-xs text-success border-success/30 hover:bg-success/10"
+                                    className="h-8 rounded-xl gap-1.5 text-xs bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)] text-white flex-1"
                                     onClick={async () => {
                                       await onMarkInvoicePaid(inv.id);
                                     }}
                                   >
-                                    <AppIcon name="CheckCircle" size={13} />
+                                    <AppIcon name="CheckCircle" size={14} />
                                     Pagar
                                   </Button>
                                 )}
@@ -481,25 +480,25 @@ export function SupplierProfileSheet({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="h-8 rounded-lg gap-1 text-xs"
+                                    className="h-8 rounded-xl gap-1.5 text-xs flex-1"
                                     onClick={() => onCreateFinanceFromInvoice(inv)}
                                   >
-                                    <AppIcon name="DollarSign" size={13} />
-                                    Lançar no Financeiro
+                                    <AppIcon name="DollarSign" size={14} />
+                                    Lançar
                                   </Button>
                                 )}
                                 {onDeleteInvoice && (
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="h-8 rounded-lg gap-1 text-xs text-destructive hover:bg-destructive/10 ml-auto"
+                                    className="h-8 w-8 rounded-xl p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
                                     onClick={() => setConfirmDelete({
                                       type: 'invoice',
                                       id: inv.id,
                                       label: inv.description,
                                     })}
                                   >
-                                    <AppIcon name="Trash2" size={13} />
+                                    <AppIcon name="Trash2" size={14} />
                                   </Button>
                                 )}
                               </div>
