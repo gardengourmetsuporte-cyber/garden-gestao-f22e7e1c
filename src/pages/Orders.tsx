@@ -800,8 +800,6 @@ export default function OrdersPage() {
               </div>
             )}
 
-            {/* Produção Tab */}
-            {orderTab === 'production' && <ProductionTab />}
           </div>
         </div>
 
