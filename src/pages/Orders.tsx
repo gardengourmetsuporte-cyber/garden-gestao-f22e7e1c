@@ -355,14 +355,13 @@ export default function OrdersPage() {
                               <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); handleOpenProfile(supplier); }}
-                                className={cn(
-                                  "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 active:scale-95 transition-all",
-                                  (supplier as any).delivery_frequency === 'daily' ? "bg-primary/15" : "bg-secondary"
-                                )}
+                                className="shrink-0 active:scale-95 transition-all"
                               >
-                                <AppIcon name="Truck" size={20} className={cn(
-                                  (supplier as any).delivery_frequency === 'daily' ? "text-primary" : "text-muted-foreground"
-                                )} />
+                                <GradientIcon
+                                  name="Truck"
+                                  color={(supplier as any).delivery_frequency === 'daily' ? 'primary' : 'muted'}
+                                  size="md"
+                                />
                               </button>
 
                               <CollapsibleTrigger
