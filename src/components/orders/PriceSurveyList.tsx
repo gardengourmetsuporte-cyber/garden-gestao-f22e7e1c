@@ -2,12 +2,18 @@ import { useState } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
-import { PriceSurvey, PriceSurveySupplier, usePriceSurveys } from '@/hooks/usePriceSurveys';
+import { PriceSurvey, usePriceSurveys } from '@/hooks/usePriceSurveys';
 import { PriceSurveySheet } from './PriceSurveySheet';
 import { PriceSurveyDetail } from './PriceSurveyDetail';
 import { Supplier } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { normalizePhone } from '@/lib/normalizePhone';
+
+const statusConfig: Record<string, { label: string; variant: string }> = {
+  draft: { label: 'Rascunho', variant: 'muted' },
+  sent: { label: 'Enviada', variant: 'primary' },
+  completed: { label: 'Completa', variant: 'success' },
+};
 
 interface Props {
   suppliers: Supplier[];
@@ -27,27 +33,6 @@ export function PriceSurveyList({ suppliers }: Props) {
     setDetailSurvey(detail);
   };
 
-  const handleResend = (survey: PriceSurvey) => {
-    const ss = survey.price_survey_suppliers || [];
-    if (ss.length === 0) return;
-    // Open WhatsApp for first pending supplier
-    const pending = ss.find(s => s.status === 'pending') || ss[0];
-    const phone = normalizePhone(pending.supplier?.phone);
-    if (!phone) return;
-    const surveyUrl = `${window.location.origin}/pesquisa/${pending.token}`;
-    const message = `Olá ${pending.supplier?.name || ''}! 🛒\n\nLembrete: sua pesquisa de preços ainda está pendente.\n\n${surveyUrl}`;
-    window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`, '_blank');
-  };
-
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case 'draft': return { label: 'Rascunho', color: 'text-muted-foreground', bg: 'bg-muted' };
-      case 'sent': return { label: 'Enviada', color: 'text-primary', bg: 'bg-primary/10' };
-      case 'completed': return { label: 'Completa', color: 'text-success', bg: 'bg-success/10' };
-      default: return { label: status, color: 'text-muted-foreground', bg: 'bg-muted' };
-    }
-  };
-
   if (detailSurvey) {
     return (
       <PriceSurveyDetail
@@ -60,12 +45,8 @@ export function PriceSurveyList({ suppliers }: Props) {
 
   return (
     <div className="space-y-3">
-      <Button
-        variant="outline"
-        className="w-full gap-2"
-        onClick={() => setSheetOpen(true)}
-      >
-        <AppIcon name="Search" size={16} />
+      <Button onClick={() => setSheetOpen(true)} className="w-full gap-2 rounded-xl h-12 shadow-glow-primary">
+        <AppIcon name="Plus" className="w-4 h-4" />
         Nova Pesquisa de Preços
       </Button>
 
@@ -80,59 +61,89 @@ export function PriceSurveyList({ suppliers }: Props) {
           subtitle="Crie uma pesquisa para captar preços dos fornecedores"
         />
       ) : (
-        surveys.map(survey => {
-          const sc = getStatusConfig(survey.status);
-          const suppliersList = survey.price_survey_suppliers || [];
-          const respondedCount = suppliersList.filter(s => s.status === 'responded').length;
+        <div className="space-y-3">
+          {surveys.map((survey, i) => {
+            const sc = statusConfig[survey.status] || statusConfig.draft;
+            const suppliersList = survey.price_survey_suppliers || [];
+            const respondedCount = suppliersList.filter(s => s.status === 'responded').length;
+            const total = suppliersList.length;
 
-          return (
-            <button
-              key={survey.id}
-              onClick={() => handleOpenDetail(survey)}
-              className="w-full bg-card rounded-2xl p-4 text-left transition-colors hover:bg-secondary/30 active:scale-[0.98]"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{survey.title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {suppliersList.length} fornecedor{suppliersList.length !== 1 ? 'es' : ''} •{' '}
-                    {respondedCount}/{suppliersList.length} responderam
-                  </p>
-                </div>
-                <span className={cn("text-[10px] font-bold uppercase px-2 py-0.5 rounded-full", sc.bg, sc.color)}>
-                  {sc.label}
-                </span>
-              </div>
-
-              {/* Progress bar */}
-              <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all"
-                  style={{ width: `${suppliersList.length > 0 ? (respondedCount / suppliersList.length) * 100 : 0}%` }}
-                />
-              </div>
-
-              {/* Supplier avatars */}
-              <div className="flex items-center gap-1 mt-2">
-                {suppliersList.slice(0, 5).map(ss => (
-                  <div
-                    key={ss.id}
-                    className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold",
-                      ss.status === 'responded' ? "bg-success/20 text-success" : "bg-muted text-muted-foreground"
-                    )}
-                    title={ss.supplier?.name}
-                  >
-                    {ss.supplier?.name?.charAt(0) || '?'}
+            return (
+              <div
+                key={survey.id}
+                onClick={() => handleOpenDetail(survey)}
+                className="card-glass rounded-2xl p-4 cursor-pointer transition-all active:scale-[0.98] animate-fade-in"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className={cn(
+                      "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                      sc.variant === 'success' ? 'bg-success/15' :
+                      sc.variant === 'primary' ? 'bg-primary/15' :
+                      'bg-secondary'
+                    )}>
+                      <AppIcon name="SearchCheck" className={cn(
+                        "w-5 h-5",
+                        sc.variant === 'success' ? 'text-success' :
+                        sc.variant === 'primary' ? 'text-primary' :
+                        'text-muted-foreground'
+                      )} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground truncate text-sm">
+                        {survey.title || 'Pesquisa de Preços'}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {total} fornecedor{total !== 1 ? 'es' : ''} • {respondedCount}/{total} responderam
+                      </p>
+                    </div>
                   </div>
-                ))}
-                {suppliersList.length > 5 && (
-                  <span className="text-xs text-muted-foreground">+{suppliersList.length - 5}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={cn(
+                      'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide rounded-full',
+                      sc.variant === 'success' ? 'bg-success/15 text-success' :
+                      sc.variant === 'primary' ? 'bg-primary/15 text-primary' :
+                      'bg-secondary text-muted-foreground'
+                    )}>
+                      {sc.label}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div className="mt-3 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all"
+                    style={{ width: `${total > 0 ? (respondedCount / total) * 100 : 0}%` }}
+                  />
+                </div>
+
+                {/* Supplier chips */}
+                {total > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {suppliersList.map(ss => (
+                      <span
+                        key={ss.id}
+                        className={cn(
+                          'inline-flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-lg font-semibold',
+                          ss.status === 'responded' ? 'bg-success/10 text-success' :
+                          'bg-secondary/60 text-muted-foreground'
+                        )}
+                      >
+                        {ss.supplier?.name}
+                        <AppIcon
+                          name={ss.status === 'responded' ? 'CheckCircle2' : 'Clock'}
+                          size={12}
+                        />
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
-            </button>
-          );
-        })
+            );
+          })}
+        </div>
       )}
 
       <PriceSurveySheet
