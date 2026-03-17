@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Camera, Upload, Loader2, MapPin, User, Package, DollarSign, Hash } from 'lucide-react';
 import type { OcrDeliveryResult } from '@/hooks/useDeliveries';
+import { takeNativePhoto } from '@/lib/native-camera';
+import { isNative } from '@/lib/native';
 
 interface Props {
   open: boolean;
