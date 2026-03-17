@@ -7,7 +7,7 @@ import { Camera, Upload, Loader2, User, MapPin, Hash, Package, DollarSign, Credi
 import type { IfoodScanResult, IfoodOrderItem } from '@/hooks/useIfoodScanner';
 import { formatCurrency } from '@/lib/format';
 import { takeNativePhoto } from '@/lib/native-camera';
-import { isNative } from '@/lib/native';
+import { InBrowserCamera } from '@/components/ui/InBrowserCamera';
 
 interface Props {
   open: boolean;
@@ -22,9 +22,9 @@ interface Props {
 }
 
 export function IfoodScannerSheet({ open, onOpenChange, state, result, error, onScan, onConfirm, onReset, onUpdateResult }: Props) {
-  const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const handleFile = (f: File) => {
     setPreview(URL.createObjectURL(f));
@@ -61,6 +61,7 @@ export function IfoodScannerSheet({ open, onOpenChange, state, result, error, on
   const showDone = state === 'done';
 
   return (
+    <>
     <Sheet open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
       <SheetContent side="bottom" className="h-[92vh] rounded-t-2xl overflow-y-auto">
         <SheetHeader>
@@ -96,7 +97,7 @@ export function IfoodScannerSheet({ open, onOpenChange, state, result, error, on
               <Button variant="outline" className="flex-1" onClick={async () => {
                 const nativeFile = await takeNativePhoto('camera');
                 if (nativeFile) { handleFile(nativeFile); return; }
-                cameraRef.current?.click();
+                setCameraOpen(true);
               }}>
                 <Camera className="w-4 h-4 mr-2" /> Câmera
               </Button>
@@ -109,14 +110,8 @@ export function IfoodScannerSheet({ open, onOpenChange, state, result, error, on
               </Button>
             </div>
 
-            {!isNative && (
-              <>
-                <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden"
-                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
-                <input ref={galleryRef} type="file" accept="image/*" className="hidden"
-                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
-              </>
-            )}
+            <input ref={galleryRef} type="file" accept="image/*" className="hidden"
+              onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); e.target.value = ''; }} />
           </div>
         )}
 
@@ -262,5 +257,15 @@ export function IfoodScannerSheet({ open, onOpenChange, state, result, error, on
         )}
       </SheetContent>
     </Sheet>
+
+    <InBrowserCamera
+      open={cameraOpen}
+      onClose={() => setCameraOpen(false)}
+      onCapture={(capturedFile) => {
+        setCameraOpen(false);
+        handleFile(capturedFile);
+      }}
+    />
+    </>
   );
 }

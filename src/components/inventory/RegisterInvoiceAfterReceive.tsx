@@ -206,7 +206,6 @@ export function RegisterInvoiceAfterReceive({
               ref={invoiceInputRef}
               type="file"
               accept="image/*"
-              capture="environment"
               className="hidden"
               onChange={handleInvoiceCapture}
             />
@@ -224,7 +223,6 @@ export function RegisterInvoiceAfterReceive({
               ref={boletoInputRef}
               type="file"
               accept="image/*"
-              capture="environment"
               className="hidden"
               onChange={handleBoletoCapture}
             />

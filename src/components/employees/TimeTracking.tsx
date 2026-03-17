@@ -971,7 +971,6 @@ function CertificateForm({ onSubmit }: { onSubmit: (data: any) => Promise<boolea
           ref={fileRef}
           type="file"
           accept="image/*"
-          capture="environment"
           onChange={handlePhotoChange}
           className="hidden"
         />

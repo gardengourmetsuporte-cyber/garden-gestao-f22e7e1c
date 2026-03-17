@@ -324,7 +324,7 @@ export function AICopilotWidget() {
 
       {/* Hidden file inputs */}
       <input ref={fileInputRef} type="file" accept={ACCEPTED_FILES} multiple className="hidden" onChange={e => e.target.files && addFiles(e.target.files)} />
-      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={e => e.target.files && addFiles(e.target.files)} />
+      <input ref={cameraInputRef} type="file" accept="image/*" className="hidden" onChange={e => e.target.files && addFiles(e.target.files)} />
       <input ref={galleryInputRef} type="file" accept="image/*" multiple className="hidden" onChange={e => e.target.files && addFiles(e.target.files)} />
 
       {/* History sheet */}
