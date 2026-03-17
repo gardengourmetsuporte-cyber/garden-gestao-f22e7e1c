@@ -460,10 +460,8 @@ export default function OrdersPage() {
                           open={expandedSuppliers['no-supplier'] ?? false}
                           onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, ['no-supplier']: open }))}
                         >
-                          <CollapsibleTrigger className="w-full flex items-center gap-3 p-4 text-left">
-                            <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-muted">
-                              <AppIcon name="Package" size={20} className="text-muted-foreground" />
-                            </div>
+                           <CollapsibleTrigger className="w-full flex items-center gap-3 p-4 text-left">
+                            <GradientIcon name="Package" color="muted" size="md" />
                             <div className="flex-1 min-w-0">
                               <span className="font-semibold text-foreground">Sem Fornecedor</span>
                               <p className="text-xs text-muted-foreground">
