@@ -599,7 +599,7 @@ export function ChecklistView({
       )}
 
       {/* Sectors (non-bonus, non-production) */}
-      {!isBonus && filteredSectors.length === 0 && (
+      {!isBonus && !isProduction && filteredSectors.length === 0 && (
         <div className="card-command p-8 text-center">
           <p className="text-muted-foreground text-sm">
             Nenhuma tarefa configurada para {getTypeLabel(checklistType)}.
