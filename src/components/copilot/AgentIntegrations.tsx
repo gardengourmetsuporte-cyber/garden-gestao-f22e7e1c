@@ -54,10 +54,13 @@ export function AgentIntegrations() {
         {INTEGRATIONS.map(integration => (
           <div key={integration.id} className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card">
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: `${integration.color}20` }}
+              className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+              style={{
+                background: `linear-gradient(135deg, ${integration.color}, ${integration.color}cc)`,
+                boxShadow: `0 4px 12px -2px ${integration.color}40`,
+              }}
             >
-              <AppIcon name={integration.icon as any} className="w-5 h-5" style={{ color: integration.color }} />
+              <AppIcon name={integration.icon as any} className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
