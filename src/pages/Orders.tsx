@@ -33,7 +33,7 @@ export default function OrdersPage() {
   const { items, registerMovement } = useInventoryDB();
   const { suppliers, addSupplier, updateSupplier, deleteSupplier } = useSuppliers();
   const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
-  const { addInvoice, invoices } = useSupplierInvoices();
+  const { addInvoice, invoices, deleteInvoice, payInvoiceWithTransaction } = useSupplierInvoices();
   const { createQuotation } = useQuotations();
   const { items: shoppingListItems, removeFromList, clearList, isLoading: shoppingListLoading } = useShoppingList();
 
