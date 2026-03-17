@@ -96,7 +96,7 @@ export function IfoodScannerSheet({ open, onOpenChange, state, result, error, on
               <Button variant="outline" className="flex-1" onClick={async () => {
                 const nativeFile = await takeNativePhoto('camera');
                 if (nativeFile) { handleFile(nativeFile); return; }
-                cameraRef.current?.click();
+                setCameraOpen(true);
               }}>
                 <Camera className="w-4 h-4 mr-2" /> Câmera
               </Button>
@@ -109,14 +109,8 @@ export function IfoodScannerSheet({ open, onOpenChange, state, result, error, on
               </Button>
             </div>
 
-            {!isNative && (
-              <>
-                <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden"
-                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
-                <input ref={galleryRef} type="file" accept="image/*" className="hidden"
-                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
-              </>
-            )}
+            <input ref={galleryRef} type="file" accept="image/*" className="hidden"
+              onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); e.target.value = ''; }} />
           </div>
         )}
 
