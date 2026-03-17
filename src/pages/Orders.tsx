@@ -320,70 +320,164 @@ export default function OrdersPage() {
           })()}
 
           <div className="animate-fade-in" key={orderTab}>
-            {orderTab === 'to-order' && (
-              Object.keys(itemsBySupplier).length === 0 ? (
-                <EmptyState
-                  icon="PackageCheck"
-                  title="Estoque em dia!"
-                  subtitle="Todos os itens estão acima do mínimo"
+            {/* Fornecedores Tab (unified with suggestions) */}
+            {orderTab === 'suppliers' && (
+              <div className="space-y-3">
+                <Input
+                  value={supplierSearch}
+                  onChange={e => setSupplierSearch(e.target.value)}
+                  placeholder="Buscar fornecedor..."
+                  className="h-11"
                 />
-              ) : (
-                <div className="space-y-3">
-                  {Object.entries(itemsBySupplier).map(([supplierId, supplierItems], index) => {
-                    const supplier = suppliers.find(s => s.id === supplierId);
-                    const isNoSupplier = supplierId === 'no-supplier';
-                    const isExpanded = expandedSuppliers[supplierId] ?? false;
-
-                    return (
-                      <div
-                        key={supplierId}
-                        className="bg-card rounded-2xl overflow-hidden transition-all animate-fade-in"
-                        style={{ animationDelay: `${index * 50}ms` }}
-                      >
-                        <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, [supplierId]: open }))}>
-                          {/* Card header - always visible */}
-                          <div className="flex items-center justify-between p-4">
-                            <CollapsibleTrigger className="flex items-center gap-3 min-w-0 flex-1 text-left">
-                              <div className={cn(
-                                "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors",
-                                isNoSupplier ? "bg-muted" : "bg-primary/10"
-                               )}>
-                                 <AppIcon name="Package" size={20} className={cn(isNoSupplier ? "text-muted-foreground" : "text-primary")} />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="font-semibold font-display text-foreground truncate">
-                                  {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {supplierItems.length} ite{supplierItems.length !== 1 ? 'ns' : 'm'} abaixo do mínimo
-                                </p>
-                              </div>
-                              <AppIcon name="ChevronDown" size={16} className={cn(
-                                "text-muted-foreground transition-transform duration-200 shrink-0 mr-2",
-                                isExpanded && "rotate-180"
-                              )} />
-                            </CollapsibleTrigger>
-                            {!isNoSupplier && supplier && (
-                              <Button
-                                size="sm"
-                                onClick={() => handleOpenOrder(supplier)}
-                                className="gap-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
+                {filteredSuppliers.length === 0 && Object.keys(itemsBySupplier).length === 0 ? (
+                  <EmptyState
+                    icon="Truck"
+                    title="Nenhum fornecedor"
+                    subtitle="Cadastre fornecedores para gerenciar pedidos"
+                  />
+                ) : (
+                  <div className="space-y-2">
+                    {filteredSuppliers.map((supplier, index) => {
+                      const supplierOrderCount = orders.filter(o => o.supplier_id === supplier.id).length;
+                      const hasWa = supplier.phone ? !!normalizePhone(supplier.phone) : false;
+                      const lowItems = itemsBySupplier[supplier.id] || [];
+                      const isExpanded = expandedSuppliers[supplier.id] ?? false;
+                      return (
+                        <div
+                          key={supplier.id}
+                          className="bg-card rounded-2xl border border-border overflow-hidden transition-all animate-fade-in"
+                          style={{ animationDelay: `${index * 30}ms` }}
+                        >
+                          <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, [supplier.id]: open }))}>
+                            <div className="flex items-center gap-3 p-4">
+                              <CollapsibleTrigger
+                                className="flex items-center gap-3 min-w-0 flex-1 text-left"
+                                onClick={(e) => {
+                                  if (lowItems.length === 0) {
+                                    e.preventDefault();
+                                    handleOpenProfile(supplier);
+                                  }
+                                }}
                               >
-                                <AppIcon name="Plus" size={16} />
-                                Pedir
-                              </Button>
-                            )}
-                          </div>
+                                <div className={cn(
+                                  "w-11 h-11 rounded-xl flex items-center justify-center shrink-0",
+                                  (supplier as any).delivery_frequency === 'daily' ? "bg-primary/15" : "bg-secondary"
+                                )}>
+                                  <AppIcon name="Truck" size={20} className={cn(
+                                    (supplier as any).delivery_frequency === 'daily' ? "text-primary" : "text-muted-foreground"
+                                  )} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-semibold text-foreground truncate">{supplier.name}</span>
+                                    {(supplier as any).delivery_frequency === 'daily' && (
+                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold shrink-0">Diário</span>
+                                    )}
+                                    {lowItems.length > 0 && (
+                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-warning/15 text-warning font-semibold shrink-0">
+                                        {lowItems.length} baixo{lowItems.length !== 1 ? 's' : ''}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-3 mt-0.5">
+                                    {supplier.phone && (
+                                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                        <AppIcon name="Phone" size={11} />
+                                        {supplier.phone}
+                                        {hasWa && <span className="text-success">✓</span>}
+                                      </span>
+                                    )}
+                                    {supplierOrderCount > 0 && (
+                                      <span className="text-xs text-muted-foreground">
+                                        {supplierOrderCount} pedido{supplierOrderCount !== 1 ? 's' : ''}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                {lowItems.length > 0 ? (
+                                  <AppIcon name="ChevronDown" size={16} className={cn(
+                                    "text-muted-foreground transition-transform duration-200 shrink-0",
+                                    isExpanded && "rotate-180"
+                                  )} />
+                                ) : (
+                                  <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
+                                )}
+                              </CollapsibleTrigger>
+                              {lowItems.length > 0 && (
+                                <Button
+                                  size="sm"
+                                  onClick={(e) => { e.stopPropagation(); handleOpenOrder(supplier); }}
+                                  className="gap-1.5 rounded-xl shrink-0"
+                                >
+                                  <AppIcon name="Plus" size={16} />
+                                  Pedir
+                                </Button>
+                              )}
+                            </div>
 
-                          {/* Items list - collapsible */}
+                            {lowItems.length > 0 && (
+                              <CollapsibleContent>
+                                <div className="border-t border-border/50">
+                                  {lowItems.map((item, i) => (
+                                    <div
+                                      key={item.id}
+                                      className={cn(
+                                        "flex items-center justify-between px-4 py-2.5 transition-colors",
+                                        i < lowItems.length - 1 && "border-b border-border/50"
+                                      )}
+                                    >
+                                      <span className="text-sm text-foreground">{item.name}</span>
+                                      <div className="flex items-center gap-2">
+                                        <span className={cn(
+                                          "text-xs font-semibold px-2 py-0.5 rounded-full",
+                                          item.current_stock === 0
+                                            ? "bg-destructive/10 text-destructive"
+                                            : "bg-warning/10 text-warning"
+                                        )}>
+                                          {item.current_stock}/{item.min_stock}
+                                        </span>
+                                        <span className="text-[10px] text-muted-foreground">{item.unit_type}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </CollapsibleContent>
+                            )}
+                          </Collapsible>
+                        </div>
+                      );
+                    })}
+
+                    {/* No-supplier items */}
+                    {itemsBySupplier['no-supplier'] && itemsBySupplier['no-supplier'].length > 0 && (
+                      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+                        <Collapsible
+                          open={expandedSuppliers['no-supplier'] ?? false}
+                          onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, ['no-supplier']: open }))}
+                        >
+                          <CollapsibleTrigger className="w-full flex items-center gap-3 p-4 text-left">
+                            <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-muted">
+                              <AppIcon name="Package" size={20} className="text-muted-foreground" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <span className="font-semibold text-foreground">Sem Fornecedor</span>
+                              <p className="text-xs text-muted-foreground">
+                                {itemsBySupplier['no-supplier'].length} ite{itemsBySupplier['no-supplier'].length !== 1 ? 'ns' : 'm'} abaixo do mínimo
+                              </p>
+                            </div>
+                            <AppIcon name="ChevronDown" size={16} className={cn(
+                              "text-muted-foreground transition-transform duration-200 shrink-0",
+                              (expandedSuppliers['no-supplier'] ?? false) && "rotate-180"
+                            )} />
+                          </CollapsibleTrigger>
                           <CollapsibleContent>
                             <div className="border-t border-border/50">
-                              {supplierItems.map((item, i) => (
+                              {itemsBySupplier['no-supplier'].map((item, i) => (
                                 <div
                                   key={item.id}
                                   className={cn(
-                                    "flex items-center justify-between px-4 py-2.5 transition-colors",
-                                    i < supplierItems.length - 1 && "border-b border-border/50"
+                                    "flex items-center justify-between px-4 py-2.5",
+                                    i < itemsBySupplier['no-supplier'].length - 1 && "border-b border-border/50"
                                   )}
                                 >
                                   <span className="text-sm text-foreground">{item.name}</span>
@@ -404,10 +498,10 @@ export default function OrdersPage() {
                           </CollapsibleContent>
                         </Collapsible>
                       </div>
-                    );
-                  })}
-                </div>
-              )
+                    )}
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Lista de Compras Rápida Tab */}
