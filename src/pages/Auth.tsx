@@ -48,6 +48,8 @@ function BrandPanel() {
           style={{
             background: 'hsl(var(--foreground))',
             boxShadow: '0 0 100px hsl(var(--primary) / 0.2), 0 25px 70px rgba(0,0,0,0.8)',
+            clipPath: 'circle(50%)',
+            WebkitClipPath: 'circle(50%)' as any,
           }}
         >
           <img alt="Garden Gestão" className="w-[85%] h-[85%] object-contain" src={gardenLogo} />
