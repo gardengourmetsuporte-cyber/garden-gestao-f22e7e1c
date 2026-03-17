@@ -278,7 +278,7 @@ export default function OrdersPage() {
             ];
 
             return (
-              <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-3">
+              <div className="grid grid-cols-4 gap-2 lg:grid-cols-4 lg:gap-3">
                 {tabs.map(tab => {
                   const isActive = orderTab === tab.key;
                   return (
