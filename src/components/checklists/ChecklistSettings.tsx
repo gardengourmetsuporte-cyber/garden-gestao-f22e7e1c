@@ -216,6 +216,23 @@ export function ChecklistSettings({
   const [itemChecklistType, setItemChecklistType] = useState<ChecklistType>('abertura');
   const [itemPoints, setItemPoints] = useState<number>(1);
   const [itemRequiresPhoto, setItemRequiresPhoto] = useState(false);
+  const [itemLinkedInventoryItemId, setItemLinkedInventoryItemId] = useState<string | null>(null);
+  const [inventoryPickerOpen, setInventoryPickerOpen] = useState(false);
+  const [productionInventoryItems, setProductionInventoryItems] = useState<{ id: string; name: string; unit_type: string }[]>([]);
+
+  const { activeUnitId } = useUnit();
+
+  // Fetch inventory items from "Produção" category
+  useEffect(() => {
+    if (!activeUnitId) return;
+    (async () => {
+      const { data: cats } = await supabase.from('categories').select('id').ilike('name', 'Produção').eq('unit_id', activeUnitId);
+      if (!cats || cats.length === 0) { setProductionInventoryItems([]); return; }
+      const catIds = cats.map(c => c.id);
+      const { data: items } = await supabase.from('inventory_items').select('id, name, unit_type').in('category_id', catIds).eq('unit_id', activeUnitId).order('name');
+      setProductionInventoryItems(items || []);
+    })();
+  }, [activeUnitId]);
 
   const sensors = useSensors(
     useSensor(TouchSensor, {
