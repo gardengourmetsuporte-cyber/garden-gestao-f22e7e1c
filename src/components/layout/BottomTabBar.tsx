@@ -110,6 +110,29 @@ export function BottomTabBar() {
   const leftTabs = resolvedTabs.slice(0, 2);
   const rightTabs = resolvedTabs.slice(2);
 
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    if (path.includes('?')) {
+      const [basePath, query] = path.split('?');
+      const params = new URLSearchParams(query);
+      const tabParam = params.get('tab');
+      const sectionParam = params.get('section');
+      const currentSearch = new URLSearchParams(location.search);
+      if (tabParam) {
+        return location.pathname.startsWith(basePath) && currentSearch.get('tab') === tabParam;
+      }
+      if (sectionParam) {
+        return location.pathname.startsWith(basePath) && currentSearch.get('section') === sectionParam;
+      }
+      return false;
+    }
+    if (isCardapioRoute && path === '/cardapio') {
+      const currentTab = new URLSearchParams(location.search).get('tab');
+      const currentSection = new URLSearchParams(location.search).get('section');
+      return location.pathname === '/cardapio' && !currentTab && !currentSection;
+    }
+    return location.pathname.startsWith(path);
+  };
 
   if (isHidden) return null;
 
