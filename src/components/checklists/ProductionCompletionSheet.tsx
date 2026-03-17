@@ -156,7 +156,7 @@ export function ProductionCompletionSheet({
             onClick={handleConfirm}
             disabled={submitting || isLoading || quantity <= 0}
           >
-            <AppIcon name="precision_manufacturing" size={18} />
+            <AppIcon name="soup_kitchen" size={18} />
             {submitting ? 'Registrando...' : `Confirmar Produção (+${quantity} ${inventoryItem.unit_type})`}
           </Button>
         </div>
