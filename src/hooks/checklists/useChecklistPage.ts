@@ -283,7 +283,7 @@ export function useChecklistPage() {
     try { await deleteSubcategory(id); } catch { toast.error('Erro ao excluir subcategoria'); }
   }, [deleteSubcategory]);
 
-  const handleAddItem = useCallback(async (data: { subcategory_id: string; name: string; description?: string; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType; points?: number }) => {
+  const handleAddItem = useCallback(async (data: { subcategory_id: string; name: string; description?: string; frequency?: 'daily' | 'weekly' | 'monthly'; checklist_type?: ChecklistType; points?: number; linked_inventory_item_id?: string | null }) => {
     try { await addItem(data); } catch (err: any) { console.error('addItem error:', err); toast.error(err?.message || 'Erro ao criar item'); }
   }, [addItem]);
 
