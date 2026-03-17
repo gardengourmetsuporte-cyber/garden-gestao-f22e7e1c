@@ -239,6 +239,7 @@ export function ChecklistView({
   };
 
   const isBonus = checklistType === 'bonus';
+  const isProduction = (checklistType as string) === 'production';
   const getItemPointsColors = isBonus ? getBonusPointsColors : getPointsColors;
 
   const isTodayDate = isToday(date);
