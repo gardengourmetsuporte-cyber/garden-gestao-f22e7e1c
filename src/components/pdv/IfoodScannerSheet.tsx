@@ -256,5 +256,15 @@ export function IfoodScannerSheet({ open, onOpenChange, state, result, error, on
         )}
       </SheetContent>
     </Sheet>
+
+    <InBrowserCamera
+      open={cameraOpen}
+      onClose={() => setCameraOpen(false)}
+      onCapture={(capturedFile) => {
+        setCameraOpen(false);
+        handleFile(capturedFile);
+      }}
+    />
+    </>
   );
 }
