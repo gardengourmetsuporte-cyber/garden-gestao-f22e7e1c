@@ -276,7 +276,6 @@ export default function OrdersPage() {
               { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
               { key: 'orders' as const, label: 'Pedidos', icon: 'ClipboardList', badge: pendingOrders.length || undefined, gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
               { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, gradient: 'linear-gradient(135deg, #8B5CF6, #EC4899)' },
-              { key: 'price-survey' as const, label: 'Pesquisa', icon: 'SearchCheck', badge: undefined, gradient: 'linear-gradient(135deg, #06B6D4, #3B82F6)' },
               { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: undefined, gradient: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' },
               { key: 'production' as const, label: 'Produção', icon: 'ChefHat', badge: undefined, gradient: 'linear-gradient(135deg, #EF4444, #F472B6)' },
             ];
