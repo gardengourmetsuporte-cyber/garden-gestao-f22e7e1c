@@ -407,6 +407,7 @@ export function ChecklistSettings({
         checklist_type: itemChecklistType,
         points: itemPoints,
         requires_photo: itemRequiresPhoto,
+        linked_inventory_item_id: itemLinkedInventoryItemId || null,
       };
       // If subcategory changed, include it
       if (selectedSubcategoryId && selectedSubcategoryId !== editingItem.subcategory_id) {
@@ -422,6 +423,7 @@ export function ChecklistSettings({
         checklist_type: itemChecklistType,
         points: itemPoints,
         requires_photo: itemRequiresPhoto,
+        linked_inventory_item_id: itemLinkedInventoryItemId || null,
       });
     }
     setItemSheetOpen(false);
