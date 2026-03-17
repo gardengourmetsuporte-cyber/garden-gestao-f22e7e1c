@@ -103,7 +103,7 @@ export function ProductionCompletionSheet({
       <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="text-left flex items-center gap-2">
-            <AppIcon name="precision_manufacturing" size={20} className="text-primary" />
+            <AppIcon name="soup_kitchen" size={20} className="text-primary" />
             Produzir: {inventoryItem.name}
           </SheetTitle>
         </SheetHeader>
