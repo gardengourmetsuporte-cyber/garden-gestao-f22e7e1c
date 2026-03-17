@@ -272,10 +272,26 @@ export function useCashClosing() {
   };
 
   // ---- Financial integration (unchanged logic) ----
+  const [integrating, setIntegrating] = useState(false);
+
   const integrateWithFinancial = async (closing: CashClosing) => {
     if (!user || !activeUnitId) return;
+    if (integrating) return; // prevent double-click
+    if (closing.financial_integrated) {
+      toast.info('Este fechamento já foi integrado ao financeiro');
+      return;
+    }
+    setIntegrating(true);
 
     try {
+      // Re-check from DB to prevent race condition
+      const { data: freshClosing } = await supabase
+        .from('cash_closings').select('financial_integrated').eq('id', closing.id).single();
+      if (freshClosing?.financial_integrated) {
+        toast.info('Este fechamento já foi integrado ao financeiro');
+        setIntegrating(false);
+        return;
+      }
       const { data: paymentSettings } = await supabase
         .from('payment_method_settings' as any).select('*').eq('user_id', user.id);
 
