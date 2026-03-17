@@ -274,9 +274,9 @@ export default function OrdersPage() {
           {(() => {
             const tabs = [
               { key: 'suppliers' as const, label: 'Fornecedores', icon: 'Truck', badge: lowStockItems.length || undefined, gradient: 'linear-gradient(135deg, #14B8A6, #0EA5E9)' },
-              { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
               { key: 'orders' as const, label: 'Pedidos', icon: 'ClipboardList', badge: pendingOrders.length || undefined, gradient: 'linear-gradient(135deg, #F59E0B, #F97316)' },
               { key: 'quotations' as const, label: 'Cotações', icon: 'Scale', badge: undefined, gradient: 'linear-gradient(135deg, #8B5CF6, #EC4899)' },
+              { key: 'shopping-list' as const, label: 'Lista', icon: 'ShoppingCart', badge: shoppingListItems.length || undefined, gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)' },
               { key: 'prices' as const, label: 'Preços', icon: 'TrendingUp', badge: undefined, gradient: 'linear-gradient(135deg, #6366F1, #8B5CF6)' },
             ];
 
