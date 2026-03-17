@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { CHECKLIST_TEMPLATES, ChecklistTemplate } from '@/lib/checklistTemplates';
