@@ -83,7 +83,7 @@ export function PriceSurveyList({ suppliers }: Props) {
                       sc.variant === 'primary' ? 'bg-primary/15' :
                       'bg-secondary'
                     )}>
-                      <AppIcon name="SearchCheck" className={cn(
+                      <AppIcon name="search" className={cn(
                         "w-5 h-5",
                         sc.variant === 'success' ? 'text-success' :
                         sc.variant === 'primary' ? 'text-primary' :
@@ -108,6 +108,14 @@ export function PriceSurveyList({ suppliers }: Props) {
                     )}>
                       {sc.label}
                     </span>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={(e) => { e.stopPropagation(); deleteSurvey.mutate(survey.id); }}
+                    >
+                      <AppIcon name="Trash2" className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
 

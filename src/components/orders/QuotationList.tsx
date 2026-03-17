@@ -125,6 +125,14 @@ export function QuotationList({ suppliers }: Props) {
                       </div>
                     </div>
 
+                    {/* Progress bar */}
+                    <div className="mt-3 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all"
+                        style={{ width: `${total > 0 ? (responded / total) * 100 : 0}%` }}
+                      />
+                    </div>
+
                     {/* Supplier chips */}
                     {(q.quotation_suppliers?.length || 0) > 0 && (
                       <div className="flex flex-wrap gap-1.5 mt-3">
