@@ -31,14 +31,28 @@ export function InBrowserCamera({ open, onClose, onCapture }: InBrowserCameraPro
       streamRef.current = null;
     }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      // Request high resolution + zoom:1 to prefer the main (1x) camera
+      // instead of ultra-wide (0.5x) which some Android devices default to
+      const constraints: MediaStreamConstraints = {
         video: {
           facingMode: { ideal: facing },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          width: { ideal: 3840, min: 1920 },
+          height: { ideal: 2160, min: 1080 },
+          // @ts-ignore - zoom is supported on many Android browsers
+          zoom: { ideal: 1 },
         },
         audio: false,
-      });
+      };
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch {
+        // Fallback without zoom/resolution constraints
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing } },
+          audio: false,
+        });
+      }
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
