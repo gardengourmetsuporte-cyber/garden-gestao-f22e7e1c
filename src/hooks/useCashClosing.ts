@@ -580,6 +580,8 @@ export function useCashClosing() {
     } catch (error) {
       console.error('Error integrating with financial:', error);
       toast.error('Erro ao integrar com financeiro');
+    } finally {
+      setIntegrating(false);
     }
   };
 
