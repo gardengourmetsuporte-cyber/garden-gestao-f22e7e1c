@@ -78,19 +78,15 @@ export function PriceSurveyList({ suppliers }: Props) {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className={cn(
-                      "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                      sc.variant === 'success' ? 'bg-success/15' :
-                      sc.variant === 'primary' ? 'bg-primary/15' :
-                      'bg-secondary'
-                    )}>
-                      <AppIcon name="search" className={cn(
-                        "w-5 h-5",
-                        sc.variant === 'success' ? 'text-success' :
-                        sc.variant === 'primary' ? 'text-primary' :
-                        'text-muted-foreground'
-                      )} />
-                    </div>
+                    <GradientIcon
+                      name="search"
+                      color={
+                        sc.variant === 'success' ? 'emerald' :
+                        sc.variant === 'primary' ? 'primary' :
+                        'muted'
+                      }
+                      size="md"
+                    />
                     <div className="min-w-0">
                       <p className="font-semibold text-foreground truncate text-sm">
                         {survey.title || 'Pesquisa de Preços'}

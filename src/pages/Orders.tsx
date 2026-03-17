@@ -731,15 +731,11 @@ export default function OrdersPage() {
                                <CollapsibleTrigger className="w-full text-left">
                                  <div className="flex items-center justify-between p-4">
                                    <div className="flex items-center gap-3 min-w-0">
-                                     <div className={cn(
-                                      "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                                      order.status === 'received' ? "bg-success/10" : "bg-destructive/10"
-                                    )}>
-                                      {order.status === 'received'
-                                        ? <AppIcon name="PackageCheck" size={20} className="text-success" />
-                                        : <AppIcon name="ShoppingCart" size={20} className="text-destructive" />
-                                      }
-                                    </div>
+                                     <GradientIcon
+                                       name={order.status === 'received' ? 'PackageCheck' : 'ShoppingCart'}
+                                       color={order.status === 'received' ? 'emerald' : 'red'}
+                                       size="md"
+                                     />
                                     <div className="min-w-0">
                                       <p className="font-semibold text-foreground truncate">{order.supplier?.name}</p>
                                       <p className="text-xs text-muted-foreground">
