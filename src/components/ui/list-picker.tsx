@@ -84,7 +84,7 @@ export function ListPicker({
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
 
-        <div className="pt-3 flex flex-col h-[calc(70vh-80px)]" data-vaul-no-drag>
+        <div className="pt-3 flex flex-col h-[calc(70vh-80px)]">
           {/* Search + Create button row */}
           <div className="flex gap-2 mb-3">
             <div className="relative flex-1">
