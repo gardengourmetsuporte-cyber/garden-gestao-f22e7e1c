@@ -83,7 +83,7 @@ export function PriceSurveyList({ suppliers }: Props) {
                       sc.variant === 'primary' ? 'bg-primary/15' :
                       'bg-secondary'
                     )}>
-                      <AppIcon name="SearchCheck" className={cn(
+                      <AppIcon name="search" className={cn(
                         "w-5 h-5",
                         sc.variant === 'success' ? 'text-success' :
                         sc.variant === 'primary' ? 'text-primary' :
