@@ -112,7 +112,7 @@ export function PriceSurveyList({ suppliers }: Props) {
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 text-destructive hover:text-destructive"
-                      onClick={(e) => { e.stopPropagation(); deleteSurvey(survey.id); }}
+                      onClick={(e) => { e.stopPropagation(); deleteSurvey.mutate(survey.id); }}
                     >
                       <AppIcon name="Trash2" className="w-4 h-4" />
                     </Button>
