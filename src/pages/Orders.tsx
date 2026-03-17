@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 import { EmptyState } from '@/components/ui/empty-state';
 import { AnimatedTabs } from '@/components/ui/animated-tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
