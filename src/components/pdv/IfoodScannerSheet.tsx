@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Camera, Upload, Loader2, User, MapPin, Hash, Package, DollarSign, CreditCard, CheckCircle2 } from 'lucide-react';
 import type { IfoodScanResult, IfoodOrderItem } from '@/hooks/useIfoodScanner';
 import { formatCurrency } from '@/lib/format';
+import { takeNativePhoto } from '@/lib/native-camera';
+import { isNative } from '@/lib/native';
 
 interface Props {
   open: boolean;
