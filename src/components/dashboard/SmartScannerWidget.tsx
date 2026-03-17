@@ -3,6 +3,8 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { SmartScannerSheet } from './SmartScannerSheet';
 import { useSmartScanner } from '@/hooks/useSmartScanner';
 import scannerHero from '@/assets/scanner-hero.png';
+import { takeNativePhoto } from '@/lib/native-camera';
+import { isNative } from '@/lib/native';
 
 export function SmartScannerWidget() {
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -58,14 +60,22 @@ export function SmartScannerWidget() {
           {/* Action buttons */}
           <div className="flex gap-2 shrink-0">
             <button
-              onClick={() => cameraRef.current?.click()}
+              onClick={async () => {
+                const nativeFile = await takeNativePhoto('camera');
+                if (nativeFile) { setSheetOpen(true); scanner.scanDocument(nativeFile); return; }
+                cameraRef.current?.click();
+              }}
               className="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 active:scale-90 transition-all backdrop-blur-md"
               title="Câmera"
             >
               <AppIcon name="Camera" size={18} className="text-white" />
             </button>
             <button
-              onClick={() => galleryRef.current?.click()}
+              onClick={async () => {
+                const nativeFile = await takeNativePhoto('gallery');
+                if (nativeFile) { setSheetOpen(true); scanner.scanDocument(nativeFile); return; }
+                galleryRef.current?.click();
+              }}
               className="flex items-center justify-center w-11 h-11 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 active:scale-90 transition-all backdrop-blur-md"
               title="Galeria"
             >
@@ -75,8 +85,8 @@ export function SmartScannerWidget() {
         </div>
       </div>
 
-      <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
-      <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+      {!isNative && <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />}
+      {!isNative && <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />}
 
       <SmartScannerSheet
         open={sheetOpen}

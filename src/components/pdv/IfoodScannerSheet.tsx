@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Camera, Upload, Loader2, User, MapPin, Hash, Package, DollarSign, CreditCard, CheckCircle2 } from 'lucide-react';
 import type { IfoodScanResult, IfoodOrderItem } from '@/hooks/useIfoodScanner';
 import { formatCurrency } from '@/lib/format';
+import { takeNativePhoto } from '@/lib/native-camera';
+import { isNative } from '@/lib/native';
 
 interface Props {
   open: boolean;
@@ -91,18 +93,30 @@ export function IfoodScannerSheet({ open, onOpenChange, state, result, error, on
             )}
 
             <div className="flex gap-3 w-full max-w-xs">
-              <Button variant="outline" className="flex-1" onClick={() => cameraRef.current?.click()}>
+              <Button variant="outline" className="flex-1" onClick={async () => {
+                const nativeFile = await takeNativePhoto('camera');
+                if (nativeFile) { handleFile(nativeFile); return; }
+                cameraRef.current?.click();
+              }}>
                 <Camera className="w-4 h-4 mr-2" /> Câmera
               </Button>
-              <Button variant="outline" className="flex-1" onClick={() => galleryRef.current?.click()}>
+              <Button variant="outline" className="flex-1" onClick={async () => {
+                const nativeFile = await takeNativePhoto('gallery');
+                if (nativeFile) { handleFile(nativeFile); return; }
+                galleryRef.current?.click();
+              }}>
                 <Upload className="w-4 h-4 mr-2" /> Galeria
               </Button>
             </div>
 
-            <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
-            <input ref={galleryRef} type="file" accept="image/*" className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+            {!isNative && (
+              <>
+                <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden"
+                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+                <input ref={galleryRef} type="file" accept="image/*" className="hidden"
+                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+              </>
+            )}
           </div>
         )}
 

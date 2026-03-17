@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Camera, Upload, Loader2, MapPin, User, Package, DollarSign, Hash } from 'lucide-react';
 import type { OcrDeliveryResult } from '@/hooks/useDeliveries';
+import { takeNativePhoto } from '@/lib/native-camera';
+import { isNative } from '@/lib/native';
 
 interface Props {
   open: boolean;
@@ -85,7 +87,11 @@ export function DeliveryOcrSheet({ open, onOpenChange, onConfirm, processImage, 
               <Button
                 variant="outline"
                 className="flex-1"
-                onClick={() => cameraRef.current?.click()}
+                onClick={async () => {
+                  const nativeFile = await takeNativePhoto('camera');
+                  if (nativeFile) { handleFile(nativeFile); return; }
+                  cameraRef.current?.click();
+                }}
                 disabled={isProcessing}
               >
                 <Camera className="w-4 h-4 mr-2" /> Câmera
@@ -93,28 +99,36 @@ export function DeliveryOcrSheet({ open, onOpenChange, onConfirm, processImage, 
               <Button
                 variant="outline"
                 className="flex-1"
-                onClick={() => inputRef.current?.click()}
+                onClick={async () => {
+                  const nativeFile = await takeNativePhoto('gallery');
+                  if (nativeFile) { handleFile(nativeFile); return; }
+                  inputRef.current?.click();
+                }}
                 disabled={isProcessing}
               >
                 <Upload className="w-4 h-4 mr-2" /> Galeria
               </Button>
             </div>
 
-            <input
-              ref={cameraRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-            />
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-            />
+            {!isNative && (
+              <>
+                <input
+                  ref={cameraRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                />
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                />
+              </>
+            )}
           </div>
         )}
 
