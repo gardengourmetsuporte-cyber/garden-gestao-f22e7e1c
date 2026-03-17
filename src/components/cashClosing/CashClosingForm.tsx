@@ -594,7 +594,6 @@ export function CashClosingForm({ onSuccess }: Props) {
             ref={fileInputRef}
             type="file"
             accept="image/*,.pdf"
-            capture="environment"
             className="hidden"
             onChange={handleFileChange}
           />
