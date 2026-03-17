@@ -480,10 +480,7 @@ export default function OrdersPage() {
             )}
 
             {/* Cotações Tab */}
-            {orderTab === 'quotations' && <QuotationList />}
-
-            {/* Pesquisa de Preços Tab */}
-            {orderTab === 'price-survey' && <PriceSurveyList suppliers={suppliers} />}
+            {orderTab === 'quotations' && <QuotationList suppliers={suppliers} />}
 
             {/* Histórico Tab */}
             {orderTab === 'orders' && (
