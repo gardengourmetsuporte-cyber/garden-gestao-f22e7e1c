@@ -54,6 +54,7 @@ const GRADIENT_MAP: Record<GradientIconColor, { gradient: string; shadow: string
   muted: {
     gradient: 'linear-gradient(135deg, hsl(var(--muted)), hsl(var(--secondary)))',
     shadow: 'none',
+    iconClass: 'text-muted-foreground',
   },
 };
 
