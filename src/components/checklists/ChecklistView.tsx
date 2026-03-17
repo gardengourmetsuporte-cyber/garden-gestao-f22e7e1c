@@ -266,6 +266,24 @@ export function ChecklistView({
   }, [isItemCompleted, optimisticToggles]);
 
   const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean) => {
+    // Check if item has linked inventory item (production) and is not being unchecked or skipped
+    if (!isSkipped) {
+      const linkedItem = sectors.flatMap(s =>
+        (s.subcategories || []).flatMap(sub =>
+          (sub.items || []).filter(i => i.id === itemId && (i as any).linked_inventory_item_id)
+        )
+      )[0];
+      if (linkedItem && (linkedItem as any).linked_inventory_item_id) {
+        setPendingProductionAction({
+          itemId, points, configuredPoints, completedByUserId, buttonElement,
+          linkedInventoryItemId: (linkedItem as any).linked_inventory_item_id,
+          itemName: linkedItem.name,
+        });
+        setProductionSheetOpen(true);
+        return;
+      }
+    }
+
     // Check if item requires photo and is not being unchecked or skipped
     if (!isSkipped) {
       const itemRequiresPhoto = sectors.some(s => 
