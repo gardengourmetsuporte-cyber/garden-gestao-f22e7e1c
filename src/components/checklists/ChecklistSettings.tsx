@@ -39,8 +39,8 @@ const sectorNameIconMap: Record<string, string> = {
   'banheiro': 'bathtub',
   'banheiros': 'bathtub',
   'geral': 'checklist',
-  'produção': 'precision_manufacturing',
-  'producao': 'precision_manufacturing',
+  'produção': 'soup_kitchen',
+  'producao': 'soup_kitchen',
   'estoque': 'inventory_2',
   'limpeza': 'cleaning_services',
   'atendimento': 'support_agent',
@@ -1052,7 +1052,7 @@ export function ChecklistSettings({
                   className="flex items-center justify-between w-full h-12 px-3 rounded-xl border border-border/40 bg-secondary/30 text-sm"
                 >
                   <div className="flex items-center gap-2">
-                    <AppIcon name="precision_manufacturing" size={16} className={itemLinkedInventoryItemId ? "text-primary" : "text-muted-foreground"} />
+                    <AppIcon name="soup_kitchen" size={16} className={itemLinkedInventoryItemId ? "text-primary" : "text-muted-foreground"} />
                     <span className={itemLinkedInventoryItemId ? "text-foreground" : "text-muted-foreground"}>
                       {itemLinkedInventoryItemId
                         ? productionInventoryItems.find(i => i.id === itemLinkedInventoryItemId)?.name || 'Item selecionado'

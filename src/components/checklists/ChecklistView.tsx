@@ -68,8 +68,8 @@ const sectorNameIconMap: Record<string, string> = {
   'banheiro': 'bathtub',
   'banheiros': 'bathtub',
   'geral': 'checklist',
-  'produção': 'precision_manufacturing',
-  'producao': 'precision_manufacturing',
+  'produção': 'soup_kitchen',
+  'producao': 'soup_kitchen',
   'estoque': 'inventory_2',
   'limpeza': 'cleaning_services',
   'atendimento': 'support_agent',
@@ -1477,7 +1477,7 @@ export function ChecklistView({
                                     <div className="flex items-center gap-1.5">
                                       <p className="font-semibold text-sm text-foreground truncate">{item.name}</p>
                                       {(item as any).requires_photo && <AppIcon name="Camera" className="w-3.5 h-3.5 text-primary shrink-0" />}
-                                      {(item as any).linked_inventory_item_id && <AppIcon name="precision_manufacturing" size={14} className="text-primary shrink-0" />}
+                                      {(item as any).linked_inventory_item_id && <AppIcon name="soup_kitchen" size={14} className="text-primary shrink-0" />}
                                     </div>
                                     {item.description && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{item.description}</p>}
                                     {stdActiveTimer && (
