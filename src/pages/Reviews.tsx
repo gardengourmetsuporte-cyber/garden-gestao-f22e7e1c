@@ -110,8 +110,8 @@ export default function Reviews() {
       {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="card-base p-5 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center">
-            <span className="text-2xl font-black text-amber-500">{avgRating}</span>
+          <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, hsl(38 92% 50%), hsl(32 95% 44%))', boxShadow: '0 4px 12px -2px hsla(38, 92%, 50%, 0.35)' }}>
+            <span className="text-2xl font-black text-white">{avgRating}</span>
           </div>
           <div>
             <StarDisplay rating={Math.round(Number(avgRating))} />
