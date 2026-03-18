@@ -286,7 +286,7 @@ serve(async (req) => {
     }
 
     // 5. Build suggestions enriched with known services
-    const suggestions = newCandidates.slice(0, 20).map(candidate => {
+    const suggestions = rankedCandidates.slice(0, 100).map(candidate => {
       const aiMatch = classifiedItems.find((ai: any) => 
         ai.original_description?.toLowerCase().trim() === candidate.description.toLowerCase().trim()
       );
