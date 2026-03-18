@@ -538,8 +538,10 @@ export function ChecklistView({
       {displaySectors.map((sector, sectorIndex) => {
         const isExpanded = expandedSectors.has(sector.id);
         // For virtual sectors (like __production__), compute progress inline
-        const progress = sector.id.startsWith('__') ? (() => {
-          const allItems = (sector.subcategories || []).flatMap((sub: any) => sub.items || []);
+        // For bonus sectors (virtual or regular), compute progress from displaySectors items
+        // to avoid counting production items that were moved to __production__ virtual sector
+        const progress = (isBonus || sector.id.startsWith('__')) ? (() => {
+          const allItems = (sector.subcategories || []).flatMap((sub: any) => (sub.items || []).filter((i: any) => i.is_active));
           const completed = allItems.filter((i: any) => isItemCompletedOptimistic(i.id)).length;
           return { completed, total: allItems.length };
         })() : getCompletionProgress(sector.id);
