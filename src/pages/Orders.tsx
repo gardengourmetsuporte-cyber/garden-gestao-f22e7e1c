@@ -677,7 +677,7 @@ export default function OrdersPage() {
                                           onClick={(e) => { e.stopPropagation(); handleSendWhatsApp(order); }}
                                           className="gap-1.5 rounded-xl bg-[#25D366] hover:bg-[#1da851] text-white shadow-lg"
                                         >
-                                          <img src="/icons/whatsapp.png" alt="" className="w-4 h-4 brightness-0 invert" />
+                                           <img src="/icons/whatsapp.png" alt="" className="w-4 h-4" />
                                           WhatsApp
                                         </Button>
                                       ) : (
