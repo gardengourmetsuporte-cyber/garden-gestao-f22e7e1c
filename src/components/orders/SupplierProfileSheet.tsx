@@ -479,7 +479,7 @@ export function SupplierProfileSheet({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="h-8 rounded-xl gap-1.5 text-xs flex-1"
+                                    className="h-9 rounded-xl gap-1.5 text-xs flex-1"
                                     onClick={() => onCreateFinanceFromInvoice(inv)}
                                   >
                                     <AppIcon name="DollarSign" size={14} />
