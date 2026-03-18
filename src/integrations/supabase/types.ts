@@ -6998,6 +6998,7 @@ export type Database = {
       }
       units: {
         Row: {
+          city: string | null
           created_at: string
           created_by: string
           id: string
@@ -7009,6 +7010,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          city?: string | null
           created_at?: string
           created_by: string
           id?: string
@@ -7020,6 +7022,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          city?: string | null
           created_at?: string
           created_by?: string
           id?: string
