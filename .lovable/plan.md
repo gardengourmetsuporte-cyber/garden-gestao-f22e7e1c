@@ -1,40 +1,88 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-# Autocomplete de Serviços com Links Pré-definidos
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-## Problema
-O campo "Nome" é texto livre e o "Link de gerenciamento" precisa ser buscado manualmente — inviável para o usuário.
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-## Solução
-Adicionar um catálogo de serviços populares (50+) com nome, categoria, URL de gerenciamento e ciclo padrão. Ao digitar no campo Nome, uma lista de sugestões aparece (autocomplete). Ao selecionar um serviço, os campos são preenchidos automaticamente.
+---
 
-## Implementação
+## Bloco de Relatórios Avançados ✅
 
-### 1. Catálogo de serviços (`src/lib/knownServices.ts`)
-Array de objetos com serviços populares no Brasil:
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-```text
-{ name, category, defaultCycle, managementUrl, icon? }
-```
+## Dashboard Analytics ✅
 
-Exemplos: Netflix, Spotify, Disney+, Amazon Prime, iCloud, Google One, Adobe, Canva, ChatGPT, Lovable, GitHub, AWS, Azure, Nubank, iFood, Uber, 99, Claro, Vivo, Tim, Oi, CPFL, Sabesp, Enel, Unimed, SmartFit, etc.
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-### 2. Modificar `SubscriptionSheet.tsx`
-- Substituir o Input de "Nome" por um campo com dropdown de sugestões (combobox-like)
-- Ao digitar, filtrar o catálogo e mostrar até 6 sugestões abaixo do input
-- Ao clicar numa sugestão: preencher automaticamente `name`, `category`, `billingCycle`, `managementUrl`
-- Permitir continuar digitando nome customizado (não obrigar a usar o catálogo)
-- O campo "Link de gerenciamento" continua editável mas já vem preenchido
+## Operacional ✅
 
-### 3. UX do Autocomplete
-- Lista suspensa com nome do serviço e categoria como badge
-- Se o usuário digitar algo que não está no catálogo, pode criar livremente
-- Visual consistente com o design system existente (dark, cards, etc.)
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-## Arquivos
+## CRM / Clientes ✅
 
-| Ação | Arquivo |
-|------|---------|
-| Criar | `src/lib/knownServices.ts` — catálogo de ~50 serviços |
-| Editar | `src/components/subscriptions/SubscriptionSheet.tsx` — autocomplete no nome |
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
+## Funcionários ✅
+
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
+
+## Produção Integrada ao Checklist ✅
+
+- Itens de checklist vinculados a itens de estoque (categoria Produção)
+- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
+- Entrada automática no estoque + registro de produção
+- Badge visual de produção nos itens vinculados
+- Configuração de vínculo no admin de checklists
+- Removido módulo Produção da página de Pedidos
