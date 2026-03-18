@@ -422,6 +422,13 @@ export default function InventoryPage() {
         />
 
         <StockTransferSheet open={transferOpen} onOpenChange={setTransferOpen} />
+
+        <SmartReceivingSheet
+          open={smartScanOpen}
+          onOpenChange={setSmartScanOpen}
+          inventoryItems={items}
+          onComplete={() => setSmartScanOpen(false)}
+        />
       </div>
     </AppLayout>
   );
