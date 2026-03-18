@@ -303,7 +303,7 @@ function OrderDetailSheet({
           {!['delivered', 'dispatched', 'cancelled'].includes(order.status) && (
             <button
               className="w-full py-2 text-xs text-destructive font-medium flex items-center justify-center gap-1 hover:bg-destructive/5 rounded-xl transition-colors"
-              onClick={() => onUpdateStatus(order, 'cancelled')}
+              onClick={() => setCancelPinOpen(true)}
               disabled={updatingStatus === order.id}
             >
               <AppIcon name="X" size={13} />
@@ -311,6 +311,14 @@ function OrderDetailSheet({
             </button>
           )}
         </div>
+
+        <PinDialog
+          open={cancelPinOpen}
+          onOpenChange={setCancelPinOpen}
+          title="Cancelar pedido"
+          subtitle="Digite o PIN de um admin autorizado"
+          onSubmit={handleCancelWithPin}
+        />
       </SheetContent>
     </Sheet>
   );
