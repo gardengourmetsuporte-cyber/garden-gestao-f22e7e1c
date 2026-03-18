@@ -57,17 +57,21 @@ export default function Subscriptions() {
     setCancelItem(null);
   };
 
-  if (isLoading) return <AppLayout title="Central Recorrente"><PageLoader /></AppLayout>;
+  if (isLoading) return <AppLayout><PageLoader /></AppLayout>;
 
   return (
-    <AppLayout
-      title="Central Recorrente"
-      actions={
-        <Button size="sm" onClick={() => { setEditItem(null); setSheetOpen(true); }} className="gap-1.5">
-          <Plus className="w-4 h-4" /> Novo
-        </Button>
-      }
-    >
+    <AppLayout>
+      <div className="pb-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <RefreshCw className="w-5 h-5 text-primary" />
+            <h1 className="text-lg font-bold">Central Recorrente</h1>
+          </div>
+          <Button size="sm" onClick={() => { setEditItem(null); setSheetOpen(true); }} className="gap-1.5">
+            <Plus className="w-4 h-4" /> Novo
+          </Button>
+        </div>
       <div className="pb-4">
         {/* Tab bar */}
         <div className="flex gap-1 p-1 bg-secondary/50 rounded-xl mb-4 overflow-x-auto">
