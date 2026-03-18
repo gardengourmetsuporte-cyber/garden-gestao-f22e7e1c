@@ -113,93 +113,102 @@ export const ReceiveOrderSheet = forwardRef<HTMLDivElement, ReceiveOrderSheetPro
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent ref={ref} side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[85vh] overflow-y-auto">
-        <SheetHeader className="pb-4">
-          <SheetTitle className="flex items-center gap-2">
-            <AppIcon name="Package" size={20} className="text-primary" />
-            Receber Pedido - {order?.supplier?.name}
+        <SheetHeader className="pb-3">
+          <SheetTitle className="flex items-center gap-2 text-base">
+            <AppIcon name="inventory_2" size={20} className="text-primary" />
+            Receber Pedido — {order?.supplier?.name}
           </SheetTitle>
         </SheetHeader>
 
-        <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Confira os itens recebidos. Ajuste as quantidades se algo veio diferente do pedido.
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Confira os itens recebidos e ajuste as quantidades se necessário.
           </p>
 
           {/* Smart Receiving Button */}
           {onSmartReceive && (
-            <Button
-              variant="outline"
+            <button
               onClick={() => {
                 onOpenChange(false);
                 onSmartReceive();
               }}
-              className="w-full h-12 gap-2 border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary"
+              className="w-full flex items-center gap-3 p-3 rounded-2xl border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors active:scale-[0.98]"
             >
-              <AppIcon name="Sparkles" size={20} />
-              Escanear Nota Fiscal com IA
-            </Button>
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <AppIcon name="document_scanner" size={18} className="text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-primary">Escanear Nota Fiscal</p>
+                <p className="text-[11px] text-primary/60">Usar IA para ler a DANFE</p>
+              </div>
+            </button>
           )}
 
-          {receivedItems.map(item => (
-            <div
-              key={item.orderItemId}
-              className={`p-4 rounded-xl border transition-colors ${
-                item.received ? 'bg-card' : 'bg-secondary/30 opacity-60'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  checked={item.received}
-                  onCheckedChange={() => handleReceivedToggle(item.orderItemId)}
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">{item.itemName}</span>
-                    <span className="text-xs text-muted-foreground">
-                      Pedido: {item.orderedQuantity} {formatUnit(item.unitType)}
-                    </span>
-                  </div>
-                  
-                  {item.received && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">Recebido:</span>
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.1"
-                        value={item.receivedQuantity}
-                        onChange={(e) => handleQuantityChange(item.orderItemId, Number(e.target.value))}
-                        className="w-24 h-9 text-center"
-                      />
-                      <span className="text-sm text-muted-foreground">
-                        {formatUnit(item.unitType)}
+          {/* Items list */}
+          <div className="space-y-2">
+            {receivedItems.map(item => (
+              <div
+                key={item.orderItemId}
+                className={`p-3.5 rounded-2xl border transition-all ${
+                  item.received
+                    ? 'bg-card border-border/30'
+                    : 'bg-secondary/20 border-border/10 opacity-50'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    checked={item.received}
+                    onCheckedChange={() => handleReceivedToggle(item.orderItemId)}
+                    className="mt-0.5"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-semibold text-sm text-foreground">{item.itemName}</span>
+                      <span className="text-[11px] text-muted-foreground shrink-0 ml-2">
+                        Pedido: {item.orderedQuantity} {formatUnit(item.unitType)}
                       </span>
-                      
-                      {item.receivedQuantity !== item.orderedQuantity && (
-                        <AppIcon name="Warning" size={16} className="text-warning ml-2" />
-                      )}
                     </div>
-                  )}
+                    
+                    {item.received && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">Recebido:</span>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.1"
+                          value={item.receivedQuantity}
+                          onChange={(e) => handleQuantityChange(item.orderItemId, Number(e.target.value))}
+                          className="w-24 h-8 text-center text-sm rounded-lg"
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          {formatUnit(item.unitType)}
+                        </span>
+                        
+                        {item.receivedQuantity !== item.orderedQuantity && (
+                          <AppIcon name="warning" size={14} className="text-warning ml-1" />
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
           {hasDiscrepancies && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-warning/10 text-warning">
-              <AppIcon name="Warning" size={16} />
-              <span className="text-sm">Algumas quantidades foram ajustadas</span>
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-warning/10 text-warning">
+              <AppIcon name="warning" size={14} />
+              <span className="text-xs font-medium">Algumas quantidades foram ajustadas</span>
             </div>
           )}
 
           <Button
             onClick={handleConfirm}
             disabled={isSubmitting || receivedItems.every(i => !i.received)}
-            className="w-full h-12 gap-2"
+            className="w-full h-12 gap-2 rounded-2xl text-sm font-semibold"
           >
-            <AppIcon name="Check" size={16} />
-            {isSubmitting ? 'Processando...' : 'Confirmar Recebimento e Adicionar ao Estoque'}
+            <AppIcon name="check_circle" size={18} />
+            {isSubmitting ? 'Processando...' : 'Confirmar Recebimento'}
           </Button>
         </div>
       </SheetContent>
