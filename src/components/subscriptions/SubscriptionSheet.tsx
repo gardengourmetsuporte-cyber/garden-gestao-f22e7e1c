@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { Subscription, SubscriptionInsert, SUBSCRIPTION_CATEGORIES } from '@/hooks/useSubscriptions';
+import { searchServices, KnownService } from '@/lib/knownServices';
+import { ExternalLink } from 'lucide-react';
 
 interface Props {
   open: boolean;
@@ -25,6 +28,11 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
   const [managementUrl, setManagementUrl] = useState('');
   const [notes, setNotes] = useState('');
 
+  const [suggestions, setSuggestions] = useState<KnownService[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (editItem) {
       setName(editItem.name);
@@ -40,7 +48,41 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
       setPrice(''); setBillingCycle('mensal'); setNextDate('');
       setManagementUrl(''); setNotes('');
     }
+    setSuggestions([]);
+    setShowSuggestions(false);
   }, [editItem, open]);
+
+  useEffect(() => {
+    if (!editItem) {
+      const results = searchServices(name);
+      setSuggestions(results);
+      setShowSuggestions(results.length > 0);
+    }
+  }, [name, editItem]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node) &&
+          inputRef.current && !inputRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectService = (service: KnownService) => {
+    setName(service.name);
+    setCategory(service.category);
+    setType(service.type);
+    setBillingCycle(service.defaultCycle);
+    setManagementUrl(service.managementUrl);
+    setShowSuggestions(false);
+  };
+
+  const getCategoryLabel = (value: string) => {
+    return SUBSCRIPTION_CATEGORIES.find(c => c.value === value)?.label || value;
+  };
 
   const handleSubmit = async () => {
     if (!name.trim() || !price) return;
@@ -73,9 +115,37 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
           <SheetTitle>{editItem ? 'Editar' : 'Nova assinatura / conta'}</SheetTitle>
         </SheetHeader>
         <div className="space-y-4 mt-4 pb-6">
-          <div>
+          {/* Nome com autocomplete */}
+          <div className="relative">
             <Label>Nome *</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Netflix, Aluguel..." />
+            <Input
+              ref={inputRef}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onFocus={() => { if (suggestions.length > 0 && !editItem) setShowSuggestions(true); }}
+              placeholder="Digite o nome do serviço..."
+              autoComplete="off"
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <div
+                ref={suggestionsRef}
+                className="absolute z-50 left-0 right-0 top-full mt-1 rounded-xl border border-border bg-popover shadow-lg overflow-hidden"
+              >
+                {suggestions.map((s) => (
+                  <button
+                    key={s.name}
+                    type="button"
+                    className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition-colors hover:bg-accent/50 focus:bg-accent/50"
+                    onClick={() => selectService(s)}
+                  >
+                    <span className="font-medium text-foreground truncate">{s.name}</span>
+                    <Badge variant="secondary" className="text-[10px] shrink-0">
+                      {getCategoryLabel(s.category)}
+                    </Badge>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -126,8 +196,15 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
           </div>
 
           <div>
-            <Label>Link de gerenciamento</Label>
-            <Input value={managementUrl} onChange={(e) => setManagementUrl(e.target.value)} placeholder="https://..." />
+            <Label className="flex items-center gap-1.5">
+              Link de gerenciamento
+              {managementUrl && (
+                <a href={managementUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              )}
+            </Label>
+            <Input value={managementUrl} onChange={(e) => setManagementUrl(e.target.value)} placeholder="Preenchido automaticamente ao selecionar um serviço" />
           </div>
 
           <div>
