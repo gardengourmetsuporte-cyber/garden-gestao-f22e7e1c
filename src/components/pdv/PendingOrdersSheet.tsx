@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
+import { PinDialog } from '@/components/checklists/PinDialog';
+import { usePOS } from '@/hooks/usePOS';
 import type { PendingOrder } from '@/hooks/usePOS';
 
 interface PendingOrdersSheetProps {
@@ -80,6 +82,21 @@ function OrderDetailSheet({
   updatingStatus: string | null;
 }) {
   const [showItems, setShowItems] = useState(false);
+  const [cancelPinOpen, setCancelPinOpen] = useState(false);
+  const { validatePinWithPermission } = usePOS();
+
+  const handleCancelWithPin = useCallback(async (pin: string): Promise<boolean> => {
+    if (!order) return false;
+    const { authorized, userName } = await validatePinWithPermission(pin, 'menu-admin.pdv-cancel');
+    if (!authorized) {
+      if (!userName) toast.error('PIN inválido');
+      else toast.error(`${userName} não tem permissão para cancelar`);
+      return false;
+    }
+    onUpdateStatus(order, 'cancelled');
+    setCancelPinOpen(false);
+    return true;
+  }, [order, validatePinWithPermission, onUpdateStatus]);
 
   if (!order) return null;
 
@@ -286,7 +303,7 @@ function OrderDetailSheet({
           {!['delivered', 'dispatched', 'cancelled'].includes(order.status) && (
             <button
               className="w-full py-2 text-xs text-destructive font-medium flex items-center justify-center gap-1 hover:bg-destructive/5 rounded-xl transition-colors"
-              onClick={() => onUpdateStatus(order, 'cancelled')}
+              onClick={() => setCancelPinOpen(true)}
               disabled={updatingStatus === order.id}
             >
               <AppIcon name="X" size={13} />
@@ -294,6 +311,14 @@ function OrderDetailSheet({
             </button>
           )}
         </div>
+
+        <PinDialog
+          open={cancelPinOpen}
+          onOpenChange={setCancelPinOpen}
+          title="Cancelar pedido"
+          subtitle="Digite o PIN de um admin autorizado"
+          onSubmit={handleCancelWithPin}
+        />
       </SheetContent>
     </Sheet>
   );
