@@ -12,6 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
+import { PinDialog } from '@/components/checklists/PinDialog';
+import { usePOS } from '@/hooks/usePOS';
 import type { PendingOrder } from '@/hooks/usePOS';
 
 interface PendingOrdersSheetProps {
