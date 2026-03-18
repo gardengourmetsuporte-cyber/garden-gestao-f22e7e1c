@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useScrollToTopOnChange } from '@/components/ScrollToTop';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { FinanceBottomNav } from '@/components/finance/FinanceBottomNav';
@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function Finance() {
+  const navigate = useNavigate();
   const { activeUnitId } = useUnit();
   const [activeTab, setActiveTab] = useState<FinanceTab>('home');
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
@@ -360,6 +361,10 @@ export default function Finance() {
         onUpdateRecurring={updateRecurringTransaction}
         onRefreshCategories={handleRefreshCategories}
         allTransactions={transactions}
+        onAddToSubscriptions={(data) => {
+          setTransactionSheetOpen(false);
+          navigate('/subscriptions', { state: { prefill: data } });
+        }}
       />
 
       {/* Account Management from Home */}
