@@ -63,7 +63,7 @@ export default function Subscriptions() {
 
   return (
     <AppLayout>
-      <div className="space-y-4">
+      <div className="px-4 py-4 pb-36 lg:pb-12 space-y-4 overflow-hidden">
         {/* Tab bar */}
         <div className="flex gap-1 p-1 bg-secondary/40 rounded-2xl overflow-x-auto">
           {tabs.map(tab => {
