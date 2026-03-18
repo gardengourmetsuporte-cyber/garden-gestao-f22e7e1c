@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 import { PriceDetailSheet } from './PriceDetailSheet';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
+
 
 export function PriceTrackingTab() {
   const { data: items = [], isLoading } = usePriceTracking();
@@ -53,8 +53,8 @@ export function PriceTrackingTab() {
           { label: 'Em queda', value: counts.down, icon: 'TrendingDown', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
           { label: 'Estáveis', value: counts.stable, icon: 'Minus', gradient: 'linear-gradient(135deg, #64748B, #94A3B8)' },
         ].map(card => (
-          <div key={card.label} className="bg-card rounded-2xl border border-border p-3 flex flex-col items-center gap-1.5">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-md" style={{ background: card.gradient }}>
+          <div key={card.label} className="bg-secondary/50 rounded-2xl p-3 flex flex-col items-center gap-1.5">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: card.gradient }}>
               <AppIcon name={card.icon} size={16} className="text-white" />
             </div>
             <span className="text-lg font-bold text-foreground">{card.value}</span>
@@ -101,68 +101,61 @@ export function PriceTrackingTab() {
         />
       ) : (
         <div className="space-y-2">
-          {filtered.map(item => (
-            <button
-              key={item.id}
-              onClick={() => { setSelectedItem(item); setDetailOpen(true); }}
-              className="w-full bg-card rounded-2xl border border-border p-3 flex items-center gap-3 text-left active:scale-[0.98] transition-all touch-manipulation"
-            >
-              {/* Mini Sparkline */}
-              <div className="w-16 h-10 shrink-0">
-                {item.history.length >= 2 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={item.history.map(h => ({ p: h.price }))}>
-                      <Line
-                        type="monotone"
-                        dataKey="p"
-                        stroke={
-                          item.variation_pct === null || item.variation_pct === 0
-                            ? 'hsl(var(--muted-foreground))'
-                            : item.variation_pct > 0
-                              ? 'hsl(var(--destructive))'
-                              : 'hsl(var(--success))'
-                        }
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-[10px] text-muted-foreground">—</span>
-                  </div>
-                )}
-              </div>
+          {filtered.map(item => {
+            const isUp = item.variation_pct !== null && item.variation_pct > 0;
+            const isDown = item.variation_pct !== null && item.variation_pct < 0;
+            const isStable = item.variation_pct === null || item.variation_pct === 0;
+            const trendIcon = isUp ? 'trending_up' : isDown ? 'trending_down' : 'remove';
+            const trendGradient = isUp
+              ? 'linear-gradient(135deg, #EF4444, #F97316)'
+              : isDown
+                ? 'linear-gradient(135deg, #22C55E, #10B981)'
+                : 'linear-gradient(135deg, #64748B, #94A3B8)';
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
-                  {item.variation_pct !== null && Math.abs(item.variation_pct) > 10 && (
-                    <AppIcon name="AlertTriangle" size={14} className="text-destructive shrink-0" />
+            return (
+              <button
+                key={item.id}
+                onClick={() => { setSelectedItem(item); setDetailOpen(true); }}
+                className="w-full bg-card/80 rounded-2xl p-3.5 flex items-center gap-3 text-left active:scale-[0.98] transition-all touch-manipulation"
+              >
+                {/* Trend Icon */}
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg shrink-0"
+                  style={{ background: trendGradient }}
+                >
+                  <AppIcon name={trendIcon} size={18} className="text-white" />
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-bold text-foreground truncate">{item.name}</p>
+                    {item.variation_pct !== null && Math.abs(item.variation_pct) > 10 && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive font-bold shrink-0">!</span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                    {item.supplier_name || 'Sem fornecedor'} · {item.category || 'Sem categoria'}
+                  </p>
+                </div>
+
+                {/* Price + Variation */}
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-bold text-foreground">R$ {item.current_price.toFixed(2)}</p>
+                  {item.variation_pct !== null ? (
+                    <span className={cn(
+                      'text-[11px] font-bold',
+                      isUp ? 'text-destructive' : isDown ? 'text-success' : 'text-muted-foreground'
+                    )}>
+                      {isUp ? '+' : ''}{item.variation_pct.toFixed(1)}%
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-muted-foreground">Novo</span>
                   )}
                 </div>
-                <p className="text-[11px] text-muted-foreground truncate">
-                  {item.supplier_name || 'Sem fornecedor'} · {item.category || 'Sem categoria'}
-                </p>
-              </div>
-
-              {/* Price + Variation */}
-              <div className="text-right shrink-0">
-                <p className="text-sm font-bold text-foreground">R$ {item.current_price.toFixed(2)}</p>
-                {item.variation_pct !== null ? (
-                  <span className={cn(
-                    'text-xs font-semibold',
-                    item.variation_pct > 0 ? 'text-destructive' : item.variation_pct < 0 ? 'text-success' : 'text-muted-foreground'
-                  )}>
-                    {item.variation_pct > 0 ? '↑' : item.variation_pct < 0 ? '↓' : '='} {Math.abs(item.variation_pct).toFixed(1)}%
-                  </span>
-                ) : (
-                  <span className="text-xs text-muted-foreground">Novo</span>
-                )}
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       )}
 
