@@ -388,12 +388,12 @@ export function SupplierProfileSheet({
 
                       return (
                         <div key={inv.id} className={cn(
-                          "rounded-xl border overflow-hidden transition-all",
+                          "rounded-2xl overflow-hidden transition-all",
                           isOverdue
-                            ? "bg-destructive/5 border-destructive/20"
+                            ? "bg-destructive/5 border border-destructive/15"
                             : isDueSoon
-                              ? "bg-warning/5 border-warning/20"
-                              : "bg-secondary/50 border-border/50"
+                              ? "bg-warning/5 border border-warning/15"
+                              : "bg-card/80 border border-border/30"
                         )}>
                           <button
                             type="button"
