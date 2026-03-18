@@ -17,14 +17,18 @@ export interface RecurringSuggestion {
   source: 'known_service' | 'ai' | 'pattern';
 }
 
+const DISMISSED_KEY_VERSION = 'v2';
+
 function getDismissedKey(unitId: string) {
-  return `recurring_dismissed_${unitId}`;
+  return `recurring_dismissed_${DISMISSED_KEY_VERSION}_${unitId}`;
 }
 
 function getDismissed(unitId: string): string[] {
   try {
     return JSON.parse(localStorage.getItem(getDismissedKey(unitId)) || '[]');
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 function addDismissed(unitId: string, name: string) {
@@ -39,7 +43,7 @@ export function useRecurringSuggestions() {
   const { create } = useSubscriptions();
   const [dismissedLocal, setDismissedLocal] = useState<string[]>([]);
 
-  const { data: suggestions = [], isLoading, refetch } = useQuery({
+  const { data: suggestions = [], isLoading, error, refetch } = useQuery({
     queryKey: ['recurring-suggestions', activeUnitId],
     queryFn: async () => {
       if (!activeUnitId) return [];
@@ -50,26 +54,28 @@ export function useRecurringSuggestions() {
 
       if (error) {
         console.error('detect-recurring error:', error);
-        return [];
+        throw error;
       }
 
       const dismissed = getDismissed(activeUnitId);
       const items = (data?.suggestions || []) as RecurringSuggestion[];
-      return items.filter(s => !dismissed.includes(s.name.toLowerCase().trim()));
+      return items.filter((s) => !dismissed.includes(s.name.toLowerCase().trim()));
     },
     enabled: !!activeUnitId && !!user,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    refetchOnWindowFocus: false,
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: 'always',
+    retry: 1,
   });
 
   const filteredSuggestions = suggestions.filter(
-    s => !dismissedLocal.includes(s.name.toLowerCase().trim())
+    (s) => !dismissedLocal.includes(s.name.toLowerCase().trim())
   );
 
   const dismiss = useCallback((name: string) => {
     if (!activeUnitId) return;
     addDismissed(activeUnitId, name);
-    setDismissedLocal(prev => [...prev, name.toLowerCase().trim()]);
+    setDismissedLocal((prev) => [...prev, name.toLowerCase().trim()]);
   }, [activeUnitId]);
 
   const accept = useCallback(async (suggestion: RecurringSuggestion) => {
@@ -92,6 +98,7 @@ export function useRecurringSuggestions() {
   return {
     suggestions: filteredSuggestions,
     isLoading,
+    isError: !!error,
     accept,
     dismiss,
     refetch,

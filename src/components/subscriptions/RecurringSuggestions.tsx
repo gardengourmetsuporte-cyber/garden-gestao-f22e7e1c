@@ -11,7 +11,7 @@ const sourceLabels: Record<string, string> = {
 };
 
 export function RecurringSuggestions() {
-  const { suggestions, isLoading, accept, dismiss } = useRecurringSuggestions();
+  const { suggestions, isLoading, isError, accept, dismiss } = useRecurringSuggestions();
 
   return (
     <div className="space-y-3">
@@ -36,6 +36,15 @@ export function RecurringSuggestions() {
           <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
           <span className="text-xs text-muted-foreground">Analisando transações...</span>
         </div>
+      ) : isError ? (
+        <div className="bg-secondary/40 rounded-2xl p-4 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
+            <Sparkles className="w-4 h-4 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Não foi possível buscar as sugestões agora. Tente novamente em alguns segundos.
+          </p>
+        </div>
       ) : suggestions.length === 0 ? (
         <div className="bg-secondary/40 rounded-2xl p-4 flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
@@ -47,7 +56,7 @@ export function RecurringSuggestions() {
         </div>
       ) : (
         <div className="space-y-2">
-          {suggestions.slice(0, 5).map((s, i) => (
+          {suggestions.slice(0, 20).map((s, i) => (
             <SuggestionCard key={`${s.name}-${i}`} suggestion={s} onAccept={accept} onDismiss={dismiss} />
           ))}
         </div>
