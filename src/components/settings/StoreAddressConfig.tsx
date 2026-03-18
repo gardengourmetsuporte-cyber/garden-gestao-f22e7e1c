@@ -10,12 +10,14 @@ import { toast } from 'sonner';
 export function StoreAddressConfig() {
   const { activeUnit } = useUnit();
   const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (activeUnit) {
       const info = (activeUnit as any).store_info;
       setAddress(info?.address || '');
+      setCity((activeUnit as any).city || '');
     }
   }, [activeUnit]);
 
@@ -26,7 +28,10 @@ export function StoreAddressConfig() {
       const currentInfo = (activeUnit as any).store_info || {};
       const { error } = await supabase
         .from('units')
-        .update({ store_info: { ...currentInfo, address: address.trim() } })
+        .update({
+          store_info: { ...currentInfo, address: address.trim() },
+          city: city.trim() || null,
+        } as any)
         .eq('id', activeUnit.id);
       if (error) throw error;
       toast.success('Endereço salvo!');
@@ -46,14 +51,25 @@ export function StoreAddressConfig() {
         Usado como ponto de origem para calcular distância e taxa de entrega
       </p>
       <div>
+        <Label className="text-xs">Cidade</Label>
+        <Input
+          value={city}
+          onChange={e => setCity(e.target.value)}
+          placeholder="Ex: São João da Boa Vista"
+        />
+        <p className="text-[10px] text-muted-foreground mt-1">
+          Usada para melhorar a precisão na busca de endereços de entrega
+        </p>
+      </div>
+      <div>
         <Label className="text-xs">Endereço completo</Label>
         <Input
           value={address}
           onChange={e => setAddress(e.target.value)}
-          placeholder="Rua Exemplo, 123 - Bairro - Cidade/UF"
+          placeholder="Rua Exemplo, 123 - Bairro"
         />
       </div>
-      <Button size="sm" className="w-full" onClick={handleSave} disabled={saving || !address.trim()}>
+      <Button size="sm" className="w-full" onClick={handleSave} disabled={saving || (!address.trim() && !city.trim())}>
         {saving ? 'Salvando...' : 'Salvar endereço'}
       </Button>
     </div>
