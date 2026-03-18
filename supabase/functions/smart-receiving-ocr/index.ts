@@ -99,7 +99,7 @@ RESPONDA APENAS com JSON válido no formato:
 }`;
 
     // Call OpenAI GPT-4o via Lovable AI proxy
-    const response = await fetch('https://ai-proxy.lovable.dev/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
