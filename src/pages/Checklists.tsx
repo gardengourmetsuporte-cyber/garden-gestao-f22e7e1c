@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { getDeadlineInfo } from '@/lib/checklistTiming';
 import { TimerSettingsPanel } from '@/components/checklists/TimerSettingsPanel';
 
-import { ChecklistTypeCard, ChecklistBonusCard, ChecklistProductionSubCard } from '@/components/checklists/ChecklistTypeCards';
+import { ChecklistTypeCard, ChecklistBonusCard } from '@/components/checklists/ChecklistTypeCards';
 import { useChecklistPage } from '@/hooks/checklists/useChecklistPage';
 
 export default function ChecklistsPage() {
