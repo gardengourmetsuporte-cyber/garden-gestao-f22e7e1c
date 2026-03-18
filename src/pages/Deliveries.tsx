@@ -37,6 +37,14 @@ export default function Deliveries() {
     updateStatus, updateAddress, deleteDelivery, invalidate,
   } = useDeliveries();
 
+  // Auto-prompt push subscription for delivery users
+  const { isSupported: pushSupported, isSubscribed: pushSubscribed, subscribe: pushSubscribe } = usePushNotifications();
+  useEffect(() => {
+    if (pushSupported && !pushSubscribed) {
+      pushSubscribe();
+    }
+  }, [pushSupported, pushSubscribed, pushSubscribe]);
+
   const [sheetOpen, setSheetOpen] = useState(false);
   const [manualSheetOpen, setManualSheetOpen] = useState(false);
   const [locationPickerDelivery, setLocationPickerDelivery] = useState<Delivery | null>(null);
