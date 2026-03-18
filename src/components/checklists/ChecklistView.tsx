@@ -177,6 +177,12 @@ export function ChecklistView({
     completedByUserId?: string; buttonElement?: HTMLElement;
     linkedInventoryItemId: string; itemName: string;
   } | null>(null);
+  // Production undo state
+  const [productionUndoOpen, setProductionUndoOpen] = useState(false);
+  const [productionUndoLoading, setProductionUndoLoading] = useState(false);
+  const [pendingProductionUndo, setPendingProductionUndo] = useState<{
+    itemId: string; linkedInventoryItemId: string; itemName: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!activeUnitId) return;
