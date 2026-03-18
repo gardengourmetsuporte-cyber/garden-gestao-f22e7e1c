@@ -111,7 +111,6 @@ export default function Freelancers() {
             title="Nenhum freelancer"
             subtitle={search || sectorFilter ? 'Nenhum resultado para este filtro.' : 'Cadastre freelancers para acessar rapidamente quando precisar de reforço.'}
           />
-          />
         ) : (
           <div className="space-y-2">
             {filtered.map(f => (
