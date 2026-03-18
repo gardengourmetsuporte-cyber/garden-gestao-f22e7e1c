@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export default function Finance() {
+  const navigate = useNavigate();
   const { activeUnitId } = useUnit();
   const [activeTab, setActiveTab] = useState<FinanceTab>('home');
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
