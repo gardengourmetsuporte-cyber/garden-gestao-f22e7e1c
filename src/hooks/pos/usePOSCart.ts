@@ -49,6 +49,7 @@ export function usePOSCart() {
     setDiscount(0);
     setSaleNotes('');
     setSaleSource('balcao');
+    setFichaNumber(null);
     setDeliveryPhone('');
     setDeliveryAddress('');
   }, []);
