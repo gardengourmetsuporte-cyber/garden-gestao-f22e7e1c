@@ -34,6 +34,7 @@ export const NAV_ITEMS: NavItem[] = [
 
   // ── Gestão ──
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'RefreshCw', label: 'Central Recorrente', href: '/subscriptions', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'UserSearch', label: 'Clientes', href: '/customers', group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'Handshake', customIcon: '/icons/fornecedores.png', label: 'Fornecedores', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
 
@@ -55,7 +56,6 @@ export const NAV_ITEMS: NavItem[] = [
   // ── Gestão ──
   { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'ShieldCheck', label: 'Obrigações Legais', href: '/compliance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'RefreshCw', label: 'Central Recorrente', href: '/subscriptions', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   
 ];
 
