@@ -304,7 +304,8 @@ export function useDeliveries() {
 
   // Geocode address using Nominatim (free)
   const geocodeAddress = useCallback(async (address: string, city: string): Promise<{ lat: number; lng: number } | null> => {
-    const fallbackCity = city?.trim() || activeUnit?.city || resolveGeocodeCity('', (activeUnit?.name || '').trim());
+    const storeCity = (activeUnit?.store_info as any)?.city || '';
+    const fallbackCity = city?.trim() || storeCity || activeUnit?.city || resolveGeocodeCity('', (activeUnit?.name || '').trim());
     const cleaned = cleanAddress(address);
     const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 
@@ -357,18 +358,35 @@ export function useDeliveries() {
     }
 
     // Second pass: unbounded fallback
-    if (anchor) {
-      for (const query of queries) {
+    for (const query of queries) {
+      try {
+        const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+          headers: { 'User-Agent': 'GardenGestao/1.0' },
+        });
+        const results = await res.json();
+        const parsed = pickValidResult(results?.[0], anchor, fallbackCity);
+        if (parsed) return parsed;
+      } catch (error) {
+        console.warn('Falha ao geocodificar endereço (fallback)', error);
+      }
+    }
+
+    // Third pass: raw search without city validation (last resort)
+    if (!anchor) {
+      for (const query of queries.slice(0, 2)) {
         try {
           const params = new URLSearchParams({ q: query, format: 'json', limit: '1', countrycodes: 'br', addressdetails: '1' });
           const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
             headers: { 'User-Agent': 'GardenGestao/1.0' },
           });
           const results = await res.json();
-          const parsed = pickValidResult(results?.[0], anchor, fallbackCity);
-          if (parsed) return parsed;
+          const result = results?.[0];
+          const lat = Number.parseFloat(result?.lat);
+          const lng = Number.parseFloat(result?.lon);
+          if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
         } catch (error) {
-          console.warn('Falha ao geocodificar endereço (fallback)', error);
+          console.warn('Falha ao geocodificar endereço (último recurso)', error);
         }
       }
     }
