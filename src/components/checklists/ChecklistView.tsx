@@ -537,7 +537,12 @@ export function ChecklistView({
       )}
       {displaySectors.map((sector, sectorIndex) => {
         const isExpanded = expandedSectors.has(sector.id);
-        const progress = getCompletionProgress(sector.id);
+        // For virtual sectors (like __production__), compute progress inline
+        const progress = sector.id.startsWith('__') ? (() => {
+          const allItems = (sector.subcategories || []).flatMap((sub: any) => sub.items || []);
+          const completed = allItems.filter((i: any) => isItemCompletedOptimistic(i.id)).length;
+          return { completed, total: allItems.length };
+        })() : getCompletionProgress(sector.id);
         const sectorComplete = progress.total > 0 && progress.completed === progress.total;
 
         return (
