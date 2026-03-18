@@ -161,8 +161,9 @@ export default function Subscriptions() {
 
       <SubscriptionSheet
         open={sheetOpen}
-        onOpenChange={setSheetOpen}
+        onOpenChange={(open) => { setSheetOpen(open); if (!open) setPrefillData(null); }}
         editItem={editItem}
+        prefillData={prefillData}
         onSave={create}
         onUpdate={update}
         isSaving={isCreating || isUpdating}

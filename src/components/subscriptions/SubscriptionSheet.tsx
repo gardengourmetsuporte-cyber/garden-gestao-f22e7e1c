@@ -79,6 +79,16 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, prefillData, o
       const fcId = (editItem as any).finance_category_id;
       setLinkFinance(!!fcId);
       setFinanceCategoryId(fcId || '');
+    } else if (prefillData) {
+      setName(prefillData.name || '');
+      setCategory(prefillData.category || 'outros');
+      setType(prefillData.type || 'assinatura');
+      setPrice(prefillData.price ? String(prefillData.price) : '');
+      setBillingCycle(prefillData.billing_cycle || 'mensal');
+      setNextDate(prefillData.next_payment_date || '');
+      setManagementUrl(prefillData.management_url || '');
+      setNotes(prefillData.notes || '');
+      setLinkFinance(false); setFinanceCategoryId('');
     } else {
       setName(''); setCategory('outros'); setType('assinatura');
       setPrice(''); setBillingCycle('mensal'); setNextDate('');
@@ -87,7 +97,7 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, prefillData, o
     }
     setSuggestions([]);
     setShowSuggestions(false);
-  }, [editItem, open]);
+  }, [editItem, prefillData, open]);
 
   useEffect(() => {
     if (!editItem) {
