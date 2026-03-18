@@ -89,6 +89,35 @@ export const KNOWN_SERVICES: KnownService[] = [
   { name: 'Duolingo Plus', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://www.duolingo.com/settings/account' },
   { name: 'Alura', category: 'software', defaultCycle: 'anual', type: 'assinatura', managementUrl: 'https://www.alura.com.br/minha-conta' },
   { name: 'Coursera Plus', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://www.coursera.org/account-settings' },
+
+  // Restaurante / Food Service
+  { name: 'Colibri', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+  { name: 'Goomer', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://www.goomer.com.br/' },
+  { name: 'Saipos', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://www.saipos.com/' },
+  { name: 'Consumer', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+  { name: 'Linx', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+  { name: 'Stone', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://conta.stone.com.br/' },
+  { name: 'Cielo', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://www.cielo.com.br/' },
+  { name: 'PagSeguro', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://pagseguro.uol.com.br/' },
+  { name: 'Getnet', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+  { name: 'Rede', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+  { name: 'Anota AI', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+  { name: 'Simples Delivery', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+  { name: 'Delivery Much', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+  { name: 'Contabilizei', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://www.contabilizei.com.br/' },
+  { name: 'Omie', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://app.omie.com.br/' },
+  { name: 'Bling', category: 'software', defaultCycle: 'mensal', type: 'assinatura', managementUrl: 'https://www.bling.com.br/' },
+  { name: 'aiqfome', category: 'alimentacao', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+  { name: 'Uber Eats', category: 'alimentacao', defaultCycle: 'mensal', type: 'assinatura', managementUrl: '' },
+
+  // Gás
+  { name: 'Comgás', category: 'energia', defaultCycle: 'mensal', type: 'conta_fixa', managementUrl: '' },
+  { name: 'Ultragaz', category: 'energia', defaultCycle: 'mensal', type: 'conta_fixa', managementUrl: '' },
+
+  // Energia extras
+  { name: 'Elektro', category: 'energia', defaultCycle: 'mensal', type: 'conta_fixa', managementUrl: '' },
+  { name: 'Energisa', category: 'energia', defaultCycle: 'mensal', type: 'conta_fixa', managementUrl: '' },
+  { name: 'Equatorial', category: 'energia', defaultCycle: 'mensal', type: 'conta_fixa', managementUrl: '' },
 ];
 
 export function searchServices(query: string): KnownService[] {
