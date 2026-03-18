@@ -294,6 +294,7 @@ export function useDeliveries() {
   // Strip apartment/unit/complement info that confuses geocoders
   const cleanAddress = useCallback((addr: string): string => {
     return addr
+      .replace(/\bnº\s*/gi, '')
       .replace(/\b(apto?|apartamento|bloco?|sala|casa|unid(ade)?|lote|quadra|andar|fundos|frente)\b\s*\d*/gi, '')
       .replace(/,\s*,/g, ',')
       .replace(/,\s*$/, '')
@@ -303,7 +304,7 @@ export function useDeliveries() {
 
   // Geocode address using Nominatim (free)
   const geocodeAddress = useCallback(async (address: string, city: string): Promise<{ lat: number; lng: number } | null> => {
-    const fallbackCity = resolveGeocodeCity(city, (activeUnit?.name || '').trim());
+    const fallbackCity = city?.trim() || activeUnit?.city || resolveGeocodeCity('', (activeUnit?.name || '').trim());
     const cleaned = cleanAddress(address);
     const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 
@@ -373,7 +374,7 @@ export function useDeliveries() {
     }
 
     return null;
-  }, [activeUnit?.name, cleanAddress, pickValidResult, resolveGeocodeCity]);
+  }, [activeUnit?.name, activeUnit?.city, cleanAddress, pickValidResult, resolveGeocodeCity]);
 
   // Create delivery
   const createDelivery = useMutation({

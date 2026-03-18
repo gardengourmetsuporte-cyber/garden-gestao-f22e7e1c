@@ -23,6 +23,7 @@ export interface Unit {
   id: string;
   name: string;
   slug: string;
+  city?: string;
   is_active: boolean;
   created_by: string;
   created_at: string;
