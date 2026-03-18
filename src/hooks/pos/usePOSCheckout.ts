@@ -28,7 +28,7 @@ export function usePOSCheckout(deps: CheckoutDeps) {
   const [savingSale, setSavingSale] = useState(false);
 
   const finalizeSale = useCallback(async (payments: PaymentLine[], sourceOrderId?: string) => {
-    const { activeUnitId, userId, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, clearCart, fetchPendingOrders } = deps;
+    const { activeUnitId, userId, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, deliveryPhone, deliveryAddress, clearCart, fetchPendingOrders } = deps;
     if (!activeUnitId || !userId) return null;
     const paymentTotal = payments.reduce((s, p) => s + p.amount, 0);
     if (paymentTotal < total) {
@@ -43,12 +43,15 @@ export function usePOSCheckout(deps: CheckoutDeps) {
       source_order_id: sourceOrderId || null,
       customer_name: customerName || null,
       customer_document: customerDocument || null,
+      customer_phone: (saleSource === 'delivery' && deliveryPhone) ? deliveryPhone : null,
       table_number: tableNumber,
       subtotal,
       discount,
       total,
       status: 'paid',
-      notes: saleNotes || null,
+      notes: saleSource === 'delivery' && deliveryAddress
+        ? (saleNotes ? `${saleNotes} | Endereço: ${deliveryAddress}` : `Endereço: ${deliveryAddress}`)
+        : (saleNotes || null),
       paid_at: new Date().toISOString(),
     };
 
