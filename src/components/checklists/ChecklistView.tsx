@@ -1940,6 +1940,31 @@ export function ChecklistView({
           }}
         />
       )}
+
+      {/* Production Undo AlertDialog */}
+      <AlertDialog open={productionUndoOpen} onOpenChange={setProductionUndoOpen}>
+        <AlertDialogContent className="max-w-sm mx-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AppIcon name="warning" size={20} className="text-amber-500" />
+              Reverter Produção
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Ao desfazer, a entrada de estoque de <strong>{pendingProductionUndo?.itemName}</strong> será revertida e a ordem de produção será removida. Deseja continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={productionUndoLoading}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleProductionUndo}
+              disabled={productionUndoLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {productionUndoLoading ? 'Revertendo...' : 'Reverter'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
