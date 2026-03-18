@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useUnit } from '@/contexts/UnitContext';
 import { supabase } from '@/integrations/supabase/client';
-import { AppIcon } from '@/components/ui/AppIcon';
+import { AppIcon } from '@/components/ui/app-icon';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
