@@ -81,7 +81,6 @@ export function SmartReceivingSheet({
     setStep('processing');
 
     try {
-      const fileToProcess = invoiceFile || boletoFile!;
       const items = inventoryItems.map(i => ({
         id: i.id,
         name: i.name,
@@ -89,33 +88,22 @@ export function SmartReceivingSheet({
         unit_price: i.unit_price,
       }));
 
-      const result = await processImage(fileToProcess, items);
+      const result = await processImage(invoiceFile, items);
       setOcrResult(result);
 
-      // Upload images to storage
+      // Upload invoice image
       let invoiceUrl: string | null = null;
-      let boletoUrl: string | null = null;
-
-      if (invoiceFile) {
-        try {
-          invoiceUrl = await uploadImage(invoiceFile, 'invoice');
-        } catch (e) {
-          console.error('Failed to upload invoice image:', e);
-        }
-      }
-      if (boletoFile) {
-        try {
-          boletoUrl = await uploadImage(boletoFile, 'boleto');
-        } catch (e) {
-          console.error('Failed to upload boleto image:', e);
-        }
+      try {
+        invoiceUrl = await uploadImage(invoiceFile, 'invoice');
+      } catch (e) {
+        console.error('Failed to upload invoice image:', e);
       }
 
       // Create receiving record
       const receiving = await createReceiving({
         ocrResult: result,
         invoiceImageUrl: invoiceUrl,
-        boletoImageUrl: boletoUrl,
+        boletoImageUrl: null,
         orderId: order?.id || null,
         supplierId: order?.supplier_id || null,
         aiRawResponse: result,
