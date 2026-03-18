@@ -73,8 +73,8 @@ export function SmartReceivingSheet({
   };
 
   const handleProcess = async () => {
-    if (!invoiceFile && !boletoFile) {
-      toast.error('Tire pelo menos uma foto');
+    if (!invoiceFile) {
+      toast.error('Tire uma foto da nota fiscal');
       return;
     }
 
