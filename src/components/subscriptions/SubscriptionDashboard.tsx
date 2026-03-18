@@ -22,10 +22,10 @@ export function SubscriptionDashboard({ totalMonthly, activeCount, upcomingBills
     .reduce((sum, s) => sum + getMonthlyPrice(s.price, s.billing_cycle), 0);
 
   const stats = [
-    { icon: DollarSign, label: 'Total mensal', value: `R$ ${totalMonthly.toFixed(2)}`, gradient: 'from-emerald-500 to-green-600' },
-    { icon: Package, label: 'Ativos', value: String(activeCount), gradient: 'from-blue-500 to-indigo-600' },
-    { icon: AlertTriangle, label: 'Próximos', value: String(upcomingBills.length), gradient: 'from-amber-500 to-orange-600' },
-    { icon: TrendingDown, label: 'Economia', value: `R$ ${canceledSavings.toFixed(2)}`, gradient: 'from-teal-500 to-emerald-600' },
+    { name: 'DollarSign', label: 'Total mensal', value: `R$ ${totalMonthly.toFixed(2)}`, color: 'primary' as const },
+    { name: 'Package', label: 'Ativos', value: String(activeCount), color: 'blue' as const },
+    { name: 'AlertTriangle', label: 'Próximos', value: String(upcomingBills.length), color: 'amber' as const },
+    { name: 'TrendingDown', label: 'Economia', value: `R$ ${canceledSavings.toFixed(2)}`, color: 'emerald' as const },
   ];
 
   return (
@@ -35,7 +35,7 @@ export function SubscriptionDashboard({ totalMonthly, activeCount, upcomingBills
         {stats.map((s) => (
           <div key={s.label} className="bg-secondary/40 rounded-2xl p-4 active:scale-[0.98] transition-transform">
             <div className="flex items-center gap-2.5 mb-2">
-              <GradientIcon icon={s.icon} className={`bg-gradient-to-br ${s.gradient}`} size="sm" />
+              <GradientIcon name={s.name} color={s.color} size="sm" />
               <span className="text-[11px] text-muted-foreground font-medium">{s.label}</span>
             </div>
             <p className="text-xl font-bold text-foreground">{s.value}</p>
