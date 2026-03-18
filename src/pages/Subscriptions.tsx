@@ -65,7 +65,7 @@ export default function Subscriptions() {
     <AppLayout>
       <div className="px-4 py-4 pb-36 lg:pb-12 space-y-4 overflow-hidden">
         {/* Tab bar */}
-        <div className="flex gap-1 p-1 bg-secondary/40 rounded-2xl overflow-x-auto">
+        <div className="flex gap-2 overflow-x-auto pb-1">
           {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
@@ -73,16 +73,22 @@ export default function Subscriptions() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-1.5 flex-1 justify-center px-3 py-2.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all active:scale-[0.97] ${
+                className={`relative flex flex-col items-center gap-1.5 flex-1 min-w-[72px] py-3 rounded-2xl text-[10px] font-medium whitespace-nowrap transition-all active:scale-[0.96] ${
                   isActive
-                    ? 'bg-primary/15 text-primary shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-primary/15 text-primary'
+                    : 'bg-secondary/40 text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                  isActive
+                    ? 'bg-primary/20 shadow-[0_0_12px_hsl(var(--primary)/0.25)]'
+                    : 'bg-muted/50'
+                }`}>
+                  <Icon className={`w-4 h-4 transition-all ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                </div>
                 {tab.label}
                 {tab.key === 'alertas' && alerts.length > 0 && (
-                  <Badge variant="destructive" className="text-[9px] h-4 min-w-4 px-1 border-0">{alerts.length}</Badge>
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 text-[9px] h-4 min-w-4 px-1 border-0">{alerts.length}</Badge>
                 )}
               </button>
             );
