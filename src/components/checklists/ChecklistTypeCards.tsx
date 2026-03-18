@@ -155,14 +155,12 @@ interface BonusCardProps {
   removeDeadline: any;
   isSavingDeadline: boolean;
   hasActiveItems?: boolean;
-  productionSlot?: React.ReactNode;
 }
 
 export function ChecklistBonusCard({
   isSelected, onSelect, settingsMode, isAdmin,
   deadlineSettings, updateDeadline, removeDeadline, isSavingDeadline,
   hasActiveItems = true,
-  productionSlot,
 }: BonusCardProps) {
   return (
     <button
