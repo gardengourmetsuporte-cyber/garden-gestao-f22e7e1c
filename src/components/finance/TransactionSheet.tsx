@@ -81,7 +81,8 @@ export function TransactionSheet({
   onUpdateRecurring,
   onSaveAndContinue,
   onRefreshCategories,
-  allTransactions = []
+  allTransactions = [],
+  onAddToSubscriptions,
 }: TransactionSheetProps) {
   const DRAFT_KEY = 'transaction-sheet-draft';
 
