@@ -55,6 +55,7 @@ export default function InventoryPage() {
   const [batchSheetOpen, setBatchSheetOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [showTemplates, setShowTemplates] = useState(true);
+  const [smartScanOpen, setSmartScanOpen] = useState(false);
 
   // Handle ?action= from quick actions / setup checklist
   useEffect(() => {
