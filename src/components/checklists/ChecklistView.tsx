@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { ActiveTimer, ItemTimeStats } from '@/hooks/checklists/useChecklistTimer';
 import { TimerBadge, TimerStatsIndicator } from '@/components/checklists/TimerBadge';
@@ -175,6 +176,12 @@ export function ChecklistView({
     itemId: string; points: number; configuredPoints: number;
     completedByUserId?: string; buttonElement?: HTMLElement;
     linkedInventoryItemId: string; itemName: string;
+  } | null>(null);
+  // Production undo state
+  const [productionUndoOpen, setProductionUndoOpen] = useState(false);
+  const [productionUndoLoading, setProductionUndoLoading] = useState(false);
+  const [pendingProductionUndo, setPendingProductionUndo] = useState<{
+    itemId: string; linkedInventoryItemId: string; itemName: string;
   } | null>(null);
 
   useEffect(() => {
@@ -400,6 +407,42 @@ export function ChecklistView({
     }
   };
 
+  const handleProductionUndo = async () => {
+    if (!pendingProductionUndo || !activeUnitId) return;
+    const { itemId, linkedInventoryItemId } = pendingProductionUndo;
+    setProductionUndoLoading(true);
+    try {
+      const { error: smError } = await supabase
+        .from('stock_movements')
+        .delete()
+        .eq('item_id', linkedInventoryItemId)
+        .eq('type', 'entrada')
+        .like('notes', '%Produção via checklist%')
+        .eq('unit_id', activeUnitId);
+      if (smError) console.error('Error deleting stock movements:', smError);
+
+      const { error: poError } = await supabase
+        .from('production_orders')
+        .delete()
+        .eq('item_id', linkedInventoryItemId)
+        .eq('unit_id', activeUnitId);
+      if (poError) console.error('Error deleting production orders:', poError);
+
+      setOptimisticToggles(prev => { const next = new Set(prev); next.add(itemId); return next; });
+      await onToggleItem(itemId, 0, undefined, undefined, undefined, false, true);
+      toast.success('Produção revertida com sucesso');
+    } catch (err: any) {
+      console.error('Production undo error:', err);
+      toast.error(err.message || 'Erro ao reverter produção');
+      setOptimisticToggles(prev => { const next = new Set(prev); next.delete(itemId); return next; });
+    } finally {
+      setProductionUndoLoading(false);
+      setProductionUndoOpen(false);
+      setPendingProductionUndo(null);
+      setOpenPopover(null);
+    }
+  };
+
   const getItemCompletionCount = useCallback((itemId: string) => {
     return completions.filter(c => c.item_id === itemId && !c.is_skipped).length;
   }, [completions]);
@@ -543,56 +586,196 @@ export function ChecklistView({
             const canToggle = canToggleItem(completion, completed);
             const configuredPoints = item.points ?? 1;
             const isJustCompleted = recentlyCompleted.has(item.id);
+            const linkedInventoryItemId = (item as any).linked_inventory_item_id;
 
-            return (
-              <button
-                key={item.id}
-                onClick={(e) => {
-                  if (!canToggle) return;
-                  handleComplete(item.id, configuredPoints, configuredPoints, currentUserId, e.currentTarget as HTMLElement);
-                }}
-                disabled={!canToggle}
-                className={cn(
-                  "w-full flex items-center gap-3 p-4 rounded-2xl border text-left transition-all duration-300",
-                  completed
-                    ? "bg-success/5 border-success/20"
-                    : "card-stat-holo",
-                  isJustCompleted && "animate-scale-in",
-                  !canToggle && !completed && "opacity-50"
-                )}
-                style={{ animationDelay: `${itemIndex * 50}ms` }}
-              >
-                <div className={cn(
-                  "w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all",
-                  completed ? "bg-success border-success" : "border-muted-foreground/30"
-                )}>
-                  {completed && <AppIcon name="check" size={14} className="text-success-foreground" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "text-sm font-medium transition-colors",
-                    completed ? "text-success line-through" : "text-foreground"
-                  )}>
-                    {item.name}
-                  </p>
-                  {item.description && (
-                    <p className="text-[11px] text-muted-foreground truncate">{item.description}</p>
+            if (completed) {
+              const wasSkipped = completion?.is_skipped === true;
+              const wasAwardedPoints = completion?.awarded_points !== false;
+              const pointsAwarded = completion?.points_awarded ?? item.points;
+              return (
+                <div key={item.id} className="space-y-1.5">
+                  <button
+                    onClick={() => {
+                      const isOwnCompletion = completion?.completed_by === currentUserId;
+                      if (isAdmin || isOwnCompletion) {
+                        setOpenPopover(openPopover === item.id ? null : item.id);
+                        return;
+                      }
+                      if (!canToggle) return;
+                    }}
+                    disabled={(isAdmin || completion?.completed_by === currentUserId) ? false : !canToggle}
+                    className={cn(
+                      "w-full flex items-start gap-3 p-3.5 rounded-2xl transition-all duration-300",
+                      wasSkipped
+                        ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
+                        : "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
+                      isJustCompleted && "animate-scale-in",
+                      openPopover === item.id && "ring-2 ring-primary/30"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-white shadow-md mt-0.5",
+                      wasSkipped ? "bg-destructive" : "bg-success"
+                    )}>
+                      {wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : <AppIcon name="Check" className="w-4 h-4" />}
+                    </div>
+                    <div className="flex-1 min-w-0 text-left">
+                      <div className="flex items-center gap-2">
+                        <p className={cn("font-medium line-through text-sm", wasSkipped ? "text-destructive" : "text-success")}>{item.name}</p>
+                        <AppIcon name="soup_kitchen" size={14} className="text-success shrink-0" />
+                      </div>
+                      {completion && (
+                        <div className="flex items-center gap-1 mt-1 text-[11px] text-muted-foreground">
+                          <AppIcon name="User" className="w-3 h-3" />
+                          <span>{completion.profile?.full_name || 'Usuário'} · {format(new Date(completion.completed_at), 'HH:mm')}</span>
+                        </div>
+                      )}
+                    </div>
+                    {wasAwardedPoints && pointsAwarded > 0 && !wasSkipped && (
+                      <div className="flex items-center gap-0.5 shrink-0" style={{ color: getItemPointsColors(pointsAwarded).color }}>
+                        <AppIcon name="Star" size={18} />
+                        <span className="text-sm font-bold">{pointsAwarded}</span>
+                      </div>
+                    )}
+                  </button>
+                  {/* Popover panel for completed production items */}
+                  {(isAdmin || completion?.completed_by === currentUserId) && openPopover === item.id && completion && (
+                    <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
+                      {canToggle && (
+                        <button
+                          onClick={() => {
+                            if (linkedInventoryItemId) {
+                              setPendingProductionUndo({ itemId: item.id, linkedInventoryItemId, itemName: item.name });
+                              setProductionUndoOpen(true);
+                            } else {
+                              setOpenPopover(null);
+                              setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
+                              onToggleItem(item.id, 0, undefined, undefined, undefined, false, true).catch(err => {
+                                setOptimisticToggles(prev => { const next = new Set(prev); next.delete(item.id); return next; });
+                                toast.error(err.message || 'Erro ao desfazer');
+                              });
+                            }
+                          }}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-secondary text-left transition-all duration-200 active:scale-[0.97]"
+                        >
+                          <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
+                            <AppIcon name="undo" size={20} className="text-muted-foreground" />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-foreground">Desfazer</p>
+                            <p className="text-xs text-muted-foreground">Reverter produção e estoque</p>
+                          </div>
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
-                <AppIcon name="soup_kitchen" size={16} className={cn(
-                  "shrink-0",
-                  completed ? "text-success" : "text-amber-500"
-                )} />
-                {configuredPoints > 0 && (
-                  <div className={cn(
-                    "px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-0.5 shrink-0",
-                    completed ? "bg-success/10 text-success" : "bg-amber-500/10 text-amber-500"
-                  )}>
-                    <AppIcon name="bolt" size={12} />
-                    {configuredPoints}
+              );
+            }
+
+            // Uncompleted production item
+            return (
+              <div key={item.id}>
+                <button
+                  disabled={!canToggle}
+                  onClick={(e) => {
+                    if (!canToggle) return;
+                    if (!isAdmin) {
+                      handleComplete(item.id, configuredPoints, configuredPoints, undefined, e.currentTarget as HTMLElement);
+                    } else {
+                      setOpenPopover(openPopover === item.id ? null : item.id);
+                    }
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300",
+                    "card-stat-holo",
+                    !canToggle && "opacity-50",
+                    canToggle && "active:scale-[0.97]",
+                    openPopover === item.id && "!border-primary/40"
+                  )}
+                >
+                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border-2 border-muted-foreground/20 bg-background/50">
+                    <AppIcon name="Check" className="w-5 h-5 text-muted-foreground/40" />
+                  </div>
+                  <div className="flex-1 min-w-0 text-left">
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-semibold text-sm text-foreground truncate">{item.name}</p>
+                      <AppIcon name="soup_kitchen" size={14} className="text-amber-500 shrink-0" />
+                    </div>
+                    {item.description && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{item.description}</p>}
+                  </div>
+                  {configuredPoints > 0 && (
+                    <div className="flex items-center gap-0.5 shrink-0 pr-1" style={{ color: getItemPointsColors(configuredPoints).color }}>
+                      <AppIcon name="Star" size={20} />
+                      <span className="text-sm font-bold">{configuredPoints}</span>
+                    </div>
+                  )}
+                </button>
+                {/* Admin popover for uncompleted production items */}
+                {openPopover === item.id && (
+                  <div className="mt-2 rounded-xl border bg-card p-4 shadow-lg animate-fade-in space-y-3">
+                    {isAdmin && profiles.length > 0 && (
+                      <>
+                        <button
+                          onClick={() => setExpandedPeopleFor(expandedPeopleFor === item.id ? null : item.id)}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary/5 hover:bg-primary/10 text-left transition-all duration-200 border border-primary/20 active:scale-[0.97]"
+                        >
+                          <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
+                            <AppIcon name="Users" className="w-5 h-5 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-foreground">Quem realizou?</p>
+                            <p className="text-xs text-muted-foreground">Selecione quem fez</p>
+                          </div>
+                          <AppIcon name="ChevronDown" className={cn("w-5 h-5 text-muted-foreground transition-transform", expandedPeopleFor === item.id && "rotate-180")} />
+                        </button>
+                        <div className={cn("overflow-hidden transition-all duration-300", expandedPeopleFor === item.id ? "max-h-64 opacity-100" : "max-h-0 opacity-0")}>
+                          <div className="max-h-48 overflow-y-auto space-y-1 pt-1">
+                            {profiles.map((profile) => (
+                              <button key={profile.user_id} onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, profile.user_id, e.currentTarget)}
+                                className={cn("w-full flex items-center gap-2 p-2 rounded-lg text-left text-sm",
+                                  profile.user_id === currentUserId ? "bg-primary/10 hover:bg-primary/20 text-primary font-medium" : "hover:bg-secondary text-foreground")}>
+                                <AppIcon name="User" className="w-4 h-4 shrink-0" /><span className="truncate">{profile.full_name}</span>
+                                {profile.user_id === currentUserId && <span className="text-xs text-muted-foreground ml-auto">(eu)</span>}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                    {!isAdmin && (
+                      <>
+                        <button onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, undefined, e.currentTarget)}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]">
+                          <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-5 h-5 text-success-foreground" /></div>
+                          <div className="flex-1"><p className="font-semibold text-success">Concluí agora</p>
+                            {configuredPoints > 0 ? (
+                              <div className="flex items-center gap-1 mt-0.5"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: getItemPointsColors(configuredPoints).color }} />
+                                <span className="text-xs font-bold" style={{ color: getItemPointsColors(configuredPoints).color }}>+{configuredPoints}</span></div>
+                            ) : (<span className="text-xs text-muted-foreground">Tarefa sem pontos</span>)}
+                          </div>
+                        </button>
+                        <div className="border-t border-border" />
+                        <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget, true)}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
+                          <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
+                          <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                        </button>
+                      </>
+                    )}
+                    {isAdmin && (
+                      <>
+                        <div className="border-t border-border" />
+                        <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
+                          <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
+                          <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
-              </button>
+              </div>
             );
           })}
         </div>
@@ -1312,6 +1495,12 @@ export function ChecklistView({
                                       {!isTimerMode && canToggle && (
                                         <button
                                           onClick={async () => {
+                                            const linkedId = (item as any).linked_inventory_item_id;
+                                            if (linkedId) {
+                                              setPendingProductionUndo({ itemId: item.id, linkedInventoryItemId: linkedId, itemName: item.name });
+                                              setProductionUndoOpen(true);
+                                              return;
+                                            }
                                             setOpenPopover(null);
                                             setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                                             try {
@@ -1328,7 +1517,7 @@ export function ChecklistView({
                                           </div>
                                           <div>
                                             <p className="font-semibold text-foreground">Desfazer</p>
-                                            <p className="text-xs text-muted-foreground">Desmarcar conclusão</p>
+                                            <p className="text-xs text-muted-foreground">{(item as any).linked_inventory_item_id ? 'Reverter produção e estoque' : 'Desmarcar conclusão'}</p>
                                           </div>
                                         </button>
                                       )}
@@ -1787,6 +1976,31 @@ export function ChecklistView({
           }}
         />
       )}
+
+      {/* Production Undo AlertDialog */}
+      <AlertDialog open={productionUndoOpen} onOpenChange={setProductionUndoOpen}>
+        <AlertDialogContent className="max-w-sm mx-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AppIcon name="warning" size={20} className="text-amber-500" />
+              Reverter Produção
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Ao desfazer, a entrada de estoque de <strong>{pendingProductionUndo?.itemName}</strong> será revertida e a ordem de produção será removida. Deseja continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={productionUndoLoading}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleProductionUndo}
+              disabled={productionUndoLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {productionUndoLoading ? 'Revertendo...' : 'Reverter'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

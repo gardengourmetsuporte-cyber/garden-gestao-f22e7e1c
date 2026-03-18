@@ -1,34 +1,88 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-## Plano: Corrigir Fluxo de Produção no Checklist
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-### Problemas Identificados
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-1. **Não pergunta "quem fez"**: O `handleComplete` intercepta itens de produção antes do popover de seleção de funcionário, pulando direto para o `ProductionCompletionSheet`
-2. **Sem opção de desfazer**: Ao desmarcar um item de produção, o sistema remove a completion mas **não reverte** a entrada de estoque (`stock_movements`) nem a ordem de produção (`production_orders`)
+---
 
-### Mudanças
+## Bloco de Relatórios Avançados ✅
 
-**1. `src/components/checklists/ChecklistView.tsx` — Manter fluxo padrão para produção**
-- O `handleComplete` NÃO deve interceptar itens de produção antes do popover — deve deixar o popover normal abrir (com "Quem realizou?" para admin, ou "Concluí agora" para não-admin)
-- Mover a lógica de detecção de produção para DEPOIS da seleção do usuário, dentro do `executeComplete`
-- Ou seja: o fluxo será: **Popover → Seleciona quem fez → Detecta produção → Abre ProductionCompletionSheet → Confirma quantidade → Completa item**
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-**2. `src/components/checklists/ChecklistView.tsx` — Adicionar opção de desfazer**
-- Quando um item de produção já está completo e o usuário clica para desmarcar, mostrar um AlertDialog de confirmação avisando que a entrada de estoque será revertida
-- Ao confirmar o desfazer: deletar o `stock_movement` correspondente (filtrado por `notes LIKE '%Produção via checklist%'` + `item_id` + data) e a `production_order` correspondente
+## Dashboard Analytics ✅
 
-**3. `src/hooks/checklists/useChecklistCompletions.ts` — Reverter estoque ao desmarcar produção**
-- Adicionar parâmetro opcional `linkedInventoryItemId` ao `toggleCompletion`
-- Quando estiver desmarcando (existingCompletions > 0) e o item tem `linkedInventoryItemId`, deletar o `stock_movement` de entrada mais recente com notes contendo "Produção via checklist" para esse item de inventário
-- Deletar a `production_order` correspondente
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-### Fluxo Resultante
-```text
-Marcar item de produção:
-  Clica → Popover (quem fez?) → Seleciona → ProductionCompletionSheet (quantidade) → Confirma → ✅
+## Operacional ✅
 
-Desmarcar item de produção:
-  Clica → AlertDialog ("Reverter produção e estoque?") → Confirma → Remove completion + stock_movement + production_order → ⬜
-```
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
+## CRM / Clientes ✅
+
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+
+## Funcionários ✅
+
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
+
+## Produção Integrada ao Checklist ✅
+
+- Itens de checklist vinculados a itens de estoque (categoria Produção)
+- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
+- Entrada automática no estoque + registro de produção
+- Badge visual de produção nos itens vinculados
+- Configuração de vínculo no admin de checklists
+- Removido módulo Produção da página de Pedidos
