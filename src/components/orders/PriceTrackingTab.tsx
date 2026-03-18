@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/ui/empty-state';
 import { cn } from '@/lib/utils';
 import { PriceDetailSheet } from './PriceDetailSheet';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
+
 
 export function PriceTrackingTab() {
   const { data: items = [], isLoading } = usePriceTracking();
