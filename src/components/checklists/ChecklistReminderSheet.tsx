@@ -164,7 +164,7 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
       <SheetContent className="flex flex-col">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <img src="/icons/whatsapp.png" alt="" className="w-5 h-5 dark:invert" />
+            <AppIcon name="chat" size={18} fill={1} className="text-[#25D366]" />
             Lembrar Equipe
           </SheetTitle>
         </SheetHeader>
@@ -244,7 +244,7 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
                       <div className="flex items-center gap-2 mt-0.5">
                         {hasPhone ? (
                           <span className="text-[10px] text-primary flex items-center gap-0.5">
-                            <img src="/icons/whatsapp.png" alt="" className="w-3 h-3 dark:invert" />
+                            <AppIcon name="chat" size={12} fill={1} className="text-primary" />
                             {m.phone}
                           </span>
                         ) : (
@@ -271,7 +271,7 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
             {sending ? (
               <AppIcon name="progress_activity" size={16} className="animate-spin" />
             ) : (
-              <img src="/icons/whatsapp.png" alt="" className="w-4 h-4" />
+              <AppIcon name="chat" size={16} fill={1} className="text-white" />
             )}
             Enviar via WhatsApp ({selectedWithPhone.length})
           </Button>
