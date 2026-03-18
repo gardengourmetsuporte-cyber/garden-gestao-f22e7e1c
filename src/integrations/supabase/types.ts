@@ -5417,6 +5417,7 @@ export type Database = {
           category: string
           color: string | null
           created_at: string | null
+          finance_category_id: string | null
           icon: string | null
           id: string
           management_url: string | null
@@ -5435,6 +5436,7 @@ export type Database = {
           category?: string
           color?: string | null
           created_at?: string | null
+          finance_category_id?: string | null
           icon?: string | null
           id?: string
           management_url?: string | null
@@ -5453,6 +5455,7 @@ export type Database = {
           category?: string
           color?: string | null
           created_at?: string | null
+          finance_category_id?: string | null
           icon?: string | null
           id?: string
           management_url?: string | null
@@ -5467,6 +5470,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "recurring_subscriptions_finance_category_id_fkey"
+            columns: ["finance_category_id"]
+            isOneToOne: false
+            referencedRelation: "finance_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "recurring_subscriptions_unit_id_fkey"
             columns: ["unit_id"]
