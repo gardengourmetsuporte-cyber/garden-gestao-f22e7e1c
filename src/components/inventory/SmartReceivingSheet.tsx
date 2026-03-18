@@ -267,8 +267,8 @@ export function SmartReceivingSheet({
         {step === 'processing' && (
           <div className="flex flex-col items-center justify-center py-12 gap-4">
             <div className="relative">
-              <AppIcon name="Progress_activity" size={48} className="text-primary animate-spin" />
-              <AppIcon name="AutoAwesome" size={20} className="text-primary absolute -top-1 -right-1 animate-pulse" />
+              <AppIcon name="progress_activity" size={48} className="text-primary animate-spin" />
+              <AppIcon name="auto_awesome" size={20} className="text-primary absolute -top-1 -right-1 animate-pulse" />
             </div>
             <p className="text-lg font-semibold">Processando...</p>
             <p className="text-sm text-muted-foreground text-center">
