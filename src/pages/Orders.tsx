@@ -465,32 +465,34 @@ export default function OrdersPage() {
 
                     {/* No-supplier items */}
                     {itemsBySupplier['no-supplier'] && itemsBySupplier['no-supplier'].length > 0 && (
-                      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+                      <div className="bg-card/80 rounded-2xl overflow-hidden">
                         <Collapsible
                           open={expandedSuppliers['no-supplier'] ?? false}
                           onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, ['no-supplier']: open }))}
                         >
-                           <CollapsibleTrigger className="w-full flex items-center gap-3 p-4 text-left">
+                           <CollapsibleTrigger className="w-full flex items-center gap-3 p-3.5 text-left">
                             <GradientIcon name="Package" color="muted" size="md" />
                             <div className="flex-1 min-w-0">
-                              <span className="font-semibold text-foreground">Sem Fornecedor</span>
-                              <p className="text-xs text-muted-foreground">
+                              <span className="font-bold text-foreground text-sm">Sem Fornecedor</span>
+                              <p className="text-[11px] text-muted-foreground mt-1">
                                 {itemsBySupplier['no-supplier'].length} ite{itemsBySupplier['no-supplier'].length !== 1 ? 'ns' : 'm'} abaixo do mínimo
                               </p>
                             </div>
-                            <AppIcon name="ChevronDown" size={16} className={cn(
-                              "text-muted-foreground transition-transform duration-200 shrink-0",
-                              (expandedSuppliers['no-supplier'] ?? false) && "rotate-180"
-                            )} />
+                            <div className="p-1.5 rounded-lg hover:bg-secondary/50 transition-colors shrink-0">
+                              <AppIcon name="ChevronDown" size={16} className={cn(
+                                "text-muted-foreground transition-transform duration-200",
+                                (expandedSuppliers['no-supplier'] ?? false) && "rotate-180"
+                              )} />
+                            </div>
                           </CollapsibleTrigger>
                           <CollapsibleContent>
-                            <div className="border-t border-border/50">
+                            <div className="border-t border-border/30 mx-3.5">
                               {itemsBySupplier['no-supplier'].map((item, i) => (
                                 <div
                                   key={item.id}
                                   className={cn(
-                                    "flex items-center justify-between px-4 py-2.5",
-                                    i < itemsBySupplier['no-supplier'].length - 1 && "border-b border-border/50"
+                                    "flex items-center justify-between py-2.5",
+                                    i < itemsBySupplier['no-supplier'].length - 1 && "border-b border-border/20"
                                   )}
                                 >
                                   <span className="text-sm text-foreground">{item.name}</span>
@@ -503,7 +505,7 @@ export default function OrdersPage() {
                                     )}>
                                       {item.current_stock}/{item.min_stock}
                                     </span>
-                                    <span className="text-[10px] text-muted-foreground">{item.unit_type}</span>
+                                    <span className="text-[10px] text-muted-foreground w-8 text-right">{item.unit_type}</span>
                                   </div>
                                 </div>
                               ))}
