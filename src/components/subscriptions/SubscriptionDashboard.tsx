@@ -1,7 +1,7 @@
 import { DollarSign, Package, AlertTriangle, TrendingDown } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Subscription, getAlertLevel, getMonthlyPrice, AlertLevel } from '@/hooks/useSubscriptions';
+import { GradientIcon } from '@/components/ui/gradient-icon';
 
 interface Props {
   totalMonthly: number;
@@ -23,61 +23,59 @@ export function SubscriptionDashboard({ totalMonthly, activeCount, upcomingBills
     .reduce((sum, s) => sum + getMonthlyPrice(s.price, s.billing_cycle), 0);
 
   const stats = [
-    { icon: DollarSign, label: 'Total mensal', value: `R$ ${totalMonthly.toFixed(2)}`, color: 'text-primary' },
-    { icon: Package, label: 'Serviços ativos', value: String(activeCount), color: 'text-blue-400' },
-    { icon: AlertTriangle, label: 'Cobranças próximas', value: String(upcomingBills.length), color: 'text-yellow-400' },
-    { icon: TrendingDown, label: 'Economia (cancelados)', value: `R$ ${canceledSavings.toFixed(2)}`, color: 'text-emerald-400' },
+    { icon: DollarSign, label: 'Total mensal', value: `R$ ${totalMonthly.toFixed(2)}`, gradient: 'from-emerald-500 to-green-600' },
+    { icon: Package, label: 'Ativos', value: String(activeCount), gradient: 'from-blue-500 to-indigo-600' },
+    { icon: AlertTriangle, label: 'Próximos', value: String(upcomingBills.length), gradient: 'from-amber-500 to-orange-600' },
+    { icon: TrendingDown, label: 'Economia', value: `R$ ${canceledSavings.toFixed(2)}`, gradient: 'from-teal-500 to-emerald-600' },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-3">
         {stats.map((s) => (
-          <Card key={s.label} className="p-4 border border-border/50">
-            <div className="flex items-center gap-2 mb-2">
-              <s.icon className={`w-4 h-4 ${s.color}`} />
-              <span className="text-xs text-muted-foreground">{s.label}</span>
+          <div key={s.label} className="bg-secondary/40 rounded-2xl p-4 active:scale-[0.98] transition-transform">
+            <div className="flex items-center gap-2.5 mb-2">
+              <GradientIcon icon={s.icon} className={`bg-gradient-to-br ${s.gradient}`} size="sm" />
+              <span className="text-[11px] text-muted-foreground font-medium">{s.label}</span>
             </div>
-            <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
-          </Card>
+            <p className="text-xl font-bold text-foreground">{s.value}</p>
+          </div>
         ))}
       </div>
 
       {/* Insights */}
-      <Card className="p-4 border border-primary/20 bg-primary/5">
-        <p className="text-sm text-muted-foreground">
+      <div className="bg-primary/5 rounded-2xl p-4">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           💡 Você tem <span className="text-foreground font-semibold">{activeCount} serviços ativos</span> totalizando{' '}
           <span className="text-primary font-semibold">R$ {totalMonthly.toFixed(2)}/mês</span>.
           {canceledSavings > 0 && (
             <> Já economizou <span className="text-emerald-400 font-semibold">R$ {canceledSavings.toFixed(2)}/mês</span> cancelando serviços.</>
           )}
         </p>
-      </Card>
+      </div>
 
       {/* Upcoming Bills */}
       {upcomingBills.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3">Próximas cobranças</h3>
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Próximas cobranças</h3>
           <div className="space-y-2">
             {upcomingBills.slice(0, 8).map((bill) => {
               const level = getAlertLevel(bill.next_payment_date);
               const style = level ? alertStyles[level] : alertStyles.soon;
               return (
-                <Card key={bill.id} className="p-3 flex items-center justify-between border border-border/30">
+                <div key={bill.id} className="bg-secondary/40 rounded-2xl p-3 flex items-center justify-between active:scale-[0.98] transition-transform">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex-shrink-0">
-                      <Badge className={`${style.bg} ${style.text} border-0 text-[10px]`}>{style.label}</Badge>
-                    </div>
+                    <Badge className={`${style.bg} ${style.text} border-0 text-[10px] shrink-0`}>{style.label}</Badge>
                     <span className="text-sm font-medium truncate">{bill.name}</span>
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0 ml-2">
                     <p className="text-sm font-bold">R$ {Number(bill.price).toFixed(2)}</p>
                     <p className="text-[10px] text-muted-foreground">
                       {bill.next_payment_date ? new Date(bill.next_payment_date + 'T12:00:00').toLocaleDateString('pt-BR') : ''}
                     </p>
                   </div>
-                </Card>
+                </div>
               );
             })}
           </div>

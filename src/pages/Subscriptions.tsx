@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus, LayoutDashboard, CreditCard, Building2, Bell, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { LayoutDashboard, CreditCard, Building2, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useSubscriptions, Subscription } from '@/hooks/useSubscriptions';
 import { SubscriptionDashboard } from '@/components/subscriptions/SubscriptionDashboard';
@@ -11,6 +10,7 @@ import { SubscriptionAlerts } from '@/components/subscriptions/SubscriptionAlert
 import { CancelSubscriptionDialog } from '@/components/subscriptions/CancelSubscriptionDialog';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PageLoader } from '@/components/PageLoader';
+import { useFabAction } from '@/contexts/FabActionContext';
 
 type Tab = 'dashboard' | 'assinaturas' | 'contas' | 'alertas';
 
@@ -32,6 +32,9 @@ export default function Subscriptions() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+
+  // FAB para criação
+  useFabAction({ icon: 'Plus', label: 'Novo', onClick: () => { setEditItem(null); setSheetOpen(true); } }, []);
 
   const filterItems = (items: Subscription[]) => {
     return items.filter(s => {
@@ -60,20 +63,9 @@ export default function Subscriptions() {
 
   return (
     <AppLayout>
-      <div className="pb-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="w-5 h-5 text-primary" />
-            <h1 className="text-lg font-bold">Central Recorrente</h1>
-          </div>
-          <Button size="sm" onClick={() => { setEditItem(null); setSheetOpen(true); }} className="gap-1.5">
-            <Plus className="w-4 h-4" /> Novo
-          </Button>
-        </div>
-
+      <div className="space-y-4">
         {/* Tab bar */}
-        <div className="flex gap-1 p-1 bg-secondary/50 rounded-xl mb-4 overflow-x-auto">
+        <div className="flex gap-1 p-1 bg-secondary/40 rounded-2xl overflow-x-auto">
           {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
@@ -81,14 +73,16 @@ export default function Subscriptions() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                  isActive ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                className={`flex items-center gap-1.5 flex-1 justify-center px-3 py-2.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all active:scale-[0.97] ${
+                  isActive
+                    ? 'bg-primary/15 text-primary shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 {tab.label}
                 {tab.key === 'alertas' && alerts.length > 0 && (
-                  <Badge variant="destructive" className="text-[9px] h-4 px-1 border-0">{alerts.length}</Badge>
+                  <Badge variant="destructive" className="text-[9px] h-4 min-w-4 px-1 border-0">{alerts.length}</Badge>
                 )}
               </button>
             );
@@ -106,7 +100,7 @@ export default function Subscriptions() {
         )}
 
         {activeTab === 'assinaturas' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <SubscriptionFilters
               search={search} onSearchChange={setSearch}
               statusFilter={statusFilter} onStatusChange={setStatusFilter}
@@ -117,7 +111,7 @@ export default function Subscriptions() {
         )}
 
         {activeTab === 'contas' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <SubscriptionFilters
               search={search} onSearchChange={setSearch}
               statusFilter={statusFilter} onStatusChange={setStatusFilter}

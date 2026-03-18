@@ -13,15 +13,15 @@ interface Props {
 export function SubscriptionList({ items, onEdit, onPause, onCancel, emptyMessage = 'Nenhum item encontrado' }: Props) {
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-        <Package className="w-12 h-12 mb-3 opacity-30" />
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <Package className="w-10 h-10 mb-3 opacity-20" />
         <p className="text-sm">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div className="space-y-2">
       {items.map((item) => (
         <SubscriptionCard key={item.id} item={item} onEdit={onEdit} onPause={onPause} onCancel={onCancel} />
       ))}

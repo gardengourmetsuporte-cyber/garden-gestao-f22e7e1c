@@ -1,5 +1,4 @@
 import { Pause, Play, Trash2, ExternalLink, PenSquare } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Subscription, getCategoryInfo, getMonthlyPrice, getAlertLevel, AlertLevel } from '@/hooks/useSubscriptions';
@@ -15,10 +14,10 @@ interface Props {
 const cycleLabels: Record<string, string> = { mensal: '/mês', anual: '/ano', semanal: '/sem' };
 
 const alertBorder: Record<AlertLevel, string> = {
-  overdue: 'border-destructive/60',
-  today: 'border-destructive/40',
-  tomorrow: 'border-orange-500/40',
-  soon: 'border-yellow-500/30',
+  overdue: 'ring-1 ring-destructive/40',
+  today: 'ring-1 ring-destructive/30',
+  tomorrow: 'ring-1 ring-orange-500/30',
+  soon: 'ring-1 ring-yellow-500/20',
 };
 
 export function SubscriptionCard({ item, onEdit, onPause, onCancel }: Props) {
@@ -29,11 +28,11 @@ export function SubscriptionCard({ item, onEdit, onPause, onCancel }: Props) {
   const monthlyVal = getMonthlyPrice(item.price, item.billing_cycle);
 
   return (
-    <Card
+    <div
       className={cn(
-        'p-4 border transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5',
+        'bg-secondary/40 rounded-2xl p-4 transition-all duration-200 active:scale-[0.98]',
         isCanceled && 'opacity-50',
-        alert && !isCanceled && !isPaused ? alertBorder[alert] : 'border-border/40'
+        alert && !isCanceled && !isPaused && alertBorder[alert]
       )}
     >
       <div className="flex items-start justify-between mb-3">
@@ -46,7 +45,7 @@ export function SubscriptionCard({ item, onEdit, onPause, onCancel }: Props) {
             {cat.label}
           </Badge>
         </div>
-        <div className="text-right flex-shrink-0 ml-2">
+        <div className="text-right shrink-0 ml-2">
           <p className="text-lg font-bold">R$ {Number(item.price).toFixed(2)}</p>
           <p className="text-[10px] text-muted-foreground">{cycleLabels[item.billing_cycle] || '/mês'}</p>
           {item.billing_cycle !== 'mensal' && (
@@ -66,17 +65,17 @@ export function SubscriptionCard({ item, onEdit, onPause, onCancel }: Props) {
         </span>
       </div>
 
-      <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(item)}>
+      <div className="flex items-center gap-1 -ml-1">
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl" onClick={() => onEdit(item)}>
           <PenSquare className="w-3.5 h-3.5" />
         </Button>
         {!isCanceled && (
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onPause(item)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl" onClick={() => onPause(item)}>
             {isPaused ? <Play className="w-3.5 h-3.5 text-primary" /> : <Pause className="w-3.5 h-3.5 text-yellow-400" />}
           </Button>
         )}
         {!isCanceled && (
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => onCancel(item)}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl text-destructive" onClick={() => onCancel(item)}>
             <Trash2 className="w-3.5 h-3.5" />
           </Button>
         )}
@@ -84,13 +83,13 @@ export function SubscriptionCard({ item, onEdit, onPause, onCancel }: Props) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 ml-auto"
+            className="h-8 w-8 rounded-xl ml-auto"
             onClick={() => window.open(item.management_url!, '_blank')}
           >
             <ExternalLink className="w-3.5 h-3.5" />
           </Button>
         )}
       </div>
-    </Card>
+    </div>
   );
 }
