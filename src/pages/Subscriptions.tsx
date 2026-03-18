@@ -130,7 +130,7 @@ export default function Subscriptions() {
               statusFilter={statusFilter} onStatusChange={setStatusFilter}
               categoryFilter={categoryFilter} onCategoryChange={setCategoryFilter}
             />
-            <SubscriptionList items={contas} onEdit={handleEdit} onPause={handlePause} onCancel={handleCancel} emptyMessage="Nenhuma conta fixa encontrada" />
+            <SubscriptionList items={contas} onEdit={handleEdit} onPause={handlePause} onCancel={handleCancel} onDelete={handleDelete} onReactivate={handleReactivate} emptyMessage="Nenhuma conta fixa encontrada" />
           </div>
         )}
 
