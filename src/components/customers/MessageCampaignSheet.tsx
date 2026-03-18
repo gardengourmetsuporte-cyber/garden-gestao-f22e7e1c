@@ -65,7 +65,13 @@ export function MessageCampaignSheet({ open, onOpenChange, customers, segment }:
       setMessage('');
       onOpenChange(false);
     } catch (err: any) {
-      toast.error(err.message || 'Erro ao enviar mensagens');
+      const msg = err.message || '';
+      if (msg.includes('CANAL_SEM_CONFIG')) {
+        setConfigError(true);
+        toast.error('Canal WhatsApp não configurado. Complete a configuração primeiro.');
+      } else {
+        toast.error(msg || 'Erro ao enviar mensagens');
+      }
     } finally {
       setSending(false);
     }
