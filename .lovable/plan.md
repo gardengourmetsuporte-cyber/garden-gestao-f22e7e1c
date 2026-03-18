@@ -1,39 +1,88 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-## Plano: Transformar "Fichas" de módulo separado em opção dentro do Modo da Venda (PDV)
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-### Contexto
-Atualmente "Fichas" é um módulo separado (`/fichas`) que mostra pedidos vindos do tablet. O usuário quer que "Ficha" seja uma **4ª opção** no `SaleSourceSheet` (junto com Balcão, Mesa, Delivery), onde ele digita o número da ficha e opcionalmente a mesa, para lançar manualmente. O lançamento automático continua vindo do tablet/QR Code.
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-### Mudanças
+---
 
-**1. `src/components/pdv/SaleSourceSheet.tsx`**
-- Adicionar `'ficha'` ao tipo `SaleSource`
-- Adicionar botão "Ficha" no array `sources` com ícone `Receipt`
-- Adicionar campos contextuais para `source === 'ficha'`: input de **Nº ficha** (obrigatório) e **Nº mesa** (opcional)
-- Adicionar campo `fichaNumber` (number | null) ao `SaleSourceData`
+## Bloco de Relatórios Avançados ✅
 
-**2. `src/hooks/pos/usePOSCart.ts`**
-- Expandir tipo do `saleSource` para incluir `'ficha'`
-- Adicionar estado `fichaNumber` com getter/setter
-- Limpar `fichaNumber` no `clearCart`
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-**3. `src/hooks/pos/usePOSCheckout.ts`**
-- Incluir `fichaNumber` nas deps
-- Ao salvar a venda com `source: 'ficha'`, guardar o número da ficha no campo `notes` (formato: `Ficha: X`) e o `table_number` se preenchido
+## Dashboard Analytics ✅
 
-**4. `src/hooks/pos/types.ts`** e `src/hooks/usePOS.ts`
-- Propagar o novo campo `fichaNumber` nas interfaces
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-**5. Remover módulo Fichas separado**
-- Remover entrada de `src/lib/modules.ts` (key `'fichas'`)
-- Remover entrada de `src/lib/navItems.ts` (href `/fichas`)
-- Remover rota `/fichas` de `src/App.tsx`
-- Manter o arquivo `src/pages/Fichas.tsx` por enquanto (pode ser removido depois), ou deletá-lo
+## Operacional ✅
 
-**6. Visualização das fichas no PDV**
-- As fichas que entram automaticamente pelo tablet já aparecem como pedidos pendentes no PDV (via `usePOSOrders`). As fichas manuais lançadas pelo operador serão vendas normais com source `'ficha'`.
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-### Resultado
-O operador verá 4 botões no sheet de Modo da Venda: **Balcão | Mesa | Delivery | Ficha**. Ao selecionar "Ficha", aparecerão campos para número da ficha e mesa. O módulo separado de Fichas será removido da navegação.
+## CRM / Clientes ✅
 
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+
+## Funcionários ✅
+
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
+
+## Produção Integrada ao Checklist ✅
+
+- Itens de checklist vinculados a itens de estoque (categoria Produção)
+- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
+- Entrada automática no estoque + registro de produção
+- Badge visual de produção nos itens vinculados
+- Configuração de vínculo no admin de checklists
+- Removido módulo Produção da página de Pedidos

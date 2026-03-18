@@ -16,7 +16,8 @@ interface CheckoutDeps {
   discount: number;
   total: number;
   saleNotes: string;
-  saleSource: 'balcao' | 'mesa' | 'delivery';
+  saleSource: 'balcao' | 'mesa' | 'delivery' | 'ficha';
+  fichaNumber: number | null;
   deliveryPhone: string;
   deliveryAddress: string;
   clearCart: () => void;
@@ -28,7 +29,7 @@ export function usePOSCheckout(deps: CheckoutDeps) {
   const [savingSale, setSavingSale] = useState(false);
 
   const finalizeSale = useCallback(async (payments: PaymentLine[], sourceOrderId?: string) => {
-    const { activeUnitId, userId, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, deliveryPhone, deliveryAddress, clearCart, fetchPendingOrders } = deps;
+    const { activeUnitId, userId, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, fichaNumber, deliveryPhone, deliveryAddress, clearCart, fetchPendingOrders } = deps;
     if (!activeUnitId || !userId) return null;
     const paymentTotal = payments.reduce((s, p) => s + p.amount, 0);
     if (paymentTotal < total) {
@@ -49,9 +50,13 @@ export function usePOSCheckout(deps: CheckoutDeps) {
       discount,
       total,
       status: 'paid',
-      notes: saleSource === 'delivery' && deliveryAddress
-        ? (saleNotes ? `${saleNotes} | Endereço: ${deliveryAddress}` : `Endereço: ${deliveryAddress}`)
-        : (saleNotes || null),
+      notes: (() => {
+        const parts: string[] = [];
+        if (saleNotes) parts.push(saleNotes);
+        if (saleSource === 'ficha' && fichaNumber) parts.push(`Ficha: ${fichaNumber}`);
+        if (saleSource === 'delivery' && deliveryAddress) parts.push(`Endereço: ${deliveryAddress}`);
+        return parts.length > 0 ? parts.join(' | ') : null;
+      })(),
       paid_at: new Date().toISOString(),
     };
 
@@ -135,7 +140,7 @@ export function usePOSCheckout(deps: CheckoutDeps) {
   }, [deps, isConnected]);
 
   const sendOrder = useCallback(async (paymentInfo?: { method: string; change: number }) => {
-    const { activeUnitId, userId, cart, saleSource, customerName, deliveryPhone, deliveryAddress, tableNumber, total, clearCart, fetchPendingOrders } = deps;
+    const { activeUnitId, userId, cart, saleSource, customerName, fichaNumber, deliveryPhone, deliveryAddress, tableNumber, total, clearCart, fetchPendingOrders } = deps;
     if (!activeUnitId || !userId) return null;
     if (cart.length === 0) { toast.error('Carrinho vazio'); return null; }
 
@@ -149,6 +154,9 @@ export function usePOSCheckout(deps: CheckoutDeps) {
       if (!customerName.trim()) { toast.error('Informe o nome do cliente'); return null; }
       if (!deliveryPhone.trim()) { toast.error('Informe o telefone'); return null; }
       if (!deliveryAddress.trim()) { toast.error('Informe o endereço'); return null; }
+    }
+    if (saleSource === 'ficha' && !fichaNumber) {
+      toast.error('Informe o número da ficha'); return null;
     }
 
     const orderData: any = {

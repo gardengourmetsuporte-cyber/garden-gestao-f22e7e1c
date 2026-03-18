@@ -8,13 +8,14 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useUnit } from '@/contexts/UnitContext';
 
-type SaleSource = 'balcao' | 'mesa' | 'delivery';
+export type SaleSource = 'balcao' | 'mesa' | 'delivery' | 'ficha';
 
-interface SaleSourceData {
+export interface SaleSourceData {
   source: SaleSource;
   customerName: string;
   customerDocument: string;
   tableNumber: number | null;
+  fichaNumber: number | null;
   deliveryPhone: string;
   deliveryAddress: string;
 }
@@ -38,6 +39,7 @@ const sources = [
   { key: 'balcao' as const, label: 'Balcão', icon: 'Store' },
   { key: 'mesa' as const, label: 'Mesa', icon: 'UtensilsCrossed' },
   { key: 'delivery' as const, label: 'Delivery', icon: 'two_wheeler' },
+  { key: 'ficha' as const, label: 'Ficha', icon: 'Receipt' },
 ];
 
 function useCustomerSearch(unitId: string | undefined) {
@@ -107,6 +109,7 @@ export function SaleSourceSheet({ open, onOpenChange, onConfirm, initialSource, 
   const [customerName, setCustomerName] = useState(initialCustomerName ?? '');
   const [customerDocument, setCustomerDocument] = useState('');
   const [tableNumber, setTableNumber] = useState<number | null>(initialTableNumber ?? null);
+  const [fichaNumber, setFichaNumber] = useState<number | null>(null);
   const [deliveryPhone, setDeliveryPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [nameFocused, setNameFocused] = useState(false);
@@ -120,6 +123,7 @@ export function SaleSourceSheet({ open, onOpenChange, onConfirm, initialSource, 
       setCustomerName(initialCustomerName ?? '');
       setCustomerDocument('');
       setTableNumber(initialTableNumber ?? null);
+      setFichaNumber(null);
       setDeliveryPhone('');
       setDeliveryAddress('');
       clear();
@@ -135,7 +139,7 @@ export function SaleSourceSheet({ open, onOpenChange, onConfirm, initialSource, 
   };
 
   const handleConfirm = () => {
-    onConfirm({ source, customerName, customerDocument, tableNumber, deliveryPhone, deliveryAddress });
+    onConfirm({ source, customerName, customerDocument, tableNumber, fichaNumber, deliveryPhone, deliveryAddress });
   };
 
   const nameInput = (placeholder: string, flex = 'flex-1') => (
@@ -176,13 +180,13 @@ export function SaleSourceSheet({ open, onOpenChange, onConfirm, initialSource, 
           </SheetHeader>
 
           {/* Source buttons */}
-          <div className="flex gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {sources.map(s => (
               <button
                 key={s.key}
                 onClick={() => setSource(s.key)}
                 className={cn(
-                  'flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl text-xs font-semibold transition-all border',
+                  'flex flex-col items-center gap-1.5 py-3 rounded-xl text-xs font-semibold transition-all border',
                   source === s.key
                     ? 'bg-primary/15 text-primary border-primary/30'
                     : 'bg-secondary/50 text-muted-foreground border-transparent'
@@ -216,6 +220,27 @@ export function SaleSourceSheet({ open, onOpenChange, onConfirm, initialSource, 
                 {phoneInput()}
               </div>
               <PDVDeliveryAddress value={deliveryAddress} onChange={setDeliveryAddress} />
+            </div>
+          )}
+
+          {source === 'ficha' && (
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                placeholder="Nº ficha"
+                value={fichaNumber ?? ''}
+                onChange={e => setFichaNumber(e.target.value ? Number(e.target.value) : null)}
+                className="h-10 text-sm w-24"
+                inputMode="numeric"
+              />
+              <Input
+                type="number"
+                placeholder="Nº mesa (opcional)"
+                value={tableNumber ?? ''}
+                onChange={e => setTableNumber(e.target.value ? Number(e.target.value) : null)}
+                className="h-10 text-sm flex-1"
+                inputMode="numeric"
+              />
             </div>
           )}
 

@@ -8,7 +8,8 @@ export function usePOSCart() {
   const [tableNumber, setTableNumber] = useState<number | null>(null);
   const [discount, setDiscount] = useState(0);
   const [saleNotes, setSaleNotes] = useState('');
-  const [saleSource, setSaleSource] = useState<'balcao' | 'mesa' | 'delivery'>('balcao');
+  const [saleSource, setSaleSource] = useState<'balcao' | 'mesa' | 'delivery' | 'ficha'>('balcao');
+  const [fichaNumber, setFichaNumber] = useState<number | null>(null);
   const [deliveryPhone, setDeliveryPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
 
@@ -48,6 +49,7 @@ export function usePOSCart() {
     setDiscount(0);
     setSaleNotes('');
     setSaleSource('balcao');
+    setFichaNumber(null);
     setDeliveryPhone('');
     setDeliveryAddress('');
   }, []);
@@ -84,6 +86,7 @@ export function usePOSCart() {
     discount, setDiscount,
     saleNotes, setSaleNotes,
     saleSource, setSaleSource,
+    fichaNumber, setFichaNumber,
     deliveryPhone, setDeliveryPhone,
     deliveryAddress, setDeliveryAddress,
     addToCart, updateCartItem, removeFromCart, clearCart, loadOrderIntoCart,
