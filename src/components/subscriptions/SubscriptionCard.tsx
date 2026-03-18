@@ -1,0 +1,96 @@
+import { Pause, Play, Trash2, ExternalLink, PenSquare } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Subscription, getCategoryInfo, getMonthlyPrice, getAlertLevel, AlertLevel } from '@/hooks/useSubscriptions';
+import { cn } from '@/lib/utils';
+
+interface Props {
+  item: Subscription;
+  onEdit: (item: Subscription) => void;
+  onPause: (item: Subscription) => void;
+  onCancel: (item: Subscription) => void;
+}
+
+const cycleLabels: Record<string, string> = { mensal: '/mês', anual: '/ano', semanal: '/sem' };
+
+const alertBorder: Record<AlertLevel, string> = {
+  overdue: 'border-destructive/60',
+  today: 'border-destructive/40',
+  tomorrow: 'border-orange-500/40',
+  soon: 'border-yellow-500/30',
+};
+
+export function SubscriptionCard({ item, onEdit, onPause, onCancel }: Props) {
+  const cat = getCategoryInfo(item.category);
+  const isCanceled = item.status === 'cancelado';
+  const isPaused = item.status === 'pausado';
+  const alert = item.next_payment_date ? getAlertLevel(item.next_payment_date) : null;
+  const monthlyVal = getMonthlyPrice(item.price, item.billing_cycle);
+
+  return (
+    <Card
+      className={cn(
+        'p-4 border transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5',
+        isCanceled && 'opacity-50',
+        alert && !isCanceled && !isPaused ? alertBorder[alert] : 'border-border/40'
+      )}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div className="min-w-0 flex-1">
+          <h4 className="font-semibold text-sm truncate">{item.name}</h4>
+          <Badge
+            className="mt-1 text-[10px] border-0"
+            style={{ backgroundColor: cat.color + '22', color: cat.color }}
+          >
+            {cat.label}
+          </Badge>
+        </div>
+        <div className="text-right flex-shrink-0 ml-2">
+          <p className="text-lg font-bold">R$ {Number(item.price).toFixed(2)}</p>
+          <p className="text-[10px] text-muted-foreground">{cycleLabels[item.billing_cycle] || '/mês'}</p>
+          {item.billing_cycle !== 'mensal' && (
+            <p className="text-[10px] text-muted-foreground/60">≈ R$ {monthlyVal.toFixed(2)}/mês</p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+        {item.next_payment_date && (
+          <span>Próx: {new Date(item.next_payment_date + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+        )}
+        <span className="ml-auto">
+          {isPaused && <Badge variant="secondary" className="text-[10px]">Pausado</Badge>}
+          {isCanceled && <Badge variant="destructive" className="text-[10px] border-0">Cancelado</Badge>}
+          {!isPaused && !isCanceled && <Badge className="text-[10px] bg-primary/20 text-primary border-0">Ativo</Badge>}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-1">
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(item)}>
+          <PenSquare className="w-3.5 h-3.5" />
+        </Button>
+        {!isCanceled && (
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onPause(item)}>
+            {isPaused ? <Play className="w-3.5 h-3.5 text-primary" /> : <Pause className="w-3.5 h-3.5 text-yellow-400" />}
+          </Button>
+        )}
+        {!isCanceled && (
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => onCancel(item)}>
+            <Trash2 className="w-3.5 h-3.5" />
+          </Button>
+        )}
+        {item.management_url && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 ml-auto"
+            onClick={() => window.open(item.management_url!, '_blank')}
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Button>
+        )}
+      </div>
+    </Card>
+  );
+}
