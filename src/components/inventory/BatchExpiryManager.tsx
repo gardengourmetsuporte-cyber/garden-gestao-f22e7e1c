@@ -55,106 +55,123 @@ export function BatchExpiryManager({ itemId, itemName }: Props) {
   const displayBatches = itemId ? batches : expiringBatches;
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Package className="w-4 h-4" />
-            {itemId ? `Lotes - ${itemName || ''}` : 'Lotes Próximos ao Vencimento'}
-          </CardTitle>
-          {itemId && (
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline">
-                  <Plus className="w-4 h-4 mr-1" /> Novo Lote
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Adicionar Lote</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-3">
-                  <div>
-                    <Label>Nº do Lote</Label>
-                    <Input value={form.batch_number} onChange={e => setForm(f => ({ ...f, batch_number: e.target.value }))} placeholder="Ex: LT-2026-001" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label>Quantidade</Label>
-                      <Input type="number" value={form.quantity} onChange={e => setForm(f => ({ ...f, quantity: e.target.value }))} />
-                    </div>
-                    <div>
-                      <Label>Custo unitário (R$)</Label>
-                      <Input type="number" step="0.01" value={form.cost_per_unit} onChange={e => setForm(f => ({ ...f, cost_per_unit: e.target.value }))} />
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Data de Validade</Label>
-                    <Input type="date" value={form.expiry_date} onChange={e => setForm(f => ({ ...f, expiry_date: e.target.value }))} />
-                  </div>
-                  <div>
-                    <Label>Observações</Label>
-                    <Input value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
-                  </div>
-                  <Button onClick={handleAdd} className="w-full" disabled={!form.quantity}>
-                    Adicionar Lote
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        {displayBatches.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            {itemId ? 'Nenhum lote registrado' : 'Nenhum lote próximo ao vencimento 🎉'}
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {displayBatches.map((batch: any) => {
-              const days = batch.expiry_date ? differenceInDays(parseISO(batch.expiry_date), new Date()) : null;
-              return (
-                <div key={batch.id} className={`flex items-center justify-between p-3 rounded-lg border ${
-                  days !== null && days < 0 ? 'border-red-300 bg-red-50' :
-                  days !== null && days <= 3 ? 'border-amber-300 bg-amber-50' :
-                  'border-border'
-                }`}>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm">
-                        {batch.batch_number || 'Sem nº'}
-                      </span>
-                      {!itemId && batch.item && (
-                        <span className="text-xs text-muted-foreground">• {batch.item.name}</span>
-                      )}
-                      {getExpiryBadge(batch.expiry_date)}
-                    </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                      <span>Qtd: {batch.quantity}</span>
-                      {batch.cost_per_unit > 0 && <span>R$ {Number(batch.cost_per_unit).toFixed(2)}/un</span>}
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {format(parseISO(batch.received_at), 'dd/MM/yy')}
-                      </span>
-                    </div>
-                  </div>
-                  {itemId && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-xs"
-                      onClick={() => consumeBatch.mutate({ id: batch.id, quantity: batch.quantity })}
-                    >
-                      Consumir
-                    </Button>
-                  )}
-                </div>
-              );
-            })}
+    <div className="bg-card rounded-2xl p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center">
+            <Package className="w-4 h-4 text-amber-500" />
           </div>
+          <span className="font-semibold text-sm">
+            {itemId ? `Lotes — ${itemName || ''}` : 'Lotes Próximos ao Vencimento'}
+          </span>
+        </div>
+        {itemId && (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="ghost" className="h-8 px-2.5 text-xs text-primary">
+                <Plus className="w-3.5 h-3.5 mr-1" /> Novo
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Adicionar Lote</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                <div>
+                  <Label>Nº do Lote</Label>
+                  <Input value={form.batch_number} onChange={e => setForm(f => ({ ...f, batch_number: e.target.value }))} placeholder="Ex: LT-2026-001" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Quantidade</Label>
+                    <Input type="number" value={form.quantity} onChange={e => setForm(f => ({ ...f, quantity: e.target.value }))} />
+                  </div>
+                  <div>
+                    <Label>Custo unitário (R$)</Label>
+                    <Input type="number" step="0.01" value={form.cost_per_unit} onChange={e => setForm(f => ({ ...f, cost_per_unit: e.target.value }))} />
+                  </div>
+                </div>
+                <div>
+                  <Label>Data de Validade</Label>
+                  <Input type="date" value={form.expiry_date} onChange={e => setForm(f => ({ ...f, expiry_date: e.target.value }))} />
+                </div>
+                <div>
+                  <Label>Observações</Label>
+                  <Input value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+                </div>
+                <Button onClick={handleAdd} className="w-full" disabled={!form.quantity}>
+                  Adicionar Lote
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
-      </CardContent>
-    </Card>
+      </div>
+
+      {displayBatches.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-6">
+          {itemId ? 'Nenhum lote registrado' : 'Nenhum lote próximo ao vencimento 🎉'}
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {displayBatches.map((batch: any) => {
+            const days = batch.expiry_date ? differenceInDays(parseISO(batch.expiry_date), new Date()) : null;
+            const isExpired = days !== null && days < 0;
+            const isUrgent = days !== null && days <= 3 && !isExpired;
+
+            return (
+              <div key={batch.id} className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${
+                isExpired ? 'bg-destructive/10' :
+                isUrgent ? 'bg-amber-500/10' :
+                'bg-secondary/40'
+              }`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
+                  isExpired ? 'bg-destructive/20' :
+                  isUrgent ? 'bg-amber-500/20' :
+                  'bg-muted'
+                }`}>
+                  <AlertTriangle className={`w-3.5 h-3.5 ${
+                    isExpired ? 'text-destructive' :
+                    isUrgent ? 'text-amber-500' :
+                    'text-muted-foreground'
+                  }`} />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-sm truncate">
+                      {batch.batch_number || 'Sem nº'}
+                    </span>
+                    {!itemId && batch.item && (
+                      <span className="text-[11px] text-muted-foreground">• {batch.item.name}</span>
+                    )}
+                    {getExpiryBadge(batch.expiry_date)}
+                  </div>
+                  <div className="flex items-center gap-3 mt-0.5 text-[11px] text-muted-foreground">
+                    <span>Qtd: {batch.quantity}</span>
+                    {batch.cost_per_unit > 0 && <span>R$ {Number(batch.cost_per_unit).toFixed(2)}/un</span>}
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {format(parseISO(batch.received_at), 'dd/MM/yy')}
+                    </span>
+                  </div>
+                </div>
+
+                {itemId && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-[11px] h-7 px-2 text-muted-foreground hover:text-foreground shrink-0"
+                    onClick={() => consumeBatch.mutate({ id: batch.id, quantity: batch.quantity })}
+                  >
+                    Consumir
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
