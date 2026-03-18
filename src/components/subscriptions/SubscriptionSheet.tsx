@@ -5,9 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { Subscription, SubscriptionInsert, SUBSCRIPTION_CATEGORIES } from '@/hooks/useSubscriptions';
 import { searchServices, KnownService } from '@/lib/knownServices';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Link2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useUnit } from '@/contexts/UnitContext';
 
 interface Props {
   open: boolean;
@@ -19,6 +23,7 @@ interface Props {
 }
 
 export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpdate, isSaving }: Props) {
+  const { activeUnitId } = useUnit();
   const [name, setName] = useState('');
   const [category, setCategory] = useState('outros');
   const [type, setType] = useState<'assinatura' | 'conta_fixa'>('assinatura');
@@ -27,11 +32,38 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
   const [nextDate, setNextDate] = useState('');
   const [managementUrl, setManagementUrl] = useState('');
   const [notes, setNotes] = useState('');
+  const [linkFinance, setLinkFinance] = useState(false);
+  const [financeCategoryId, setFinanceCategoryId] = useState<string>('');
 
   const [suggestions, setSuggestions] = useState<KnownService[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch finance categories (expense type only)
+  const { data: financeCategories = [] } = useQuery({
+    queryKey: ['finance-categories-expense', activeUnitId],
+    queryFn: async () => {
+      if (!activeUnitId) return [];
+      const { data, error } = await supabase
+        .from('finance_categories')
+        .select('id, name, icon, color, parent_id')
+        .eq('unit_id', activeUnitId)
+        .eq('type', 'expense')
+        .order('sort_order');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!activeUnitId && linkFinance,
+  });
+
+  // Group categories: parent > children
+  const groupedCategories = financeCategories.reduce((acc, cat) => {
+    if (!cat.parent_id) {
+      acc.push({ ...cat, children: financeCategories.filter(c => c.parent_id === cat.id) });
+    }
+    return acc;
+  }, [] as Array<typeof financeCategories[0] & { children: typeof financeCategories }>);
 
   useEffect(() => {
     if (editItem) {
@@ -43,10 +75,14 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
       setNextDate(editItem.next_payment_date || '');
       setManagementUrl(editItem.management_url || '');
       setNotes(editItem.notes || '');
+      const fcId = (editItem as any).finance_category_id;
+      setLinkFinance(!!fcId);
+      setFinanceCategoryId(fcId || '');
     } else {
       setName(''); setCategory('outros'); setType('assinatura');
       setPrice(''); setBillingCycle('mensal'); setNextDate('');
       setManagementUrl(''); setNotes('');
+      setLinkFinance(false); setFinanceCategoryId('');
     }
     setSuggestions([]);
     setShowSuggestions(false);
@@ -86,7 +122,7 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
 
   const handleSubmit = async () => {
     if (!name.trim() || !price) return;
-    const data: SubscriptionInsert = {
+    const data: any = {
       name: name.trim(),
       category,
       type,
@@ -98,6 +134,7 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
       notes: notes.trim() || null,
       icon: null,
       color: null,
+      finance_category_id: linkFinance && financeCategoryId ? financeCategoryId : null,
     };
 
     if (editItem && onUpdate) {
@@ -193,6 +230,43 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
           <div>
             <Label>Próximo vencimento</Label>
             <Input type="date" value={nextDate} onChange={(e) => setNextDate(e.target.value)} />
+          </div>
+
+          {/* Vincular ao financeiro */}
+          <div className="rounded-2xl bg-secondary/40 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Link2 className="w-4 h-4 text-primary" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">Vincular ao Financeiro</p>
+                  <p className="text-[10px] text-muted-foreground">Lançar automaticamente no módulo financeiro</p>
+                </div>
+              </div>
+              <Switch checked={linkFinance} onCheckedChange={setLinkFinance} />
+            </div>
+
+            {linkFinance && (
+              <div>
+                <Label className="text-xs">Categoria financeira</Label>
+                <Select value={financeCategoryId} onValueChange={setFinanceCategoryId}>
+                  <SelectTrigger><SelectValue placeholder="Selecione uma categoria..." /></SelectTrigger>
+                  <SelectContent>
+                    {groupedCategories.map(parent => (
+                      <div key={parent.id}>
+                        <SelectItem value={parent.id} className="font-semibold">
+                          {parent.name}
+                        </SelectItem>
+                        {parent.children.map(child => (
+                          <SelectItem key={child.id} value={child.id} className="pl-6">
+                            {child.name}
+                          </SelectItem>
+                        ))}
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <div>
