@@ -1,88 +1,66 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
+Objetivo: deixar as sugestões realmente úteis, mostrando apenas contas fixas reais e assinaturas reais (ex.: Colibri, Goomer), removendo ruído de fornecedor/funcionário.
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+1) Diagnóstico confirmado (com dados reais do backend)
+- Hoje a função `detect-recurring` aceita quase tudo que repete em 2+ meses, sem filtrar vínculo de fornecedor/funcionário.
+- Resultado atual inclui nomes de pessoas e fornecedores (ex.: Bruno, Gabriel, Mega G, Catupiry), que não deveriam virar assinatura/conta fixa.
+- O recorte de 180 dias faz a IA perder casos reais como Colibri (tem histórico recorrente, mas uma ocorrência ficou fora da janela).
+- A lista “known services” do backend está incompleta para o contexto do restaurante (ex.: Colibri/Goomer).
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+2) Mudanças de implementação (sem alterar banco)
+Arquivo principal: `supabase/functions/detect-recurring/index.ts`
 
----
+2.1) Melhorar coleta e contexto
+- Buscar transações não deletadas (`deleted_at is null`) e incluir `supplier_id`, `employee_id`.
+- Expandir janela de não-fixos de 180 para 365 dias (ou 12 meses) para capturar recorrências reais mais espaçadas.
 
-## Bloco de Relatórios Avançados ✅
+2.2) Pré-filtro inteligente (antes da IA)
+- Excluir automaticamente grupos com:
+  - qualquer `supplier_id` presente
+  - qualquer `employee_id` presente
+- Excluir por sinais de operação variável (não assinatura), com regras defensivas:
+  - descrições com padrão de taxa/tarifa percentual (ex.: “taxa … %”)
+  - alta frequência no mesmo mês (indicador de gasto operacional, não mensalidade)
+- Manter elegíveis:
+  - serviços conhecidos
+  - itens marcados como fixos
+  - recorrência temporal consistente (2+ meses com padrão plausível)
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+2.3) Normalização de descrição mais robusta
+- Fortalecer normalização para unificar variações:
+  - caixa baixa, espaços extras
+  - sufixos de parcela `(n/12)` e variações equivalentes
+- Isso evita duplicatas e melhora agrupamento correto (ex.: “Goomer”, “Goomer (3/12)”).
 
-## Dashboard Analytics ✅
+2.4) Fortalecer classificação da IA
+- Atualizar prompt com regra explícita:
+  - “NUNCA classificar como assinatura/conta fixa quando for fornecedor/funcionário”
+- Passar contexto resumido da candidatura (ex.: `has_supplier`, `has_employee`, frequência mensal, variabilidade de valor).
+- Só aceitar classificação da IA quando bater com as regras de elegibilidade; caso contrário, descartar item.
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+2.5) Expandir dicionário de serviços conhecidos
+- Incluir no backend (`KNOWN_SERVICES` da função):
+  - `colibri` → assinatura (software)
+  - `goomer` → assinatura (software/app delivery)
+- (Opcional de consistência) refletir os mesmos serviços em `src/lib/knownServices.ts` para autocomplete/manual.
 
-## Operacional ✅
+2.6) Ranking final mais útil
+- Prioridade:
+  1) known services (Colibri/Goomer etc.)
+  2) fixos reais com padrão mensal
+  3) demais recorrências com boa confiança
+- Reduzir saída para itens de alta qualidade (menos volume, mais precisão), para que os importantes apareçam no topo.
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+3) Critérios de aceite
+- Não devem mais aparecer sugestões como nomes de funcionários e fornecedores.
+- Devem aparecer sugestões reais como Goomer e Colibri quando houver histórico mínimo.
+- As abas de Assinaturas/Contas continuam recebendo itens já classificados com opção de editar antes de adicionar.
 
-## CRM / Clientes ✅
-
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
-
-## Funcionários ✅
-
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
-
-## Produção Integrada ao Checklist ✅
-
-- Itens de checklist vinculados a itens de estoque (categoria Produção)
-- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
-- Entrada automática no estoque + registro de produção
-- Badge visual de produção nos itens vinculados
-- Configuração de vínculo no admin de checklists
-- Removido módulo Produção da página de Pedidos
+4) Validação após implementação
+- Teste direto da função com `unit_id` (via chamada de função) e revisar payload:
+  - Esperado: Colibri/Goomer presentes.
+  - Esperado: Bruno/Gabriel/Mega G/Catupiry ausentes.
+- Verificação no app `/subscriptions`:
+  - sugestões separadas por aba corretas
+  - fluxo “Editar antes de adicionar” intacto
+  - botão de adicionar/cancelar continua funcionando.
