@@ -1,88 +1,70 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+# Integração IA entre Financeiro e Central Recorrente
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+## Visão Geral
 
----
+Criar uma edge function que analisa as transações financeiras da unidade, identifica padrões de gastos recorrentes (contas fixas, assinaturas) e sugere adicioná-los à Central Recorrente. A IA cruza as transações com o catálogo de serviços conhecidos (`knownServices.ts`) e detecta padrões de repetição por descrição/valor.
 
-## Bloco de Relatórios Avançados ✅
+## Arquitetura
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+```text
+finance_transactions ──► Edge Function (detect-recurring) ──► Sugestões
+                              │
+                              ├── Cruza com knownServices (nome/categoria/URL)
+                              ├── Detecta padrões: mesma descrição + valor em 2+ meses
+                              └── Filtra já cadastrados em recurring_subscriptions
+                              
+Sugestões ──► Banner no Dashboard da Central Recorrente
+         ──► Cards de sugestão com 1 clique para adicionar
+```
 
-## Dashboard Analytics ✅
+## Implementação
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+### 1. Edge Function `detect-recurring`
+- Recebe `unit_id`
+- Busca transações dos últimos 3 meses com `is_fixed = true` ou `is_recurring = true`, ou que aparecem com mesma descrição+valor em 2+ meses distintos
+- Usa Lovable AI (Gemini Flash) para classificar as transações e extrair: nome do serviço, categoria, tipo (assinatura/conta_fixa), ciclo
+- Cruza com a lista de serviços conhecidos para enriquecer com `management_url`
+- Filtra itens já existentes em `recurring_subscriptions`
+- Retorna array de sugestões
 
-## Operacional ✅
+### 2. Hook `useRecurringSuggestions.ts`
+- Invoca a edge function
+- Cache de 10 minutos
+- Retorna sugestões + função `acceptSuggestion` que cria o item na tabela `recurring_subscriptions`
+- Função `dismissSuggestion` para ignorar (salva em localStorage)
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+### 3. Componente `RecurringSuggestions.tsx`
+- Banner/seção no Dashboard da Central Recorrente
+- Cards com: nome detectado, valor, categoria, badge "IA detectou"
+- Botão "Adicionar" (1 clique → cria na tabela)
+- Botão "Ignorar" (esconde a sugestão)
 
-## CRM / Clientes ✅
+### 4. Modificações
+- `SubscriptionDashboard.tsx` → renderiza `RecurringSuggestions` acima dos cards de resumo
+- `Subscriptions.tsx` → passa dependências necessárias
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+## Arquivos
 
-## Funcionários ✅
+| Ação | Arquivo |
+|------|---------|
+| Criar | `supabase/functions/detect-recurring/index.ts` |
+| Criar | `src/hooks/useRecurringSuggestions.ts` |
+| Criar | `src/components/subscriptions/RecurringSuggestions.tsx` |
+| Editar | `src/components/subscriptions/SubscriptionDashboard.tsx` |
 
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
+## Detalhes Técnicos
 
-## Cardápio Digital ✅
+### Edge Function — Lógica de detecção
+1. Query: transações `expense`/`credit_card` dos últimos 90 dias, agrupadas por `LOWER(description)` + `amount`, contando meses distintos
+2. Filtra grupos com `count_distinct_months >= 2`
+3. Envia ao Lovable AI (Gemini Flash) com tool calling para extrair estrutura: `{ name, category, type, billing_cycle, estimated_price }`
+4. Cruza `name` com `KNOWN_SERVICES` (duplica a lista na edge function) para preencher `management_url`
+5. Filtra itens já em `recurring_subscriptions` (query por `unit_id` + nome similar)
 
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
+### UX das sugestões
+- Aparece como seção "🤖 Sugestões da IA" no topo do Dashboard
+- Cada card mostra: nome, valor, categoria, botões Adicionar/Ignorar
+- Ao adicionar, abre o Sheet pré-preenchido para o usuário confirmar antes de salvar
 
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
-
-## Produção Integrada ao Checklist ✅
-
-- Itens de checklist vinculados a itens de estoque (categoria Produção)
-- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
-- Entrada automática no estoque + registro de produção
-- Badge visual de produção nos itens vinculados
-- Configuração de vínculo no admin de checklists
-- Removido módulo Produção da página de Pedidos
