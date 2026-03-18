@@ -490,7 +490,7 @@ export function SupplierProfileSheet({
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="h-8 w-8 rounded-xl p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                                    className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
                                     onClick={() => setConfirmDelete({
                                       type: 'invoice',
                                       id: inv.id,
