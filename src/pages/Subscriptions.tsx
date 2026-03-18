@@ -27,6 +27,8 @@ const tabs: { key: Tab; label: string; iconName: string; color: GradientIconColo
 
 export default function Subscriptions() {
   const { subscriptions, isLoading, totalMonthly, activeCount, upcomingBills, alerts, create, update, remove, isCreating, isUpdating } = useSubscriptions();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -40,6 +42,23 @@ export default function Subscriptions() {
 
   // Prefill from suggestion for edit-before-add
   const [prefillData, setPrefillData] = useState<Partial<Subscription> | null>(null);
+
+  // Receive prefill from Finance module via navigation state
+  useEffect(() => {
+    const state = location.state as { prefill?: { name: string; price: number; category: string } } | null;
+    if (state?.prefill) {
+      setEditItem(null);
+      setPrefillData({
+        name: state.prefill.name || '',
+        price: state.prefill.price || 0,
+        status: 'ativo',
+        billing_cycle: 'mensal',
+      } as Partial<Subscription>);
+      setSheetOpen(true);
+      // Clear the state so it doesn't re-trigger
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   // FAB para criação
   useFabAction({ icon: 'Plus', label: 'Novo', onClick: () => { setEditItem(null); setPrefillData(null); setSheetOpen(true); } }, []);
