@@ -304,7 +304,8 @@ export function useDeliveries() {
 
   // Geocode address using Nominatim (free)
   const geocodeAddress = useCallback(async (address: string, city: string): Promise<{ lat: number; lng: number } | null> => {
-    const fallbackCity = city?.trim() || activeUnit?.city || resolveGeocodeCity('', (activeUnit?.name || '').trim());
+    const storeCity = (activeUnit?.store_info as any)?.city || '';
+    const fallbackCity = city?.trim() || storeCity || activeUnit?.city || resolveGeocodeCity('', (activeUnit?.name || '').trim());
     const cleaned = cleanAddress(address);
     const streetOnly = cleaned.replace(/,\s*\d+[^,]*$/g, '').trim();
 
