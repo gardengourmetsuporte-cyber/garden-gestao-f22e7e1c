@@ -119,7 +119,7 @@ export default function Subscriptions() {
               statusFilter={statusFilter} onStatusChange={setStatusFilter}
               categoryFilter={categoryFilter} onCategoryChange={setCategoryFilter}
             />
-            <SubscriptionList items={assinaturas} onEdit={handleEdit} onPause={handlePause} onCancel={handleCancel} emptyMessage="Nenhuma assinatura encontrada" />
+            <SubscriptionList items={assinaturas} onEdit={handleEdit} onPause={handlePause} onCancel={handleCancel} onDelete={handleDelete} onReactivate={handleReactivate} emptyMessage="Nenhuma assinatura encontrada" />
           </div>
         )}
 
