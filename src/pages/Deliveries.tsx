@@ -68,7 +68,7 @@ export default function Deliveries() {
         .select('id, customer_name, customer_address, customer_phone, total, status, source, created_at, table_number, tablet_order_items(id, quantity, notes, unit_price, tablet_products(name))')
         .eq('unit_id', activeUnitId)
         .eq('source', 'delivery')
-        .in('status', ['confirmed', 'preparing', 'ready'])
+        .in('status', ['awaiting_confirmation', 'pending', 'confirmed', 'preparing', 'ready'])
         .order('created_at', { ascending: false })
         .limit(50);
 
