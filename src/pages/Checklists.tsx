@@ -155,7 +155,6 @@ export default function ChecklistsPage() {
                   sub.items?.some((i: any) => i.is_active && i.checklist_type === 'bonus')
                 )
               );
-              if (!isAdmin && !hasActiveBonusItems) return null;
 
               const productionItems = sectors.flatMap((s: any) =>
                 (s.subcategories || []).flatMap((sub: any) =>
@@ -163,6 +162,9 @@ export default function ChecklistsPage() {
                 )
               );
               const prodCompletedCount = productionItems.filter((i: any) => isItemCompleted(i.id)).length;
+
+              // Show bonus card if admin, has bonus items, or has production items
+              if (!isAdmin && !hasActiveBonusItems && productionItems.length === 0) return null;
 
               return (
                 <ChecklistBonusCard
@@ -172,14 +174,14 @@ export default function ChecklistsPage() {
                   deadlineSettings={deadlineSettings}
                   updateDeadline={updateDeadline} removeDeadline={removeDeadline} isSavingDeadline={isSavingDeadline}
                   hasActiveItems={hasActiveBonusItems}
-                  productionSlot={productionItems.length > 0 ? (
+                  productionSlot={
                     <ChecklistProductionSubCard
                       isSelected={checklistType === 'production' as any}
                       onSelect={() => setChecklistType('production' as any)}
                       productionCount={productionItems.length}
                       completedCount={prodCompletedCount}
                     />
-                  ) : undefined}
+                  }
                 />
               );
             })()}

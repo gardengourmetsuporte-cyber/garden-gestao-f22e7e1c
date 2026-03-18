@@ -231,8 +231,8 @@ interface ProductionSubCardProps {
 export function ChecklistProductionSubCard({
   isSelected, onSelect, productionCount, completedCount,
 }: ProductionSubCardProps) {
-  if (productionCount === 0) return null;
-  const percent = Math.round((completedCount / productionCount) * 100);
+  // Always show, even with 0 items
+  const percent = productionCount > 0 ? Math.round((completedCount / productionCount) * 100) : 0;
 
   return (
     <div
