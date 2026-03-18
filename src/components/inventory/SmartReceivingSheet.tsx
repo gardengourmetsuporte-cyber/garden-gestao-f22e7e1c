@@ -35,13 +35,10 @@ export function SmartReceivingSheet({
 }: SmartReceivingSheetProps) {
   const { processImage, uploadImage, createReceiving, confirmReceiving, isProcessing } = useSmartReceiving();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const boletoInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<Step>('capture');
   const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
-  const [boletoFile, setBoletoFile] = useState<File | null>(null);
   const [invoicePreview, setInvoicePreview] = useState<string | null>(null);
-  const [boletoPreview, setBoletoPreview] = useState<string | null>(null);
   const [ocrResult, setOcrResult] = useState<OcrResult | null>(null);
   const [receivingId, setReceivingId] = useState<string | null>(null);
   const [editedItems, setEditedItems] = useState<SmartReceivingItem[]>([]);
@@ -58,9 +55,7 @@ export function SmartReceivingSheet({
       setTimeout(() => {
         setStep('capture');
         setInvoiceFile(null);
-        setBoletoFile(null);
         setInvoicePreview(null);
-        setBoletoPreview(null);
         setOcrResult(null);
         setReceivingId(null);
         setEditedItems([]);
@@ -71,27 +66,21 @@ export function SmartReceivingSheet({
     }
   }, [open]);
 
-  const handleFileCapture = (file: File, type: 'invoice' | 'boleto') => {
+  const handleFileCapture = (file: File) => {
     const url = URL.createObjectURL(file);
-    if (type === 'invoice') {
-      setInvoiceFile(file);
-      setInvoicePreview(url);
-    } else {
-      setBoletoFile(file);
-      setBoletoPreview(url);
-    }
+    setInvoiceFile(file);
+    setInvoicePreview(url);
   };
 
   const handleProcess = async () => {
-    if (!invoiceFile && !boletoFile) {
-      toast.error('Tire pelo menos uma foto');
+    if (!invoiceFile) {
+      toast.error('Tire uma foto da nota fiscal');
       return;
     }
 
     setStep('processing');
 
     try {
-      const fileToProcess = invoiceFile || boletoFile!;
       const items = inventoryItems.map(i => ({
         id: i.id,
         name: i.name,
@@ -99,33 +88,22 @@ export function SmartReceivingSheet({
         unit_price: i.unit_price,
       }));
 
-      const result = await processImage(fileToProcess, items);
+      const result = await processImage(invoiceFile, items);
       setOcrResult(result);
 
-      // Upload images to storage
+      // Upload invoice image
       let invoiceUrl: string | null = null;
-      let boletoUrl: string | null = null;
-
-      if (invoiceFile) {
-        try {
-          invoiceUrl = await uploadImage(invoiceFile, 'invoice');
-        } catch (e) {
-          console.error('Failed to upload invoice image:', e);
-        }
-      }
-      if (boletoFile) {
-        try {
-          boletoUrl = await uploadImage(boletoFile, 'boleto');
-        } catch (e) {
-          console.error('Failed to upload boleto image:', e);
-        }
+      try {
+        invoiceUrl = await uploadImage(invoiceFile, 'invoice');
+      } catch (e) {
+        console.error('Failed to upload invoice image:', e);
       }
 
       // Create receiving record
       const receiving = await createReceiving({
         ocrResult: result,
         invoiceImageUrl: invoiceUrl,
-        boletoImageUrl: boletoUrl,
+        boletoImageUrl: null,
         orderId: order?.id || null,
         supplierId: order?.supplier_id || null,
         aiRawResponse: result,
@@ -216,7 +194,7 @@ export function SmartReceivingSheet({
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[90vh] overflow-y-auto">
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center gap-2">
-            <AppIcon name="AutoAwesome" size={20} className="text-primary" />
+            <AppIcon name="document_scanner" size={20} className="text-primary" />
             Recebimento Inteligente
             {order?.supplier?.name && (
               <span className="text-sm font-normal text-muted-foreground">
@@ -228,16 +206,19 @@ export function SmartReceivingSheet({
 
         {/* Step: Capture */}
         {step === 'capture' && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <p className="text-sm text-muted-foreground">
-              Fotografe a nota fiscal (DANFE) e/ou o boleto para processar automaticamente.
+              Fotografe a nota fiscal (DANFE) para processar automaticamente e dar entrada no estoque.
             </p>
 
             {/* Invoice capture */}
             <div className="space-y-2">
-              <Label className="text-foreground font-medium">📄 Nota Fiscal (DANFE)</Label>
+              <Label className="text-foreground font-medium flex items-center gap-1.5">
+                <AppIcon name="description" size={16} className="text-muted-foreground" />
+                Nota Fiscal (DANFE)
+              </Label>
               {invoicePreview ? (
-                <div className="relative rounded-xl overflow-hidden border">
+                <div className="relative rounded-xl overflow-hidden border border-border">
                   <img src={invoicePreview} alt="Preview NF" className="w-full max-h-48 object-cover" />
                   <Button
                     size="icon"
@@ -251,11 +232,11 @@ export function SmartReceivingSheet({
               ) : (
                 <Button
                   variant="outline"
-                  className="w-full h-24 border-dashed flex flex-col gap-2"
+                  className="w-full h-28 border-dashed border-2 border-border/60 flex flex-col gap-2 rounded-xl"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <AppIcon name="ScanLine" size={24} className="text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Scanner Inteligente</span>
+                  <AppIcon name="document_scanner" size={28} className="text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Tirar foto ou selecionar arquivo</span>
                 </Button>
               )}
               <input
@@ -265,45 +246,7 @@ export function SmartReceivingSheet({
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) handleFileCapture(file, 'invoice');
-                  e.target.value = '';
-                }}
-              />
-            </div>
-
-            {/* Boleto capture */}
-            <div className="space-y-2">
-              <Label className="text-foreground font-medium">🏦 Boleto (opcional)</Label>
-              {boletoPreview ? (
-                <div className="relative rounded-xl overflow-hidden border">
-                  <img src={boletoPreview} alt="Preview Boleto" className="w-full max-h-48 object-cover" />
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="absolute top-2 right-2 h-8 w-8"
-                    onClick={() => { setBoletoFile(null); setBoletoPreview(null); }}
-                  >
-                    <AppIcon name="Close" size={16} />
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  className="w-full h-16 border-dashed flex flex-col gap-1"
-                  onClick={() => boletoInputRef.current?.click()}
-                >
-                  <AppIcon name="PhotoCamera" size={20} className="text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Tirar foto do boleto</span>
-                </Button>
-              )}
-              <input
-                ref={boletoInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFileCapture(file, 'boleto');
+                  if (file) handleFileCapture(file);
                   e.target.value = '';
                 }}
               />
@@ -311,10 +254,10 @@ export function SmartReceivingSheet({
 
             <Button
               onClick={handleProcess}
-              disabled={!invoiceFile && !boletoFile}
+              disabled={!invoiceFile}
               className="w-full h-12 gap-2"
             >
-              <AppIcon name="AutoAwesome" size={16} />
+              <AppIcon name="auto_awesome" size={16} />
               Processar com IA
             </Button>
           </div>
@@ -324,8 +267,8 @@ export function SmartReceivingSheet({
         {step === 'processing' && (
           <div className="flex flex-col items-center justify-center py-12 gap-4">
             <div className="relative">
-              <AppIcon name="Progress_activity" size={48} className="text-primary animate-spin" />
-              <AppIcon name="AutoAwesome" size={20} className="text-primary absolute -top-1 -right-1 animate-pulse" />
+              <AppIcon name="progress_activity" size={48} className="text-primary animate-spin" />
+              <AppIcon name="auto_awesome" size={20} className="text-primary absolute -top-1 -right-1 animate-pulse" />
             </div>
             <p className="text-lg font-semibold">Processando...</p>
             <p className="text-sm text-muted-foreground text-center">
@@ -378,7 +321,7 @@ export function SmartReceivingSheet({
                     Itens ({confirmedCount}/{editedItems.length})
                   </span>
                 </div>
-                {expandedItems ? <AppIcon name="ExpandLess" size={16} /> : <AppIcon name="ExpandMore" size={16} />}
+                {expandedItems ? <AppIcon name="expand_less" size={16} /> : <AppIcon name="expand_more" size={16} />}
               </button>
 
               {expandedItems && editedItems.map((item, idx) => (
@@ -495,7 +438,7 @@ export function SmartReceivingSheet({
                 className="w-full h-12 gap-2"
               >
                 {isConfirming ? (
-                  <AppIcon name="Progress_activity" size={16} className="animate-spin" />
+                  <AppIcon name="progress_activity" size={16} className="animate-spin" />
                 ) : (
                   <AppIcon name="Check" size={16} />
                 )}
