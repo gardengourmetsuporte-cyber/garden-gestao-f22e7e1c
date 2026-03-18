@@ -1,88 +1,52 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Plano: Transformar Produção e Bônus em Subgrupos Colapsáveis
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+### Problema Atual
+- O card de Produção funciona como uma "aba separada" (`checklistType='production'`) — ao clicar, muda o tipo e mostra uma lista flat isolada
+- As tarefas Bônus também são uma lista flat, sem organização por setores
+- O usuário quer que Produção seja um **subgrupo colapsável** dentro do Bônus, e poder criar outros subgrupos
 
----
+### Solução
+Usar os **setores com `scope='bonus'`** como subgrupos visuais dentro da view do Bônus, com headers colapsáveis. A "Produção" será um subgrupo especial (virtual) que agrupa todos os itens com `linked_inventory_item_id`.
 
-## Bloco de Relatórios Avançados ✅
+### Mudanças
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+**1. `src/components/checklists/ChecklistView.tsx`**
+- Quando `isBonus`, em vez de renderizar uma lista flat, renderizar os **setores bonus** como subgrupos colapsáveis (similar aos setores de abertura/fechamento, mas com visual mais compacto)
+- Adicionar um subgrupo virtual "Produção" no final que agrupa itens de produção (com `linked_inventory_item_id`) de qualquer setor
+- Remover a lógica separada de `isProduction` — os itens de produção aparecem inline dentro do Bônus
+- Cada subgrupo terá: header com ícone + nome + progresso + chevron para expandir/colapsar
 
-## Dashboard Analytics ✅
+**2. `src/pages/Checklists.tsx`**
+- Remover o `ChecklistProductionSubCard` e a lógica de `checklistType === 'production'`
+- Ao clicar no card Bônus, simplesmente mostra o Bônus com todos os subgrupos (incluindo Produção)
+- Simplificar: não precisa mais do estado `'production'` como checklistType
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+**3. `src/components/checklists/ChecklistTypeCards.tsx`**
+- Remover o componente `ChecklistProductionSubCard` (não é mais necessário como card separado)
+- Atualizar `ChecklistBonusCard` para remover `productionSlot`
+- Opcionalmente, mostrar o progresso combinado (bonus + produção) no card do Bônus
 
-## Operacional ✅
+### Visual dos Subgrupos dentro do Bônus
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+```text
+┌─────────────────────────────────┐
+│  ▼ Produção          2/3  67%  │
+│    ☑ Molde de catupiry    ⚡10  │
+│    ☐ Massa de pizza       ⚡10  │
+│    ☑ Recheio especial     ⚡5   │
+├─────────────────────────────────┤
+│  ▼ Limpeza Extra     0/2   0%  │
+│    ☐ Limpar vitrine       ⚡3   │
+│    ☐ Organizar estoque    ⚡3   │
+└─────────────────────────────────┘
+```
 
-## CRM / Clientes ✅
+Cada subgrupo = um setor com `scope='bonus'`. Produção = subgrupo virtual com itens que têm `linked_inventory_item_id`. O fluxo de completar/desfazer produção continua igual (popover → sheet de quantidade → entrada no estoque).
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+### Arquivos Afetados
+- `src/components/checklists/ChecklistView.tsx` — Renderizar bonus como subgrupos colapsáveis
+- `src/pages/Checklists.tsx` — Remover lógica de production como tipo separado
+- `src/components/checklists/ChecklistTypeCards.tsx` — Simplificar BonusCard, remover ProductionSubCard
 
-## Funcionários ✅
-
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
-
-## Produção Integrada ao Checklist ✅
-
-- Itens de checklist vinculados a itens de estoque (categoria Produção)
-- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
-- Entrada automática no estoque + registro de produção
-- Badge visual de produção nos itens vinculados
-- Configuração de vínculo no admin de checklists
-- Removido módulo Produção da página de Pedidos
