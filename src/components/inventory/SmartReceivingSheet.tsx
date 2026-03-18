@@ -438,7 +438,7 @@ export function SmartReceivingSheet({
                 className="w-full h-12 gap-2"
               >
                 {isConfirming ? (
-                  <AppIcon name="Progress_activity" size={16} className="animate-spin" />
+                  <AppIcon name="progress_activity" size={16} className="animate-spin" />
                 ) : (
                   <AppIcon name="Check" size={16} />
                 )}
