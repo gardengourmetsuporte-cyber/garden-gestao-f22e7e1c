@@ -1,34 +1,88 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-## Plano: Melhorar Layout do Cardápio (Modo Ficha Técnica)
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-### Problemas Identificados
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-1. **Ícone laranja genérico nos produtos**: No modo Ficha Técnica (`FichaTecnicaCard` em `ProductCard.tsx`), produtos sem foto exibem um círculo laranja com ícone `Package` genérico — não é informativo nem bonito
-2. **Produtos com foto também não aproveitam bem**: A thumbnail é pequena (w-10 h-10) e o ícone da categoria não aparece
-3. **Ícone do grupo também é genérico**: O `MenuGroupContent` no modo ficha usa `ChefHat` fixo em vez do ícone real da categoria
+---
 
-### Mudanças Propostas
+## Bloco de Relatórios Avançados ✅
 
-**1. `src/components/menu/ProductCard.tsx` — FichaTecnicaCard**
-- Quando o produto tem foto: exibir a imagem em tamanho maior (w-12 h-12) com `rounded-xl`
-- Quando **não** tem foto: usar a primeira letra do nome do produto como avatar (estilo iniciais), com fundo `bg-secondary/60` e texto `text-foreground` — eliminar completamente o ícone laranja genérico
-- Manter o layout compacto mas mais legível
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-**2. `src/components/menu/ProductCard.tsx` — MenuModeCard**  
-- Mesma lógica: sem foto → mostrar iniciais do produto no placeholder em vez do ícone de câmera
-- Manter a funcionalidade de click para upload
+## Dashboard Analytics ✅
 
-**3. `src/components/menu/MenuGroupContent.tsx`**
-- No header do grupo (modo ficha), usar o ícone da categoria do grupo em vez de `ChefHat` fixo — isso requer passar a info da categoria como prop
-- Simplificar o espaçamento para ficar mais clean
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-**4. `src/components/menu/MenuCategoryTree.tsx`**
-- Sem mudanças estruturais — o layout de categorias já está bom com o ícone circular colorido
+## Operacional ✅
 
-### Resumo Visual
-- Produtos sem foto: avatar com iniciais (letra do nome) em fundo neutro
-- Produtos com foto: thumbnail arredondada
-- Remover todos os ícones laranjas genéricos de produto
-- Padronizar tamanhos de thumbnail entre modo menu e modo ficha
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
+## CRM / Clientes ✅
+
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+
+## Funcionários ✅
+
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
+
+## Cardápio Digital ✅
+
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
+
+## Produção Integrada ao Checklist ✅
+
+- Itens de checklist vinculados a itens de estoque (categoria Produção)
+- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
+- Entrada automática no estoque + registro de produção
+- Badge visual de produção nos itens vinculados
+- Configuração de vínculo no admin de checklists
+- Removido módulo Produção da página de Pedidos
