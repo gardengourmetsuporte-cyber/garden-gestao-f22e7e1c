@@ -374,7 +374,7 @@ export function useDeliveries() {
     }
 
     return null;
-  }, [activeUnit?.name, cleanAddress, pickValidResult, resolveGeocodeCity]);
+  }, [activeUnit?.name, activeUnit?.city, cleanAddress, pickValidResult, resolveGeocodeCity]);
 
   // Create delivery
   const createDelivery = useMutation({
