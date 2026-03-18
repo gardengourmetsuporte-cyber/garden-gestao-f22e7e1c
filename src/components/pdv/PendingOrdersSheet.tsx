@@ -180,7 +180,7 @@ function OrderDetailSheet({
             {order.customer_address && (
               <div className="px-3.5 py-3 flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #EF4444, #F472B6)' }}>
-                  <AppIcon name="MapPin" size={16} className="text-white" />
+                  <AppIcon name="location_on" size={16} className="text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground leading-relaxed">{order.customer_address}</p>
