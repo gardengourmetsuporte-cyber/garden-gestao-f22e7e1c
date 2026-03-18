@@ -177,11 +177,18 @@ serve(async (req) => {
       return new Response(JSON.stringify({ suggestions: [] }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    const rankedCandidates = [...newCandidates].sort((a, b) => {
+      if (a.isFixed !== b.isFixed) return Number(b.isFixed) - Number(a.isFixed);
+      if (a.months.size !== b.months.size) return b.months.size - a.months.size;
+      if (a.count !== b.count) return b.count - a.count;
+      return b.amount - a.amount;
+    });
+
     // 4. Use AI to classify
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const candidateList = newCandidates.slice(0, 20).map(c => `"${c.description}" - R$ ${c.amount} (${c.months.size} meses, ${c.isFixed ? 'marcado fixo' : 'recorrente'})`).join("\n");
+    const candidateList = rankedCandidates.slice(0, 20).map(c => `"${c.description}" - R$ ${c.amount} (${c.months.size} meses, ${c.isFixed ? 'marcado fixo' : 'recorrente'})`).join("\n");
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
