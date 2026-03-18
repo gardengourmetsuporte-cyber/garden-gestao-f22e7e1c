@@ -398,7 +398,7 @@ export function SupplierProfileSheet({
                           <button
                             type="button"
                             onClick={() => setExpandedInvoice(isExpanded ? null : inv.id)}
-                            className="w-full flex items-center justify-between p-3 text-left active:bg-secondary/80 transition-colors touch-manipulation"
+                            className="w-full flex items-center justify-between p-3.5 text-left active:bg-secondary/50 transition-colors touch-manipulation"
                           >
                             <div className="min-w-0 flex-1">
                               <p className="text-sm font-medium text-foreground">{inv.description}</p>
