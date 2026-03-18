@@ -122,7 +122,7 @@ export function ItemFormSheet({
   }, []);
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange} mobileHandleOnly>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-safe-bottom h-[85dvh] overflow-y-auto scroll-smooth overscroll-contain">
         <SheetHeader className="pb-4">
           <SheetTitle className="text-xl">
