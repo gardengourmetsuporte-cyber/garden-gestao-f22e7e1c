@@ -462,11 +462,11 @@ export function SupplierProfileSheet({
                               </div>
 
                               {/* Action buttons */}
-                              <div className="flex items-center gap-2 pt-1">
+                              <div className="flex items-center gap-2 pt-2">
                                 {!inv.is_paid && onMarkInvoicePaid && (
                                   <Button
                                     size="sm"
-                                    className="h-8 rounded-xl gap-1.5 text-xs bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)] text-white flex-1"
+                                    className="h-9 rounded-xl gap-1.5 text-xs bg-success hover:bg-success/90 text-white flex-1"
                                     onClick={async () => {
                                       await onMarkInvoicePaid(inv.id);
                                     }}
