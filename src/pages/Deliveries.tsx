@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 const FILTERS: { key: DeliveryStatus | 'all'; label: string; icon: string }[] = [
   { key: 'all', label: 'Todas', icon: 'Package' },
@@ -35,6 +36,14 @@ export default function Deliveries() {
     processImage, uploadPhoto, createDelivery, createManualDelivery, isCreatingManual,
     updateStatus, updateAddress, deleteDelivery, invalidate,
   } = useDeliveries();
+
+  // Auto-prompt push subscription for delivery users
+  const { isSupported: pushSupported, isSubscribed: pushSubscribed, subscribe: pushSubscribe } = usePushNotifications();
+  useEffect(() => {
+    if (pushSupported && !pushSubscribed) {
+      pushSubscribe();
+    }
+  }, [pushSupported, pushSubscribed, pushSubscribe]);
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [manualSheetOpen, setManualSheetOpen] = useState(false);

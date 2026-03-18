@@ -9,7 +9,7 @@ export interface AppNotification {
   type: 'info' | 'alert' | 'success';
   title: string;
   description: string;
-  origin: 'estoque' | 'financeiro' | 'checklist' | 'caixa' | 'agenda' | 'sistema';
+  origin: 'estoque' | 'financeiro' | 'checklist' | 'caixa' | 'agenda' | 'sistema' | 'entregas';
   read: boolean;
   created_at: string;
 }

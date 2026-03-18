@@ -24,6 +24,7 @@ const CATEGORIES: NotifCategory[] = [
   { key: 'checklist', label: 'Checklists', description: 'Lembretes de tarefas pendentes', icon: 'ClipboardCheck', moduleKey: 'checklists' },
   { key: 'caixa', label: 'Fechamento de Caixa', description: 'Alertas de caixa não fechado', icon: 'Calculator', moduleKey: 'cash-closing' },
   { key: 'agenda', label: 'Agenda', description: 'Compromissos e eventos próximos', icon: 'CalendarDays', moduleKey: 'agenda' },
+  { key: 'entregas', label: 'Entregas', description: 'Alertas quando entregas saem para rota', icon: 'LocalShipping', moduleKey: 'deliveries' },
   { key: 'sistema', label: 'Sistema', description: 'Atualizações e avisos gerais', icon: 'Bell', moduleKey: 'dashboard' },
 ];
 
