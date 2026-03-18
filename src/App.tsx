@@ -316,6 +316,7 @@ function AuthenticatedRoutes() {
           <Route path="/admin/monitor" element={<ProtectedRoute><AdminMonitor /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
+          <Route path="/subscriptions" element={<ProtectedRoute><Subscriptions /></ProtectedRoute>} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

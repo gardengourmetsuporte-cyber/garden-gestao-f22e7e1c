@@ -70,6 +70,7 @@ export const MODULE_REQUIRED_PLAN: Record<string, PlanTier> = {
   'whatsapp': 'business',
   'pdv': 'business',
   'deliveries': 'business',
+  'subscriptions': 'business',
 };
 
 /** Modules that are still in production (shown with a beta/production badge) */
