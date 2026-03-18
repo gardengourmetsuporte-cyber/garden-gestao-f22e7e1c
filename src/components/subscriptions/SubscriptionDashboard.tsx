@@ -31,6 +31,9 @@ export function SubscriptionDashboard({ totalMonthly, activeCount, upcomingBills
 
   return (
     <div className="space-y-4">
+      {/* AI Suggestions */}
+      <RecurringSuggestions />
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-3">
         {stats.map((s) => (

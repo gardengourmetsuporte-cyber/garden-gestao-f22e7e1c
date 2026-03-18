@@ -95,3 +95,6 @@ verify_jwt = false
 
 [functions.price-survey-public]
 verify_jwt = false
+
+[functions.detect-recurring]
+verify_jwt = false
