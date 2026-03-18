@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus, LayoutDashboard, CreditCard, Building2, Bell } from 'lucide-react';
+import { Plus, LayoutDashboard, CreditCard, Building2, Bell, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSubscriptions, Subscription } from '@/hooks/useSubscriptions';
@@ -9,7 +9,7 @@ import { SubscriptionSheet } from '@/components/subscriptions/SubscriptionSheet'
 import { SubscriptionFilters } from '@/components/subscriptions/SubscriptionFilters';
 import { SubscriptionAlerts } from '@/components/subscriptions/SubscriptionAlerts';
 import { CancelSubscriptionDialog } from '@/components/subscriptions/CancelSubscriptionDialog';
-import AppLayout from '@/components/AppLayout';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { PageLoader } from '@/components/PageLoader';
 
 type Tab = 'dashboard' | 'assinaturas' | 'contas' | 'alertas';
