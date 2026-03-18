@@ -140,7 +140,7 @@ export function usePOSCheckout(deps: CheckoutDeps) {
   }, [deps, isConnected]);
 
   const sendOrder = useCallback(async (paymentInfo?: { method: string; change: number }) => {
-    const { activeUnitId, userId, cart, saleSource, customerName, deliveryPhone, deliveryAddress, tableNumber, total, clearCart, fetchPendingOrders } = deps;
+    const { activeUnitId, userId, cart, saleSource, customerName, fichaNumber, deliveryPhone, deliveryAddress, tableNumber, total, clearCart, fetchPendingOrders } = deps;
     if (!activeUnitId || !userId) return null;
     if (cart.length === 0) { toast.error('Carrinho vazio'); return null; }
 
@@ -154,6 +154,9 @@ export function usePOSCheckout(deps: CheckoutDeps) {
       if (!customerName.trim()) { toast.error('Informe o nome do cliente'); return null; }
       if (!deliveryPhone.trim()) { toast.error('Informe o telefone'); return null; }
       if (!deliveryAddress.trim()) { toast.error('Informe o endereço'); return null; }
+    }
+    if (saleSource === 'ficha' && !fichaNumber) {
+      toast.error('Informe o número da ficha'); return null;
     }
 
     const orderData: any = {
