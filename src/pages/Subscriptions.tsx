@@ -59,6 +59,15 @@ export default function Subscriptions() {
     await update({ id: cancelItem.id, status: 'cancelado' } as any);
     setCancelItem(null);
   };
+  const handleDelete = (item: Subscription) => setDeleteItem(item);
+  const handleConfirmDelete = async () => {
+    if (!deleteItem) return;
+    await remove(deleteItem.id);
+    setDeleteItem(null);
+  };
+  const handleReactivate = async (item: Subscription) => {
+    await update({ id: item.id, status: 'ativo' } as any);
+  };
 
   if (isLoading) return <AppLayout><PageLoader /></AppLayout>;
 
