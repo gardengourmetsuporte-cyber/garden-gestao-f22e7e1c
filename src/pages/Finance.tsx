@@ -361,6 +361,10 @@ export default function Finance() {
         onUpdateRecurring={updateRecurringTransaction}
         onRefreshCategories={handleRefreshCategories}
         allTransactions={transactions}
+        onAddToSubscriptions={(data) => {
+          setTransactionSheetOpen(false);
+          navigate('/subscriptions', { state: { prefill: data } });
+        }}
       />
 
       {/* Account Management from Home */}
