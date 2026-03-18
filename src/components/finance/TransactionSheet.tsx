@@ -887,6 +887,25 @@ export function TransactionSheet({
                     rows={2}
                   />
                 </div>
+
+                {/* Add to subscriptions button - only for editing expenses */}
+                {editingTransaction && type === 'expense' && onAddToSubscriptions && (
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 text-muted-foreground"
+                    onClick={() => {
+                      onAddToSubscriptions({
+                        name: description,
+                        price: parseFloat(amount) || 0,
+                        category: categoryId || '',
+                      });
+                      onOpenChange(false);
+                    }}
+                  >
+                    <AppIcon name="Repeat" size={16} />
+                    Adicionar como assinatura / conta fixa
+                  </Button>
+                )}
               </div>
 
           </div>
