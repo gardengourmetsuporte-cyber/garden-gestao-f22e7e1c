@@ -282,128 +282,99 @@ export function CashClosingForm({ onSuccess }: Props) {
 
   const getIcon = (iconName: string) => iconName;
 
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
   return (
     <div className="space-y-4 pb-6">
-      {/* Header Info with Date Selector */}
-      <Card className="card-unified">
-        <CardContent className="p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center text-sm">
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">Data operacional:</span>
-              <DateInline
-                selectedDate={selectedDate}
-                onSelect={setSelectedDate}
-                todayDate={todayDate}
-                minAllowedDate={minAllowedDate}
-              />
-            </div>
-            <div>
-              <span className="text-muted-foreground">Responsável:</span>
-              <span className="ml-2 font-medium">{profile?.full_name || 'Usuário'}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Header: Date + Responsible */}
+      <div className="flex items-center justify-between bg-secondary/40 rounded-2xl p-3">
+        <DateInline
+          selectedDate={selectedDate}
+          onSelect={setSelectedDate}
+          todayDate={todayDate}
+          minAllowedDate={minAllowedDate}
+        />
+        <span className="text-xs text-muted-foreground truncate ml-2">
+          {profile?.full_name || 'Usuário'}
+        </span>
+      </div>
 
-      {/* Payment Values */}
-      {/* Initial Cash */}
-      <Card className="card-unified">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <AppIcon name="Wallet" className="w-4 h-4" />
-            Caixa Inicial
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-warning/10">
-              <AppIcon name="Wallet" className="w-5 h-5 text-warning" />
-            </div>
-            <Label className="flex-1 text-sm font-medium">Valor inicial do caixa</Label>
-            <div className="relative w-32">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+      {/* 💰 Caixa — Inicial + Contado side-by-side */}
+      <div className="rounded-2xl bg-card p-4 space-y-3">
+        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, hsl(142 71% 45%), hsl(160 84% 39%))' }}>
+            <AppIcon name="payments" size={15} fill={1} className="text-white" />
+          </div>
+          Caixa
+        </h3>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-[11px] text-muted-foreground">Valor inicial</Label>
+            <div className="relative">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">R$</span>
               <Input
                 type="number"
                 inputMode="decimal"
                 step="0.01"
                 min="0"
-                className="pl-10 text-right h-11"
+                className="pl-8 text-right h-11 text-base font-medium"
                 value={initialCash || ''}
                 onChange={(e) => setInitialCash(parseFloat(e.target.value) || 0)}
                 placeholder="0,00"
               />
             </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Valor em dinheiro que estava no caixa no início do turno
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Cash Counted (physical money at closing) */}
-      <Card className="card-unified">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <AppIcon name="Banknote" className="w-4 h-4" />
-            Dinheiro Contado no Caixa
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-3">
-            <div 
-              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{ backgroundColor: '#22c55e20' }}
-            >
-              <AppIcon name="Banknote" className="w-5 h-5" style={{ color: '#22c55e' }} />
-            </div>
-            <Label className="flex-1 text-sm font-medium">Valor contado (notas + moedas)</Label>
-            <div className="relative w-32">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+          <div className="space-y-1.5">
+            <Label className="text-[11px] text-muted-foreground">Valor contado</Label>
+            <div className="relative">
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">R$</span>
               <Input
                 type="number"
                 inputMode="decimal"
                 step="0.01"
                 min="0"
-                className="pl-10 text-right h-11"
+                className="pl-8 text-right h-11 text-base font-medium"
                 value={cashCounted || ''}
                 onChange={(e) => setCashCounted(parseFloat(e.target.value) || 0)}
                 placeholder="0,00"
               />
             </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Valor físico contado no caixa no fim do turno
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+        <p className="text-[10px] text-muted-foreground/70 leading-tight">
+          Inicial = dinheiro no início do turno · Contado = notas + moedas no fim
+        </p>
+      </div>
 
-      {/* Other Payment Methods */}
-      <Card className="card-unified">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Outros Meios de Pagamento</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+      {/* 💳 Outros Meios de Pagamento */}
+      <div className="rounded-2xl bg-card p-4 space-y-3">
+        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)' }}>
+            <AppIcon name="credit_card" size={15} fill={1} className="text-white" />
+          </div>
+          Meios de Pagamento
+        </h3>
+        <div className="space-y-2">
           {PAYMENT_METHODS.filter(m => m.key !== 'cash_amount').map(method => {
-            const Icon = getIcon(method.icon);
             const { value } = paymentValues[method.key] || { value: 0 };
             if (!paymentValues[method.key]) return null;
             return (
-              <div key={method.key} className="flex items-center gap-3">
-                <div 
-                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: `${method.color}20` }}
+              <div key={method.key} className="flex items-center gap-2.5">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ background: `${method.color}18` }}
                 >
-                  <AppIcon name={Icon} className="w-5 h-5" style={{ color: method.color }} />
+                  <AppIcon name={method.icon} size={16} style={{ color: method.color }} />
                 </div>
-                <Label className="flex-1 text-sm font-medium">{method.label}</Label>
-                <div className="relative w-32">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
+                <span className="flex-1 text-sm text-foreground">{method.label}</span>
+                <div className="relative w-28">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">R$</span>
                   <Input
                     type="number"
                     inputMode="decimal"
                     step="0.01"
                     min="0"
-                    className="pl-10 text-right h-11"
+                    className="pl-8 text-right h-10 text-sm"
                     value={value || ''}
                     onChange={(e) => handleValueChange(method.key, e.target.value)}
                     placeholder="0,00"
@@ -412,276 +383,217 @@ export function CashClosingForm({ onSuccess }: Props) {
               </div>
             );
           })}
+        </div>
+      </div>
 
-        </CardContent>
-      </Card>
+      {/* 🧾 Gastos do Dia */}
+      <div className="rounded-2xl bg-card p-4 space-y-3">
+        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #EF4444, #F97316)' }}>
+            <AppIcon name="receipt_long" size={15} fill={1} className="text-white" />
+          </div>
+          Gastos do Dia
+          <span className="text-[10px] text-muted-foreground font-normal ml-auto">opcional</span>
+        </h3>
 
-      {/* Expenses Section */}
-      <Card className="card-unified">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <AppIcon name="Receipt" className="w-4 h-4" />
-            Gastos do Dia (opcional)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {/* Existing expenses */}
-          {expenses.map((expense, index) => (
-            <div key={index} className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
-              <span className="flex-1 text-sm">{expense.description}</span>
-              <span className="font-medium text-destructive">
-                - R$ {expense.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+        {expenses.map((expense, index) => (
+          <div key={index} className="flex items-center gap-2 p-2 bg-secondary/40 rounded-xl">
+            <span className="flex-1 text-sm truncate">{expense.description}</span>
+            <span className="font-medium text-destructive text-sm">- R$ {fmt(expense.amount)}</span>
+            <button
+              onClick={() => removeExpense(index)}
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            >
+              <AppIcon name="close" size={14} />
+            </button>
+          </div>
+        ))}
+
+        <div className="flex gap-2">
+          <Input
+            placeholder="Ex: Geladeira"
+            value={newExpense.description}
+            onChange={(e) => setNewExpense(prev => ({ ...prev, description: e.target.value }))}
+            className="flex-1 h-10"
+          />
+          <div className="relative w-24">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">R$</span>
+            <Input
+              type="number"
+              inputMode="decimal"
+              step="0.01"
+              min="0"
+              className="pl-7 text-right h-10 text-sm"
+              value={newExpense.amount || ''}
+              onChange={(e) => setNewExpense(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
+              placeholder="0,00"
+            />
+          </div>
+          <Button variant="secondary" size="icon" onClick={addExpense} className="shrink-0 h-10 w-10 rounded-xl">
+            <AppIcon name="add" size={18} />
+          </Button>
+        </div>
+
+        {expenses.length > 0 && (
+          <div className="flex justify-between text-sm pt-2 border-t border-border/30">
+            <span className="text-muted-foreground">Total gastos</span>
+            <span className="font-semibold text-destructive">- R$ {fmt(totalExpenses)}</span>
+          </div>
+        )}
+      </div>
+
+      {/* 📊 Resumo */}
+      <div className="rounded-2xl p-4 space-y-3" style={{ background: 'linear-gradient(135deg, hsl(142 71% 45% / 0.08), hsl(160 84% 39% / 0.06))' }}>
+        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, hsl(142 71% 45%), hsl(160 84% 39%))' }}>
+            <AppIcon name="bar_chart" size={15} fill={1} className="text-white" />
+          </div>
+          Resumo
+        </h3>
+
+        {/* Dinheiro vendido highlight */}
+        <div className="bg-card/60 rounded-xl p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-xs text-muted-foreground block">Dinheiro vendido</span>
+              <span className="text-[10px] text-muted-foreground/60">
+                {fmt(cashCounted)} + {fmt(totalExpenses)} − {fmt(initialCash)}
               </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                onClick={() => removeExpense(index)}
-              >
-                <AppIcon name="Trash2" className="w-4 h-4" />
-              </Button>
+            </div>
+            <span className="text-lg font-black text-success">R$ {fmt(cashSold)}</span>
+          </div>
+        </div>
+
+        {/* Payment breakdown — compact */}
+        <div className="space-y-1.5 px-1">
+          {[
+            { label: 'Débito', value: debitAmount },
+            { label: 'Crédito', value: creditAmount },
+            { label: 'Pix', value: pixAmount },
+            { label: 'Vale Alimentação', value: mealVoucherAmount },
+            { label: 'Delivery', value: deliveryAmount },
+            { label: 'Conta Assinada', value: signedAccountAmount },
+          ].filter(r => r.value > 0).map(row => (
+            <div key={row.label} className="flex justify-between text-sm">
+              <span className="text-muted-foreground">+ {row.label}</span>
+              <span className="text-foreground">R$ {fmt(row.value)}</span>
             </div>
           ))}
+        </div>
 
-          {/* Add new expense */}
-          <div className="flex gap-2">
+        {/* Total */}
+        <div className="border-t border-success/20 pt-3 flex items-center justify-between">
+          <span className="font-bold text-base">Total em Vendas</span>
+          <span className="text-xl font-black text-primary">R$ {fmt(totalPayments)}</span>
+        </div>
+
+        {/* Expected */}
+        <div className="flex items-center justify-between text-sm px-1">
+          <span className="text-muted-foreground">Esperado no caixa</span>
+          <span className="font-semibold text-foreground">R$ {fmt(expectedCashInDrawer)}</span>
+        </div>
+      </div>
+
+      {/* Diferença de Caixa */}
+      <div className="rounded-2xl bg-card p-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-warning/10">
+            <AppIcon name="swap_vert" size={16} className="text-warning" />
+          </div>
+          <span className="flex-1 text-sm text-foreground">Diferença de caixa</span>
+          <div className="relative w-28">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">R$</span>
             <Input
-              placeholder="Descrição (ex: Geladeira)"
-              value={newExpense.description}
-              onChange={(e) => setNewExpense(prev => ({ ...prev, description: e.target.value }))}
-              className="flex-1"
+              type="number"
+              inputMode="decimal"
+              step="0.01"
+              className="pl-8 text-right h-10 text-sm"
+              value={cashDifference || ''}
+              onChange={(e) => setCashDifference(parseFloat(e.target.value) || 0)}
+              placeholder="0,00"
             />
-            <div className="relative w-28">
-              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-              <Input
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                min="0"
-                className="pl-8 text-right"
-                value={newExpense.amount || ''}
-                onChange={(e) => setNewExpense(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
-                placeholder="0,00"
-              />
+          </div>
+        </div>
+        {cashDifference !== 0 && (
+          <p className="text-[11px] text-warning mt-2 flex items-center gap-1 ml-10">
+            <AppIcon name="info" size={12} />
+            {cashDifference > 0 ? 'Sobra' : 'Falta'} será registrada
+          </p>
+        )}
+      </div>
+
+      {/* 📎 Comprovante */}
+      <div className="rounded-2xl bg-card p-4 space-y-3">
+        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #64748B, #94A3B8)' }}>
+            <AppIcon name="upload_file" size={15} fill={1} className="text-white" />
+          </div>
+          Comprovante PDV
+          <span className="text-[10px] text-muted-foreground font-normal ml-auto">opcional</span>
+        </h3>
+
+        <input ref={fileInputRef} type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} />
+        <input ref={galleryInputRef} type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} />
+
+        {receiptPreview ? (
+          <div className="relative">
+            <img src={receiptPreview} alt="Comprovante" className="w-full h-40 object-cover rounded-xl" />
+            <div className="absolute bottom-2 right-2 flex gap-2">
+              <Button variant="secondary" size="sm" className="h-8 rounded-lg gap-1.5 text-xs" onClick={() => fileInputRef.current?.click()}>
+                <AppIcon name="photo_camera" size={14} /> Trocar
+              </Button>
             </div>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={addExpense}
-              className="shrink-0"
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex flex-col items-center gap-1.5 p-4 rounded-xl bg-secondary/40 hover:bg-secondary/60 transition-colors"
             >
-              <AppIcon name="Plus" className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {expenses.length > 0 && (
-            <div className="border-t pt-2 mt-2 flex justify-between text-sm">
-              <span className="text-muted-foreground">Total de gastos:</span>
-              <span className="font-medium text-destructive">
-                - R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Calculated Sales Summary */}
-      <Card className="card-unified bg-success/5 border-success/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">📊 Resumo Calculado</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {/* Dinheiro Vendido */}
-          <div className="bg-background/50 rounded-lg p-3 space-y-1">
-            <div className="text-xs text-muted-foreground">Dinheiro Vendido (calculado)</div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">
-                Contado ({cashCounted.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}) + Gastos ({totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}) − Inicial ({initialCash.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})
-              </span>
-              <span className="text-lg font-bold text-success">
-                R$ {cashSold.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-          </div>
-
-          <div className="border-t pt-2 mt-2 space-y-1">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">+ Débito</span>
-              <span>R$ {debitAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">+ Crédito</span>
-              <span>R$ {creditAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">+ Pix</span>
-              <span>R$ {pixAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">+ Vale Alimentação</span>
-              <span>R$ {mealVoucherAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">+ Delivery</span>
-              <span>R$ {deliveryAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">+ Conta Assinada</span>
-              <span>R$ {signedAccountAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-            </div>
-          </div>
-
-          <div className="border-t pt-3 mt-2">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-lg">Total em Vendas</span>
-              <span className="text-2xl font-bold text-primary">
-                R$ {totalPayments.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-          </div>
-
-          <div className="border-t pt-3 mt-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Total esperado no caixa</span>
-              <span className="font-semibold text-primary">
-                R$ {expectedCashInDrawer.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              (Igual ao dinheiro contado se não houver diferença)
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Cash Difference (optional) */}
-      <Card className="card-unified">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <Label className="flex-1 text-sm">Diferença de Caixa (se houver)</Label>
-            <div className="relative w-32">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">R$</span>
-              <Input
-                type="number"
-                inputMode="decimal"
-                step="0.01"
-                className="pl-10 text-right h-11"
-                value={cashDifference || ''}
-                onChange={(e) => setCashDifference(parseFloat(e.target.value) || 0)}
-                placeholder="0,00"
-              />
-            </div>
-          </div>
-          {cashDifference !== 0 && (
-            <p className="text-xs text-warning mt-2 flex items-center gap-1">
-              <AppIcon name="AlertCircle" className="w-3 h-3" />
-              {cashDifference > 0 ? 'Sobra' : 'Falta'} no caixa será registrada
-            </p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Receipt Upload */}
-      <Card className="card-unified">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <AppIcon name="Upload" className="w-4 h-4" />
-            Comprovante do PDV (Colibri) - opcional
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*,.pdf"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <input
-            ref={galleryInputRef}
-            type="file"
-            accept="image/*,.pdf"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          
-          {receiptPreview ? (
-            <div className="relative">
-              <img 
-                src={receiptPreview} 
-                alt="Comprovante" 
-                className="w-full h-48 object-cover rounded-xl"
-              />
-              <div className="absolute bottom-2 right-2 flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                   <AppIcon name="ScanLine" className="w-4 h-4 mr-1" />
-                  Scanner
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => galleryInputRef.current?.click()}
-                >
-                  <AppIcon name="Upload" className="w-4 h-4 mr-1" />
-                  Galeria
-                </Button>
+              <div className="w-9 h-9 rounded-full flex items-center justify-center bg-primary/10">
+                <AppIcon name="photo_camera" size={18} className="text-primary" />
               </div>
-            </div>
-          ) : (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 h-12 border-dashed gap-2"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <AppIcon name="ScanLine" className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground text-sm">Scanner</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 h-12 border-dashed gap-2"
-                onClick={() => galleryInputRef.current?.click()}
-              >
-                <AppIcon name="Upload" className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground text-sm">Galeria / Arquivo</span>
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              <span className="text-xs font-medium text-foreground">Câmera</span>
+            </button>
+            <button
+              onClick={() => galleryInputRef.current?.click()}
+              className="flex flex-col items-center gap-1.5 p-4 rounded-xl bg-secondary/40 hover:bg-secondary/60 transition-colors"
+            >
+              <div className="w-9 h-9 rounded-full flex items-center justify-center bg-primary/10">
+                <AppIcon name="photo_library" size={18} className="text-primary" />
+              </div>
+              <span className="text-xs font-medium text-foreground">Galeria</span>
+            </button>
+          </div>
+        )}
+      </div>
 
-      {/* Notes */}
-      <Card className="card-unified">
-        <CardContent className="p-4">
-          <Label className="text-sm mb-2 block">Observações (opcional)</Label>
-          <Textarea
-            placeholder="Alguma observação sobre o fechamento..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            rows={2}
-          />
-        </CardContent>
-      </Card>
+      {/* Observações */}
+      <div className="rounded-2xl bg-card p-4 space-y-2">
+        <Label className="text-sm font-medium">Observações <span className="text-muted-foreground font-normal text-[10px]">opcional</span></Label>
+        <Textarea
+          placeholder="Alguma observação sobre o fechamento..."
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          rows={2}
+          className="rounded-xl"
+        />
+      </div>
 
-
-      {/* Submit Button */}
+      {/* Submit */}
       <Button
-        className="w-full h-14 text-lg font-semibold"
+        className="w-full h-14 text-base font-bold rounded-2xl gap-2"
         onClick={handleSubmit}
         disabled={isSubmitting}
       >
         {isSubmitting ? (
           <>
-            <AppIcon name="Loader2" className="w-5 h-5 mr-2 animate-spin" />
+            <AppIcon name="progress_activity" size={20} className="animate-spin" />
             Enviando...
           </>
         ) : (
           <>
-            <AppIcon name="CheckCircle2" className="w-5 h-5 mr-2" />
+            <AppIcon name="check_circle" size={20} fill={1} />
             Enviar Fechamento
           </>
         )}
