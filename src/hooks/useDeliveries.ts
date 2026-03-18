@@ -294,6 +294,7 @@ export function useDeliveries() {
   // Strip apartment/unit/complement info that confuses geocoders
   const cleanAddress = useCallback((addr: string): string => {
     return addr
+      .replace(/\bnº\s*/gi, '')
       .replace(/\b(apto?|apartamento|bloco?|sala|casa|unid(ade)?|lote|quadra|andar|fundos|frente)\b\s*\d*/gi, '')
       .replace(/,\s*,/g, ',')
       .replace(/,\s*$/, '')
