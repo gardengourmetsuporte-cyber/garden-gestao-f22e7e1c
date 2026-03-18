@@ -79,7 +79,7 @@ export function PriceSurveySheet({ open, onOpenChange, suppliers, onSubmit }: Pr
                   disabled={!normalizePhone(ss.supplier?.phone)}
                   className="gap-1.5"
                 >
-                  <img src="/icons/whatsapp.png" className="w-4 h-4 dark:invert" alt="" />
+                  <AppIcon name="chat" size={15} fill={1} className="text-white" />
                   Enviar
                 </Button>
               </div>

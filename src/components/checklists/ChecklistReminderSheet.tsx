@@ -244,7 +244,7 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
                       <div className="flex items-center gap-2 mt-0.5">
                         {hasPhone ? (
                           <span className="text-[10px] text-primary flex items-center gap-0.5">
-                            <img src="/icons/whatsapp.png" alt="" className="w-3 h-3 dark:invert" />
+                            <AppIcon name="chat" size={12} fill={1} className="text-primary" />
                             {m.phone}
                           </span>
                         ) : (
