@@ -429,11 +429,13 @@ export function ChecklistSettings({
     setItemSheetOpen(false);
   };
 
-  // For bonus mode: collect all items flat
+  // For bonus mode: collect all items grouped by sector
   const isBonusMode = selectedType === 'bonus';
-  const allBonusItems = isBonusMode ? sectors.flatMap(sector =>
+
+  // Collect production items (linked to inventory) across all bonus sectors
+  const productionItemsList = isBonusMode ? sectors.flatMap(sector =>
     sector.subcategories?.flatMap(sub =>
-      (sub.items || []).filter(i => i.checklist_type === 'bonus').map(item => ({ ...item, _subcategoryId: sub.id }))
+      (sub.items || []).filter(i => (i as any).linked_inventory_item_id).map(item => ({ ...item, _subcategoryId: sub.id }))
     ) || []
   ) : [];
 
@@ -450,96 +452,153 @@ export function ChecklistSettings({
   const handleAddBonusItem = async () => {
     let subcatId = getDefaultBonusSubcategoryId();
     if (!subcatId) {
-      // Auto-create a default sector + subcategory for bonus
       await onAddSector({ name: 'Bônus', color: '#22c55e', icon: 'Zap' });
-      return; // After sector is created, subcategory will be auto-created, user clicks again
+      return;
     }
     handleOpenItemSheet(subcatId);
   };
 
   if (isBonusMode) {
+    // Group items by sector for display
+    const bonusSectors = sectors.filter(s => {
+      const hasBonus = s.subcategories?.some(sub =>
+        sub.items?.some(i => i.checklist_type === 'bonus' && !(i as any).linked_inventory_item_id)
+      );
+      return hasBonus;
+    });
+
+    const renderBonusItem = (item: any) => {
+      const pointsColors = getBonusPointsColors(item.points);
+      const isProduction = !!(item as any).linked_inventory_item_id;
+      return (
+        <div key={item.id} className={cn(
+          "flex items-center gap-3 p-3 rounded-xl border transition-all",
+          item.is_active
+            ? "bg-card/80 border-border/50 hover:border-border"
+            : "bg-muted/30 border-border/30 opacity-60"
+        )}>
+          <Switch
+            checked={item.is_active}
+            onCheckedChange={(checked) => onUpdateItem(item.id, { is_active: checked })}
+          />
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold border"
+            style={{
+              backgroundColor: item.points > 0 ? pointsColors.bg : undefined,
+              color: item.points > 0 ? pointsColors.color : undefined,
+              borderColor: item.points > 0 ? pointsColors.border : undefined,
+            }}
+          >
+            {item.points > 0 ? (
+              <span className="flex items-center gap-0.5">
+                <AppIcon name={isProduction ? "soup_kitchen" : "bolt"} size={12} />{item.points}
+              </span>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+            <p className="text-[11px] text-muted-foreground">{getFrequencyLabel(item.frequency || 'daily')}</p>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={() => handleOpenItemSheet(item._subcategoryId || item.subcategory_id, item)}
+              className="w-7 h-7 rounded-lg flex items-center justify-center bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+            >
+              <AppIcon name="edit" size={14} />
+            </button>
+            <button
+              onClick={() => onDeleteItem(item.id)}
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+            >
+              <AppIcon name="delete" size={14} />
+            </button>
+          </div>
+        </div>
+      );
+    };
+
     return (
       <div className="space-y-4">
-        {/* Add Bonus Task Button */}
-        <Button
-          onClick={handleAddBonusItem}
-          className="w-full gap-2"
-          variant="outline"
-        >
+        <Button onClick={handleAddBonusItem} className="w-full gap-2" variant="outline">
           <AppIcon name="add" size={16} />
           Nova Tarefa Bônus
         </Button>
 
-        {/* Flat list of all bonus items */}
-        {allBonusItems.length === 0 ? (
+        {/* Production subgroup */}
+        {productionItemsList.length > 0 && (
+          <div className="rounded-2xl border border-amber-500/30 bg-card/80 overflow-hidden">
+            <button
+              onClick={() => toggleSector('__production__')}
+              className="w-full flex items-center gap-3 p-3.5"
+            >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md"
+                style={{ background: 'linear-gradient(135deg, #F59E0B, #F97316)' }}>
+                <AppIcon name="soup_kitchen" size={18} fill={1} className="text-white" />
+              </div>
+              <div className="flex-1 text-left min-w-0">
+                <span className="font-semibold text-sm text-foreground">Produção</span>
+                <p className="text-[11px] text-muted-foreground">{productionItemsList.length} {productionItemsList.length === 1 ? 'item' : 'itens'}</p>
+              </div>
+              <AppIcon name={expandedSectors.has('__production__') ? 'expand_less' : 'expand_more'} size={20} className="text-muted-foreground" />
+            </button>
+            {expandedSectors.has('__production__') && (
+              <div className="px-3 pb-3 space-y-1.5">
+                {productionItemsList.map(item => renderBonusItem(item))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Bonus sectors */}
+        {bonusSectors.map(sector => {
+          const sectorItems = sector.subcategories?.flatMap(sub =>
+            (sub.items || []).filter(i => i.checklist_type === 'bonus' && !(i as any).linked_inventory_item_id).map(item => ({ ...item, _subcategoryId: sub.id }))
+          ) || [];
+          if (sectorItems.length === 0) return null;
+          const isExpanded = expandedSectors.has(sector.id);
+          return (
+            <div key={sector.id} className="rounded-2xl border border-border/40 bg-card/80 overflow-hidden">
+              <button
+                onClick={() => toggleSector(sector.id)}
+                className="w-full flex items-center gap-3 p-3.5"
+              >
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-md"
+                  style={{ background: `linear-gradient(135deg, ${sector.color}, ${sector.color}99)` }}>
+                  <AppIcon name={getSectorIcon(sector)} size={18} fill={0} className="text-white" />
+                </div>
+                <div className="flex-1 text-left min-w-0">
+                  <span className="font-semibold text-sm text-foreground">{sector.name}</span>
+                  <p className="text-[11px] text-muted-foreground">{sectorItems.length} {sectorItems.length === 1 ? 'item' : 'itens'}</p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleOpenSectorSheet(sector); }}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                  >
+                    <AppIcon name="edit" size={14} />
+                  </button>
+                  <AppIcon name={isExpanded ? 'expand_less' : 'expand_more'} size={20} className="text-muted-foreground" />
+                </div>
+              </button>
+              {isExpanded && (
+                <div className="px-3 pb-3 space-y-1.5">
+                  {sectorItems.map(item => renderBonusItem(item))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {productionItemsList.length === 0 && bonusSectors.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             <AppIcon name="bolt" size={48} className="mx-auto mb-3 opacity-50" />
             <p className="font-medium">Nenhuma tarefa bônus</p>
             <p className="text-sm mt-1">Adicione tarefas para a equipe ganhar pontos extras</p>
           </div>
-        ) : (
-          <div className="space-y-1.5">
-            {allBonusItems.map(item => {
-              const pointsColors = getBonusPointsColors(item.points);
-              return (
-                <div key={item.id} className={cn(
-                  "flex items-center gap-3 p-3 rounded-xl border transition-all",
-                  item.is_active
-                    ? "bg-card/80 border-border/50 hover:border-border"
-                    : "bg-muted/30 border-border/30 opacity-60"
-                )}>
-                  {/* Toggle */}
-                  <Switch
-                    checked={item.is_active}
-                    onCheckedChange={(checked) => onUpdateItem(item.id, { is_active: checked })}
-                  />
-
-                  {/* Points badge */}
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold border"
-                    style={{
-                      backgroundColor: item.points > 0 ? pointsColors.bg : undefined,
-                      color: item.points > 0 ? pointsColors.color : undefined,
-                      borderColor: item.points > 0 ? pointsColors.border : undefined,
-                    }}
-                  >
-                    {item.points > 0 ? (
-                      <span className="flex items-center gap-0.5"><AppIcon name="bolt" size={12} />{item.points}</span>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </div>
-
-                  {/* Name + freq */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
-                    <p className="text-[11px] text-muted-foreground">{getFrequencyLabel(item.frequency || 'daily')}</p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={() => handleOpenItemSheet((item as any)._subcategoryId, item)}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-                      title="Editar"
-                    >
-                      <AppIcon name="edit" size={14} />
-                    </button>
-                    <button
-                      onClick={() => onDeleteItem(item.id)}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                      title="Excluir"
-                    >
-                      <AppIcon name="delete" size={14} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         )}
 
-        {/* Item Sheet (reused) */}
         {renderItemSheet()}
       </div>
     );
