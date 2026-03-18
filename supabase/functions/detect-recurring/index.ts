@@ -89,38 +89,70 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Access denied" }), { status: 403, headers: corsHeaders });
     }
 
-    // 1. Get transactions from last 90 days (expense/credit_card)
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-    const dateStr = ninetyDaysAgo.toISOString().split("T")[0];
+    // 1. Get ALL fixed transactions + last 180 days recurring
+    const halfYearAgo = new Date();
+    halfYearAgo.setDate(halfYearAgo.getDate() - 180);
+    const dateStr = halfYearAgo.toISOString().split("T")[0];
 
-    const { data: transactions, error: txError } = await supabase
-      .from("finance_transactions")
-      .select("id, description, amount, date, type, is_fixed, category_id")
-      .eq("unit_id", unit_id)
-      .in("type", ["expense", "credit_card"])
-      .gte("date", dateStr)
-      .order("date", { ascending: false })
-      .limit(500);
+    // Fetch fixed transactions (no date limit) + recent transactions
+    const [fixedResult, recentResult] = await Promise.all([
+      supabase
+        .from("finance_transactions")
+        .select("id, description, amount, date, type, is_fixed, category_id")
+        .eq("unit_id", unit_id)
+        .eq("is_fixed", true)
+        .in("type", ["expense", "credit_card"])
+        .order("date", { ascending: false })
+        .limit(500),
+      supabase
+        .from("finance_transactions")
+        .select("id, description, amount, date, type, is_fixed, category_id")
+        .eq("unit_id", unit_id)
+        .eq("is_fixed", false)
+        .in("type", ["expense", "credit_card"])
+        .gte("date", dateStr)
+        .order("date", { ascending: false })
+        .limit(500),
+    ]);
 
-    if (txError) throw txError;
-    if (!transactions || transactions.length === 0) {
+    if (fixedResult.error) throw fixedResult.error;
+    if (recentResult.error) throw recentResult.error;
+
+    // Merge and deduplicate
+    const seenIds = new Set<string>();
+    const transactions: typeof fixedResult.data = [];
+    for (const tx of [...(fixedResult.data || []), ...(recentResult.data || [])]) {
+      if (!seenIds.has(tx.id)) {
+        seenIds.add(tx.id);
+        transactions.push(tx);
+      }
+    }
+
+    if (transactions.length === 0) {
       return new Response(JSON.stringify({ suggestions: [] }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // 2. Group by description+amount, count distinct months
-    const groups: Record<string, { description: string; amount: number; months: Set<string>; isFixed: boolean; count: number }> = {};
+    // 2. Group by normalized description (ignoring amount differences and month suffixes like "(6/12)")
+    const groups: Record<string, { description: string; amount: number; months: Set<string>; isFixed: boolean; count: number; amounts: number[] }> = {};
     
     for (const tx of transactions) {
       if (!tx.description) continue;
-      const key = `${tx.description.toLowerCase().trim()}|${tx.amount}`;
+      // Normalize: remove parenthetical suffixes like (6/12), (11/12), trim
+      const normalized = tx.description.toLowerCase().trim().replace(/\s*\(\d+\/\d+\)\s*$/, '').trim();
+      const key = normalized;
       const month = tx.date?.substring(0, 7) || "";
       if (!groups[key]) {
-        groups[key] = { description: tx.description, amount: tx.amount, months: new Set(), isFixed: !!tx.is_fixed, count: 0 };
+        groups[key] = { description: tx.description.replace(/\s*\(\d+\/\d+\)\s*$/, '').trim(), amount: tx.amount, months: new Set(), isFixed: !!tx.is_fixed, count: 0, amounts: [] };
       }
       groups[key].months.add(month);
       groups[key].count++;
+      groups[key].amounts.push(tx.amount);
       if (tx.is_fixed) groups[key].isFixed = true;
+    }
+
+    // Calculate average amount for each group
+    for (const g of Object.values(groups)) {
+      g.amount = Math.round((g.amounts.reduce((a, b) => a + b, 0) / g.amounts.length) * 100) / 100;
     }
 
     // Filter: is_fixed OR appears in 2+ distinct months
