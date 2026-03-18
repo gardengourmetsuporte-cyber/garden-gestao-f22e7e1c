@@ -82,6 +82,21 @@ function OrderDetailSheet({
   updatingStatus: string | null;
 }) {
   const [showItems, setShowItems] = useState(false);
+  const [cancelPinOpen, setCancelPinOpen] = useState(false);
+  const { validatePinWithPermission } = usePOS();
+
+  const handleCancelWithPin = useCallback(async (pin: string): Promise<boolean> => {
+    if (!order) return false;
+    const { authorized, userName } = await validatePinWithPermission(pin, 'menu-admin.pdv-cancel');
+    if (!authorized) {
+      if (!userName) toast.error('PIN inválido');
+      else toast.error(`${userName} não tem permissão para cancelar`);
+      return false;
+    }
+    onUpdateStatus(order, 'cancelled');
+    setCancelPinOpen(false);
+    return true;
+  }, [order, validatePinWithPermission, onUpdateStatus]);
 
   if (!order) return null;
 
