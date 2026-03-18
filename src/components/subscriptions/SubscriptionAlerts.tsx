@@ -1,5 +1,4 @@
 import { AlertTriangle, Clock, Bell, AlertCircle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Subscription, AlertLevel } from '@/hooks/useSubscriptions';
 
@@ -21,10 +20,10 @@ const alertConfig: Record<AlertLevel, { icon: typeof AlertTriangle; label: strin
 export function SubscriptionAlerts({ alerts }: Props) {
   if (alerts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-        <Bell className="w-12 h-12 mb-3 opacity-30" />
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <Bell className="w-10 h-10 mb-3 opacity-20" />
         <p className="text-sm">Nenhum alerta no momento</p>
-        <p className="text-xs mt-1">Tudo em dia! 🎉</p>
+        <p className="text-xs mt-1 opacity-60">Tudo em dia! 🎉</p>
       </div>
     );
   }
@@ -51,15 +50,15 @@ export function SubscriptionAlerts({ alerts }: Props) {
             </div>
             <div className="space-y-2">
               {items.map(item => (
-                <Card key={item.id} className={`p-3 flex items-center justify-between ${config.bg} border-0`}>
+                <div key={item.id} className={`rounded-2xl p-3 flex items-center justify-between ${config.bg}`}>
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{item.name}</p>
                     <p className="text-[10px] text-muted-foreground">
                       {item.next_payment_date ? new Date(item.next_payment_date + 'T12:00:00').toLocaleDateString('pt-BR') : ''}
                     </p>
                   </div>
-                  <p className="text-sm font-bold flex-shrink-0 ml-2">R$ {Number(item.price).toFixed(2)}</p>
-                </Card>
+                  <p className="text-sm font-bold shrink-0 ml-2">R$ {Number(item.price).toFixed(2)}</p>
+                </div>
               ))}
             </div>
           </div>
