@@ -1,88 +1,51 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Plan: Add "Fichas" Module for Comanda/QR Code Order Management
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+The system already has all the infrastructure for comandas: the `ComandaScanner` component, `comanda_number` column in `tablet_orders`, and QR code scanning on tablets. What's missing is a dedicated management module on the admin side to view, track, and manage orders grouped by ficha/comanda number.
 
----
+### What This Module Does
 
-## Bloco de Relatórios Avançados ✅
+- Shows all active fichas (comandas) grouped by their number, with the associated table number
+- Receives orders from tablets where customers scan their comanda QR code at the end of the order
+- Allows operators to see which fichas are open, their total, and close them
+- The table number is stored on the tablet and can only be changed with admin PIN (this already works via `TableConfigDialog`)
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+### Changes
 
-## Dashboard Analytics ✅
+**1. New page: `src/pages/Fichas.tsx`**
+- Full-screen management view with the standard `AppLayout`
+- Header with title "Fichas" and stats (active fichas count, total value)
+- Grid of ficha cards, each showing:
+  - Ficha/comanda number (large, prominent)
+  - Table number association
+  - Order count and total value
+  - Status indicator (active orders in yellow, all completed in green)
+  - Tap to expand and see individual orders + items
+- Queries `tablet_orders` filtered by `comanda_number IS NOT NULL` for the active unit
+- Groups orders by `comanda_number` to show consolidated ficha view
+- Realtime subscription for live updates when new orders come in from tablets
+- Empty state encouraging comanda QR code usage
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+**2. Route: `src/App.tsx`**
+- Add `/fichas` route under `AuthenticatedRoutes` with `ProtectedRoute`
+- Lazy import the new page
 
-## Operacional ✅
+**3. Navigation entry**
+- Add "Fichas" to the relevant navigation/menu config so it appears in the sidebar/bottom bar
+- Icon: `receipt_long` (Material Symbol) or `Receipt`
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+**4. Ficha Detail Sheet**
+- When tapping a ficha card, opens a `Sheet` showing:
+  - All orders under that comanda number
+  - Each order's items, time, status
+  - Total accumulated
+  - Action to close/finalize the ficha (marks all orders as delivered)
+  - Action to print summary
 
-## CRM / Clientes ✅
+### No Database Changes Required
+All infrastructure (`tablet_orders.comanda_number`, `tablet_order_items`, etc.) already exists. This is purely a frontend module that reads existing data in a new grouped view.
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+### Visual Style
+Following system patterns: `bg-card rounded-2xl`, borderless cards, circular icon containers with color-coded backgrounds, `text-primary` for active states, compact `text-[10px]` subtitles.
 
-## Funcionários ✅
-
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
-
-## Produção Integrada ao Checklist ✅
-
-- Itens de checklist vinculados a itens de estoque (categoria Produção)
-- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
-- Entrada automática no estoque + registro de produção
-- Badge visual de produção nos itens vinculados
-- Configuração de vínculo no admin de checklists
-- Removido módulo Produção da página de Pedidos
