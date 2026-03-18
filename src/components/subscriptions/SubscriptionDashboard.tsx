@@ -2,7 +2,6 @@ import { Badge } from '@/components/ui/badge';
 import { Info } from 'lucide-react';
 import { Subscription, getAlertLevel, getMonthlyPrice, AlertLevel } from '@/hooks/useSubscriptions';
 import { GradientIcon } from '@/components/ui/gradient-icon';
-import { RecurringSuggestions } from './RecurringSuggestions';
 
 interface Props {
   totalMonthly: number;
@@ -32,9 +31,6 @@ export function SubscriptionDashboard({ totalMonthly, activeCount, upcomingBills
 
   return (
     <div className="space-y-4">
-      {/* AI Suggestions */}
-      <RecurringSuggestions />
-
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-3">
         {stats.map((s) => (

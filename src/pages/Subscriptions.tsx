@@ -9,6 +9,8 @@ import { SubscriptionSheet } from '@/components/subscriptions/SubscriptionSheet'
 import { SubscriptionFilters } from '@/components/subscriptions/SubscriptionFilters';
 import { SubscriptionAlerts } from '@/components/subscriptions/SubscriptionAlerts';
 import { CancelSubscriptionDialog } from '@/components/subscriptions/CancelSubscriptionDialog';
+import { RecurringSuggestions } from '@/components/subscriptions/RecurringSuggestions';
+import { RecurringSuggestion } from '@/hooks/useRecurringSuggestions';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
@@ -35,8 +37,25 @@ export default function Subscriptions() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
+  // Prefill from suggestion for edit-before-add
+  const [prefillData, setPrefillData] = useState<Partial<Subscription> | null>(null);
+
   // FAB para criação
-  useFabAction({ icon: 'Plus', label: 'Novo', onClick: () => { setEditItem(null); setSheetOpen(true); } }, []);
+  useFabAction({ icon: 'Plus', label: 'Novo', onClick: () => { setEditItem(null); setPrefillData(null); setSheetOpen(true); } }, []);
+
+  const handleEditBeforeAdd = (suggestion: RecurringSuggestion) => {
+    setEditItem(null);
+    setPrefillData({
+      name: suggestion.name,
+      category: suggestion.category,
+      type: suggestion.type,
+      price: suggestion.price,
+      billing_cycle: suggestion.billing_cycle,
+      management_url: suggestion.management_url || null,
+      status: 'ativo',
+    } as Partial<Subscription>);
+    setSheetOpen(true);
+  };
 
   const filterItems = (items: Subscription[]) => {
     return items.filter(s => {
@@ -115,6 +134,7 @@ export default function Subscriptions() {
 
         {activeTab === 'assinaturas' && (
           <div className="space-y-3">
+            <RecurringSuggestions typeFilter="assinatura" onEditBeforeAdd={handleEditBeforeAdd} />
             <SubscriptionFilters
               search={search} onSearchChange={setSearch}
               statusFilter={statusFilter} onStatusChange={setStatusFilter}
@@ -126,6 +146,7 @@ export default function Subscriptions() {
 
         {activeTab === 'contas' && (
           <div className="space-y-3">
+            <RecurringSuggestions typeFilter="conta_fixa" onEditBeforeAdd={handleEditBeforeAdd} />
             <SubscriptionFilters
               search={search} onSearchChange={setSearch}
               statusFilter={statusFilter} onStatusChange={setStatusFilter}
@@ -140,8 +161,9 @@ export default function Subscriptions() {
 
       <SubscriptionSheet
         open={sheetOpen}
-        onOpenChange={setSheetOpen}
+        onOpenChange={(open) => { setSheetOpen(open); if (!open) setPrefillData(null); }}
         editItem={editItem}
+        prefillData={prefillData}
         onSave={create}
         onUpdate={update}
         isSaving={isCreating || isUpdating}

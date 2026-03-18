@@ -17,12 +17,13 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editItem?: Subscription | null;
+  prefillData?: Partial<Subscription> | null;
   onSave: (data: SubscriptionInsert) => Promise<void>;
   onUpdate?: (data: Partial<Subscription> & { id: string }) => Promise<void>;
   isSaving: boolean;
 }
 
-export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpdate, isSaving }: Props) {
+export function SubscriptionSheet({ open, onOpenChange, editItem, prefillData, onSave, onUpdate, isSaving }: Props) {
   const { activeUnitId } = useUnit();
   const [name, setName] = useState('');
   const [category, setCategory] = useState('outros');
@@ -78,6 +79,16 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
       const fcId = (editItem as any).finance_category_id;
       setLinkFinance(!!fcId);
       setFinanceCategoryId(fcId || '');
+    } else if (prefillData) {
+      setName(prefillData.name || '');
+      setCategory(prefillData.category || 'outros');
+      setType(prefillData.type || 'assinatura');
+      setPrice(prefillData.price ? String(prefillData.price) : '');
+      setBillingCycle(prefillData.billing_cycle || 'mensal');
+      setNextDate(prefillData.next_payment_date || '');
+      setManagementUrl(prefillData.management_url || '');
+      setNotes(prefillData.notes || '');
+      setLinkFinance(false); setFinanceCategoryId('');
     } else {
       setName(''); setCategory('outros'); setType('assinatura');
       setPrice(''); setBillingCycle('mensal'); setNextDate('');
@@ -86,7 +97,7 @@ export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpda
     }
     setSuggestions([]);
     setShowSuggestions(false);
-  }, [editItem, open]);
+  }, [editItem, prefillData, open]);
 
   useEffect(() => {
     if (!editItem) {
