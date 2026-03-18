@@ -53,7 +53,7 @@ export default function Freelancers() {
   };
 
   return (
-    <AppLayout title="Freelancers" subtitle={`${freelancers.length} cadastrados`}>
+    <AppLayout>
       <div className="space-y-4 pb-24">
         {/* Search + broadcast */}
         <div className="flex gap-2">
