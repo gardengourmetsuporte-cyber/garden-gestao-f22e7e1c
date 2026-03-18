@@ -1,88 +1,87 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Plan: Push Notification for Delivery Dispatch
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+### What happens today
+When a delivery person clicks "Despachar" or a delivery status changes to `out` (em rota), only a local toast appears. No push notification is sent to PDV users.
 
----
+### What we'll build
+When a delivery status changes to `out`, the system will:
+1. Insert a notification in the `notifications` table for all unit users with PDV access
+2. The existing DB trigger (`send_push_on_notification`) will automatically fire push notifications
+3. The existing in-app notification system will play the WhatsApp-style sound and show the card
 
-## Bloco de Relatórios Avançados ✅
+### Changes
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+**1. Database: Create a trigger function for delivery dispatch notifications**
+- New migration with a function `notify_delivery_dispatched()` that fires `AFTER UPDATE` on `deliveries` when `status` changes to `'out'`
+- The function queries all users with access to the `pdv` module in the same unit (via `user_modules` or `user_roles`)
+- For each user, it inserts a row into `notifications` with:
+  - `type: 'alert'`
+  - `origin: 'sistema'` (or add a new origin `'entregas'`)
+  - `title: '🚀 Entrega saiu!'`
+  - `description: 'Pedido #XXX saiu para entrega'`
+- The existing `send_push_on_notification` trigger handles the push automatically
 
-## Dashboard Analytics ✅
+**2. Add `'entregas'` as notification origin**
+- Update `useNotifications.ts` `AppNotification` type to include `'entregas'` origin
+- Add `entregas` category to `NotificationSettings.tsx` categories list
+- Add the category to `notification_preferences` defaults
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+**3. Update `useDeliveries.ts` — no changes needed**
+The trigger fires on the DB level, so no frontend code changes are needed for the dispatch itself.
 
-## Operacional ✅
+**4. Ensure push is auto-activated**
+- On the Deliveries page or PDV page, auto-prompt push subscription if not already subscribed (using `usePushNotifications().subscribe()`)
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+### Technical Details
 
-## CRM / Clientes ✅
+```sql
+-- Trigger function
+CREATE OR REPLACE FUNCTION public.notify_delivery_dispatched()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  unit_row RECORD;
+  user_record RECORD;
+  order_num TEXT;
+BEGIN
+  IF NEW.status = 'out' AND (OLD.status IS DISTINCT FROM 'out') THEN
+    order_num := COALESCE(NEW.order_number, LEFT(NEW.id::text, 8));
+    
+    -- Notify all users in this unit who have PDV or deliveries module access
+    FOR user_record IN
+      SELECT DISTINCT um.user_id 
+      FROM public.user_modules um
+      WHERE um.unit_id = NEW.unit_id 
+        AND um.module_key IN ('pdv', 'deliveries')
+        AND um.user_id != NEW.assigned_to  -- don't notify the delivery person
+    LOOP
+      INSERT INTO public.notifications (user_id, type, title, description, origin)
+      VALUES (
+        user_record.user_id,
+        'info',
+        '🚀 Entrega saiu!',
+        'Pedido #' || order_num || ' saiu para entrega',
+        'sistema'
+      );
+    END LOOP;
+  END IF;
+  RETURN NEW;
+END;
+$$;
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+CREATE TRIGGER on_delivery_dispatched
+  AFTER UPDATE ON public.deliveries
+  FOR EACH ROW
+  EXECUTE FUNCTION public.notify_delivery_dispatched();
+```
 
-## Funcionários ✅
+### File changes summary
+| File | Change |
+|------|--------|
+| New migration SQL | Trigger function + trigger on `deliveries` |
+| `src/hooks/useNotifications.ts` | Add `'entregas'` to origin type |
+| `src/components/settings/NotificationSettings.tsx` | Add `entregas` category |
+| `src/pages/Deliveries.tsx` | Auto-prompt push subscription on mount |
+| `src/components/pdv/PendingOrdersSheet.tsx` | Auto-prompt push subscription on mount |
 
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
-
-## Produção Integrada ao Checklist ✅
-
-- Itens de checklist vinculados a itens de estoque (categoria Produção)
-- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
-- Entrada automática no estoque + registro de produção
-- Badge visual de produção nos itens vinculados
-- Configuração de vínculo no admin de checklists
-- Removido módulo Produção da página de Pedidos
