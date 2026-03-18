@@ -75,9 +75,8 @@ function MenuModeCard({
             </div>
           </>
         ) : (
-          <div className="flex flex-col items-center gap-0.5">
-            <AppIcon name="Camera" size={16} className="text-muted-foreground" />
-            <span className="text-[8px] text-muted-foreground">Foto</span>
+          <div className="flex flex-col items-center justify-center w-full h-full">
+            <span className="text-lg font-bold text-muted-foreground">{product.name?.charAt(0)?.toUpperCase() || '?'}</span>
           </div>
         )}
       </div>
