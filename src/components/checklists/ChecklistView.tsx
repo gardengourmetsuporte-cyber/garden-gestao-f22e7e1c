@@ -461,26 +461,57 @@ export function ChecklistView({
     }
   };
 
-  // For bonus: collect all items flat across all sectors
-  const allBonusItems = isBonus ? sectors.flatMap(sector =>
-    sector.subcategories?.flatMap(sub =>
-      (sub.items || []).filter(i => i.is_active && (i as any).checklist_type === 'bonus')
-    ) || []
-  ) : [];
+  // Build display sectors — for bonus, group by sector + virtual "Produção" subgroup
+  const displaySectors = useMemo(() => {
+    if (isBonus) {
+      const productionItems: any[] = [];
+      const regularBonusSectors = sectors
+        .filter(s => s.scope === 'bonus')
+        .map(sector => ({
+          ...sector,
+          subcategories: (sector.subcategories || []).map(sub => ({
+            ...sub,
+            items: (sub.items || []).filter((i: any) => {
+              if (!i.is_active || i.checklist_type !== 'bonus') return false;
+              if (i.linked_inventory_item_id) {
+                productionItems.push(i);
+                return false;
+              }
+              return true;
+            })
+          })).filter(sub => (sub.items || []).length > 0)
+        }))
+        .filter(s => (s.subcategories || []).length > 0);
 
-  // For production: collect all items with linked_inventory_item_id
-  const allProductionItems = isProduction ? sectors.flatMap(sector =>
-    sector.subcategories?.flatMap(sub =>
-      (sub.items || []).filter(i => i.is_active && (i as any).linked_inventory_item_id)
-    ) || []
-  ) : [];
+      const result: any[] = [];
+      if (productionItems.length > 0) {
+        result.push({
+          id: '__production__',
+          name: 'Produção',
+          icon: 'soup_kitchen',
+          color: '#F59E0B',
+          scope: 'bonus',
+          sort_order: -1,
+          subcategories: [{
+            id: '__production_sub__',
+            name: 'Produção',
+            sector_id: '__production__',
+            sort_order: 0,
+            items: productionItems,
+          }],
+        });
+      }
+      result.push(...regularBonusSectors);
+      return result;
+    }
 
-  const filteredSectors = sectors.filter(sector => {
-    const hasActiveItems = sector.subcategories?.some(sub =>
-      sub.items?.some(i => i.is_active && (i as any).checklist_type === checklistType)
-    );
-    return hasActiveItems;
-  });
+    return sectors.filter(sector => {
+      const hasActiveItems = sector.subcategories?.some(sub =>
+        sub.items?.some(i => i.is_active && (i as any).checklist_type === checklistType)
+      );
+      return hasActiveItems;
+    });
+  }, [isBonus, sectors, checklistType]);
 
   const deadlineBannerText = deadlinePassed
     ? '⏰ Prazo encerrado — itens pendentes marcados como "não concluído"'
