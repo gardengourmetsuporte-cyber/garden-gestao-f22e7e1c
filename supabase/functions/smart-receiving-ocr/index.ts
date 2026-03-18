@@ -125,7 +125,7 @@ RESPONDA APENAS com JSON válido no formato:
             ],
           },
         ],
-        max_tokens: 4000,
+        max_completion_tokens: 4000,
         temperature: 0.1,
       }),
     });
