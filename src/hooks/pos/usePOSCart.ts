@@ -86,6 +86,7 @@ export function usePOSCart() {
     discount, setDiscount,
     saleNotes, setSaleNotes,
     saleSource, setSaleSource,
+    fichaNumber, setFichaNumber,
     deliveryPhone, setDeliveryPhone,
     deliveryAddress, setDeliveryAddress,
     addToCart, updateCartItem, removeFromCart, clearCart, loadOrderIntoCart,

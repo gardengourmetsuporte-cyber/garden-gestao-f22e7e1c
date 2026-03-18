@@ -29,6 +29,7 @@ export function usePOS() {
     total: cartHook.total,
     saleNotes: cartHook.saleNotes,
     saleSource: cartHook.saleSource,
+    fichaNumber: cartHook.fichaNumber,
     deliveryPhone: cartHook.deliveryPhone,
     deliveryAddress: cartHook.deliveryAddress,
     clearCart: cartHook.clearCart,

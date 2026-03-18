@@ -101,9 +101,6 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
-    key: 'fichas', label: 'Fichas', icon: 'Receipt', route: '/fichas', routes: ['/fichas'], group: 'Operação',
-  },
-  {
     key: 'pdv', label: 'PDV', icon: 'Monitor', route: '/pdv', routes: ['/pdv'], group: 'Operação',
   },
   {

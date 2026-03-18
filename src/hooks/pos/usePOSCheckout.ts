@@ -50,9 +50,13 @@ export function usePOSCheckout(deps: CheckoutDeps) {
       discount,
       total,
       status: 'paid',
-      notes: saleSource === 'delivery' && deliveryAddress
-        ? (saleNotes ? `${saleNotes} | Endereço: ${deliveryAddress}` : `Endereço: ${deliveryAddress}`)
-        : (saleNotes || null),
+      notes: (() => {
+        const parts: string[] = [];
+        if (saleNotes) parts.push(saleNotes);
+        if (saleSource === 'ficha' && fichaNumber) parts.push(`Ficha: ${fichaNumber}`);
+        if (saleSource === 'delivery' && deliveryAddress) parts.push(`Endereço: ${deliveryAddress}`);
+        return parts.length > 0 ? parts.join(' | ') : null;
+      })(),
       paid_at: new Date().toISOString(),
     };
 
