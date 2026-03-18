@@ -67,7 +67,6 @@ export default function Subscriptions() {
         {/* Tab bar */}
         <div className="flex gap-2 overflow-x-auto pb-1">
           {tabs.map(tab => {
-            const Icon = tab.icon;
             const isActive = activeTab === tab.key;
             return (
               <button
@@ -79,13 +78,11 @@ export default function Subscriptions() {
                     : 'bg-secondary/40 text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                  isActive
-                    ? 'bg-primary/20 shadow-[0_0_12px_hsl(var(--primary)/0.25)]'
-                    : 'bg-muted/50'
-                }`}>
-                  <Icon className={`w-4 h-4 transition-all ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                </div>
+                <GradientIcon
+                  name={tab.iconName}
+                  color={isActive ? tab.color : 'muted'}
+                  size="sm"
+                />
                 {tab.label}
                 {tab.key === 'alertas' && alerts.length > 0 && (
                   <Badge variant="destructive" className="absolute -top-1 -right-1 text-[9px] h-4 min-w-4 px-1 border-0">{alerts.length}</Badge>
