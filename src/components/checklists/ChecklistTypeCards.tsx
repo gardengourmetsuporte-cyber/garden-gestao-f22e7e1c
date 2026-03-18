@@ -203,9 +203,6 @@ export function ChecklistBonusCard({
         </div>
         <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
       </div>
-      {productionSlot && (
-        <div className="mt-3 relative z-10">{productionSlot}</div>
-      )}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
