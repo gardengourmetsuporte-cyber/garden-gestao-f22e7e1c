@@ -5411,6 +5411,71 @@ export type Database = {
           },
         ]
       }
+      recurring_subscriptions: {
+        Row: {
+          billing_cycle: string
+          category: string
+          color: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          management_url: string | null
+          name: string
+          next_payment_date: string | null
+          notes: string | null
+          price: number
+          status: string
+          type: string
+          unit_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          billing_cycle?: string
+          category?: string
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          management_url?: string | null
+          name: string
+          next_payment_date?: string | null
+          notes?: string | null
+          price?: number
+          status?: string
+          type?: string
+          unit_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          billing_cycle?: string
+          category?: string
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          management_url?: string | null
+          name?: string
+          next_payment_date?: string | null
+          notes?: string | null
+          price?: number
+          status?: string
+          type?: string
+          unit_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_subscriptions_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reservations: {
         Row: {
           created_at: string | null

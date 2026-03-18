@@ -191,6 +191,14 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
+    key: 'subscriptions', label: 'Central Recorrente', icon: 'RefreshCw', route: '/subscriptions', routes: ['/subscriptions'], group: 'Gestão',
+    children: [
+      { key: 'subscriptions.view', label: 'Ver assinaturas', icon: 'Eye' },
+      { key: 'subscriptions.create', label: 'Criar/editar', icon: 'PenSquare' },
+      { key: 'subscriptions.manage', label: 'Gerenciar status', icon: 'Settings' },
+    ],
+  },
+  {
     key: 'settings', label: 'Configurações', icon: 'Settings', route: '/settings', routes: ['/settings'], group: 'Sistema',
     children: [
       { key: 'settings.team', label: 'Equipe e convites', icon: 'Users' },
