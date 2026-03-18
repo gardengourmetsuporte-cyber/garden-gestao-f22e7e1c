@@ -7585,7 +7585,7 @@ export type Database = {
         }[]
       }
       get_dashboard_stats: {
-        Args: { p_is_admin?: boolean; p_unit_id: string; p_user_id: string }
+        Args: { p_is_admin: boolean; p_unit_id: string; p_user_id: string }
         Returns: Json
       }
       get_global_leaderboard_data: {
