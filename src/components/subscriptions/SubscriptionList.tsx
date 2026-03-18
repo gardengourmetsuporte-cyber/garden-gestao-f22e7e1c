@@ -7,10 +7,12 @@ interface Props {
   onEdit: (item: Subscription) => void;
   onPause: (item: Subscription) => void;
   onCancel: (item: Subscription) => void;
+  onDelete?: (item: Subscription) => void;
+  onReactivate?: (item: Subscription) => void;
   emptyMessage?: string;
 }
 
-export function SubscriptionList({ items, onEdit, onPause, onCancel, emptyMessage = 'Nenhum item encontrado' }: Props) {
+export function SubscriptionList({ items, onEdit, onPause, onCancel, onDelete, onReactivate, emptyMessage = 'Nenhum item encontrado' }: Props) {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
@@ -23,7 +25,7 @@ export function SubscriptionList({ items, onEdit, onPause, onCancel, emptyMessag
   return (
     <div className="space-y-2">
       {items.map((item) => (
-        <SubscriptionCard key={item.id} item={item} onEdit={onEdit} onPause={onPause} onCancel={onCancel} />
+        <SubscriptionCard key={item.id} item={item} onEdit={onEdit} onPause={onPause} onCancel={onCancel} onDelete={onDelete} onReactivate={onReactivate} />
       ))}
     </div>
   );
