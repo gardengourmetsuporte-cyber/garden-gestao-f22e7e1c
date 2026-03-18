@@ -1,14 +1,17 @@
 import * as React from "react";
 
+import { shouldAutoScrollOnFocus } from "@/lib/focus-scroll";
 import { cn } from "@/lib/utils";
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, onFocus, ...props }, ref) => {
   const handleFocus = React.useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
-    setTimeout(() => {
-      e.target.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
-    }, 300);
+    if (shouldAutoScrollOnFocus()) {
+      setTimeout(() => {
+        e.target.scrollIntoView?.({ block: 'center', inline: 'nearest' });
+      }, 280);
+    }
     onFocus?.(e);
   }, [onFocus]);
 
