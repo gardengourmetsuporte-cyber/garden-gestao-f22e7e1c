@@ -35,13 +35,10 @@ export function SmartReceivingSheet({
 }: SmartReceivingSheetProps) {
   const { processImage, uploadImage, createReceiving, confirmReceiving, isProcessing } = useSmartReceiving();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const boletoInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<Step>('capture');
   const [invoiceFile, setInvoiceFile] = useState<File | null>(null);
-  const [boletoFile, setBoletoFile] = useState<File | null>(null);
   const [invoicePreview, setInvoicePreview] = useState<string | null>(null);
-  const [boletoPreview, setBoletoPreview] = useState<string | null>(null);
   const [ocrResult, setOcrResult] = useState<OcrResult | null>(null);
   const [receivingId, setReceivingId] = useState<string | null>(null);
   const [editedItems, setEditedItems] = useState<SmartReceivingItem[]>([]);
@@ -58,9 +55,7 @@ export function SmartReceivingSheet({
       setTimeout(() => {
         setStep('capture');
         setInvoiceFile(null);
-        setBoletoFile(null);
         setInvoicePreview(null);
-        setBoletoPreview(null);
         setOcrResult(null);
         setReceivingId(null);
         setEditedItems([]);
