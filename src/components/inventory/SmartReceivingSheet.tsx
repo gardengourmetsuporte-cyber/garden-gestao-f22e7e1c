@@ -194,7 +194,7 @@ export function SmartReceivingSheet({
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 max-h-[90vh] overflow-y-auto">
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center gap-2">
-            <AppIcon name="AutoAwesome" size={20} className="text-primary" />
+            <AppIcon name="document_scanner" size={20} className="text-primary" />
             Recebimento Inteligente
             {order?.supplier?.name && (
               <span className="text-sm font-normal text-muted-foreground">
@@ -206,16 +206,19 @@ export function SmartReceivingSheet({
 
         {/* Step: Capture */}
         {step === 'capture' && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <p className="text-sm text-muted-foreground">
-              Fotografe a nota fiscal (DANFE) e/ou o boleto para processar automaticamente.
+              Fotografe a nota fiscal (DANFE) para processar automaticamente e dar entrada no estoque.
             </p>
 
             {/* Invoice capture */}
             <div className="space-y-2">
-              <Label className="text-foreground font-medium">📄 Nota Fiscal (DANFE)</Label>
+              <Label className="text-foreground font-medium flex items-center gap-1.5">
+                <AppIcon name="description" size={16} className="text-muted-foreground" />
+                Nota Fiscal (DANFE)
+              </Label>
               {invoicePreview ? (
-                <div className="relative rounded-xl overflow-hidden border">
+                <div className="relative rounded-xl overflow-hidden border border-border">
                   <img src={invoicePreview} alt="Preview NF" className="w-full max-h-48 object-cover" />
                   <Button
                     size="icon"
@@ -229,11 +232,11 @@ export function SmartReceivingSheet({
               ) : (
                 <Button
                   variant="outline"
-                  className="w-full h-24 border-dashed flex flex-col gap-2"
+                  className="w-full h-28 border-dashed border-2 border-border/60 flex flex-col gap-2 rounded-xl"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <AppIcon name="ScanLine" size={24} className="text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Scanner Inteligente</span>
+                  <AppIcon name="document_scanner" size={28} className="text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Tirar foto ou selecionar arquivo</span>
                 </Button>
               )}
               <input
@@ -243,45 +246,7 @@ export function SmartReceivingSheet({
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) handleFileCapture(file, 'invoice');
-                  e.target.value = '';
-                }}
-              />
-            </div>
-
-            {/* Boleto capture */}
-            <div className="space-y-2">
-              <Label className="text-foreground font-medium">🏦 Boleto (opcional)</Label>
-              {boletoPreview ? (
-                <div className="relative rounded-xl overflow-hidden border">
-                  <img src={boletoPreview} alt="Preview Boleto" className="w-full max-h-48 object-cover" />
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="absolute top-2 right-2 h-8 w-8"
-                    onClick={() => { setBoletoFile(null); setBoletoPreview(null); }}
-                  >
-                    <AppIcon name="Close" size={16} />
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  className="w-full h-16 border-dashed flex flex-col gap-1"
-                  onClick={() => boletoInputRef.current?.click()}
-                >
-                  <AppIcon name="PhotoCamera" size={20} className="text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Tirar foto do boleto</span>
-                </Button>
-              )}
-              <input
-                ref={boletoInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFileCapture(file, 'boleto');
+                  if (file) handleFileCapture(file);
                   e.target.value = '';
                 }}
               />
@@ -289,10 +254,10 @@ export function SmartReceivingSheet({
 
             <Button
               onClick={handleProcess}
-              disabled={!invoiceFile && !boletoFile}
+              disabled={!invoiceFile}
               className="w-full h-12 gap-2"
             >
-              <AppIcon name="AutoAwesome" size={16} />
+              <AppIcon name="auto_awesome" size={16} />
               Processar com IA
             </Button>
           </div>
