@@ -1,4 +1,4 @@
-import { Bot, Plus, X, Sparkles } from 'lucide-react';
+import { Bot, Plus, X, Sparkles, PenSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RecurringSuggestion, useRecurringSuggestions } from '@/hooks/useRecurringSuggestions';
@@ -10,8 +10,19 @@ const sourceLabels: Record<string, string> = {
   pattern: 'Padrão detectado',
 };
 
-export function RecurringSuggestions() {
+interface RecurringSuggestionsProps {
+  typeFilter?: 'assinatura' | 'conta_fixa';
+  onEditBeforeAdd?: (suggestion: RecurringSuggestion) => void;
+}
+
+export function RecurringSuggestions({ typeFilter, onEditBeforeAdd }: RecurringSuggestionsProps = {}) {
   const { suggestions, isLoading, isError, accept, dismiss } = useRecurringSuggestions();
+
+  const filtered = typeFilter
+    ? suggestions.filter((s) => s.type === typeFilter)
+    : suggestions;
+
+  if (!isLoading && !isError && filtered.length === 0) return null;
 
   return (
     <div className="space-y-3">
@@ -23,10 +34,10 @@ export function RecurringSuggestions() {
           <h3 className="text-xs font-semibold text-foreground">Sugestões da IA</h3>
           <p className="text-[10px] text-muted-foreground">Detectamos gastos recorrentes no seu financeiro</p>
         </div>
-        {suggestions.length > 0 && (
+        {filtered.length > 0 && (
           <Badge className="ml-auto bg-primary/15 text-primary border-0 text-[10px]">
             <Sparkles className="w-3 h-3 mr-1" />
-            {suggestions.length}
+            {filtered.length}
           </Badge>
         )}
       </div>
@@ -45,19 +56,10 @@ export function RecurringSuggestions() {
             Não foi possível buscar as sugestões agora. Tente novamente em alguns segundos.
           </p>
         </div>
-      ) : suggestions.length === 0 ? (
-        <div className="bg-secondary/40 rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
-            <Sparkles className="w-4 h-4 text-muted-foreground" />
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Nenhuma despesa recorrente detectada. Cadastre transações no financeiro para receber sugestões automáticas.
-          </p>
-        </div>
       ) : (
         <div className="space-y-2">
-          {suggestions.slice(0, 20).map((s, i) => (
-            <SuggestionCard key={`${s.name}-${i}`} suggestion={s} onAccept={accept} onDismiss={dismiss} />
+          {filtered.slice(0, 20).map((s, i) => (
+            <SuggestionCard key={`${s.name}-${i}`} suggestion={s} onAccept={accept} onDismiss={dismiss} onEdit={onEditBeforeAdd} />
           ))}
         </div>
       )}
@@ -65,10 +67,11 @@ export function RecurringSuggestions() {
   );
 }
 
-function SuggestionCard({ suggestion, onAccept, onDismiss }: {
+function SuggestionCard({ suggestion, onAccept, onDismiss, onEdit }: {
   suggestion: RecurringSuggestion;
   onAccept: (s: RecurringSuggestion) => void;
   onDismiss: (name: string) => void;
+  onEdit?: (s: RecurringSuggestion) => void;
 }) {
   const cat = getCategoryInfo(suggestion.category);
 
@@ -99,6 +102,16 @@ function SuggestionCard({ suggestion, onAccept, onDismiss }: {
           <Plus className="w-3.5 h-3.5" />
           Adicionar
         </Button>
+        {onEdit && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-8 w-8 p-0 rounded-xl"
+            onClick={() => onEdit(suggestion)}
+          >
+            <PenSquare className="w-3.5 h-3.5" />
+          </Button>
+        )}
         <Button
           size="sm"
           variant="ghost"
