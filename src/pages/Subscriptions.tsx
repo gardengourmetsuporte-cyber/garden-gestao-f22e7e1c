@@ -37,8 +37,25 @@ export default function Subscriptions() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
+  // Prefill from suggestion for edit-before-add
+  const [prefillData, setPrefillData] = useState<Partial<Subscription> | null>(null);
+
   // FAB para criação
-  useFabAction({ icon: 'Plus', label: 'Novo', onClick: () => { setEditItem(null); setSheetOpen(true); } }, []);
+  useFabAction({ icon: 'Plus', label: 'Novo', onClick: () => { setEditItem(null); setPrefillData(null); setSheetOpen(true); } }, []);
+
+  const handleEditBeforeAdd = (suggestion: RecurringSuggestion) => {
+    setEditItem(null);
+    setPrefillData({
+      name: suggestion.name,
+      category: suggestion.category,
+      type: suggestion.type,
+      price: suggestion.price,
+      billing_cycle: suggestion.billing_cycle,
+      management_url: suggestion.management_url || null,
+      status: 'ativo',
+    } as Partial<Subscription>);
+    setSheetOpen(true);
+  };
 
   const filterItems = (items: Subscription[]) => {
     return items.filter(s => {
