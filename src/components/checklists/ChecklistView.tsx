@@ -1459,6 +1459,12 @@ export function ChecklistView({
                                       {!isTimerMode && canToggle && (
                                         <button
                                           onClick={async () => {
+                                            const linkedId = (item as any).linked_inventory_item_id;
+                                            if (linkedId) {
+                                              setPendingProductionUndo({ itemId: item.id, linkedInventoryItemId: linkedId, itemName: item.name });
+                                              setProductionUndoOpen(true);
+                                              return;
+                                            }
                                             setOpenPopover(null);
                                             setOptimisticToggles(prev => { const next = new Set(prev); next.add(item.id); return next; });
                                             try {
@@ -1475,7 +1481,7 @@ export function ChecklistView({
                                           </div>
                                           <div>
                                             <p className="font-semibold text-foreground">Desfazer</p>
-                                            <p className="text-xs text-muted-foreground">Desmarcar conclusão</p>
+                                            <p className="text-xs text-muted-foreground">{(item as any).linked_inventory_item_id ? 'Reverter produção e estoque' : 'Desmarcar conclusão'}</p>
                                           </div>
                                         </button>
                                       )}
