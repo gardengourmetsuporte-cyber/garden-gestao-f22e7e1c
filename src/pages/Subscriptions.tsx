@@ -28,6 +28,7 @@ export default function Subscriptions() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Subscription | null>(null);
   const [cancelItem, setCancelItem] = useState<Subscription | null>(null);
+  const [deleteItem, setDeleteItem] = useState<Subscription | null>(null);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
