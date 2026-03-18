@@ -407,6 +407,42 @@ export function ChecklistView({
     }
   };
 
+  const handleProductionUndo = async () => {
+    if (!pendingProductionUndo || !activeUnitId) return;
+    const { itemId, linkedInventoryItemId } = pendingProductionUndo;
+    setProductionUndoLoading(true);
+    try {
+      const { error: smError } = await supabase
+        .from('stock_movements')
+        .delete()
+        .eq('item_id', linkedInventoryItemId)
+        .eq('type', 'entrada')
+        .like('notes', '%Produção via checklist%')
+        .eq('unit_id', activeUnitId);
+      if (smError) console.error('Error deleting stock movements:', smError);
+
+      const { error: poError } = await supabase
+        .from('production_orders')
+        .delete()
+        .eq('item_id', linkedInventoryItemId)
+        .eq('unit_id', activeUnitId);
+      if (poError) console.error('Error deleting production orders:', poError);
+
+      setOptimisticToggles(prev => { const next = new Set(prev); next.add(itemId); return next; });
+      await onToggleItem(itemId, 0, undefined, undefined, undefined, false, true);
+      toast.success('Produção revertida com sucesso');
+    } catch (err: any) {
+      console.error('Production undo error:', err);
+      toast.error(err.message || 'Erro ao reverter produção');
+      setOptimisticToggles(prev => { const next = new Set(prev); next.delete(itemId); return next; });
+    } finally {
+      setProductionUndoLoading(false);
+      setProductionUndoOpen(false);
+      setPendingProductionUndo(null);
+      setOpenPopover(null);
+    }
+  };
+
   const getItemCompletionCount = useCallback((itemId: string) => {
     return completions.filter(c => c.item_id === itemId && !c.is_skipped).length;
   }, [completions]);
