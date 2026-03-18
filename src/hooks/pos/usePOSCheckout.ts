@@ -16,7 +16,8 @@ interface CheckoutDeps {
   discount: number;
   total: number;
   saleNotes: string;
-  saleSource: 'balcao' | 'mesa' | 'delivery';
+  saleSource: 'balcao' | 'mesa' | 'delivery' | 'ficha';
+  fichaNumber: number | null;
   deliveryPhone: string;
   deliveryAddress: string;
   clearCart: () => void;
