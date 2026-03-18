@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import { LayoutDashboard, CreditCard, Building2, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { GradientIcon, GradientIconColor } from '@/components/ui/gradient-icon';
 import { useSubscriptions, Subscription } from '@/hooks/useSubscriptions';
 import { SubscriptionDashboard } from '@/components/subscriptions/SubscriptionDashboard';
 import { SubscriptionList } from '@/components/subscriptions/SubscriptionList';
@@ -14,11 +14,11 @@ import { useFabAction } from '@/contexts/FabActionContext';
 
 type Tab = 'dashboard' | 'assinaturas' | 'contas' | 'alertas';
 
-const tabs: { key: Tab; label: string; icon: typeof LayoutDashboard }[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { key: 'assinaturas', label: 'Assinaturas', icon: CreditCard },
-  { key: 'contas', label: 'Contas', icon: Building2 },
-  { key: 'alertas', label: 'Alertas', icon: Bell },
+const tabs: { key: Tab; label: string; iconName: string; color: GradientIconColor }[] = [
+  { key: 'dashboard', label: 'Dashboard', iconName: 'LayoutDashboard', color: 'primary' },
+  { key: 'assinaturas', label: 'Assinaturas', iconName: 'CreditCard', color: 'blue' },
+  { key: 'contas', label: 'Contas', iconName: 'Building2', color: 'purple' },
+  { key: 'alertas', label: 'Alertas', iconName: 'Bell', color: 'amber' },
 ];
 
 export default function Subscriptions() {
