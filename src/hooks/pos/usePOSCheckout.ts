@@ -29,7 +29,7 @@ export function usePOSCheckout(deps: CheckoutDeps) {
   const [savingSale, setSavingSale] = useState(false);
 
   const finalizeSale = useCallback(async (payments: PaymentLine[], sourceOrderId?: string) => {
-    const { activeUnitId, userId, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, deliveryPhone, deliveryAddress, clearCart, fetchPendingOrders } = deps;
+    const { activeUnitId, userId, cart, customerName, customerDocument, tableNumber, subtotal, discount, total, saleNotes, saleSource, fichaNumber, deliveryPhone, deliveryAddress, clearCart, fetchPendingOrders } = deps;
     if (!activeUnitId || !userId) return null;
     const paymentTotal = payments.reduce((s, p) => s + p.amount, 0);
     if (paymentTotal < total) {
