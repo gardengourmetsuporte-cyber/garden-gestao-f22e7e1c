@@ -271,7 +271,7 @@ export function ChecklistReminderSheet({ open, onOpenChange, checklistType, pend
             {sending ? (
               <AppIcon name="progress_activity" size={16} className="animate-spin" />
             ) : (
-              <img src="/icons/whatsapp.png" alt="" className="w-4 h-4 brightness-0 invert" />
+              <img src="/icons/whatsapp.png" alt="" className="w-4 h-4" />
             )}
             Enviar via WhatsApp ({selectedWithPhone.length})
           </Button>
