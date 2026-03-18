@@ -53,8 +53,8 @@ export function PriceTrackingTab() {
           { label: 'Em queda', value: counts.down, icon: 'TrendingDown', gradient: 'linear-gradient(135deg, #22C55E, #10B981)' },
           { label: 'Estáveis', value: counts.stable, icon: 'Minus', gradient: 'linear-gradient(135deg, #64748B, #94A3B8)' },
         ].map(card => (
-          <div key={card.label} className="bg-card rounded-2xl border border-border p-3 flex flex-col items-center gap-1.5">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-md" style={{ background: card.gradient }}>
+          <div key={card.label} className="bg-secondary/50 rounded-2xl p-3 flex flex-col items-center gap-1.5">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-lg" style={{ background: card.gradient }}>
               <AppIcon name={card.icon} size={16} className="text-white" />
             </div>
             <span className="text-lg font-bold text-foreground">{card.value}</span>
