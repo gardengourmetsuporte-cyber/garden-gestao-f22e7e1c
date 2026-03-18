@@ -109,6 +109,7 @@ const AdminMonitor = lazy(() => lazyRetry(() => import("./pages/AdminMonitor")))
 const Reports = lazy(() => lazyRetry(() => import("./pages/Reports")));
 const Reservations = lazy(() => lazyRetry(() => import("./pages/Reservations")));
 const Subscriptions = lazy(() => lazyRetry(() => import("./pages/Subscriptions")));
+const Freelancers = lazy(() => lazyRetry(() => import("./pages/Freelancers")));
 
 
 const queryClient = new QueryClient({
@@ -317,6 +318,7 @@ function AuthenticatedRoutes() {
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/reservations" element={<ProtectedRoute><Reservations /></ProtectedRoute>} />
           <Route path="/subscriptions" element={<ProtectedRoute><Subscriptions /></ProtectedRoute>} />
+          <Route path="/freelancers" element={<ProtectedRoute><Freelancers /></ProtectedRoute>} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

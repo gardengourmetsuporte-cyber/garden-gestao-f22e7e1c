@@ -1,60 +1,88 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-## Módulo Freelancers / Candidatos
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-### Objetivo
-Criar um módulo para gerenciar freelancers disponíveis para trabalho avulso, organizados por setor (Cozinha, Entregador, Salão, etc.), com envio rápido de mensagens individuais ou em massa via WhatsApp.
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-### Banco de Dados
+---
 
-**Nova tabela `freelancers`:**
-- `id` (uuid, PK)
-- `unit_id` (uuid, FK → units, NOT NULL)
-- `name` (text, NOT NULL)
-- `phone` (text, NOT NULL)
-- `sector` (text, NOT NULL) — ex: "cozinha", "entregador", "salao"
-- `notes` (text, nullable)
-- `is_active` (boolean, default true)
-- `avatar_url` (text, nullable)
-- `created_at`, `updated_at` (timestamps)
+## Bloco de Relatórios Avançados ✅
 
-RLS: filtro por `user_has_unit_access(auth.uid(), unit_id)` para SELECT/INSERT/UPDATE/DELETE.
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-### Frontend
+## Dashboard Analytics ✅
 
-1. **Nova página `src/pages/Freelancers.tsx`** — seguindo o padrão de Customers:
-   - Filtro por setor (chips: Todos, Cozinha, Salão, Entregador, Outros)
-   - Busca por nome/telefone
-   - Lista de cards com nome, telefone, setor e botão WhatsApp direto
-   - FAB para adicionar novo freelancer
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-2. **Componentes:**
-   - `FreelancerCard` — card com nome, setor (badge colorido), telefone, botão de mensagem
-   - `FreelancerSheet` — formulário para criar/editar (nome, telefone, setor, observações)
-   - `FreelancerBroadcastSheet` — envio em massa: campo de mensagem com variáveis (nome, valor do dia, horário), seleção por setor ou individual, abre links `wa.me` para cada contato
+## Operacional ✅
 
-3. **Hook `useFreelancers`** — CRUD padrão com filtro por `unit_id`
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-4. **Envio de mensagens:**
-   - Individual: abre `https://wa.me/{phone}?text={mensagem}` diretamente
-   - Em massa: sheet com template de mensagem (ex: "Oi {nome}, temos vaga hoje para {setor}. Valor: R${valor}. Horário: {horário}. Interesse?"), itera e abre links ou envia via Evolution API se configurado
+## CRM / Clientes ✅
 
-### Navegação
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-- Adicionar item no `navItems.ts` no grupo "pessoas": `{ icon: 'UserPlus', label: 'Freelancers', href: '/freelancers', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' }`
-- Adicionar rota protegida em `App.tsx`
-- Adicionar módulo `freelancers` nos access levels do `auto_provision_unit`
+## Funcionários ✅
 
-### Resumo de arquivos
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
-| Ação | Arquivo |
-|------|---------|
-| Migração | Nova tabela `freelancers` + RLS |
-| Criar | `src/pages/Freelancers.tsx` |
-| Criar | `src/components/freelancers/FreelancerCard.tsx` |
-| Criar | `src/components/freelancers/FreelancerSheet.tsx` |
-| Criar | `src/components/freelancers/FreelancerBroadcastSheet.tsx` |
-| Criar | `src/hooks/useFreelancers.ts` |
-| Editar | `src/lib/navItems.ts` — novo item |
-| Editar | `src/App.tsx` — nova rota |
+## Cardápio Digital ✅
 
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
+
+## Produção Integrada ao Checklist ✅
+
+- Itens de checklist vinculados a itens de estoque (categoria Produção)
+- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
+- Entrada automática no estoque + registro de produção
+- Badge visual de produção nos itens vinculados
+- Configuração de vínculo no admin de checklists
+- Removido módulo Produção da página de Pedidos

@@ -52,6 +52,7 @@ export const NAV_ITEMS: NavItem[] = [
   { icon: 'Users', customIcon: '/icons/funcionarios.png', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Gift', customIcon: '/icons/gift.png', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
   { icon: 'Trophy', customIcon: '/icons/trophy.png', label: 'Ranking', href: '/ranking', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'UserPlus', label: 'Freelancers', href: '/freelancers', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
 
   // ── Gestão ──
   { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },

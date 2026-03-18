@@ -199,6 +199,10 @@ export const ALL_MODULES: ModuleDef[] = [
     ],
   },
   {
+    key: 'freelancers', label: 'Freelancers', icon: 'UserPlus', route: '/freelancers', routes: ['/freelancers'], group: 'Pessoas',
+    children: [],
+  },
+  {
     key: 'settings', label: 'Configurações', icon: 'Settings', route: '/settings', routes: ['/settings'], group: 'Sistema',
     children: [
       { key: 'settings.team', label: 'Equipe e convites', icon: 'Users' },
