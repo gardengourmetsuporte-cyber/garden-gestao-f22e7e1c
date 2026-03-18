@@ -188,7 +188,7 @@ export default function ChecklistsPage() {
             })()}
 
             {/* View Mode Toggle — only in view mode and not bonus */}
-            {!settingsMode && checklistType !== 'bonus' && (() => {
+            {!settingsMode && checklistType !== 'bonus' && (checklistType as string) !== 'production' && (() => {
               const availableSectors = sectors.filter((s: any) =>
                 s.scope !== 'bonus' && s.subcategories?.some((sub: any) =>
                   sub.items?.some((i: any) => i.is_active && (i as any).checklist_type === checklistType)
