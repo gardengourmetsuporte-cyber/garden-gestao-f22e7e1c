@@ -259,6 +259,13 @@ export default function InventoryPage() {
               <span className="text-sm font-medium hidden sm:inline">Lote</span>
             </button>
             <button
+              onClick={() => setSmartScanOpen(true)}
+              className="shrink-0 h-10 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 flex items-center gap-1.5 transition-colors"
+              title="Scanner IA — nota fiscal"
+            >
+              <AppIcon name="document_scanner" size={18} fill={1} />
+            </button>
+            <button
               onClick={() => setTransferOpen(true)}
               className="shrink-0 h-10 px-3 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary flex items-center gap-1.5 transition-colors"
               title="Transferir estoque"
