@@ -117,16 +117,18 @@ export function SupplierProfileSheet({
 
   const handleConfirmDelete = async () => {
     if (!confirmDelete) return;
+    const { type, id } = confirmDelete;
+    setConfirmDelete(null);
     try {
-      if (confirmDelete.type === 'order' && onDeleteOrder) {
-        await onDeleteOrder(confirmDelete.id);
-      } else if (confirmDelete.type === 'invoice' && onDeleteInvoice) {
-        await onDeleteInvoice(confirmDelete.id);
+      if (type === 'order' && onDeleteOrder) {
+        await onDeleteOrder(id);
+      } else if (type === 'invoice' && onDeleteInvoice) {
+        setExpandedInvoice(null);
+        await onDeleteInvoice(id);
       }
     } catch {
       toast.error('Erro ao excluir');
     }
-    setConfirmDelete(null);
   };
 
   const statusMap: Record<string, { label: string; cls: string }> = {
@@ -386,17 +388,17 @@ export function SupplierProfileSheet({
 
                       return (
                         <div key={inv.id} className={cn(
-                          "rounded-xl border overflow-hidden transition-all",
+                          "rounded-2xl overflow-hidden transition-all",
                           isOverdue
-                            ? "bg-destructive/5 border-destructive/20"
+                            ? "bg-destructive/5 border border-destructive/15"
                             : isDueSoon
-                              ? "bg-warning/5 border-warning/20"
-                              : "bg-secondary/50 border-border/50"
+                              ? "bg-warning/5 border border-warning/15"
+                              : "bg-card/80 border border-border/30"
                         )}>
                           <button
                             type="button"
                             onClick={() => setExpandedInvoice(isExpanded ? null : inv.id)}
-                            className="w-full flex items-center justify-between p-3 text-left active:bg-secondary/80 transition-colors touch-manipulation"
+                            className="w-full flex items-center justify-between p-3.5 text-left active:bg-secondary/50 transition-colors touch-manipulation"
                           >
                             <div className="min-w-0 flex-1">
                               <p className="text-sm font-medium text-foreground">{inv.description}</p>
@@ -460,11 +462,11 @@ export function SupplierProfileSheet({
                               </div>
 
                               {/* Action buttons */}
-                              <div className="flex items-center gap-2 pt-1">
+                              <div className="flex items-center gap-2 pt-2">
                                 {!inv.is_paid && onMarkInvoicePaid && (
                                   <Button
                                     size="sm"
-                                    className="h-8 rounded-xl gap-1.5 text-xs bg-[hsl(142,70%,35%)] hover:bg-[hsl(142,70%,30%)] text-white flex-1"
+                                    className="h-9 rounded-xl gap-1.5 text-xs bg-success hover:bg-success/90 text-white flex-1"
                                     onClick={async () => {
                                       await onMarkInvoicePaid(inv.id);
                                     }}
@@ -477,7 +479,7 @@ export function SupplierProfileSheet({
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="h-8 rounded-xl gap-1.5 text-xs flex-1"
+                                    className="h-9 rounded-xl gap-1.5 text-xs flex-1"
                                     onClick={() => onCreateFinanceFromInvoice(inv)}
                                   >
                                     <AppIcon name="DollarSign" size={14} />
@@ -488,7 +490,7 @@ export function SupplierProfileSheet({
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="h-8 w-8 rounded-xl p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                                    className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
                                     onClick={() => setConfirmDelete({
                                       type: 'invoice',
                                       id: inv.id,
