@@ -134,6 +134,7 @@ export default function Subscriptions() {
 
         {activeTab === 'assinaturas' && (
           <div className="space-y-3">
+            <RecurringSuggestions typeFilter="assinatura" onEditBeforeAdd={handleEditBeforeAdd} />
             <SubscriptionFilters
               search={search} onSearchChange={setSearch}
               statusFilter={statusFilter} onStatusChange={setStatusFilter}
