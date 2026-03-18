@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { getDeadlineInfo } from '@/lib/checklistTiming';
 import { TimerSettingsPanel } from '@/components/checklists/TimerSettingsPanel';
 
-import { ChecklistTypeCard, ChecklistBonusCard } from '@/components/checklists/ChecklistTypeCards';
+import { ChecklistTypeCard, ChecklistBonusCard, ChecklistProductionCard } from '@/components/checklists/ChecklistTypeCards';
 import { useChecklistPage } from '@/hooks/checklists/useChecklistPage';
 
 export default function ChecklistsPage() {
@@ -148,6 +148,25 @@ export default function ChecklistsPage() {
               />
             </div>
 
+            {/* Production Card */}
+            {(() => {
+              const productionItems = sectors.flatMap((s: any) =>
+                (s.subcategories || []).flatMap((sub: any) =>
+                  (sub.items || []).filter((i: any) => i.is_active && (i as any).linked_inventory_item_id)
+                )
+              );
+              if (productionItems.length === 0) return null;
+              const completedCount = productionItems.filter((i: any) => isItemCompleted(i.id)).length;
+              return (
+                <ChecklistProductionCard
+                  isSelected={checklistType === 'production' as any}
+                  onSelect={() => setChecklistType('production' as any)}
+                  productionCount={productionItems.length}
+                  completedCount={completedCount}
+                />
+              );
+            })()}
+
             {/* Bonus Card - hidden for non-admins when no active bonus items */}
             {(() => {
               const hasActiveBonusItems = sectors.some((s: any) =>
@@ -169,7 +188,7 @@ export default function ChecklistsPage() {
             })()}
 
             {/* View Mode Toggle — only in view mode and not bonus */}
-            {!settingsMode && checklistType !== 'bonus' && (() => {
+            {!settingsMode && checklistType !== 'bonus' && (checklistType as string) !== 'production' && (() => {
               const availableSectors = sectors.filter((s: any) =>
                 s.scope !== 'bonus' && s.subcategories?.some((sub: any) =>
                   sub.items?.some((i: any) => i.is_active && (i as any).checklist_type === checklistType)
