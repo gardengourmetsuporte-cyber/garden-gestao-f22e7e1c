@@ -66,15 +66,10 @@ export function SmartReceivingSheet({
     }
   }, [open]);
 
-  const handleFileCapture = (file: File, type: 'invoice' | 'boleto') => {
+  const handleFileCapture = (file: File) => {
     const url = URL.createObjectURL(file);
-    if (type === 'invoice') {
-      setInvoiceFile(file);
-      setInvoicePreview(url);
-    } else {
-      setBoletoFile(file);
-      setBoletoPreview(url);
-    }
+    setInvoiceFile(file);
+    setInvoicePreview(url);
   };
 
   const handleProcess = async () => {
