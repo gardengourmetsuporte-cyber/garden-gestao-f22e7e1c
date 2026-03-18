@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { GradientIcon, GradientIconColor } from '@/components/ui/gradient-icon';
 import { useSubscriptions, Subscription } from '@/hooks/useSubscriptions';
@@ -28,6 +29,7 @@ export default function Subscriptions() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editItem, setEditItem] = useState<Subscription | null>(null);
   const [cancelItem, setCancelItem] = useState<Subscription | null>(null);
+  const [deleteItem, setDeleteItem] = useState<Subscription | null>(null);
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -57,6 +59,15 @@ export default function Subscriptions() {
     if (!cancelItem) return;
     await update({ id: cancelItem.id, status: 'cancelado' } as any);
     setCancelItem(null);
+  };
+  const handleDelete = (item: Subscription) => setDeleteItem(item);
+  const handleConfirmDelete = async () => {
+    if (!deleteItem) return;
+    await remove(deleteItem.id);
+    setDeleteItem(null);
+  };
+  const handleReactivate = async (item: Subscription) => {
+    await update({ id: item.id, status: 'ativo' } as any);
   };
 
   if (isLoading) return <AppLayout><PageLoader /></AppLayout>;
@@ -109,7 +120,7 @@ export default function Subscriptions() {
               statusFilter={statusFilter} onStatusChange={setStatusFilter}
               categoryFilter={categoryFilter} onCategoryChange={setCategoryFilter}
             />
-            <SubscriptionList items={assinaturas} onEdit={handleEdit} onPause={handlePause} onCancel={handleCancel} emptyMessage="Nenhuma assinatura encontrada" />
+            <SubscriptionList items={assinaturas} onEdit={handleEdit} onPause={handlePause} onCancel={handleCancel} onDelete={handleDelete} onReactivate={handleReactivate} emptyMessage="Nenhuma assinatura encontrada" />
           </div>
         )}
 
@@ -120,7 +131,7 @@ export default function Subscriptions() {
               statusFilter={statusFilter} onStatusChange={setStatusFilter}
               categoryFilter={categoryFilter} onCategoryChange={setCategoryFilter}
             />
-            <SubscriptionList items={contas} onEdit={handleEdit} onPause={handlePause} onCancel={handleCancel} emptyMessage="Nenhuma conta fixa encontrada" />
+            <SubscriptionList items={contas} onEdit={handleEdit} onPause={handlePause} onCancel={handleCancel} onDelete={handleDelete} onReactivate={handleReactivate} emptyMessage="Nenhuma conta fixa encontrada" />
           </div>
         )}
 
@@ -142,6 +153,23 @@ export default function Subscriptions() {
         item={cancelItem}
         onConfirm={handleConfirmCancel}
       />
+
+      <AlertDialog open={!!deleteItem} onOpenChange={(open) => !open && setDeleteItem(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir definitivamente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O item "{deleteItem?.name}" será removido permanentemente. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Voltar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 }
