@@ -23,7 +23,7 @@ interface Props {
   isSaving: boolean;
 }
 
-export function SubscriptionSheet({ open, onOpenChange, editItem, onSave, onUpdate, isSaving }: Props) {
+export function SubscriptionSheet({ open, onOpenChange, editItem, prefillData, onSave, onUpdate, isSaving }: Props) {
   const { activeUnitId } = useUnit();
   const [name, setName] = useState('');
   const [category, setCategory] = useState('outros');
