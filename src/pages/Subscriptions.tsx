@@ -9,6 +9,8 @@ import { SubscriptionSheet } from '@/components/subscriptions/SubscriptionSheet'
 import { SubscriptionFilters } from '@/components/subscriptions/SubscriptionFilters';
 import { SubscriptionAlerts } from '@/components/subscriptions/SubscriptionAlerts';
 import { CancelSubscriptionDialog } from '@/components/subscriptions/CancelSubscriptionDialog';
+import { RecurringSuggestions } from '@/components/subscriptions/RecurringSuggestions';
+import { RecurringSuggestion } from '@/hooks/useRecurringSuggestions';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { PageLoader } from '@/components/PageLoader';
 import { useFabAction } from '@/contexts/FabActionContext';
