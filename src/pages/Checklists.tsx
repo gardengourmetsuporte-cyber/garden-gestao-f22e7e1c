@@ -148,26 +148,7 @@ export default function ChecklistsPage() {
               />
             </div>
 
-            {/* Production Card */}
-            {(() => {
-              const productionItems = sectors.flatMap((s: any) =>
-                (s.subcategories || []).flatMap((sub: any) =>
-                  (sub.items || []).filter((i: any) => i.is_active && (i as any).linked_inventory_item_id)
-                )
-              );
-              if (productionItems.length === 0) return null;
-              const completedCount = productionItems.filter((i: any) => isItemCompleted(i.id)).length;
-              return (
-                <ChecklistProductionCard
-                  isSelected={checklistType === 'production' as any}
-                  onSelect={() => setChecklistType('production' as any)}
-                  productionCount={productionItems.length}
-                  completedCount={completedCount}
-                />
-              );
-            })()}
-
-            {/* Bonus Card - hidden for non-admins when no active bonus items */}
+            {/* Bonus Card with nested Production sub-card */}
             {(() => {
               const hasActiveBonusItems = sectors.some((s: any) =>
                 s.scope === 'bonus' && s.subcategories?.some((sub: any) =>
@@ -175,6 +156,14 @@ export default function ChecklistsPage() {
                 )
               );
               if (!isAdmin && !hasActiveBonusItems) return null;
+
+              const productionItems = sectors.flatMap((s: any) =>
+                (s.subcategories || []).flatMap((sub: any) =>
+                  (sub.items || []).filter((i: any) => i.is_active && (i as any).linked_inventory_item_id)
+                )
+              );
+              const prodCompletedCount = productionItems.filter((i: any) => isItemCompleted(i.id)).length;
+
               return (
                 <ChecklistBonusCard
                   isSelected={checklistType === 'bonus'}
@@ -183,6 +172,14 @@ export default function ChecklistsPage() {
                   deadlineSettings={deadlineSettings}
                   updateDeadline={updateDeadline} removeDeadline={removeDeadline} isSavingDeadline={isSavingDeadline}
                   hasActiveItems={hasActiveBonusItems}
+                  productionSlot={productionItems.length > 0 ? (
+                    <ChecklistProductionSubCard
+                      isSelected={checklistType === 'production' as any}
+                      onSelect={() => setChecklistType('production' as any)}
+                      productionCount={productionItems.length}
+                      completedCount={prodCompletedCount}
+                    />
+                  ) : undefined}
                 />
               );
             })()}

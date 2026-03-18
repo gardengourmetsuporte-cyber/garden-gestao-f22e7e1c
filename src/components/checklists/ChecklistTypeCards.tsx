@@ -155,12 +155,14 @@ interface BonusCardProps {
   removeDeadline: any;
   isSavingDeadline: boolean;
   hasActiveItems?: boolean;
+  productionSlot?: React.ReactNode;
 }
 
 export function ChecklistBonusCard({
   isSelected, onSelect, settingsMode, isAdmin,
   deadlineSettings, updateDeadline, removeDeadline, isSavingDeadline,
   hasActiveItems = true,
+  productionSlot,
 }: BonusCardProps) {
   return (
     <button
@@ -203,6 +205,9 @@ export function ChecklistBonusCard({
         </div>
         <AppIcon name="ChevronRight" size={18} className="text-muted-foreground" />
       </div>
+      {productionSlot && (
+        <div className="mt-3 relative z-10">{productionSlot}</div>
+      )}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -213,6 +218,64 @@ export function ChecklistBonusCard({
         }}
       />
     </button>
+  );
+}
+
+interface ProductionSubCardProps {
+  isSelected: boolean;
+  onSelect: () => void;
+  productionCount: number;
+  completedCount: number;
+}
+
+export function ChecklistProductionSubCard({
+  isSelected, onSelect, productionCount, completedCount,
+}: ProductionSubCardProps) {
+  if (productionCount === 0) return null;
+  const percent = Math.round((completedCount / productionCount) * 100);
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => { e.stopPropagation(); onSelect(); }}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onSelect(); } }}
+      className={cn(
+        "rounded-xl p-2.5 transition-all duration-200 cursor-pointer",
+        isSelected
+          ? "bg-amber-500/15 ring-1 ring-amber-500/30"
+          : "bg-secondary/30 border border-border/15 hover:bg-secondary/50"
+      )}
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+          style={{ background: 'linear-gradient(135deg, hsl(38 92% 50%), hsl(25 95% 45%))' }}>
+          <AppIcon name="soup_kitchen" size={16} fill={1} className="text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-foreground">Produção</span>
+            <span className="text-[10px] font-bold text-muted-foreground">{completedCount}/{productionCount}</span>
+          </div>
+          <div className="mt-1 h-1 bg-muted/50 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${percent}%`,
+                background: percent === 100
+                  ? 'hsl(var(--success))'
+                  : 'linear-gradient(90deg, hsl(38 92% 50%), hsl(25 95% 53%))',
+              }}
+            />
+          </div>
+        </div>
+        <span className={cn(
+          "text-xs font-black",
+          percent === 100 ? "text-success" : "text-amber-500"
+        )}>{percent}%</span>
+      </div>
+    </div>
   );
 }
 
