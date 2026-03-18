@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => ({
         description: "Sistema completo de gestão empresarial",
         theme_color: "#0c1120",
         background_color: "#0c1120",
-        display: "fullscreen",
+        display: "standalone",
         orientation: "any",
         scope: "/",
         start_url: "/",
