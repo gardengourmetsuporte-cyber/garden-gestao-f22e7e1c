@@ -17,6 +17,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editItem?: Subscription | null;
+  prefillData?: Partial<Subscription> | null;
   onSave: (data: SubscriptionInsert) => Promise<void>;
   onUpdate?: (data: Partial<Subscription> & { id: string }) => Promise<void>;
   isSaving: boolean;
