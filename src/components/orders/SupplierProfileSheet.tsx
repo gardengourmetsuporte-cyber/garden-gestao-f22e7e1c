@@ -117,16 +117,18 @@ export function SupplierProfileSheet({
 
   const handleConfirmDelete = async () => {
     if (!confirmDelete) return;
+    const { type, id } = confirmDelete;
+    setConfirmDelete(null);
     try {
-      if (confirmDelete.type === 'order' && onDeleteOrder) {
-        await onDeleteOrder(confirmDelete.id);
-      } else if (confirmDelete.type === 'invoice' && onDeleteInvoice) {
-        await onDeleteInvoice(confirmDelete.id);
+      if (type === 'order' && onDeleteOrder) {
+        await onDeleteOrder(id);
+      } else if (type === 'invoice' && onDeleteInvoice) {
+        setExpandedInvoice(null);
+        await onDeleteInvoice(id);
       }
     } catch {
       toast.error('Erro ao excluir');
     }
-    setConfirmDelete(null);
   };
 
   const statusMap: Record<string, { label: string; cls: string }> = {
