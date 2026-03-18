@@ -109,7 +109,8 @@ export default function Freelancers() {
           <EmptyState
             icon="Users"
             title="Nenhum freelancer"
-            description={search || sectorFilter ? 'Nenhum resultado para este filtro.' : 'Cadastre freelancers para acessar rapidamente quando precisar de reforço.'}
+            subtitle={search || sectorFilter ? 'Nenhum resultado para este filtro.' : 'Cadastre freelancers para acessar rapidamente quando precisar de reforço.'}
+          />
           />
         ) : (
           <div className="space-y-2">
