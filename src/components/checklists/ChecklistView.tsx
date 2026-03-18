@@ -466,7 +466,7 @@ export function ChecklistView({
     if (isBonus) {
       const productionItems: any[] = [];
       const regularBonusSectors = sectors
-        .filter(s => s.scope === 'bonus')
+        .filter((s: any) => s.scope === 'bonus')
         .map(sector => ({
           ...sector,
           subcategories: (sector.subcategories || []).map(sub => ({
