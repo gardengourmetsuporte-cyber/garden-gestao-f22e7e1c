@@ -51,6 +51,7 @@ interface TransactionSheetProps {
   onSaveAndContinue?: (data: TransactionFormData) => Promise<void>;
   onRefreshCategories?: () => Promise<void>;
   allTransactions?: FinanceTransaction[];
+  onAddToSubscriptions?: (data: { name: string; price: number; category: string }) => void;
 }
 
 const RECURRING_OPTIONS = [
