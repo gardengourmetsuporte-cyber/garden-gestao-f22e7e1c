@@ -614,7 +614,7 @@ export function ChecklistView({
             )}>
               {isBonus ? (
                 /* BONUS: Flat list - items directly under sector, no subcategory headers */
-                <div className="ml-4 space-y-1.5 pt-1 pb-2">
+                <div className="ml-1 space-y-1.5 pt-1 pb-2">
                   {sector.subcategories?.flatMap(sub => 
                     (sub.items || []).filter(i => i.is_active && (i as any).checklist_type === checklistType)
                   ).map((item, itemIndex) => {
