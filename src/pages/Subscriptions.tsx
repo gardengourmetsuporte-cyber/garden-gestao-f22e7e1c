@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import { LayoutDashboard, CreditCard, Building2, Bell } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { GradientIcon, GradientIconColor } from '@/components/ui/gradient-icon';
 import { useSubscriptions, Subscription } from '@/hooks/useSubscriptions';
 import { SubscriptionDashboard } from '@/components/subscriptions/SubscriptionDashboard';
 import { SubscriptionList } from '@/components/subscriptions/SubscriptionList';
@@ -14,11 +14,11 @@ import { useFabAction } from '@/contexts/FabActionContext';
 
 type Tab = 'dashboard' | 'assinaturas' | 'contas' | 'alertas';
 
-const tabs: { key: Tab; label: string; icon: typeof LayoutDashboard }[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { key: 'assinaturas', label: 'Assinaturas', icon: CreditCard },
-  { key: 'contas', label: 'Contas', icon: Building2 },
-  { key: 'alertas', label: 'Alertas', icon: Bell },
+const tabs: { key: Tab; label: string; iconName: string; color: GradientIconColor }[] = [
+  { key: 'dashboard', label: 'Dashboard', iconName: 'LayoutDashboard', color: 'primary' },
+  { key: 'assinaturas', label: 'Assinaturas', iconName: 'CreditCard', color: 'blue' },
+  { key: 'contas', label: 'Contas', iconName: 'Building2', color: 'purple' },
+  { key: 'alertas', label: 'Alertas', iconName: 'Bell', color: 'amber' },
 ];
 
 export default function Subscriptions() {
@@ -67,7 +67,6 @@ export default function Subscriptions() {
         {/* Tab bar */}
         <div className="flex gap-2 overflow-x-auto pb-1">
           {tabs.map(tab => {
-            const Icon = tab.icon;
             const isActive = activeTab === tab.key;
             return (
               <button
@@ -79,13 +78,11 @@ export default function Subscriptions() {
                     : 'bg-secondary/40 text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                  isActive
-                    ? 'bg-primary/20 shadow-[0_0_12px_hsl(var(--primary)/0.25)]'
-                    : 'bg-muted/50'
-                }`}>
-                  <Icon className={`w-4 h-4 transition-all ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                </div>
+                <GradientIcon
+                  name={tab.iconName}
+                  color={isActive ? tab.color : 'muted'}
+                  size="sm"
+                />
                 {tab.label}
                 {tab.key === 'alertas' && alerts.length > 0 && (
                   <Badge variant="destructive" className="absolute -top-1 -right-1 text-[9px] h-4 min-w-4 px-1 border-0">{alerts.length}</Badge>

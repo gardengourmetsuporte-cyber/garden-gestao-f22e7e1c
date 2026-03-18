@@ -13,8 +13,6 @@ const sourceLabels: Record<string, string> = {
 export function RecurringSuggestions() {
   const { suggestions, isLoading, accept, dismiss } = useRecurringSuggestions();
 
-  if (isLoading || suggestions.length === 0) return null;
-
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
@@ -25,17 +23,35 @@ export function RecurringSuggestions() {
           <h3 className="text-xs font-semibold text-foreground">Sugestões da IA</h3>
           <p className="text-[10px] text-muted-foreground">Detectamos gastos recorrentes no seu financeiro</p>
         </div>
-        <Badge className="ml-auto bg-primary/15 text-primary border-0 text-[10px]">
-          <Sparkles className="w-3 h-3 mr-1" />
-          {suggestions.length}
-        </Badge>
+        {suggestions.length > 0 && (
+          <Badge className="ml-auto bg-primary/15 text-primary border-0 text-[10px]">
+            <Sparkles className="w-3 h-3 mr-1" />
+            {suggestions.length}
+          </Badge>
+        )}
       </div>
 
-      <div className="space-y-2">
-        {suggestions.slice(0, 5).map((s, i) => (
-          <SuggestionCard key={`${s.name}-${i}`} suggestion={s} onAccept={accept} onDismiss={dismiss} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="bg-secondary/40 rounded-2xl p-4 flex items-center justify-center gap-2">
+          <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <span className="text-xs text-muted-foreground">Analisando transações...</span>
+        </div>
+      ) : suggestions.length === 0 ? (
+        <div className="bg-secondary/40 rounded-2xl p-4 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center shrink-0">
+            <Sparkles className="w-4 h-4 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Nenhuma despesa recorrente detectada. Cadastre transações no financeiro para receber sugestões automáticas.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {suggestions.slice(0, 5).map((s, i) => (
+            <SuggestionCard key={`${s.name}-${i}`} suggestion={s} onAccept={accept} onDismiss={dismiss} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
