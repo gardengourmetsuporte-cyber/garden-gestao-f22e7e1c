@@ -321,7 +321,7 @@ export function SmartReceivingSheet({
                     Itens ({confirmedCount}/{editedItems.length})
                   </span>
                 </div>
-                {expandedItems ? <AppIcon name="ExpandLess" size={16} /> : <AppIcon name="ExpandMore" size={16} />}
+                {expandedItems ? <AppIcon name="expand_less" size={16} /> : <AppIcon name="expand_more" size={16} />}
               </button>
 
               {expandedItems && editedItems.map((item, idx) => (
