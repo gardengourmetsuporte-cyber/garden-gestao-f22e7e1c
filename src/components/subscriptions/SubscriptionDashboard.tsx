@@ -48,15 +48,21 @@ export function SubscriptionDashboard({ totalMonthly, activeCount, upcomingBills
         ))}
       </div>
 
-      {/* Insights */}
-      <div className="bg-primary/5 rounded-2xl p-4">
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          💡 Você tem <span className="text-foreground font-semibold">{activeCount} serviços ativos</span> totalizando{' '}
-          <span className="text-primary font-semibold">R$ {totalMonthly.toFixed(2)}/mês</span>.
-          {canceledSavings > 0 && (
-            <> Já economizou <span className="text-emerald-400 font-semibold">R$ {canceledSavings.toFixed(2)}/mês</span> cancelando serviços.</>
-          )}
-        </p>
+      {/* Informative Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/15 via-primary/10 to-primary/5 p-4">
+        <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-primary/10 blur-2xl -translate-y-6 translate-x-6" />
+        <div className="flex items-start gap-3 relative">
+          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+            <Info className="w-4 h-4 text-primary" />
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Você tem <span className="text-foreground font-semibold">{activeCount} serviços ativos</span> totalizando{' '}
+            <span className="text-primary font-semibold">R$ {totalMonthly.toFixed(2)}/mês</span>.
+            {canceledSavings > 0 && (
+              <> Economia de <span className="text-emerald-400 font-semibold">R$ {canceledSavings.toFixed(2)}/mês</span> com cancelamentos.</>
+            )}
+          </p>
+        </div>
       </div>
 
       {/* Upcoming Bills */}
