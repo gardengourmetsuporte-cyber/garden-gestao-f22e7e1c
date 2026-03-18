@@ -1,4 +1,4 @@
-import { Pause, Play, Trash2, ExternalLink, PenSquare } from 'lucide-react';
+import { Pause, Play, Trash2, ExternalLink, PenSquare, RotateCcw, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Subscription, getCategoryInfo, getMonthlyPrice, getAlertLevel, AlertLevel } from '@/hooks/useSubscriptions';
@@ -9,6 +9,8 @@ interface Props {
   onEdit: (item: Subscription) => void;
   onPause: (item: Subscription) => void;
   onCancel: (item: Subscription) => void;
+  onDelete?: (item: Subscription) => void;
+  onReactivate?: (item: Subscription) => void;
 }
 
 const cycleLabels: Record<string, string> = { mensal: '/mês', anual: '/ano', semanal: '/sem' };
@@ -20,7 +22,7 @@ const alertBorder: Record<AlertLevel, string> = {
   soon: 'ring-1 ring-yellow-500/20',
 };
 
-export function SubscriptionCard({ item, onEdit, onPause, onCancel }: Props) {
+export function SubscriptionCard({ item, onEdit, onPause, onCancel, onDelete, onReactivate }: Props) {
   const cat = getCategoryInfo(item.category);
   const isCanceled = item.status === 'cancelado';
   const isPaused = item.status === 'pausado';
@@ -66,9 +68,11 @@ export function SubscriptionCard({ item, onEdit, onPause, onCancel }: Props) {
       </div>
 
       <div className="flex items-center gap-1 -ml-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl" onClick={() => onEdit(item)}>
-          <PenSquare className="w-3.5 h-3.5" />
-        </Button>
+        {!isCanceled && (
+          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl" onClick={() => onEdit(item)}>
+            <PenSquare className="w-3.5 h-3.5" />
+          </Button>
+        )}
         {!isCanceled && (
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl" onClick={() => onPause(item)}>
             {isPaused ? <Play className="w-3.5 h-3.5 text-primary" /> : <Pause className="w-3.5 h-3.5 text-yellow-400" />}
@@ -76,7 +80,19 @@ export function SubscriptionCard({ item, onEdit, onPause, onCancel }: Props) {
         )}
         {!isCanceled && (
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl text-destructive" onClick={() => onCancel(item)}>
+            <X className="w-3.5 h-3.5" />
+          </Button>
+        )}
+        {isCanceled && onReactivate && (
+          <Button variant="ghost" size="sm" className="h-8 rounded-xl text-primary gap-1 text-xs" onClick={() => onReactivate(item)}>
+            <RotateCcw className="w-3.5 h-3.5" />
+            Reativar
+          </Button>
+        )}
+        {isCanceled && onDelete && (
+          <Button variant="ghost" size="sm" className="h-8 rounded-xl text-destructive gap-1 text-xs" onClick={() => onDelete(item)}>
             <Trash2 className="w-3.5 h-3.5" />
+            Excluir
           </Button>
         )}
         {item.management_url && (
