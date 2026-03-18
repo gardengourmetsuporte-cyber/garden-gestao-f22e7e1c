@@ -60,6 +60,9 @@ export default function Deliveries() {
     queryKey: ['delivery-pending-orders', activeUnitId],
     queryFn: async () => {
       if (!activeUnitId) return [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
       const { data: tabletOrders } = await supabase
         .from('tablet_orders')
         .select('id, customer_name, customer_address, customer_phone, total, status, source, created_at, table_number, tablet_order_items(id, quantity, notes, unit_price, tablet_products(name))')
@@ -76,6 +79,24 @@ export default function Deliveries() {
         .in('status', ['ready', 'dispatched'])
         .order('created_at', { ascending: false })
         .limit(50);
+
+      // PDV delivery sales (paid today)
+      const { data: posSales } = await supabase
+        .from('pos_sales')
+        .select('id, customer_name, customer_phone, total, notes, sale_number, created_at, pos_sale_items(id, product_name, quantity)')
+        .eq('unit_id', activeUnitId)
+        .eq('source', 'delivery')
+        .eq('status', 'paid')
+        .gte('created_at', today.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      // Extract address from notes (stored as "... | Endereço: ...")
+      const extractAddress = (notes: string | null) => {
+        if (!notes) return '';
+        const match = notes.match(/Endereço:\s*(.+)$/);
+        return match ? match[1].trim() : '';
+      };
 
       return [
         ...(tabletOrders || []).map((o: any) => ({
@@ -99,6 +120,17 @@ export default function Deliveries() {
           source: o.platform === 'ifood' ? 'iFood' : o.platform === 'rappi' ? 'Rappi' : o.platform,
           displayId: o.platform_display_id,
           items: (o.delivery_hub_order_items || []).map((i: any) => `${i.quantity}x ${i.name}`).join(', '),
+          created_at: o.created_at,
+        })),
+        ...(posSales || []).map((o: any) => ({
+          type: 'pdv' as const,
+          id: o.id,
+          customer_name: o.customer_name || 'Delivery PDV',
+          customer_address: extractAddress(o.notes),
+          total: o.total || 0,
+          status: 'confirmed',
+          source: 'PDV',
+          items: (o.pos_sale_items || []).map((i: any) => `${i.quantity}x ${i.product_name}`).join(', '),
           created_at: o.created_at,
         })),
       ];
