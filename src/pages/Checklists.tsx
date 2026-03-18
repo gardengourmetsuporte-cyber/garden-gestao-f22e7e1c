@@ -178,12 +178,12 @@ export default function ChecklistsPage() {
                 )
               );
               return (
-                <div className="space-y-3">
-                  <div className="flex items-center bg-secondary/50 rounded-xl p-1 gap-1">
+                <div className="space-y-2.5">
+                  <div className="flex items-center bg-secondary/40 rounded-xl p-0.5 gap-0.5">
                     <button
                       onClick={() => setViewMode('full')}
                       className={cn(
-                        "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all",
+                        "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-[10px] text-xs font-semibold transition-all active:scale-[0.97]",
                         viewMode === 'full'
                           ? "bg-background text-foreground shadow-sm"
                           : "text-muted-foreground hover:text-foreground"
@@ -200,7 +200,7 @@ export default function ChecklistsPage() {
                         }
                       }}
                       className={cn(
-                        "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold transition-all",
+                        "flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-[10px] text-xs font-semibold transition-all active:scale-[0.97]",
                         viewMode === 'sector'
                           ? "bg-background text-foreground shadow-sm"
                           : "text-muted-foreground hover:text-foreground"
@@ -211,9 +211,9 @@ export default function ChecklistsPage() {
                     </button>
                   </div>
 
-                   {viewMode === 'sector' && availableSectors.length > 0 && (
-                    <div className="space-y-2">
-                      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                  {viewMode === 'sector' && availableSectors.length > 0 && (
+                    <div className="space-y-1.5">
+                      <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
                         {availableSectors.map((sector: any) => {
                           const isSelected = selectedSectorId === sector.id;
                           return (
@@ -221,13 +221,13 @@ export default function ChecklistsPage() {
                               key={sector.id}
                               onClick={() => { setSelectedSectorId(sector.id); setSelectedSubcategoryId(null); }}
                               className={cn(
-                                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all shrink-0",
+                                "flex items-center px-3.5 py-1.5 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95",
                                 isSelected
-                                  ? "bg-foreground text-background backdrop-blur-md"
-                                  : "bg-foreground/[0.07] text-muted-foreground backdrop-blur-sm hover:bg-foreground/[0.12]"
+                                  ? "bg-foreground text-background"
+                                  : "bg-foreground/[0.07] text-muted-foreground hover:bg-foreground/[0.12]"
                               )}
                             >
-                              <span className="text-[13px]">{sector.name}</span>
+                              {sector.name}
                             </button>
                           );
                         })}
@@ -240,11 +240,11 @@ export default function ChecklistsPage() {
                         );
                         if (subs.length <= 1) return null;
                         return (
-                          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                          <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
                             <button
                               onClick={() => setSelectedSubcategoryId(null)}
                               className={cn(
-                                "px-2.5 py-1 rounded-full text-[11px] font-medium whitespace-nowrap transition-all shrink-0",
+                                "px-3 py-1 rounded-full text-[11px] font-medium whitespace-nowrap transition-all shrink-0 active:scale-95",
                                 !selectedSubcategoryId
                                   ? "bg-primary/15 text-primary"
                                   : "bg-foreground/[0.05] text-muted-foreground hover:bg-foreground/[0.08]"
@@ -257,7 +257,7 @@ export default function ChecklistsPage() {
                                 key={sub.id}
                                 onClick={() => setSelectedSubcategoryId(sub.id)}
                                 className={cn(
-                                  "px-2.5 py-1 rounded-full text-[11px] font-medium whitespace-nowrap transition-all shrink-0",
+                                  "px-3 py-1 rounded-full text-[11px] font-medium whitespace-nowrap transition-all shrink-0 active:scale-95",
                                   selectedSubcategoryId === sub.id
                                     ? "bg-primary/15 text-primary"
                                     : "bg-foreground/[0.05] text-muted-foreground hover:bg-foreground/[0.08]"
