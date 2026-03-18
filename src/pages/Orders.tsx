@@ -348,11 +348,12 @@ export default function OrdersPage() {
                       return (
                         <div
                           key={supplier.id}
-                          className="bg-card rounded-2xl border border-border overflow-hidden transition-all animate-fade-in"
+                          className="bg-card/80 rounded-2xl overflow-hidden transition-all animate-fade-in"
                           style={{ animationDelay: `${index * 30}ms` }}
                         >
                           <Collapsible open={isExpanded} onOpenChange={(open) => setExpandedSuppliers(prev => ({ ...prev, [supplier.id]: open }))}>
-                            <div className="flex items-center gap-3 p-3">
+                            <div className="flex items-center gap-3 p-3.5">
+                              {/* Avatar */}
                               <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); handleOpenProfile(supplier); }}
@@ -365,6 +366,7 @@ export default function OrdersPage() {
                                 />
                               </button>
 
+                              {/* Info */}
                               <CollapsibleTrigger
                                 className="flex-1 min-w-0 text-left"
                                 onClick={(e) => {
@@ -374,62 +376,69 @@ export default function OrdersPage() {
                                   }
                                 }}
                               >
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="font-semibold text-foreground text-sm">{supplier.name}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-foreground text-sm truncate">{supplier.name}</span>
                                   {lowItems.length > 0 && (
-                                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-warning/15 text-warning font-semibold shrink-0">
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-warning/15 text-warning font-bold whitespace-nowrap shrink-0">
                                       {lowItems.length} baixo{lowItems.length !== 1 ? 's' : ''}
                                     </span>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-2 mt-0.5">
+                                <div className="flex items-center gap-3 mt-1">
                                   {supplier.phone && (
                                     <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                                       <AppIcon name="Phone" size={10} />
                                       {supplier.phone}
-                                      {hasWa && <span className="text-success text-[10px]">✓</span>}
+                                      {hasWa && <AppIcon name="check_circle" size={12} className="text-success ml-0.5" />}
                                     </span>
                                   )}
                                   {supplierOrderCount > 0 && (
-                                    <span className="text-[11px] text-muted-foreground">
+                                    <span className="text-[11px] text-muted-foreground whitespace-nowrap">
                                       {supplierOrderCount} pedido{supplierOrderCount !== 1 ? 's' : ''}
                                     </span>
                                   )}
                                 </div>
                               </CollapsibleTrigger>
 
-                              {lowItems.length > 0 && (
-                                <>
-                                  <CollapsibleTrigger className="shrink-0 p-1">
+                              {/* Actions - fixed width area for alignment */}
+                              <div className="flex items-center gap-2 shrink-0">
+                                {lowItems.length > 0 && (
+                                  <CollapsibleTrigger className="p-1.5 rounded-lg hover:bg-secondary/50 transition-colors">
                                     <AppIcon name="ChevronDown" size={16} className={cn(
                                       "text-muted-foreground transition-transform duration-200",
                                       isExpanded && "rotate-180"
                                     )} />
                                   </CollapsibleTrigger>
+                                )}
+                                {lowItems.length > 0 ? (
                                   <Button
                                     size="sm"
                                     onClick={(e) => { e.stopPropagation(); handleOpenOrder(supplier); }}
-                                    className="gap-1 rounded-xl shrink-0 h-9 px-3 text-xs"
+                                    className="gap-1 rounded-xl h-9 px-4 text-xs font-bold"
                                   >
                                     <AppIcon name="Plus" size={14} />
                                     Pedir
                                   </Button>
-                                </>
-                              )}
-                              {lowItems.length === 0 && (
-                                <AppIcon name="ChevronRight" size={16} className="text-muted-foreground shrink-0" />
-                              )}
+                                ) : (
+                                  <button
+                                    onClick={() => handleOpenProfile(supplier)}
+                                    className="p-1.5 rounded-lg hover:bg-secondary/50 transition-colors"
+                                  >
+                                    <AppIcon name="ChevronRight" size={16} className="text-muted-foreground" />
+                                  </button>
+                                )}
+                              </div>
                             </div>
 
                             {lowItems.length > 0 && (
                               <CollapsibleContent>
-                                <div className="border-t border-border/50">
+                                <div className="border-t border-border/30 mx-3.5">
                                   {lowItems.map((item, i) => (
                                     <div
                                       key={item.id}
                                       className={cn(
-                                        "flex items-center justify-between px-4 py-2.5 transition-colors",
-                                        i < lowItems.length - 1 && "border-b border-border/50"
+                                        "flex items-center justify-between py-2.5",
+                                        i < lowItems.length - 1 && "border-b border-border/20"
                                       )}
                                     >
                                       <span className="text-sm text-foreground">{item.name}</span>
@@ -442,7 +451,7 @@ export default function OrdersPage() {
                                         )}>
                                           {item.current_stock}/{item.min_stock}
                                         </span>
-                                        <span className="text-[10px] text-muted-foreground">{item.unit_type}</span>
+                                        <span className="text-[10px] text-muted-foreground w-8 text-right">{item.unit_type}</span>
                                       </div>
                                     </div>
                                   ))}
