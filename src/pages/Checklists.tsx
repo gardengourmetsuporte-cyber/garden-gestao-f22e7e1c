@@ -148,7 +148,7 @@ export default function ChecklistsPage() {
               />
             </div>
 
-            {/* Bonus Card with nested Production sub-card */}
+            {/* Bonus Card */}
             {(() => {
               const hasActiveBonusItems = sectors.some((s: any) =>
                 s.scope === 'bonus' && s.subcategories?.some((sub: any) =>
@@ -156,15 +156,7 @@ export default function ChecklistsPage() {
                 )
               );
 
-              const productionItems = sectors.flatMap((s: any) =>
-                (s.subcategories || []).flatMap((sub: any) =>
-                  (sub.items || []).filter((i: any) => i.is_active && (i as any).linked_inventory_item_id)
-                )
-              );
-              const prodCompletedCount = productionItems.filter((i: any) => isItemCompleted(i.id)).length;
-
-              // Show bonus card if admin, has bonus items, or has production items
-              if (!isAdmin && !hasActiveBonusItems && productionItems.length === 0) return null;
+              if (!isAdmin && !hasActiveBonusItems) return null;
 
               return (
                 <ChecklistBonusCard
@@ -174,14 +166,6 @@ export default function ChecklistsPage() {
                   deadlineSettings={deadlineSettings}
                   updateDeadline={updateDeadline} removeDeadline={removeDeadline} isSavingDeadline={isSavingDeadline}
                   hasActiveItems={hasActiveBonusItems}
-                  productionSlot={
-                    <ChecklistProductionSubCard
-                      isSelected={checklistType === 'production' as any}
-                      onSelect={() => setChecklistType('production' as any)}
-                      productionCount={productionItems.length}
-                      completedCount={prodCompletedCount}
-                    />
-                  }
                 />
               );
             })()}
