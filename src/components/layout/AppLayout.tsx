@@ -78,7 +78,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="flex-1 flex flex-col min-w-0">
           {/* ======= Unified Header (Mobile + Desktop) ======= */}
           <header
-            className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out lg:sticky lg:top-0 lg:left-auto lg:right-auto"
+            className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out"
             style={{
               paddingTop: isLgScreen ? '0' : 'env(safe-area-inset-top)',
               background: isDashboard
@@ -139,7 +139,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           {/* ======= Main Content ======= */}
           <main
             className="flex-1"
-            style={{ paddingTop: isLgScreen ? '0' : 'calc(env(safe-area-inset-top) + 3rem)' }}
+            style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3rem)' }}
           >
             <PageTransition>
               {children}
