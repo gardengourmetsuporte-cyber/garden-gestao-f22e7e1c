@@ -45,11 +45,11 @@ export default function CalendarFull() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-24 lg:pb-12">
-        <div className="px-4 py-3 lg:px-8 lg:max-w-6xl lg:mx-auto space-y-4">
+        <div className="px-4 py-3 lg:px-8 lg:max-w-7xl lg:mx-auto space-y-4">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(-1)}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 lg:hidden" onClick={() => navigate(-1)}>
                 <AppIcon name="ChevronLeft" size={18} />
               </Button>
               <h1 className="text-lg font-extrabold text-foreground font-display" style={{ letterSpacing: '-0.02em' }}>
@@ -67,80 +67,95 @@ export default function CalendarFull() {
             </button>
           </div>
 
-          {/* Month nav */}
-          <UnifiedMonthNav
-            currentMonth={currentMonth}
-            onMonthChange={setCurrentMonth}
-          />
+          {/* Desktop: side-by-side layout */}
+          <div className="lg:flex lg:gap-6">
+            {/* Left: Calendar */}
+            <div className="lg:flex-1 space-y-4">
+              {/* Month nav */}
+              <UnifiedMonthNav
+                currentMonth={currentMonth}
+                onMonthChange={setCurrentMonth}
+              />
 
-          {/* Calendar grid */}
-          <UnifiedMonthGrid
-            currentMonth={currentMonth}
-            selectedDate={selectedDate}
-            onSelectDate={(key) => setSelectedDate(key || null)}
-            getDayIndicators={getDayIndicators}
-            isLoading={isLoading}
-          />
+              {/* Calendar grid */}
+              <UnifiedMonthGrid
+                currentMonth={currentMonth}
+                selectedDate={selectedDate}
+                onSelectDate={(key) => setSelectedDate(key || null)}
+                getDayIndicators={getDayIndicators}
+                isLoading={isLoading}
+              />
 
-          {/* Legend */}
-          <div className="flex flex-wrap gap-x-4 gap-y-1.5 justify-center">
-            {[
-              { label: 'Tarefas', color: calendarEventColors.task_pending },
-              { label: 'Marketing', color: calendarEventColors.marketing },
-              { label: 'Folga', color: calendarEventColors.schedule },
-              { label: 'Financeiro', color: calendarEventColors.finance_income },
-              { label: 'Data importante', color: calendarEventColors.finance_peak },
-            ].map(s => (
-              <div key={s.label} className="flex items-center gap-1.5">
-                <div className={cn('w-2.5 h-2.5 rounded-full', s.color)} />
-                <span className="text-[10px] text-muted-foreground font-medium">{s.label}</span>
+              {/* Legend */}
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5 justify-center">
+                {[
+                  { label: 'Tarefas', color: calendarEventColors.task_pending },
+                  { label: 'Marketing', color: calendarEventColors.marketing },
+                  { label: 'Folga', color: calendarEventColors.schedule },
+                  { label: 'Financeiro', color: calendarEventColors.finance_income },
+                  { label: 'Data importante', color: calendarEventColors.finance_peak },
+                ].map(s => (
+                  <div key={s.label} className="flex items-center gap-1.5">
+                    <div className={cn('w-2.5 h-2.5 rounded-full', s.color)} />
+                    <span className="text-[10px] text-muted-foreground font-medium">{s.label}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
 
-          {/* Detail panel */}
-          {selectedDate && (
-            <div className="rounded-2xl border border-border/40 bg-card p-4 space-y-4 animate-fade-in">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-foreground capitalize">
-                  {format(new Date(selectedDate + 'T12:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}
-                </p>
-                <button onClick={() => setSelectedDate(null)} className="text-muted-foreground hover:text-foreground transition-colors">
-                  <AppIcon name="X" size={16} />
-                </button>
-              </div>
+            {/* Right: Detail panel (desktop: always visible, sticky) */}
+            <div className="lg:w-[380px] lg:shrink-0 mt-4 lg:mt-0">
+              {selectedDate ? (
+                <div className="rounded-2xl border border-border/40 bg-card p-4 space-y-4 animate-fade-in lg:sticky lg:top-16">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold text-foreground capitalize">
+                      {format(new Date(selectedDate + 'T12:00:00'), "EEEE, d 'de' MMMM", { locale: ptBR })}
+                    </p>
+                    <button onClick={() => setSelectedDate(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                      <AppIcon name="X" size={16} />
+                    </button>
+                  </div>
 
-              {allEvents.length === 0 ? (
-                <div className="py-8 text-center">
-                  <AppIcon name="CalendarDays" size={32} className="text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Nenhum evento neste dia</p>
+                  {allEvents.length === 0 ? (
+                    <div className="py-8 text-center">
+                      <AppIcon name="CalendarDays" size={32} className="text-muted-foreground/30 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Nenhum evento neste dia</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {selectedEvents!.tasks.length > 0 && (
+                        <EventSection icon="CheckCircle2" iconColor="text-success" title="Tarefas">
+                          {selectedEvents!.tasks.map(ev => <EventRow key={ev.id} event={ev} />)}
+                        </EventSection>
+                      )}
+                      {selectedEvents!.finance.length > 0 && (
+                        <EventSection icon="DollarSign" iconColor="text-orange-500" title="Financeiro">
+                          {selectedEvents!.finance.map(ev => <EventRow key={ev.id} event={ev} />)}
+                        </EventSection>
+                      )}
+                      {selectedEvents!.marketing.length > 0 && (
+                        <EventSection icon="Megaphone" iconColor="text-accent" title="Marketing">
+                          {selectedEvents!.marketing.map(ev => <EventRow key={ev.id} event={ev} />)}
+                        </EventSection>
+                      )}
+                      {selectedEvents!.schedules.length > 0 && (
+                        <EventSection icon="Coffee" iconColor="text-amber-500" title="Folgas">
+                          {selectedEvents!.schedules.map(ev => <EventRow key={ev.id} event={ev} />)}
+                        </EventSection>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {selectedEvents!.tasks.length > 0 && (
-                    <EventSection icon="CheckCircle2" iconColor="text-success" title="Tarefas">
-                      {selectedEvents!.tasks.map(ev => <EventRow key={ev.id} event={ev} />)}
-                    </EventSection>
-                  )}
-                  {selectedEvents!.finance.length > 0 && (
-                    <EventSection icon="DollarSign" iconColor="text-orange-500" title="Financeiro">
-                      {selectedEvents!.finance.map(ev => <EventRow key={ev.id} event={ev} />)}
-                    </EventSection>
-                  )}
-                  {selectedEvents!.marketing.length > 0 && (
-                    <EventSection icon="Megaphone" iconColor="text-accent" title="Marketing">
-                      {selectedEvents!.marketing.map(ev => <EventRow key={ev.id} event={ev} />)}
-                    </EventSection>
-                  )}
-                  {selectedEvents!.schedules.length > 0 && (
-                    <EventSection icon="Coffee" iconColor="text-amber-500" title="Folgas">
-                      {selectedEvents!.schedules.map(ev => <EventRow key={ev.id} event={ev} />)}
-                    </EventSection>
-                  )}
+                <div className="hidden lg:flex rounded-2xl border border-border/40 bg-card p-8 items-center justify-center animate-fade-in">
+                  <div className="text-center">
+                    <AppIcon name="CalendarDays" size={40} className="text-muted-foreground/20 mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">Selecione um dia para ver os eventos</p>
+                  </div>
                 </div>
               )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </AppLayout>
