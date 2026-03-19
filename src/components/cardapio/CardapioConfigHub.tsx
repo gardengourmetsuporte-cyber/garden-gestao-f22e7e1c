@@ -119,7 +119,7 @@ export function CardapioConfigHub() {
                 ) : (
                   <Suspense fallback={<SectionSkeleton />}>
                     <CardapioSettings
-                      initialTab={section.id === 'delivery' ? 'config' : section.id === 'tablet' ? 'pdv' : section.id === 'gamificacao' ? 'roleta' : 'rodizio'}
+                      initialTab={section.id === 'delivery' ? 'config' : section.id === 'tablet' ? 'mesas' : section.id === 'colibri' ? 'pdv' : section.id === 'gamificacao' ? 'roleta' : 'rodizio'}
                       embedded
                     />
                   </Suspense>
