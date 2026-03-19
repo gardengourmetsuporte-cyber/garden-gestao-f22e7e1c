@@ -102,14 +102,13 @@ export function MemoryGame({ onBack, unitId }: Props) {
           lockRef.current = false;
 
           if (newMatches === totalPairs) {
-            const finalMoves = moves + 1; // current move
+            const finalMoves = moves + 1;
             setGameState('won');
             if (timerRef.current) clearInterval(timerRef.current);
             if (!bestTime || timer < bestTime) {
               setBestTime(timer);
               try { localStorage.setItem('garden_memory_best', String(timer)); } catch {}
             }
-            // Save to ranking (fewer moves = better)
             saveScore('memory', finalMoves, { time: timer });
           }
         }, 400);
@@ -145,7 +144,7 @@ export function MemoryGame({ onBack, unitId }: Props) {
       </div>
 
       {/* Score bar */}
-      <div className="flex items-center justify-center gap-3 px-4 py-2.5 shrink-0">
+      <div className="flex items-center justify-center gap-3 px-4 py-2 shrink-0">
         <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/8 border border-amber-500/15">
           <span className="text-sm">🎯</span>
           <span className="text-sm text-amber-400 font-black tabular-nums">{moves} jogadas</span>
@@ -162,9 +161,9 @@ export function MemoryGame({ onBack, unitId }: Props) {
         )}
       </div>
 
-      {/* Game area */}
+      {/* Game area — centered for tablet */}
       <div className="flex-1 flex items-center justify-center px-5 py-3 relative">
-        <div className="relative w-full max-w-[600px]">
+        <div className="relative w-full max-w-[700px]">
           {gameState === 'menu' && (
             <div className="flex flex-col items-center justify-center gap-7 py-12">
               <div className="text-7xl animate-pulse" style={{ animationDuration: '2s' }}>🧠</div>
@@ -187,12 +186,12 @@ export function MemoryGame({ onBack, unitId }: Props) {
           )}
 
           {gameState !== 'menu' && (
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-4 gap-3 max-w-[600px] mx-auto">
               {cards.map(card => (
                 <button
                   key={card.id}
                   onClick={() => handleCardClick(card.id)}
-                  className={`aspect-square rounded-2xl text-3xl sm:text-4xl flex items-center justify-center font-bold transition-all duration-300 transform ${
+                  className={`aspect-square rounded-2xl text-4xl md:text-5xl flex items-center justify-center font-bold transition-all duration-300 transform touch-manipulation ${
                     card.matched
                       ? 'bg-emerald-500/15 border-2 border-emerald-500/30 scale-[0.92] opacity-60'
                       : card.flipped

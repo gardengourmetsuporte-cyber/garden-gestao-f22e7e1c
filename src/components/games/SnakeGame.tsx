@@ -37,7 +37,6 @@ function drawFoodShape(ctx: CanvasRenderingContext2D, x: number, y: number, cell
   const cy = y + cell / 2;
   const r = cell * 0.32;
 
-  // Glow
   const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, cell * 0.7);
   glow.addColorStop(0, item.color + '40');
   glow.addColorStop(1, 'transparent');
@@ -46,7 +45,6 @@ function drawFoodShape(ctx: CanvasRenderingContext2D, x: number, y: number, cell
   ctx.arc(cx, cy, cell * 0.7, 0, Math.PI * 2);
   ctx.fill();
 
-  // Main circle
   const grad = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, 0, cx, cy, r);
   grad.addColorStop(0, item.color);
   grad.addColorStop(1, shadeColor(item.color, -30));
@@ -55,13 +53,11 @@ function drawFoodShape(ctx: CanvasRenderingContext2D, x: number, y: number, cell
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fill();
 
-  // Highlight
   ctx.fillStyle = 'rgba(255,255,255,0.35)';
   ctx.beginPath();
   ctx.arc(cx - r * 0.2, cy - r * 0.2, r * 0.35, 0, Math.PI * 2);
   ctx.fill();
 
-  // Points text
   ctx.fillStyle = 'white';
   ctx.font = `bold ${cell * 0.22}px system-ui, sans-serif`;
   ctx.textAlign = 'center';
@@ -114,11 +110,9 @@ export function SnakeGame({ onBack, unitId }: Props) {
     const cell = size / GRID;
     cellSize.current = cell;
 
-    // Background
     ctx.fillStyle = 'hsl(150, 12%, 7%)';
     ctx.fillRect(0, 0, size, size);
 
-    // Grid dots (subtle)
     ctx.fillStyle = 'hsla(150, 10%, 20%, 0.3)';
     for (let i = 0; i < GRID; i++) {
       for (let j = 0; j < GRID; j++) {
@@ -128,11 +122,9 @@ export function SnakeGame({ onBack, unitId }: Props) {
       }
     }
 
-    // Food
     const food = foodRef.current;
     drawFoodShape(ctx, food.pos.x * cell, food.pos.y * cell, cell, food.item);
 
-    // Snake
     const snake = snakeRef.current;
     snake.forEach((seg, i) => {
       const progress = i / Math.max(snake.length - 1, 1);
@@ -141,7 +133,6 @@ export function SnakeGame({ onBack, unitId }: Props) {
       const saturation = 75 - progress * 15;
 
       if (i === 0) {
-        // Head glow
         const headGlow = ctx.createRadialGradient(
           seg.x * cell + cell / 2, seg.y * cell + cell / 2, cell * 0.2,
           seg.x * cell + cell / 2, seg.y * cell + cell / 2, cell * 0.9
@@ -151,7 +142,6 @@ export function SnakeGame({ onBack, unitId }: Props) {
         ctx.fillStyle = headGlow;
         ctx.fillRect(seg.x * cell - cell * 0.3, seg.y * cell - cell * 0.3, cell * 1.6, cell * 1.6);
 
-        // Head body
         const headGrad = ctx.createLinearGradient(
           seg.x * cell, seg.y * cell,
           seg.x * cell + cell, seg.y * cell + cell
@@ -163,17 +153,14 @@ export function SnakeGame({ onBack, unitId }: Props) {
         ctx.roundRect(seg.x * cell + 1, seg.y * cell + 1, cell - 2, cell - 2, cell * 0.35);
         ctx.fill();
 
-        // Head shine
         ctx.fillStyle = 'hsla(142, 80%, 70%, 0.15)';
         ctx.beginPath();
         ctx.roundRect(seg.x * cell + 3, seg.y * cell + 3, cell * 0.45, cell * 0.35, cell * 0.2);
         ctx.fill();
 
-        // Eyes
         const eyeSize = cell * 0.11;
         const eyeOffsets = getEyeOffsets(dirRef.current, cell);
         
-        // Eye whites
         ctx.fillStyle = 'white';
         ctx.beginPath();
         ctx.arc(seg.x * cell + cell / 2 + eyeOffsets[0].x, seg.y * cell + cell / 2 + eyeOffsets[0].y, eyeSize, 0, Math.PI * 2);
@@ -182,7 +169,6 @@ export function SnakeGame({ onBack, unitId }: Props) {
         ctx.arc(seg.x * cell + cell / 2 + eyeOffsets[1].x, seg.y * cell + cell / 2 + eyeOffsets[1].y, eyeSize, 0, Math.PI * 2);
         ctx.fill();
 
-        // Pupils
         ctx.fillStyle = '#111';
         const pd = getPupilDirection(dirRef.current, cell * 0.04);
         ctx.beginPath();
@@ -192,7 +178,6 @@ export function SnakeGame({ onBack, unitId }: Props) {
         ctx.arc(seg.x * cell + cell / 2 + eyeOffsets[1].x + pd.x, seg.y * cell + cell / 2 + eyeOffsets[1].y + pd.y, eyeSize * 0.55, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // Body segment
         const bodyGrad = ctx.createRadialGradient(
           seg.x * cell + cell / 2, seg.y * cell + cell / 2, 0,
           seg.x * cell + cell / 2, seg.y * cell + cell / 2, cell * 0.5
@@ -206,7 +191,6 @@ export function SnakeGame({ onBack, unitId }: Props) {
         ctx.roundRect(seg.x * cell + gap, seg.y * cell + gap, cell - gap * 2, cell - gap * 2, cell * 0.3);
         ctx.fill();
 
-        // Scale pattern
         if (i % 2 === 0) {
           ctx.fillStyle = `hsla(${hue}, 50%, ${lightness + 12}%, 0.12)`;
           ctx.beginPath();
@@ -216,7 +200,6 @@ export function SnakeGame({ onBack, unitId }: Props) {
       }
     });
 
-    // Border
     ctx.strokeStyle = 'hsla(142, 50%, 30%, 0.6)';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -273,7 +256,6 @@ export function SnakeGame({ onBack, unitId }: Props) {
       setHighScore(finalScore);
       try { localStorage.setItem('garden_snake_high', String(finalScore)); } catch {}
     }
-    // Save score to ranking (async, fire-and-forget)
     saveScore('snake', finalScore);
   };
 
@@ -311,7 +293,7 @@ export function SnakeGame({ onBack, unitId }: Props) {
     return () => window.removeEventListener('keydown', handleKey);
   }, [gameState]);
 
-  // Touch
+  // Touch swipe
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -339,16 +321,17 @@ export function SnakeGame({ onBack, unitId }: Props) {
     if (newDir === 'RIGHT' && dir !== 'LEFT') nextDirRef.current = 'RIGHT';
   };
 
-  // Canvas sizing
+  // Canvas sizing — optimized for tablet landscape
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState(400);
 
   useEffect(() => {
     const resize = () => {
       if (containerRef.current) {
-        const w = containerRef.current.clientWidth - 32;
-        const h = containerRef.current.clientHeight - 16;
-        const maxSize = Math.min(w, h, 800); // increased max for tablets
+        const rect = containerRef.current.getBoundingClientRect();
+        const w = rect.width - 32;
+        const h = rect.height - 16;
+        const maxSize = Math.min(w, h, 800);
         setCanvasSize(Math.max(Math.floor(maxSize / GRID) * GRID, GRID * 10));
       }
     };
@@ -379,7 +362,7 @@ export function SnakeGame({ onBack, unitId }: Props) {
       </div>
 
       {/* Score bar */}
-      <div className="flex items-center justify-center gap-3 px-4 py-2.5 shrink-0">
+      <div className="flex items-center justify-center gap-3 px-4 py-2 shrink-0">
         <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/8 border border-emerald-500/15">
           <span className="text-sm">⭐</span>
           <span className="text-sm text-emerald-400 font-black tabular-nums">{score}</span>
@@ -393,10 +376,9 @@ export function SnakeGame({ onBack, unitId }: Props) {
         )}
       </div>
 
-      {/* Game area */}
-      <div ref={containerRef} className="flex-1 flex items-center justify-center px-4 relative">
-        <div className="relative rounded-3xl overflow-hidden" style={{ boxShadow: '0 0 60px hsla(142, 40%, 25%, 0.12), 0 0 120px hsla(142, 40%, 15%, 0.06)' }}>
-          {/* Glow border effect */}
+      {/* Game area — horizontal layout on tablet: canvas + D-pad side by side */}
+      <div ref={containerRef} className="flex-1 flex items-center justify-center gap-6 px-4 relative">
+        <div className="relative rounded-3xl overflow-hidden shrink-0" style={{ boxShadow: '0 0 60px hsla(142, 40%, 25%, 0.12), 0 0 120px hsla(142, 40%, 15%, 0.06)' }}>
           <div className="absolute inset-0 rounded-3xl border border-emerald-500/10 pointer-events-none z-10" />
           
           <canvas
@@ -422,7 +404,7 @@ export function SnakeGame({ onBack, unitId }: Props) {
               >
                 ▶ JOGAR
               </button>
-              <p className="text-[11px] text-white/30 font-medium">Deslize ou use as setas para mover</p>
+              <p className="text-[11px] text-white/30 font-medium">Deslize ou use os botões para mover</p>
             </div>
           )}
 
@@ -451,39 +433,42 @@ export function SnakeGame({ onBack, unitId }: Props) {
             </div>
           )}
         </div>
+
+        {/* D-Pad — always visible during gameplay, positioned beside the canvas on tablet */}
+        {gameState === 'playing' && (
+          <div className="shrink-0">
+            <div className="relative w-[180px] h-[180px]">
+              {(['UP', 'DOWN', 'LEFT', 'RIGHT'] as Direction[]).map(d => {
+                const pos = {
+                  UP: 'top-0 left-1/2 -translate-x-1/2',
+                  DOWN: 'bottom-0 left-1/2 -translate-x-1/2',
+                  LEFT: 'left-0 top-1/2 -translate-y-1/2',
+                  RIGHT: 'right-0 top-1/2 -translate-y-1/2',
+                }[d];
+                const arrows: Record<Direction, string> = {
+                  UP: '▲',
+                  DOWN: '▼',
+                  LEFT: '◀',
+                  RIGHT: '▶',
+                };
+                return (
+                  <button
+                    key={d}
+                    onTouchStart={(e) => { e.preventDefault(); changeDir(d); }}
+                    onMouseDown={() => changeDir(d)}
+                    className={`absolute ${pos} w-14 h-14 rounded-2xl bg-emerald-500/12 border-2 border-emerald-500/25 flex items-center justify-center active:bg-emerald-500/30 active:scale-90 transition-all touch-manipulation`}
+                  >
+                    <span className="text-emerald-400/80 text-lg font-bold select-none">{arrows[d]}</span>
+                  </button>
+                );
+              })}
+              {/* Center circle */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-500/5 border border-emerald-500/10" />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* D-Pad */}
-      {gameState === 'playing' && (
-        <div className="shrink-0 flex justify-center pb-[max(env(safe-area-inset-bottom,8px),14px)] pt-2">
-          <div className="relative w-[140px] h-[140px]">
-            {(['UP', 'DOWN', 'LEFT', 'RIGHT'] as Direction[]).map(d => {
-              const pos = {
-                UP: 'top-0 left-1/2 -translate-x-1/2',
-                DOWN: 'bottom-0 left-1/2 -translate-x-1/2',
-                LEFT: 'left-0 top-1/2 -translate-y-1/2',
-                RIGHT: 'right-0 top-1/2 -translate-y-1/2',
-              }[d];
-              const icon = {
-                UP: 'KeyboardArrowUp',
-                DOWN: 'KeyboardArrowDown',
-                LEFT: 'KeyboardArrowLeft',
-                RIGHT: 'KeyboardArrowRight',
-              }[d];
-              return (
-                <button
-                  key={d}
-                  onTouchStart={() => changeDir(d)}
-                  onMouseDown={() => changeDir(d)}
-                  className={`absolute ${pos} w-11 h-11 rounded-2xl bg-emerald-500/8 border border-emerald-500/15 flex items-center justify-center active:bg-emerald-500/25 active:scale-95 transition-all`}
-                >
-                  <AppIcon name={icon} size={22} className="text-emerald-400/60" />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
       {showRanking && unitId && (
         <GameRanking unitId={unitId} gameType="snake" accentColor="emerald" onClose={() => setShowRanking(false)} />
       )}
