@@ -75,7 +75,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         {/* Desktop Sidebar — hidden on mobile via shadcn Sidebar internals */}
         <AppSidebar />
 
-        <div className="flex-1 flex flex-col min-w-0 max-h-screen overflow-y-auto overflow-x-hidden">
+        <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden lg:max-h-screen lg:overflow-y-auto">
           {/* ======= Unified Header (Mobile + Desktop) ======= */}
           <header
             className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out lg:sticky lg:top-0 lg:left-auto lg:right-auto"
