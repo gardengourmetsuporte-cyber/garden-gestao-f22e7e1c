@@ -30,34 +30,30 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   // ── Início ──
   { icon: 'CalendarDays', label: 'Agenda', href: '/agenda', group: 'principal', groupLabel: 'Início' },
-  { icon: 'Sparkles', customIcon: '/icons/copilot-ai.png', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'principal', groupLabel: 'Início' },
+  { icon: 'Sparkles', label: 'Copilot IA', href: '/copilot', adminOnly: true, group: 'principal', groupLabel: 'Início' },
 
   // ── Gestão ──
   { icon: 'DollarSign', label: 'Financeiro', href: '/finance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'RefreshCw', label: 'Central Recorrente', href: '/subscriptions', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
   { icon: 'UserSearch', label: 'Clientes', href: '/customers', group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'Handshake', customIcon: '/icons/fornecedores.png', label: 'Fornecedores', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'Handshake', label: 'Fornecedores', href: '/orders', group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'Campaign', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
+  { icon: 'ShieldCheck', label: 'Obrigações Legais', href: '/compliance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
 
   // ── Operação ──
-  { icon: 'CheckCircle', customIcon: '/icons/checklists.png', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'CheckCircle', label: 'Checklists', href: '/checklists', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Receipt', label: 'Fechamento de Caixa', href: '/cash-closing', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Package', label: 'Estoque', href: '/inventory', group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'Truck', customIcon: '/icons/motocicleta.png', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'TwoWheeler', label: 'Entregas', href: '/deliveries', group: 'operacao', groupLabel: 'Operação' },
   { icon: 'Monitor', label: 'PDV', href: '/pdv', group: 'operacao', groupLabel: 'Operação' },
-  
-  { icon: 'RecipeBook', customIcon: '/icons/cardapio.png', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
-  { icon: 'chat', label: 'WhatsApp IA', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação', keepIconColor: true },
+  { icon: 'MenuBook', label: 'Cardápio', href: '/cardapio', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
+  { icon: 'Chat', label: 'WhatsApp IA', href: '/whatsapp', adminOnly: true, group: 'operacao', groupLabel: 'Operação' },
 
   // ── Pessoas ──
-  { icon: 'Users', customIcon: '/icons/funcionarios.png', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'Gift', customIcon: '/icons/gift.png', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'Trophy', customIcon: '/icons/trophy.png', label: 'Ranking', href: '/ranking', group: 'pessoas', groupLabel: 'Pessoas' },
-  { icon: 'UserPlus', label: 'Freelancers', href: '/freelancers', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
-
-  // ── Gestão ──
-  { icon: 'Megaphone', customIcon: '/icons/megaphone.png', label: 'Marketing', href: '/marketing', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
-  { icon: 'ShieldCheck', label: 'Obrigações Legais', href: '/compliance', adminOnly: true, group: 'gestao', groupLabel: 'Gestão' },
-  
+  { icon: 'Groups', label: 'Funcionários', href: '/employees', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'CardGiftcard', label: 'Recompensas', href: '/rewards', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'EmojiEvents', label: 'Ranking', href: '/ranking', group: 'pessoas', groupLabel: 'Pessoas' },
+  { icon: 'PersonAdd', label: 'Freelancers', href: '/freelancers', adminOnly: true, group: 'pessoas', groupLabel: 'Pessoas' },
 ];
 
 /**
