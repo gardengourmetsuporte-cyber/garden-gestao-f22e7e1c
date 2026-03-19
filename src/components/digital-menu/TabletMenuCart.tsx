@@ -495,7 +495,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         </Button>
         <Button
           className={`w-full h-12 rounded-xl text-sm font-bold ${payWithCoins ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
-          onClick={handleSend}
+          onClick={handleSendClick}
           disabled={sending || (payWithCoins && !canPayWithCoins)}
         >
           {sending ? (
