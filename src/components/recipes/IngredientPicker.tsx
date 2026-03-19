@@ -8,15 +8,13 @@ import { formatCurrency } from '@/types/recipe';
 import { AppIcon } from '@/components/ui/app-icon';
  import { cn } from '@/lib/utils';
  
- interface InventoryItem {
-   id: string;
-   name: string;
-   unit_type: string;
-   unit_price: number;
-  recipe_unit_type?: string | null;
-  recipe_unit_price?: number | null;
-   category?: { id: string; name: string; color: string } | null;
- }
+interface InventoryItem {
+  id: string;
+  name: string;
+  unit_type: string;
+  unit_price: number;
+  category?: { id: string; name: string; color: string } | null;
+}
  
 interface SubRecipeItem {
   id: string;
