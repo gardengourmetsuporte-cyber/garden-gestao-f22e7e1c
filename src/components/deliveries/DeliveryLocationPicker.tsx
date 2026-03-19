@@ -66,7 +66,7 @@ function createMarkerIcon() {
   });
 }
 
-export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm }: Props) {
+export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm, cityContext }: Props) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
