@@ -52,6 +52,7 @@ export interface MenuProduct {
   created_at: string;
   option_group_count?: number;
   recipe_id?: string | null;
+  recipe_base_cost?: number | null;
   profit_margin?: number | null;
   cost_per_portion?: number;
 }
@@ -124,13 +125,41 @@ export function useMenuAdmin() {
 
   const fetchProducts = useCallback(async () => {
     if (!activeUnitId) return;
+
     const { data } = await supabase
       .from('tablet_products')
       .select('*')
       .eq('unit_id', activeUnitId)
       .eq('is_active', true)
       .order('sort_order');
-    setProducts((data as MenuProduct[]) || []);
+
+    const products = (data as MenuProduct[]) || [];
+    const recipeIds = [...new Set(products.map(p => p.recipe_id).filter(Boolean))] as string[];
+
+    if (recipeIds.length === 0) {
+      setProducts(products);
+      return;
+    }
+
+    const { data: recipeRows } = await supabase
+      .from('recipes')
+      .select('id, cost_per_portion')
+      .in('id', recipeIds);
+
+    const recipeCostMap = new Map<string, number>();
+    (recipeRows || []).forEach((recipe: any) => {
+      recipeCostMap.set(recipe.id, Number(recipe.cost_per_portion || 0));
+    });
+
+    const productsWithBaseCost = products.map(product => {
+      if (!product.recipe_id) return product;
+      return {
+        ...product,
+        recipe_base_cost: recipeCostMap.get(product.recipe_id) ?? null,
+      };
+    });
+
+    setProducts(productsWithBaseCost);
   }, [activeUnitId]);
 
   const fetchOptionGroups = useCallback(async () => {
