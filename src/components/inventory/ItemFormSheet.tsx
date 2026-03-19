@@ -97,7 +97,7 @@ export function ItemFormSheet({
       current_stock: parseFloat(currentStock) || 0,
       min_stock: parseFloat(minStock) || 0,
       unit_price: unitPrice ? parseFloat(unitPrice) : null,
-      stock_unit_label: stockUnitLabel.trim() || null,
+      stock_unit_label: null,
       purchase_unit_label: purchaseUnitLabel.trim() || null,
       purchase_to_stock_factor: purchaseToStockFactor ? parseFloat(purchaseToStockFactor) : null,
     });
