@@ -14,7 +14,7 @@ interface AppIconProps {
 }
 
 export const AppIcon = memo(forwardRef<HTMLSpanElement, AppIconProps>(
-  ({ name, size = 24, className, style, fill = 1, weight = 400 }, ref) => {
+  ({ name, size = 26, className, style, fill = 1, weight = 400 }, ref) => {
     const customPaths = CUSTOM_SVG_PATHS[name];
 
     if (customPaths) {
