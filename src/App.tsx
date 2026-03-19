@@ -90,6 +90,7 @@ const PriceSurveyPublic = lazy(() => lazyRetry(() => import("./pages/PriceSurvey
 const CalendarFull = lazy(() => lazyRetry(() => import("./pages/CalendarFull")));
 const Customers = lazy(() => lazyRetry(() => import("./pages/Customers")));
 const DigitalMenu = lazy(() => lazyRetry(() => import("./pages/DigitalMenu")));
+const QrLogin = lazy(() => lazyRetry(() => import("./pages/QrLogin")));
 const TabletDigitalMenu = lazy(() => lazyRetry(() => import("./pages/TabletDigitalMenu")));
 const SupplierPortal = lazy(() => lazyRetry(() => import("./pages/SupplierPortal")));
 const TabletHome = lazy(() => lazyRetry(() => import("./pages/TabletHome")));
@@ -229,6 +230,7 @@ function PublicRoutes() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/m/:unitId" element={<DigitalMenu />} />
+        <Route path="/qr-login/:unitId" element={<QrLogin />} />
         <Route path="/tablet/:unitId" element={<TabletHome />} />
         <Route path="/tablet/:unitId/menu" element={<TabletDigitalMenu />} />
         <Route path="/tablet/:unitId/rodizio" element={<TabletRodizio />} />
