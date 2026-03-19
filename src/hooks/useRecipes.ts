@@ -200,7 +200,8 @@ import { useUnit } from '@/contexts/UnitContext';
        yield_quantity: number;
         yield_unit: string;
         min_ready_stock?: number;
-        preparation_notes?: string;
+        packaging_template_id?: string | null;
+        preparation_notes?: string | null;
        ingredients: Array<{
          id?: string;
         item_id: string | null;
@@ -219,8 +220,8 @@ import { useUnit } from '@/contexts/UnitContext';
        const total_cost = ingredients.reduce((sum, ing) => sum + ing.total_cost, 0);
        const cost_per_portion = data.yield_quantity > 0 ? total_cost / data.yield_quantity : total_cost;
        
-       // Update recipe
-       const { error: recipeError } = await supabase
+       // Update recipe — use .select() to verify the row was actually updated
+       const { data: updatedRows, error: recipeError } = await supabase
          .from('recipes')
          .update({
            ...recipeData,
@@ -228,9 +229,13 @@ import { useUnit } from '@/contexts/UnitContext';
            cost_per_portion,
            cost_updated_at: new Date().toISOString(),
          })
-         .eq('id', id);
+         .eq('id', id)
+         .select('id');
        
        if (recipeError) throw recipeError;
+       if (!updatedRows || updatedRows.length === 0) {
+         throw new Error('Sem permissão para editar esta ficha técnica.');
+       }
        
        // Delete existing ingredients
        const { error: deleteError } = await supabase
@@ -242,7 +247,7 @@ import { useUnit } from '@/contexts/UnitContext';
        
        // Insert new ingredients
        if (ingredients.length > 0) {
-         const { error: ingredientsError } = await supabase
+         const { data: insertedRows, error: ingredientsError } = await supabase
            .from('recipe_ingredients')
            .insert(
              ingredients.map((ing, index) => ({
@@ -257,9 +262,13 @@ import { useUnit } from '@/contexts/UnitContext';
                source_recipe_id: ing.source_recipe_id,
                kds_station_id: ing.kds_station_id || null,
              }))
-           );
+           )
+           .select('id');
          
          if (ingredientsError) throw ingredientsError;
+         if (!insertedRows || insertedRows.length === 0) {
+           throw new Error('Sem permissão para salvar os ingredientes.');
+         }
        }
        
        return { id };
@@ -268,8 +277,8 @@ import { useUnit } from '@/contexts/UnitContext';
        queryClient.invalidateQueries({ queryKey: ['recipes'] });
        toast({ title: 'Ficha técnica atualizada com sucesso!' });
      },
-     onError: () => {
-       toast({ title: 'Erro ao atualizar ficha técnica', variant: 'destructive' });
+     onError: (error: any) => {
+       toast({ title: error?.message || 'Erro ao atualizar ficha técnica', variant: 'destructive' });
      },
    });
  
