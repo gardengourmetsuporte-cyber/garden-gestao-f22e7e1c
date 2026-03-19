@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
+import { getPublicAppUrl } from '@/lib/publicAppUrl';
 import { toast } from 'sonner';
 import { AppIcon } from '@/components/ui/app-icon';
 
