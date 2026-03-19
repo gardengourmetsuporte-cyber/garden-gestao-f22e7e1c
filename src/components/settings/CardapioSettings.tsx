@@ -458,6 +458,9 @@ export function CardapioSettings({ initialTab = null, embedded = false }: Cardap
               <p className="text-xs text-muted-foreground text-center py-4">Nenhuma mesa cadastrada</p>
             )}
           </div>
+
+          {/* Comandas Físicas */}
+          <ComandaQRGenerator />
         </div>
       )}
 
