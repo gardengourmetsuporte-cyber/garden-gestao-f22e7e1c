@@ -280,10 +280,23 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
         </div>
 
         {/* Conversion note — only when units differ */}
-        {!hasNoPrice && ingredient.unit_type !== displayUnit && (
-          <p className="text-[11px] text-muted-foreground italic mt-1.5">
-            {ingredient.quantity} {UNIT_OPTIONS.find(u => u.value === ingredient.unit_type)?.label} → {unitLabel}
-          </p>
+        {!hasNoPrice && ingredient.unit_type !== displayUnit && ingredient.quantity > 0 && (
+          <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-muted-foreground">
+            <AppIcon name="ArrowRightLeft" className="h-3 w-3 shrink-0" />
+            <span>
+              {ingredient.quantity} {UNIT_OPTIONS.find(u => u.value === ingredient.unit_type)?.label}
+              {' = '}
+              {(() => {
+                const converted = ingredient.unit_type === 'g' && displayUnit === 'kg' ? ingredient.quantity / 1000
+                  : ingredient.unit_type === 'kg' && displayUnit === 'g' ? ingredient.quantity * 1000
+                  : ingredient.unit_type === 'ml' && displayUnit === 'litro' ? ingredient.quantity / 1000
+                  : ingredient.unit_type === 'litro' && displayUnit === 'ml' ? ingredient.quantity * 1000
+                  : ingredient.quantity;
+                return `${Number.isInteger(converted) ? converted : converted.toFixed(3)} ${unitLabel}`;
+              })()}
+              {' no estoque'}
+            </span>
+          </div>
         )}
 
         {/* KDS Station */}
