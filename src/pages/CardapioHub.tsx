@@ -265,7 +265,8 @@ export default function CardapioHub() {
   // ==================== CARDÁPIO VIEW (default) ====================
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background pb-24">
+      <CardapioDesktopNav />
+      <div className="min-h-screen bg-background pb-24 lg:pb-6">
         {/* Quick Access Links only in config */}
 
         {(
