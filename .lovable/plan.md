@@ -1,58 +1,42 @@
 
 
-## Plano: Sistema Profissional de Conversão de Unidades no Cadastro de Estoque
+## Plano: Custo Fixo Manual com Rateio Proporcional ao Preço de Venda
 
-### Problema Atual
-O sistema tem dois campos de unidade no item de estoque:
-1. **Unidade de controle** (`unit_type`) — kg, g, L, ml, un
-2. **Unidade de compra** (`purchase_unit_label` + `purchase_to_stock_factor`) — campo de texto livre (ex: "caixa") + fator de conversão
+O método atual (proporcional) já é o correto. O problema é que o **valor do custo fixo mensal** está vindo errado porque depende das transações lançadas no financeiro (que podem estar incompletas). A solução é deixar o usuário informar o valor real manualmente.
 
-Falta uma camada clara de **3 níveis de unidade** que é o padrão profissional de sistemas de food service, necessário para a baixa automática funcionar corretamente.
-
-### Modelo Proposto: 3 Níveis de Unidade
+### Como vai funcionar
 
 ```text
-┌──────────────────────────────────────────────────┐
-│  UNIDADE DE COMPRA (como você compra)            │
-│  Ex: Caixa com 24un, Saco de 5kg, Galão de 5L   │
-│  Campos: purchase_unit_label + purchase_qty      │
-├──────────────────────────────────────────────────┤
-│  UNIDADE DE ESTOQUE (como você controla)         │
-│  Ex: unidade, kg, litro                          │
-│  Campo: unit_type + unit_price (preço/unidade)   │
-├──────────────────────────────────────────────────┤
-│  UNIDADE DE RECEITA (como a ficha técnica usa)   │
-│  Ex: g, ml (subdivisões do estoque)              │
-│  Conversão automática: kg↔g, litro↔ml            │
-└──────────────────────────────────────────────────┘
-```
+Configurações:
+  ┌─────────────────────────────────────────┐
+  │  Custo Fixo Mensal Total: R$ 25.000     │  ← usuário digita
+  │  Faturamento Mensal:      R$ 80.000     │  ← usuário digita
+  └─────────────────────────────────────────┘
 
-A conversão entre receita↔estoque já existe no código (`UNIT_CONVERSIONS` em `types/recipe.ts`). O que precisa melhorar é a **UX do cadastro** para tornar isso claro e profissional.
+Na ficha técnica (automático):
+  Produto vendido a R$ 30,00
+  Custo fixo = (30 / 80.000) × 25.000 = R$ 9,37
+```
 
 ### Alterações
 
-#### 1. Redesign do `ItemFormSheet.tsx` — Cadastro mais guiado
-- Reorganizar o formulário em seções visuais claras:
-  - **Identificação**: Nome, Categoria, Fornecedor
-  - **Controle de Estoque**: Unidade de controle (chips), estoque atual, mínimo, preço por unidade
-  - **Conversão de Compra**: Sempre visível (não mais collapsible escondido). Layout visual tipo card com preview da conversão: "1 caixa = 24 unidades → R$ X por caixa"
-- Adicionar preview em tempo real da conversão (ex: "Ao usar 200g na receita, serão debitados 0.2 kg do estoque")
-- Manter os mesmos campos do banco (`purchase_unit_label`, `purchase_to_stock_factor`)
+**1. Migração — nova coluna**
+- Adicionar `monthly_fixed_cost_manual numeric default 0` na tabela `recipe_cost_settings`
 
-#### 2. Melhorar `IngredientRow.tsx` — Feedback visual de conversão
-- Exibir nota de conversão mais clara quando a unidade da receita difere da unidade de estoque
-- Ex: "200g = 0.2 kg no estoque" com ícone de seta
+**2. Hook `useRecipeCostSettings.ts`**
+- Remover a query que busca transações do financeiro (`monthly-fixed-cost`)
+- Remover a query de categorias de despesa (`finance-expense-categories`)
+- Usar `monthly_fixed_cost_manual` diretamente no cálculo
+- Fórmula: `(sellingPrice / monthlyRevenue) × monthlyFixedCostManual`
 
-#### 3. Nenhuma migração necessária
-- Os campos no banco já suportam o modelo de 3 níveis
-- `unit_type` + `unit_price` = estoque
-- `purchase_unit_label` + `purchase_to_stock_factor` = compra
-- Receita já usa conversão automática via `calculateIngredientCost()`
-- Triggers `auto_consume_stock_on_sale` e `auto_consume_stock_on_order` já fazem a conversão kg↔g e litro↔ml
+**3. Tela de configurações `RecipeCostSettings.tsx`**
+- Substituir a seção de checkboxes de categorias por um único campo: **"Custo Fixo Mensal Total (R$)"**
+- Manter o campo de faturamento mensal
+- Preview: "Produto de R$ 30 → R$ X de custo fixo"
+- Interface mais limpa e direta
 
-### Detalhes Técnicos
-
-**Arquivos a editar:**
-- `src/components/inventory/ItemFormSheet.tsx` — Redesign completo do layout com seções visuais, preview de conversão sempre visível, exemplos contextuais
-- `src/components/recipes/IngredientRow.tsx` — Melhorar nota de conversão com feedback visual "X na receita = Y no estoque"
+### Arquivos
+- `src/hooks/useRecipeCostSettings.ts`
+- `src/components/settings/RecipeCostSettings.tsx`
+- Migração SQL (1 coluna nova)
 
