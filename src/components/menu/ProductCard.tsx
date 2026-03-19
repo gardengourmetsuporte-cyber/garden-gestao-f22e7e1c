@@ -4,7 +4,155 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn } from '@/lib/utils';
 import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
 import type { MenuProduct } from '@/hooks/useMenuAdmin';
-...
+
+interface Props {
+  product: MenuProduct;
+  optionCount: number;
+  onEdit: () => void;
+  onDelete: () => void;
+  onLinkOptions: () => void;
+  onImageUpload?: (productId: string, file: File) => void;
+  onToggleAvailability?: (product: MenuProduct, channel: 'tablet' | 'delivery') => void;
+  onEditRecipe?: (product: MenuProduct) => void;
+  viewMode?: 'menu' | 'ficha';
+}
+
+const formatPrice = (v: number) =>
+  v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+export function ProductCard({ product, optionCount, onEdit, onDelete, onLinkOptions, onImageUpload, onToggleAvailability, onEditRecipe, viewMode = 'menu' }: Props) {
+  if (viewMode === 'ficha') {
+    return (
+      <FichaTecnicaCard
+        product={product}
+        onEditRecipe={onEditRecipe}
+        onEdit={onEdit}
+      />
+    );
+  }
+
+  return (
+    <MenuModeCard
+      product={product}
+      optionCount={optionCount}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onLinkOptions={onLinkOptions}
+      onImageUpload={onImageUpload}
+      onToggleAvailability={onToggleAvailability}
+    />
+  );
+}
+
+/* ====== MENU MODE (original) ====== */
+function MenuModeCard({
+  product, optionCount, onEdit, onDelete, onLinkOptions, onImageUpload, onToggleAvailability,
+}: Omit<Props, 'viewMode' | 'onEditRecipe'>) {
+  const avail = product.availability as any;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onImageUpload) fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onImageUpload) onImageUpload(product.id, file);
+    e.target.value = '';
+  };
+
+  return (
+    <div className="card-interactive flex items-center gap-3 p-3 group">
+      <div
+        className="w-14 h-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center relative cursor-pointer bg-secondary/60 border border-border/30"
+        onClick={handleImageClick}
+      >
+        {product.image_url ? (
+          <>
+            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <AppIcon name="photo_camera" size={16} className="text-white" />
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center justify-center w-full h-full relative">
+            <AppIcon name="photo_camera" size={20} className="text-muted-foreground/40" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-sm">
+              <AppIcon name="add" size={11} className="text-primary-foreground" />
+            </div>
+          </div>
+        )}
+      </div>
+      <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFileChange} />
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <p className="font-semibold text-sm text-foreground truncate">{product.name}</p>
+          {product.is_highlighted && <AppIcon name="Star" size={12} className="text-primary shrink-0" fill={1} />}
+        </div>
+        {product.description && <p className="text-[11px] text-muted-foreground truncate mt-0.5">{product.description}</p>}
+        <div className="flex items-center gap-1.5 mt-1.5">
+          {product.codigo_pdv && (
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-secondary text-muted-foreground">PDV: {product.codigo_pdv}</span>
+          )}
+          {onToggleAvailability ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleAvailability(product, 'tablet'); }}
+              className={cn(
+                "text-[10px] px-2.5 py-1 rounded-full font-semibold transition-colors active:scale-95 min-h-[28px]",
+                avail?.tablet ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+              )}
+            >Mesa</button>
+          ) : avail?.tablet ? (
+            <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-success/15 text-success">Mesa</span>
+          ) : null}
+          {onToggleAvailability ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleAvailability(product, 'delivery'); }}
+              className={cn(
+                "text-[10px] px-2.5 py-1 rounded-full font-semibold transition-colors active:scale-95 min-h-[28px]",
+                avail?.delivery ? "bg-success/15 text-success" : "bg-muted text-muted-foreground/50 line-through"
+              )}
+            >Delivery</button>
+          ) : avail?.delivery ? (
+            <span className="text-[10px] px-2.5 py-1 rounded-full font-semibold bg-success/15 text-success">Delivery</span>
+          ) : null}
+          {optionCount > 0 && (
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-primary/10 text-primary">{optionCount} {optionCount === 1 ? 'opcional' : 'opcionais'}</span>
+          )}
+          {!product.is_active && (
+            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold bg-destructive/10 text-destructive">Inativo</span>
+          )}
+        </div>
+      </div>
+
+      <div className="text-right shrink-0 flex items-center gap-1">
+        <span className="font-bold text-sm text-primary">{formatPrice(product.price)}</span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="p-1.5 rounded-lg hover:bg-secondary/60 transition-opacity">
+              <AppIcon name="MoreVertical" size={16} className="text-muted-foreground" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onEdit}>
+              <AppIcon name="Pencil" size={14} className="mr-2" /> Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onLinkOptions}>
+              <AppIcon name="Link" size={14} className="mr-2" /> Opcionais
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDelete} className="text-destructive">
+              <AppIcon name="Trash2" size={14} className="mr-2" /> Excluir
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
+}
+
+/* ====== FICHA TÉCNICA MODE ====== */
 function FichaTecnicaCard({
   product,
   onEditRecipe,
