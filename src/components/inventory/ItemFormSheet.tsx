@@ -262,13 +262,6 @@ export function ItemFormSheet({
             </div>
           </div>
 
-          {/* Recipe info note */}
-          <div className="rounded-xl bg-primary/5 border border-primary/20 p-3">
-            <p className="text-sm text-muted-foreground">
-              💡 Nas fichas técnicas, você poderá usar unidades compatíveis (ex: kg↔g, L↔ml) e a conversão será automática.
-            </p>
-          </div>
-
           {/* Purchase unit section */}
           <Collapsible open={showPurchaseSection} onOpenChange={setShowPurchaseSection}>
             <CollapsibleTrigger asChild>
