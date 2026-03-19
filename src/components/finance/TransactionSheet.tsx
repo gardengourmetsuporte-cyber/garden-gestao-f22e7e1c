@@ -471,7 +471,11 @@ export function TransactionSheet({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={onOpenChange} mobileHandleOnly>
+      <Sheet open={open} onOpenChange={(v) => {
+          // Prevent parent from closing when a nested picker is open
+          if (!v && (showCategoryPicker || showAccountPicker || showToAccountPicker || showSupplierPicker || showEmployeePicker)) return;
+          onOpenChange(v);
+        }} mobileHandleOnly>
         <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl overflow-hidden flex flex-col">
           <SheetHeader className="pb-4">
             <SheetTitle>
