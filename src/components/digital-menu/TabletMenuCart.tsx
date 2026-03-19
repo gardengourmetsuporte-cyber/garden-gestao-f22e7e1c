@@ -373,9 +373,14 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         {/* Auth banner */}
         <div className="px-4 pb-3">
           {!customerUser ? (
-            <CustomerAuthBanner
+            <TabletQrLoginBanner
+              unitId={unitId}
               bonusPoints={signupBonusPoints}
-              onEmailLogin={onLoginClick}
+              onLoginComplete={(email, name, userId) => {
+                // The auth state change listener in the parent will handle this
+                // Force reload to pick up the new session
+                window.location.reload();
+              }}
               onSkip={() => {}}
             />
           ) : (
