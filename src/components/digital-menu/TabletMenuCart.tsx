@@ -131,8 +131,17 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
     }
   };
 
-  const handleSend = async () => {
-    if (!comandaNumber && !configuredTableNumber) {
+  const handleSendClick = () => {
+    if (!comandaNumber) {
+      setShowScanner(true);
+      return;
+    }
+    handleSend(comandaNumber);
+  };
+
+  const handleSend = async (finalComanda?: number | null) => {
+    const comanda = finalComanda ?? comandaNumber;
+    if (!comanda && !configuredTableNumber) {
       toast.error('Escaneie uma comanda para identificar o pedido');
       return;
     }
@@ -174,7 +183,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
               .insert({
                 unit_id: unitId,
                 table_number: configuredTableNumber,
-                comanda_number: comandaNumber || null,
+                comanda_number: comanda || null,
                 status: isOnlinePayment ? 'awaiting_payment' : (shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation'),
                 total: payWithCoins ? 0 : cartTotal,
                 source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
@@ -384,18 +393,9 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           )}
         </div>
 
-        {/* Comanda scan + Mesa info */}
-        <div className="px-4 pb-3 space-y-2">
-          {/* Show configured table number */}
-          {configuredTableNumber > 0 && (
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-secondary/40 border border-border/30">
-              <AppIcon name="TableBar" size={16} className="text-muted-foreground" />
-              <span className="text-sm font-semibold text-foreground">Mesa {configuredTableNumber}</span>
-            </div>
-          )}
-
-          {/* Comanda */}
-          {comandaNumber ? (
+        {/* Comanda result (shown after scan) */}
+        {comandaNumber && (
+          <div className="px-4 pb-3">
             <div className="flex items-center gap-2 p-2.5 rounded-xl bg-primary/5 border border-primary/20">
               <span className="text-sm font-black text-primary">#{comandaNumber}</span>
               <span className="flex-1 text-xs text-muted-foreground">Comanda escaneada</span>
@@ -403,13 +403,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 <AppIcon name="X" size={14} className="text-muted-foreground" />
               </button>
             </div>
-          ) : (
-            <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowScanner(true)}>
-              <AppIcon name="Camera" size={16} className="mr-1.5" />
-              Escanear Comanda
-            </Button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Coin option */}
         {customerUser && allProductsHaveCoinPrice && customerCoins !== null && (
@@ -501,7 +496,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         </Button>
         <Button
           className={`w-full h-12 rounded-xl text-sm font-bold ${payWithCoins ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
-          onClick={handleSend}
+          onClick={handleSendClick}
           disabled={sending || (payWithCoins && !canPayWithCoins)}
         >
           {sending ? (
@@ -525,6 +520,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             setComandaNumber(num);
             setShowScanner(false);
             toast.success(`Comanda #${num} escaneada!`);
+            handleSend(num);
           }}
           onCancel={() => setShowScanner(false)}
         />
