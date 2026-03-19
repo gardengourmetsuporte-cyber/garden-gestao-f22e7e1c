@@ -392,7 +392,15 @@ export default function CardapioHub() {
       <LinkOptionsDialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen} optionGroup={linkingOG} categories={categories} groups={groups} products={products} linkedProductIds={linkingOG ? getLinkedProductIds(linkingOG.id) : []} onSave={(ogId, pids) => setProductOptionLinks(ogId, pids)} />
       <RecipeSheet
         open={recipeSheetOpen}
-        onOpenChange={setRecipeSheetOpen}
+        onOpenChange={(open) => {
+          setRecipeSheetOpen(open);
+          if (!open) {
+            setEditingRecipe(null);
+            setRecipeTargetProductId(null);
+            setDefaultRecipeName('');
+            setDefaultRecipeCategoryId(null);
+          }
+        }}
         recipe={editingRecipe}
         defaultName={defaultRecipeName}
         defaultCategoryId={defaultRecipeCategoryId}
