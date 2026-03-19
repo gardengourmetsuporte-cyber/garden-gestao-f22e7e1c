@@ -22,7 +22,7 @@ const LINKS_DATA = [
 ] as const;
 
 const SECTIONS = [
-  { id: 'kds-stations', icon: 'ChefHat', label: 'Pistas da Cozinha (KDS)', description: 'Setores configuráveis para agrupar ingredientes no KDS', settingsTab: null },
+  { id: 'kds-stations', icon: 'ChefHat', label: 'Solução KDS', description: 'Pistas e setores configuráveis para a cozinha', settingsTab: null },
   { id: 'delivery', icon: 'Truck', label: 'Solução Delivery', description: 'Sobre, delivery & retirada, áreas, pagamento, horários', settingsTab: 'config' as const },
   { id: 'tablet', icon: 'Tablet', label: 'Solução Tablet', description: 'Mesas, comandas, QR codes e chave Pix', settingsTab: 'mesas' as const },
   { id: 'qrcode', icon: 'ScanLine', label: 'Solução QR Code', description: 'Link externo para pedidos via celular do cliente', settingsTab: null },
