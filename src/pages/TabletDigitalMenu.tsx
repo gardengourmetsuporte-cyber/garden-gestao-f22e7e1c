@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDigitalMenu, DMProduct } from '@/hooks/useDigitalMenu';
+import { useMenuTranslation } from '@/hooks/useMenuTranslation';
 import { TabletProductDetail } from '@/components/digital-menu/TabletProductDetail';
 import { MenuSearch } from '@/components/digital-menu/MenuSearch';
 import { TabletMenuCart } from '@/components/digital-menu/TabletMenuCart';
 import { MenuCustomerAuth } from '@/components/digital-menu/MenuCustomerAuth';
 import { MenuCustomerProfile } from '@/components/digital-menu/MenuCustomerProfile';
-// Sheet removed - cart is now a persistent right panel
+import { LanguageSwitcher } from '@/components/digital-menu/LanguageSwitcher';
 import { AppIcon } from '@/components/ui/app-icon';
 import { cn } from '@/lib/utils';
 import { formatCurrency as formatPrice } from '@/lib/format';
