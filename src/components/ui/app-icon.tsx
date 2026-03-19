@@ -41,8 +41,8 @@ export const AppIcon = memo(forwardRef<HTMLSpanElement, AppIconProps>(
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            width={size}
-            height={size}
+            width={Math.round(size * 0.78)}
+            height={Math.round(size * 0.78)}
           >
             {customPaths.map((d, i) => (
               <path key={i} d={d} />
