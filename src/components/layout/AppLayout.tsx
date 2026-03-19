@@ -2,6 +2,7 @@ import { ReactNode, useState, useMemo, useEffect, lazy, Suspense } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import gardenLogo from '@/assets/logo.png';
 import { PageLoader } from '@/components/PageLoader';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { PageTransition } from './PageTransition';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -9,7 +10,6 @@ import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimatio
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
-import { DesktopHeader } from './DesktopHeader';
 import { NotificationBell } from './NotificationBell';
 import { ProfileDropdown } from './ProfileDropdown';
 
@@ -76,11 +76,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <AppSidebar />
 
         <div className="flex-1 flex flex-col min-w-0">
-          {/* ======= Mobile Header ======= */}
+          {/* ======= Unified Header (Mobile + Desktop) ======= */}
           <header
-            className="lg:hidden fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out"
+            className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out lg:sticky lg:top-0 lg:left-auto lg:right-auto"
             style={{
-              paddingTop: 'env(safe-area-inset-top)',
+              paddingTop: isLgScreen ? '0' : 'env(safe-area-inset-top)',
               background: isDashboard
                 ? (isScrolled ? 'hsl(var(--background) / 0.85)' : 'transparent')
                 : 'hsl(var(--background) / 0.85)',
@@ -92,8 +92,12 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           >
             <div className="relative overflow-hidden">
               <div className="flex items-center justify-between h-12 px-3.5 relative z-10">
-                {/* Left: Logo pill */}
+                {/* Left: Logo pill (mobile) / Sidebar trigger + title (desktop) */}
                 <div className="flex items-center gap-1 relative" style={{ minWidth: '2.5rem' }}>
+                  {/* Desktop: sidebar trigger */}
+                  <SidebarTrigger className="hidden lg:flex mr-1 text-foreground/70 hover:text-foreground" />
+
+                  {/* Logo pill */}
                   <button
                     onClick={() => navigate('/')}
                     className={cn(
@@ -123,7 +127,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </button>
                 </div>
 
-                {/* Right: Notifications + Profile */}
+                {/* Right: Theme toggle (desktop) + Notifications + Profile */}
                 <div className="flex items-center gap-0.5">
                   <NotificationBell />
                   <ProfileDropdown />
@@ -132,12 +136,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </div>
           </header>
 
-          {/* ======= Desktop Header ======= */}
-          <DesktopHeader />
-
           {/* ======= Main Content ======= */}
           <main
-            className="flex-1 lg:pt-0"
+            className="flex-1"
             style={{ paddingTop: isLgScreen ? '0' : 'calc(env(safe-area-inset-top) + 3rem)' }}
           >
             <PageTransition>
