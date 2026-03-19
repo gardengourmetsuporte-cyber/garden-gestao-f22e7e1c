@@ -27,6 +27,7 @@ import { useRecipeMenuSync } from '@/hooks/useRecipeMenuSync';
 // Recipe integration
 import { RecipeSheet } from '@/components/recipes/RecipeSheet';
 import { useRecipes } from '@/hooks/useRecipes';
+import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
 import type { Recipe } from '@/types/recipe';
 
 import { Button } from '@/components/ui/button';
@@ -82,16 +83,19 @@ export default function CardapioHub() {
     addRecipe, updateRecipe, isAddingRecipe, isUpdatingRecipe, getAvailableSubRecipes,
     updateItemPrice, updateItemUnit,
   } = useRecipes();
+  const { calculateOperationalCosts } = useRecipeCostSettings();
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [recipeTargetProductId, setRecipeTargetProductId] = useState<string | null>(null);
 
   const [defaultRecipeName, setDefaultRecipeName] = useState('');
   const [defaultRecipeCategoryId, setDefaultRecipeCategoryId] = useState<string | null>(null);
+  const [defaultRecipeSellingPrice, setDefaultRecipeSellingPrice] = useState<number | null>(null);
 
   const handleEditRecipe = useCallback((product: MenuProduct) => {
     const recipeId = (product as any).recipe_id;
     setRecipeTargetProductId(product.id);
+    setDefaultRecipeSellingPrice(product.price || 0);
 
     if (recipeId) {
       const recipe = recipes.find(r => r.id === recipeId) || null;
@@ -113,16 +117,22 @@ export default function CardapioHub() {
     const savedRecipe = data.id ? await updateRecipe(data) : await addRecipe(data);
     const savedRecipeId = savedRecipe?.id || data.id;
 
-    // Calculate cost_per_portion from ingredients
-    const totalCost = (data.ingredients || []).reduce((sum: number, ing: any) => sum + (ing.total_cost || 0), 0);
-    const costPerPortion = data.yield_quantity > 0 ? totalCost / data.yield_quantity : totalCost;
+    const ingredientTotalCost = (data.ingredients || []).reduce((sum: number, ing: any) => sum + (ing.total_cost || 0), 0);
+    const ingredientCostPerPortion = data.yield_quantity > 0 ? ingredientTotalCost / data.yield_quantity : ingredientTotalCost;
+
+    const targetProduct = recipeTargetProductId
+      ? products.find(p => p.id === recipeTargetProductId)
+      : products.find(p => (p as any).recipe_id === savedRecipeId);
+
+    const opCosts = calculateOperationalCosts(ingredientCostPerPortion, targetProduct?.price);
+    const fullCostPerPortion = ingredientCostPerPortion + opCosts.totalOperational;
 
     if (recipeTargetProductId && savedRecipeId) {
       const { data: linkedRows, error: linkError } = await supabase
         .from('tablet_products')
         .update({
           recipe_id: savedRecipeId,
-          cost_per_portion: costPerPortion,
+          cost_per_portion: fullCostPerPortion,
           updated_at: new Date().toISOString(),
         })
         .eq('id', recipeTargetProductId)
@@ -134,16 +144,13 @@ export default function CardapioHub() {
       }
 
       await menuAdmin.fetchProducts();
-    } else if (savedRecipeId) {
-      // Update cost on any already-linked product
-      const linkedProduct = products.find(p => (p as any).recipe_id === savedRecipeId);
-      if (linkedProduct) {
-        await supabase
-          .from('tablet_products')
-          .update({ cost_per_portion: costPerPortion, updated_at: new Date().toISOString() })
-          .eq('id', linkedProduct.id);
-        await menuAdmin.fetchProducts();
-      }
+    } else if (savedRecipeId && targetProduct) {
+      await supabase
+        .from('tablet_products')
+        .update({ cost_per_portion: fullCostPerPortion, updated_at: new Date().toISOString() })
+        .eq('id', targetProduct.id);
+
+      await menuAdmin.fetchProducts();
     }
   };
 
