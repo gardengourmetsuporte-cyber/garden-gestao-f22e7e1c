@@ -79,16 +79,16 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="flex-1 flex flex-col min-w-0">
           {/* ======= Unified Header (Mobile + Desktop) ======= */}
           <header
-            className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out lg:left-[--sidebar-width]  group-data-[state=collapsed]/sidebar-wrapper:lg:left-[--sidebar-width-icon]"
+            className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out lg:sticky lg:top-0 lg:left-auto lg:right-auto"
             style={{
-              paddingTop: 'env(safe-area-inset-top)',
+              paddingTop: isLgScreen ? '0' : 'env(safe-area-inset-top)',
               background: isDashboard
                 ? (isScrolled ? 'hsl(var(--background) / 0.85)' : 'transparent')
                 : 'hsl(var(--background) / 0.85)',
               backdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
               WebkitBackdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
               borderBottom: isScrolled ? '1px solid hsl(var(--border))' : '1px solid transparent',
-              transition: 'background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, left 0.2s ease',
+              transition: 'background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease',
             }}
           >
             <div className="relative overflow-hidden">
