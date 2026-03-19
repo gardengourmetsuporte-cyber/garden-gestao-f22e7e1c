@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -12,6 +13,27 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
 import type { User } from '@supabase/supabase-js';
+
+function buildPixPayload(pixKey: string, _pixKeyType: string, merchantName: string, amount: number): string {
+  const tlv = (id: string, val: string) => `${id}${val.length.toString().padStart(2, '0')}${val}`;
+  const gui = tlv('00', 'br.gov.bcb.pix');
+  const key = tlv('01', pixKey);
+  const mai = tlv('26', gui + key);
+  const mcc = tlv('52', '0000');
+  const cur = tlv('53', '986');
+  const amt = tlv('54', amount.toFixed(2));
+  const country = tlv('58', 'BR');
+  const name = tlv('59', merchantName.slice(0, 25));
+  const city = tlv('60', 'SAO PAULO');
+  const payload = '000201' + mai + mcc + cur + amt + country + name + city + '6304';
+  // CRC16 CCITT
+  let crc = 0xFFFF;
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
+  }
+  return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+}
 
 interface Props {
   cart: CartItem[];
@@ -41,9 +63,27 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [comandaNumber, setComandaNumber] = useState<number | null>(null);
   const [paymentTiming, setPaymentTiming] = useState<'now' | 'later'>('later');
   const [showOnlinePayment, setShowOnlinePayment] = useState(false);
+  const [showManualPix, setShowManualPix] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
   const { asaasActive } = useAsaasConfig(unitId);
+
+  // Load unit's PIX key for manual PIX
+  const [unitPixKey, setUnitPixKey] = useState<string | null>(null);
+  const [unitName, setUnitName] = useState('');
+  useEffect(() => {
+    supabase.from('units').select('name, store_info').eq('id', unitId).maybeSingle().then(({ data }) => {
+      if (data) {
+        setUnitName(data.name || 'Loja');
+        setUnitPixKey((data.store_info as any)?.pix_key || null);
+      }
+    });
+  }, [unitId]);
+
+  const manualPixPayload = useMemo(() => {
+    if (!unitPixKey || cartTotal <= 0) return null;
+    return buildPixPayload(unitPixKey, '', unitName, cartTotal);
+  }, [unitPixKey, unitName, cartTotal]);
 
   // Check customer coin balance
   const coinTotal = cart.reduce((sum, item) => {
@@ -169,7 +209,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
     }
 
     const isOnlinePayment = paymentTiming === 'now' && asaasActive;
-    const paymentOption = isOnlinePayment ? 'pix' as const : 'presencial' as const;
+    const isPixManual = paymentTiming === 'now' && !asaasActive;
+    const paymentOption = (isOnlinePayment || isPixManual) ? 'pix' as const : 'presencial' as const;
 
     let lastError: any = null;
 
@@ -184,7 +225,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 unit_id: unitId,
                 table_number: configuredTableNumber,
                 comanda_number: comanda || null,
-                status: isOnlinePayment ? 'awaiting_payment' : (shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation'),
+                status: isOnlinePayment ? 'awaiting_payment' : isPixManual ? 'confirmed' : (shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation'),
                 total: payWithCoins ? 0 : cartTotal,
                 source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
                 customer_name: finalName,
@@ -216,12 +257,22 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           );
           if (itemsError) throw new Error(itemsError.message);
 
-          // If online payment (Pagar agora), show PIX QR code
+          // If online payment via ASAAS, show ASAAS PIX QR code
           if (isOnlinePayment) {
             const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
             setPendingOrderId((order as any).id);
             setPendingOrderNumber(orderNum);
             setShowOnlinePayment(true);
+            setSending(false);
+            return;
+          }
+
+          // If manual PIX (no ASAAS), show unit's own PIX key QR
+          if (isPixManual) {
+            const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
+            setPendingOrderId((order as any).id);
+            setPendingOrderNumber(orderNum);
+            setShowManualPix(true);
             setSending(false);
             return;
           }
@@ -461,30 +512,28 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 </div>
               </button>
 
-              {/* Pagar agora (PIX) — only if ASAAS is active */}
-              {asaasActive && (
-                <button
-                  onClick={() => setPaymentTiming('now')}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
-                    paymentTiming === 'now' ? 'border-primary bg-primary/5' : 'border-border/40'
-                  }`}
-                >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                    paymentTiming === 'now' ? 'bg-primary/10' : 'bg-muted'
-                  }`}>
-                    <AppIcon name="QrCode" size={18} className={paymentTiming === 'now' ? 'text-primary' : 'text-muted-foreground'} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground">Pagar agora (PIX)</p>
-                    <p className="text-[11px] text-muted-foreground">QR Code instantâneo • confirmação automática</p>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    paymentTiming === 'now' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
-                  }`}>
-                    {paymentTiming === 'now' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
-                  </div>
-                </button>
-              )}
+              {/* Pagar agora (PIX) */}
+              <button
+                onClick={() => setPaymentTiming('now')}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
+                  paymentTiming === 'now' ? 'border-primary bg-primary/5' : 'border-border/40'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                  paymentTiming === 'now' ? 'bg-primary/10' : 'bg-muted'
+                }`}>
+                  <AppIcon name="QrCode" size={18} className={paymentTiming === 'now' ? 'text-primary' : 'text-muted-foreground'} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">Pagar agora (PIX)</p>
+                  <p className="text-[11px] text-muted-foreground">QR Code instantâneo</p>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  paymentTiming === 'now' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                }`}>
+                  {paymentTiming === 'now' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                </div>
+              </button>
             </div>
           </div>
         )}
@@ -549,6 +598,48 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             setPendingOrderNumber(null);
           }}
         />
+      )}
+
+      {/* Manual PIX QR Code (unit's own PIX key) */}
+      {showManualPix && pendingOrderNumber && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowManualPix(false); setOrderSent(pendingOrderNumber); }}>
+          <div
+            className="bg-card rounded-3xl p-6 shadow-2xl border border-border/30 flex flex-col items-center gap-4 max-w-sm w-full mx-4 animate-in zoom-in-95 fade-in duration-200"
+            onClick={e => e.stopPropagation()}
+          >
+            <p className="text-lg font-bold text-foreground">Pagar via PIX</p>
+            <p className="text-xs text-muted-foreground text-center">Pedido #{pendingOrderNumber}</p>
+            {manualPixPayload ? (
+              <>
+                <div className="bg-white p-4 rounded-2xl">
+                  <QRCodeSVG value={manualPixPayload} size={180} />
+                </div>
+                <p className="text-xl font-black text-primary">{formatPrice(cartTotal)}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(unitPixKey || '');
+                    toast.success('Chave Pix copiada!');
+                  }}
+                >
+                  <AppIcon name="Copy" size={14} className="mr-1" /> Copiar chave
+                </Button>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">Chave PIX não configurada. Pague no caixa.</p>
+            )}
+            <Button
+              className="w-full"
+              onClick={() => {
+                setShowManualPix(false);
+                setOrderSent(pendingOrderNumber);
+              }}
+            >
+              Fechar
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

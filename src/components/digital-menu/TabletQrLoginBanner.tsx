@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { AppIcon } from '@/components/ui/app-icon';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { getPublicAppUrl } from '@/lib/publicAppUrl';
 
@@ -14,11 +15,14 @@ interface Props {
 }
 
 export function TabletQrLoginBanner({ unitId, bonusPoints = 0, onLoginComplete, onSkip }: Props) {
-  const [mode, setMode] = useState<'buttons' | 'qr'>('buttons');
+  const [mode, setMode] = useState<'buttons' | 'qr' | 'phone'>('buttons');
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [qrUrl, setQrUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+  const [timeLeft, setTimeLeft] = useState(300);
+  const [phone, setPhone] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const sessionIdRef = useRef<string | null>(null);
 
@@ -39,12 +43,10 @@ export function TabletQrLoginBanner({ unitId, bonusPoints = 0, onLoginComplete, 
       setSessionToken(token);
       setTimeLeft(300);
 
-      // Build QR URL - always use published URL so phone can access it
       const baseUrl = getPublicAppUrl();
       const url = `${baseUrl}/qr-login/${unitId}?session=${token}`;
       setQrUrl(url);
 
-      // Subscribe to realtime changes
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
       }
@@ -122,11 +124,51 @@ export function TabletQrLoginBanner({ unitId, bonusPoints = 0, onLoginComplete, 
     }
   };
 
+  const handleSendOtp = async () => {
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length < 10) {
+      toast.error('Número inválido');
+      return;
+    }
+    setLoading(true);
+    try {
+      const fullPhone = cleaned.startsWith('55') ? `+${cleaned}` : `+55${cleaned}`;
+      const { error } = await supabase.auth.signInWithOtp({ phone: fullPhone });
+      if (error) throw error;
+      setOtpSent(true);
+      toast.success('Código enviado por SMS!');
+    } catch (e: any) {
+      toast.error(e?.message || 'Erro ao enviar código');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otp.length < 6) return;
+    setLoading(true);
+    try {
+      const cleaned = phone.replace(/\D/g, '');
+      const fullPhone = cleaned.startsWith('55') ? `+${cleaned}` : `+55${cleaned}`;
+      const { data, error } = await supabase.auth.verifyOtp({ phone: fullPhone, token: otp, type: 'sms' });
+      if (error) throw error;
+      if (data.user) {
+        toast.success('Login realizado!');
+        onLoginComplete?.(data.user.phone || '', '', data.user.id);
+      }
+    } catch (e: any) {
+      toast.error(e?.message || 'Código inválido');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
+  // ─── QR Code Mode ───
   if (mode === 'qr' && qrUrl) {
     return (
-      <div className="rounded-2xl overflow-hidden border border-primary/25" style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.04))' }}>
+      <div className="rounded-2xl overflow-hidden border border-primary/25" style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--primary) / 0.02))' }}>
         <div className="px-4 pt-4 pb-3 text-center space-y-3">
           <p className="text-sm font-bold text-foreground">📱 Escaneie com seu celular</p>
           <p className="text-xs text-muted-foreground">Abra a câmera do celular e aponte para o QR Code</p>
@@ -161,62 +203,114 @@ export function TabletQrLoginBanner({ unitId, bonusPoints = 0, onLoginComplete, 
     );
   }
 
+  // ─── Phone Mode ───
+  if (mode === 'phone') {
+    return (
+      <div className="rounded-2xl overflow-hidden border border-primary/25" style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--primary) / 0.02))' }}>
+        <div className="px-4 pt-4 pb-3 space-y-3">
+          <div className="flex items-center gap-2">
+            <button onClick={() => { setMode('buttons'); setOtpSent(false); setOtp(''); }} className="text-muted-foreground hover:text-foreground">
+              <AppIcon name="ArrowLeft" size={18} />
+            </button>
+            <p className="text-sm font-bold text-foreground">Login por telefone</p>
+          </div>
+
+          {!otpSent ? (
+            <div className="space-y-2">
+              <Input
+                placeholder="(11) 99999-9999"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                type="tel"
+                className="h-11"
+              />
+              <button
+                onClick={handleSendOtp}
+                disabled={loading || phone.replace(/\D/g, '').length < 10}
+                className="w-full h-11 rounded-xl flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-60 text-sm font-bold"
+              >
+                {loading ? <AppIcon name="Loader2" size={16} className="animate-spin" /> : <AppIcon name="Send" size={16} />}
+                Enviar código SMS
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Digite o código de 6 dígitos enviado para seu celular</p>
+              <Input
+                placeholder="000000"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                type="text"
+                inputMode="numeric"
+                className="h-11 text-center text-lg font-bold tracking-widest"
+              />
+              <button
+                onClick={handleVerifyOtp}
+                disabled={loading || otp.length < 6}
+                className="w-full h-11 rounded-xl flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-60 text-sm font-bold"
+              >
+                {loading ? <AppIcon name="Loader2" size={16} className="animate-spin" /> : null}
+                Verificar
+              </button>
+              <button onClick={() => { setOtpSent(false); setOtp(''); }} className="w-full text-xs text-muted-foreground hover:text-foreground py-1">
+                Alterar número
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Buttons Mode (default) ───
   return (
-    <div className="rounded-2xl overflow-hidden border border-primary/25" style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.04))' }}>
-      {/* Hero */}
-      <div className="px-4 pt-4 pb-3 flex items-start gap-3">
-        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))' }}>
-          <span className="text-2xl">🪙</span>
+    <div className="rounded-2xl overflow-hidden border border-primary/25" style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--primary) / 0.02))' }}>
+      {/* Compact promo */}
+      <div className="px-4 pt-3.5 pb-2 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.7))' }}>
+          <span className="text-lg">🪙</span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-base font-black text-foreground leading-tight">
-            Ganhe Garden Coins! 🎉
+          <p className="text-sm font-bold text-foreground leading-tight">
+            Acumule pontos a cada pedido!
           </p>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            {bonusPoints > 0
-              ? `Cadastre-se e ganhe ${bonusPoints} moedas! Acumule pontos a cada pedido.`
-              : 'Faça login e acumule moedas a cada pedido. Troque por produtos grátis!'}
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            Faça login e troque por produtos grátis
           </p>
         </div>
       </div>
 
-      {/* Benefits */}
-      <div className="px-4 pb-3 flex items-center gap-3">
-        {[
-          { icon: 'Star', label: 'Cashback' },
-          { icon: 'Gift', label: 'Produtos grátis' },
-          { icon: 'Percent', label: 'Descontos' },
-        ].map((b, i) => (
-          <div key={b.label} className="flex items-center gap-1.5 text-[10px] font-semibold text-primary">
-            {i > 0 && <div className="w-px h-3 bg-border/40 -ml-1.5 mr-0" />}
-            <AppIcon name={b.icon} size={12} className="text-primary" />
-            <span>{b.label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Login buttons */}
-      <div className="px-4 pb-3 flex gap-2">
-        {/* QR Code - primary action for tablet */}
+      {/* Login buttons - 3 options */}
+      <div className="px-4 pb-3 pt-1 flex gap-2">
+        {/* QR Code - primary */}
         <button
           onClick={createQrSession}
           disabled={loading}
-          className="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-60 text-sm font-bold shadow-md"
+          className="flex-1 h-11 rounded-xl flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-60 text-sm font-bold shadow-sm"
         >
           {loading ? (
             <AppIcon name="Loader2" size={16} className="animate-spin" />
           ) : (
-            <AppIcon name="QrCode" size={18} />
+            <AppIcon name="QrCode" size={16} />
           )}
           QR Code
         </button>
-        {/* Google - secondary */}
+        {/* Phone */}
+        <button
+          onClick={() => setMode('phone')}
+          disabled={loading}
+          className="flex-1 h-11 rounded-xl flex items-center justify-center gap-2 bg-card border border-border/50 hover:bg-accent active:scale-[0.98] transition-all disabled:opacity-60 text-sm font-bold text-foreground shadow-sm"
+        >
+          <AppIcon name="Phone" size={16} />
+          Telefone
+        </button>
+        {/* Google */}
         <button
           onClick={handleGoogleDirect}
           disabled={loading}
-          className="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 bg-card border border-border/50 hover:bg-accent active:scale-[0.98] transition-all disabled:opacity-60 text-sm font-bold text-foreground shadow-sm"
+          className="flex-1 h-11 rounded-xl flex items-center justify-center gap-2 bg-card border border-border/50 hover:bg-accent active:scale-[0.98] transition-all disabled:opacity-60 text-sm font-bold text-foreground shadow-sm"
         >
-          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -228,10 +322,10 @@ export function TabletQrLoginBanner({ unitId, bonusPoints = 0, onLoginComplete, 
 
       {/* Skip */}
       {onSkip && (
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-2.5">
           <button
             onClick={onSkip}
-            className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-1.5 font-medium"
+            className="w-full text-[11px] text-muted-foreground hover:text-foreground transition-colors py-1 font-medium"
           >
             Continuar sem conta →
           </button>
