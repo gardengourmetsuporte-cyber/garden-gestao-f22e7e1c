@@ -357,7 +357,7 @@ export default function TabletDigitalMenu() {
             {/* Group headers + products */}
             {categoryGroups.length > 0 ? (
               categoryGroups.map(group => {
-                const groupProducts = getGroupProducts(group.id);
+                const groupProducts = tGetGroupProducts(group.id);
                 if (groupProducts.length === 0) return null;
                 return (
                   <div key={group.id} className="mb-6">
