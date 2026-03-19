@@ -71,6 +71,14 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
       });
   }, [customerUser, unitId]);
 
+  // Auto-send after comanda is scanned
+  useEffect(() => {
+    if (sendAfterScan && comandaNumber) {
+      setSendAfterScan(false);
+      handleSend();
+    }
+  }, [sendAfterScan, comandaNumber]);
+
   if (orderSent) {
     return (
       <div className="flex flex-col items-center justify-center px-6 py-16 text-center gap-5">
