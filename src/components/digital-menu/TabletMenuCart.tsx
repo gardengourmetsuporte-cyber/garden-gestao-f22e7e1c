@@ -63,9 +63,27 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [comandaNumber, setComandaNumber] = useState<number | null>(null);
   const [paymentTiming, setPaymentTiming] = useState<'now' | 'later'>('later');
   const [showOnlinePayment, setShowOnlinePayment] = useState(false);
+  const [showManualPix, setShowManualPix] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
   const { asaasActive } = useAsaasConfig(unitId);
+
+  // Load unit's PIX key for manual PIX
+  const [unitPixKey, setUnitPixKey] = useState<string | null>(null);
+  const [unitName, setUnitName] = useState('');
+  useEffect(() => {
+    supabase.from('units').select('name, store_info').eq('id', unitId).maybeSingle().then(({ data }) => {
+      if (data) {
+        setUnitName(data.name || 'Loja');
+        setUnitPixKey((data.store_info as any)?.pix_key || null);
+      }
+    });
+  }, [unitId]);
+
+  const manualPixPayload = useMemo(() => {
+    if (!unitPixKey || cartTotal <= 0) return null;
+    return buildPixPayload(unitPixKey, '', unitName, cartTotal);
+  }, [unitPixKey, unitName, cartTotal]);
 
   // Check customer coin balance
   const coinTotal = cart.reduce((sum, item) => {
