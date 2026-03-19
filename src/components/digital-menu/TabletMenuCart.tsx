@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { AppIcon } from '@/components/ui/app-icon';
 import { CartItemsList } from '@/components/digital-menu/MenuCart';
 import { CustomerAuthBanner } from '@/components/digital-menu/CustomerAuthBanner';
 import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
-import { PaymentMethodSelector, paymentOptionToBillingType } from '@/components/digital-menu/PaymentMethodSelector';
+import { paymentOptionToBillingType } from '@/components/digital-menu/PaymentMethodSelector';
 import { OnlinePaymentSheet } from '@/components/digital-menu/OnlinePaymentSheet';
 import { useAsaasConfig } from '@/hooks/useAsaasConfig';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,8 +28,10 @@ interface Props {
 }
 
 export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, customerUser, signupBonusPoints = 0, onUpdateQuantity, onRemove, onClear, onClose, onLoginClick }: Props) {
-  const [tableNumber, setTableNumber] = useState('');
-  const [customerName, setCustomerName] = useState('');
+  // Auto-pull mesa number from tablet config (localStorage)
+  const savedMesa = localStorage.getItem('tablet_mesa_config');
+  const configuredTableNumber = savedMesa ? parseInt(savedMesa) || 0 : 0;
+
   const [sending, setSending] = useState(false);
   const [orderSent, setOrderSent] = useState<string | null>(null);
   const [orderType, setOrderType] = useState<'dine-in' | 'takeout'>('dine-in');
@@ -38,7 +39,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [customerCoins, setCustomerCoins] = useState<number | null>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [comandaNumber, setComandaNumber] = useState<number | null>(null);
-  const [paymentOption, setPaymentOption] = useState<'presencial' | 'pix' | 'credit_card' | 'boleto'>('presencial');
+  const [paymentTiming, setPaymentTiming] = useState<'now' | 'later'>('later');
   const [showOnlinePayment, setShowOnlinePayment] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
@@ -47,7 +48,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   // Check customer coin balance
   const coinTotal = cart.reduce((sum, item) => {
     const cp = item.product.coin_price;
-    if (cp == null || cp <= 0) return sum + 999999; // product not available for coins
+    if (cp == null || cp <= 0) return sum + 999999;
     return sum + cp * item.quantity;
   }, 0);
   const allProductsHaveCoinPrice = cart.every(i => i.product.coin_price != null && i.product.coin_price > 0);
@@ -81,7 +82,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             Pedido <span className="font-mono font-bold text-foreground">#{orderSent}</span>
           </p>
           <p className="text-muted-foreground text-xs mt-1">
-            {comandaNumber ? `Comanda #${comandaNumber}` : `Mesa ${tableNumber}`} • {customerName || 'Cliente'} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            {comandaNumber ? `Comanda #${comandaNumber}` : `Mesa ${configuredTableNumber}`} • {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
         <div className="bg-card rounded-2xl border border-border/30 p-4 w-full max-w-xs mt-2 animate-in fade-in slide-in-from-bottom-6 duration-700">
@@ -122,9 +123,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
     const timeoutPromise = new Promise<T>((_, reject) => {
       timeoutId = window.setTimeout(() => reject(new Error(`timeout:${label}`)), ms);
     });
-
     try {
-      // Postgrest builders are PromiseLike (thenable), not real Promises.
       const wrapped = Promise.resolve(promiseLike as any) as Promise<T>;
       return await Promise.race([wrapped, timeoutPromise]);
     } finally {
@@ -133,25 +132,20 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   };
 
   const handleSend = async () => {
-    if (!comandaNumber && !tableNumber.trim()) {
-      toast.error('Escaneie uma comanda ou informe o número da mesa');
+    if (!comandaNumber && !configuredTableNumber) {
+      toast.error('Escaneie uma comanda para identificar o pedido');
       return;
     }
-    // Use logged-in user name or manual input
+
     const finalName = customerUser
       ? (customerUser.user_metadata?.full_name || customerUser.user_metadata?.name || customerUser.email || 'Cliente')
-      : customerName.trim();
-    if (!finalName) {
-      toast.error('Informe seu nome');
-      return;
-    }
+      : 'Cliente';
 
     setSending(true);
 
     const requestTimeoutMs = 20000;
     const maxRetries = 3;
 
-    // Resolve live auto-confirm from unit store_info (avoid stale cache on long-open tablets)
     let shouldAutoConfirm = autoConfirm;
     try {
       const { data: unitRow } = await withTimeout(
@@ -165,19 +159,21 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
       // keep prop fallback
     }
 
+    const isOnlinePayment = paymentTiming === 'now' && asaasActive;
+    const paymentOption = isOnlinePayment ? 'pix' as const : 'presencial' as const;
+
     let lastError: any = null;
 
     try {
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-          const isOnlinePayment = paymentOptionToBillingType(paymentOption) !== null;
           const orderNotes = payWithCoins ? `[PAGO_COM_MOEDAS:${coinTotal}]` : null;
           const { data: order, error: orderError } = await withTimeout(
             supabase
               .from('tablet_orders')
               .insert({
                 unit_id: unitId,
-                table_number: comandaNumber || (parseInt(tableNumber) || 0),
+                table_number: configuredTableNumber,
                 comanda_number: comandaNumber || null,
                 status: isOnlinePayment ? 'awaiting_payment' : (shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation'),
                 total: payWithCoins ? 0 : cartTotal,
@@ -204,94 +200,90 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             unit_price: c.product.price + c.selectedOptions.reduce((s, o) => s + o.price, 0),
           }));
 
-           const { error: itemsError } = await withTimeout(
-             supabase.from('tablet_order_items').insert(items),
-             requestTimeoutMs,
-             'create_items'
-           );
-           if (itemsError) throw new Error(itemsError.message);
+          const { error: itemsError } = await withTimeout(
+            supabase.from('tablet_order_items').insert(items),
+            requestTimeoutMs,
+            'create_items'
+          );
+          if (itemsError) throw new Error(itemsError.message);
 
-           // If online payment, show payment sheet
-           if (isOnlinePayment) {
-             const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
-             setPendingOrderId((order as any).id);
-             setPendingOrderNumber(orderNum);
-             setShowOnlinePayment(true);
-             setSending(false);
-             return;
-           }
+          // If online payment (Pagar agora), show PIX QR code
+          if (isOnlinePayment) {
+            const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
+            setPendingOrderId((order as any).id);
+            setPendingOrderNumber(orderNum);
+            setShowOnlinePayment(true);
+            setSending(false);
+            return;
+          }
 
-           if (shouldAutoConfirm) {
-              try {
-                await fetch(
-                  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
-                  {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-                    },
-                    body: JSON.stringify({ order_id: (order as any).id }),
-                  }
-                );
-              } catch (e) {
-                console.warn('[TabletMenuCart] send-to-pdv failed:', e);
-              }
-            }
-
-           // Deduct coins if paying with coins
-           if (payWithCoins && customerUser?.email) {
-              try {
-                const { data: cust } = await supabase
-                  .from('customers')
-                  .select('id, loyalty_points')
-                  .eq('unit_id', unitId)
-                  .eq('email', customerUser.email)
-                  .maybeSingle();
-                if (cust) {
-                  await supabase
-                    .from('customers')
-                    .update({ loyalty_points: Math.max(0, (cust.loyalty_points ?? 0) - coinTotal) })
-                    .eq('id', cust.id);
-                  await supabase.from('loyalty_events').insert({
-                    customer_id: cust.id,
-                    unit_id: unitId,
-                    type: 'redeemed',
-                    points: -coinTotal,
-                    description: 'Pedido #' + ((order as any).order_number || (order as any).id.slice(0, 8)) + ' pago com moedas',
-                  });
-                  setCustomerCoins(Math.max(0, (cust.loyalty_points ?? 0) - coinTotal));
+          if (shouldAutoConfirm) {
+            try {
+              await fetch(
+                `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tablet-order?action=send-to-pdv`,
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                  },
+                  body: JSON.stringify({ order_id: (order as any).id }),
                 }
-              } catch (e) {
-                console.warn('[TabletMenuCart] coin deduction failed:', e);
-              }
+              );
+            } catch (e) {
+              console.warn('[TabletMenuCart] send-to-pdv failed:', e);
             }
+          }
 
-           toast.success(payWithCoins ? 'Pedido enviado! Moedas debitadas ✨' : 'Pedido enviado com sucesso!');
-           setOrderSent((order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8));
-           return; // Success — exit
+          // Deduct coins if paying with coins
+          if (payWithCoins && customerUser?.email) {
+            try {
+              const { data: cust } = await supabase
+                .from('customers')
+                .select('id, loyalty_points')
+                .eq('unit_id', unitId)
+                .eq('email', customerUser.email)
+                .maybeSingle();
+              if (cust) {
+                await supabase
+                  .from('customers')
+                  .update({ loyalty_points: Math.max(0, (cust.loyalty_points ?? 0) - coinTotal) })
+                  .eq('id', cust.id);
+                await supabase.from('loyalty_events').insert({
+                  customer_id: cust.id,
+                  unit_id: unitId,
+                  type: 'redeemed',
+                  points: -coinTotal,
+                  description: 'Pedido #' + ((order as any).order_number || (order as any).id.slice(0, 8)) + ' pago com moedas',
+                });
+                setCustomerCoins(Math.max(0, (cust.loyalty_points ?? 0) - coinTotal));
+              }
+            } catch (e) {
+              console.warn('[TabletMenuCart] coin deduction failed:', e);
+            }
+          }
+
+          toast.success(payWithCoins ? 'Pedido enviado! Moedas debitadas ✨' : 'Pedido enviado com sucesso!');
+          setOrderSent((order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8));
+          return;
         } catch (err: any) {
           lastError = err;
           console.error(`[TabletMenuCart] Attempt ${attempt + 1} failed:`, err?.message || err);
-
           const msg = String(err?.message || '');
           const isTimeout = msg.startsWith('timeout:');
           const isAbort = err?.name === 'AbortError' || msg.toLowerCase().includes('abort');
           const isNetwork = msg.toLowerCase().includes('fetch') || msg.toLowerCase().includes('network');
-
           if ((isTimeout || isAbort || isNetwork) && attempt < maxRetries - 1) {
             await new Promise(r => setTimeout(r, 900 * (attempt + 1)));
-            continue; // Retry
+            continue;
           }
-
-          break; // Non-retryable error
+          break;
         }
       }
 
       const errorMsg = lastError?.message || 'Erro desconhecido';
       const isTimeoutError = errorMsg.startsWith('timeout:') || errorMsg.toLowerCase().includes('abort');
       toast.error(isTimeoutError ? 'Conexão lenta. Tente novamente.' : `Erro ao enviar pedido: ${errorMsg}`);
-      console.error('[TabletMenuCart] Order send failed:', lastError);
     } finally {
       setSending(false);
     }
@@ -301,14 +293,13 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
     <div className="flex flex-col h-full">
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
-        {/* Cart items - Goomer style with images */}
+        {/* Cart items */}
         <div className="divide-y divide-border/15">
           {cart.map((item, idx) => {
             const optionsPrice = item.selectedOptions.reduce((s, o) => s + o.price, 0);
             const lineTotal = (item.product.price + optionsPrice) * item.quantity;
             return (
               <div key={idx} className="flex gap-3 p-4">
-                {/* Product image */}
                 {item.product.image_url ? (
                   <img src={item.product.image_url} alt={item.product.name} className="w-20 h-20 rounded-xl object-cover shrink-0" />
                 ) : (
@@ -316,7 +307,6 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                     <AppIcon name="Image" size={20} className="text-muted-foreground/20" />
                   </div>
                 )}
-
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
@@ -334,8 +324,6 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                     </div>
                     <span className="text-sm font-bold text-foreground shrink-0">{formatPrice(lineTotal)}</span>
                   </div>
-
-                  {/* Actions row */}
                   <div className="flex items-center gap-2 mt-2">
                     <div className="flex items-center bg-secondary/60 rounded-lg">
                       <button
@@ -396,8 +384,17 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           )}
         </div>
 
-        {/* Comanda / Mesa fields */}
+        {/* Comanda scan + Mesa info */}
         <div className="px-4 pb-3 space-y-2">
+          {/* Show configured table number */}
+          {configuredTableNumber > 0 && (
+            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-secondary/40 border border-border/30">
+              <AppIcon name="TableBar" size={16} className="text-muted-foreground" />
+              <span className="text-sm font-semibold text-foreground">Mesa {configuredTableNumber}</span>
+            </div>
+          )}
+
+          {/* Comanda */}
           {comandaNumber ? (
             <div className="flex items-center gap-2 p-2.5 rounded-xl bg-primary/5 border border-primary/20">
               <span className="text-sm font-black text-primary">#{comandaNumber}</span>
@@ -407,28 +404,10 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
               </button>
             </div>
           ) : (
-            <div className="space-y-2">
-              <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowScanner(true)}>
-                <AppIcon name="Camera" size={16} className="mr-1.5" />
-                Escanear Comanda
-              </Button>
-              <Input
-                placeholder="Nº da mesa"
-                value={tableNumber}
-                onChange={e => setTableNumber(e.target.value)}
-                className="text-center h-10 text-sm font-bold rounded-xl"
-                type="number"
-                inputMode="numeric"
-              />
-            </div>
-          )}
-          {!customerUser && (
-            <Input
-              placeholder="Seu nome"
-              value={customerName}
-              onChange={e => setCustomerName(e.target.value)}
-              className="h-10 rounded-xl text-sm"
-            />
+            <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowScanner(true)}>
+              <AppIcon name="Camera" size={16} className="mr-1.5" />
+              Escanear Comanda
+            </Button>
           )}
         </div>
 
@@ -454,19 +433,64 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           </div>
         )}
 
-        {/* Payment method selector */}
+        {/* Payment timing: Pagar agora vs Pagar depois */}
         {!payWithCoins && (
-          <div className="px-4 pb-3">
-            <PaymentMethodSelector
-              selected={paymentOption}
-              onChange={setPaymentOption}
-              asaasActive={asaasActive}
-            />
+          <div className="px-4 pb-3 space-y-2">
+            <h3 className="text-sm font-bold text-foreground">Quando pagar?</h3>
+            <div className="space-y-1.5">
+              {/* Pagar depois */}
+              <button
+                onClick={() => setPaymentTiming('later')}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
+                  paymentTiming === 'later' ? 'border-primary bg-primary/5' : 'border-border/40'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                  paymentTiming === 'later' ? 'bg-primary/10' : 'bg-muted'
+                }`}>
+                  <AppIcon name="Banknote" size={18} className={paymentTiming === 'later' ? 'text-primary' : 'text-muted-foreground'} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">Pagar depois</p>
+                  <p className="text-[11px] text-muted-foreground">Pague no caixa ao final</p>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  paymentTiming === 'later' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                }`}>
+                  {paymentTiming === 'later' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                </div>
+              </button>
+
+              {/* Pagar agora (PIX) — only if ASAAS is active */}
+              {asaasActive && (
+                <button
+                  onClick={() => setPaymentTiming('now')}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
+                    paymentTiming === 'now' ? 'border-primary bg-primary/5' : 'border-border/40'
+                  }`}
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                    paymentTiming === 'now' ? 'bg-primary/10' : 'bg-muted'
+                  }`}>
+                    <AppIcon name="QrCode" size={18} className={paymentTiming === 'now' ? 'text-primary' : 'text-muted-foreground'} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">Pagar agora (PIX)</p>
+                    <p className="text-[11px] text-muted-foreground">QR Code instantâneo • confirmação automática</p>
+                  </div>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    paymentTiming === 'now' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                  }`}>
+                    {paymentTiming === 'now' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                  </div>
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>
 
-      {/* ─── Sticky Bottom Actions (Goomer-style) ─── */}
+      {/* ─── Sticky Bottom Actions ─── */}
       <div className="shrink-0 border-t border-border/20 p-4 space-y-2 bg-card">
         <Button
           variant="outline"
@@ -487,8 +511,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           )}
           {payWithCoins
             ? `Pagar com ${coinTotal} moedas`
-            : paymentOptionToBillingType(paymentOption)
-              ? 'Enviar e pagar online'
+            : paymentTiming === 'now'
+              ? `Pagar ${formatPrice(cartTotal)} via PIX`
               : 'Enviar pedido'}
         </Button>
       </div>
@@ -506,14 +530,14 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         />
       )}
 
-      {/* Online Payment Sheet */}
+      {/* Online Payment Sheet (PIX QR Code) */}
       {showOnlinePayment && pendingOrderId && pendingOrderNumber && (
         <OnlinePaymentSheet
           orderId={pendingOrderId}
           orderNumber={pendingOrderNumber}
           total={cartTotal}
           unitId={unitId}
-          billingType={paymentOptionToBillingType(paymentOption)!}
+          billingType="PIX"
           onPaymentConfirmed={() => {
             setShowOnlinePayment(false);
             setOrderSent(pendingOrderNumber);
