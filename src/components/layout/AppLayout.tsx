@@ -146,7 +146,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           {/* ======= Main Content ======= */}
           <main
             className="flex-1"
-            style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3rem)' }}
+            style={{ paddingTop: isLgScreen ? '0' : 'calc(env(safe-area-inset-top) + 3rem)' }}
           >
             <PageTransition>
               {children}
