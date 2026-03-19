@@ -361,7 +361,6 @@ export function RecipeSheet({
                   })()}
                   <div className="min-w-0">
                     <p className="font-semibold text-foreground truncate">{name || 'Nova Ficha'}</p>
-                    <p className="text-xs text-muted-foreground">{categories.find(c => c.id === categoryId)?.name || 'Sem categoria'}</p>
                   </div>
                 </div>
 
