@@ -78,7 +78,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <div className="flex-1 flex flex-col min-w-0">
           {/* ======= Unified Header (Mobile + Desktop) ======= */}
           <header
-            className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out"
+            className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out lg:sticky lg:top-0 lg:left-auto lg:right-auto"
             style={{
               paddingTop: isLgScreen ? '0' : 'env(safe-area-inset-top)',
               background: isDashboard
@@ -97,11 +97,11 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   {/* Desktop: sidebar trigger */}
                   <SidebarTrigger className="hidden lg:flex mr-1 text-foreground/70 hover:text-foreground" />
 
-                  {/* Logo pill */}
+                  {/* Logo pill — mobile only */}
                   <button
                     onClick={() => navigate('/')}
                     className={cn(
-                      "flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
+                      "lg:hidden flex items-center rounded-full overflow-hidden shrink-0 active:scale-95 transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]",
                       !isScrolled
                         ? "h-9 bg-foreground/[0.08] backdrop-blur-xl pl-1.5 pr-3 gap-2"
                         : "h-8 w-8 bg-transparent p-0 justify-center"
@@ -125,6 +125,13 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                       {isDashboard ? 'Garden' : (moduleTitle || 'Garden')}
                     </span>
                   </button>
+
+                  {/* Desktop: page title */}
+                  {!isMobile && moduleTitle && (
+                    <h1 className="hidden lg:block text-sm font-bold text-foreground truncate">
+                      {moduleTitle}
+                    </h1>
+                  )}
                 </div>
 
                 {/* Right: Theme toggle (desktop) + Notifications + Profile */}
@@ -139,7 +146,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           {/* ======= Main Content ======= */}
           <main
             className="flex-1"
-            style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3rem)' }}
+            style={{ paddingTop: isLgScreen ? '0' : 'calc(env(safe-area-inset-top) + 3rem)' }}
           >
             <PageTransition>
               {children}
