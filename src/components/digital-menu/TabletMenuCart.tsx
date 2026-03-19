@@ -185,7 +185,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 unit_id: unitId,
                 table_number: configuredTableNumber,
                 comanda_number: comanda || null,
-                status: isOnlinePayment ? 'awaiting_payment' : (shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation'),
+                status: isOnlinePayment ? 'awaiting_payment' : isPixManual ? 'confirmed' : (shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation'),
                 total: payWithCoins ? 0 : cartTotal,
                 source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
                 customer_name: finalName,
