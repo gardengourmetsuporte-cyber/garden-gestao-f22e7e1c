@@ -137,11 +137,12 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
       setShowScanner(true);
       return;
     }
-    handleSend();
+    handleSend(comandaNumber);
   };
 
-  const handleSend = async () => {
-    if (!comandaNumber && !configuredTableNumber) {
+  const handleSend = async (finalComanda?: number | null) => {
+    const comanda = finalComanda ?? comandaNumber;
+    if (!comanda && !configuredTableNumber) {
       toast.error('Escaneie uma comanda para identificar o pedido');
       return;
     }
