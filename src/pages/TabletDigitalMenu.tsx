@@ -234,7 +234,9 @@ export default function TabletDigitalMenu() {
           <span className="text-[10px] text-muted-foreground bg-secondary/60 px-2 py-0.5 rounded-full font-medium">Mesa {mesa}</span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher onChange={() => forceRerender(n => n + 1)} />
+          {isTranslating && <span className="text-[9px] text-muted-foreground animate-pulse">Traduzindo...</span>}
           {/* Search */}
           <button
             onClick={() => setSearchOpen(!searchOpen)}
