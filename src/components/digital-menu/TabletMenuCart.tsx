@@ -599,6 +599,48 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           }}
         />
       )}
+
+      {/* Manual PIX QR Code (unit's own PIX key) */}
+      {showManualPix && pendingOrderNumber && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowManualPix(false); setOrderSent(pendingOrderNumber); }}>
+          <div
+            className="bg-card rounded-3xl p-6 shadow-2xl border border-border/30 flex flex-col items-center gap-4 max-w-sm w-full mx-4 animate-in zoom-in-95 fade-in duration-200"
+            onClick={e => e.stopPropagation()}
+          >
+            <p className="text-lg font-bold text-foreground">Pagar via PIX</p>
+            <p className="text-xs text-muted-foreground text-center">Pedido #{pendingOrderNumber}</p>
+            {manualPixPayload ? (
+              <>
+                <div className="bg-white p-4 rounded-2xl">
+                  <QRCodeSVG value={manualPixPayload} size={180} />
+                </div>
+                <p className="text-xl font-black text-primary">{formatPrice(cartTotal)}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(unitPixKey || '');
+                    toast.success('Chave Pix copiada!');
+                  }}
+                >
+                  <AppIcon name="Copy" size={14} className="mr-1" /> Copiar chave
+                </Button>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">Chave PIX não configurada. Pague no caixa.</p>
+            )}
+            <Button
+              className="w-full"
+              onClick={() => {
+                setShowManualPix(false);
+                setOrderSent(pendingOrderNumber);
+              }}
+            >
+              Fechar
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
