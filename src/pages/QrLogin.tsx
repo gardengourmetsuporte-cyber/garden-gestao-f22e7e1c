@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
+import { getPublicAppUrl } from '@/lib/publicAppUrl';
 import { toast } from 'sonner';
 import { AppIcon } from '@/components/ui/app-icon';
 
@@ -76,8 +77,10 @@ export default function QrLogin() {
   const handleGoogleLogin = async () => {
     setStatus('logging_in');
     try {
+      const publicBase = getPublicAppUrl();
+      const redirectUrl = `${publicBase}/qr-login/${unitId}?session=${sessionToken}`;
       const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.href,
+        redirect_uri: redirectUrl,
       });
       if (result.error) {
         toast.error('Erro ao fazer login');

@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
+import { getPublicAppUrl } from '@/lib/publicAppUrl';
 
 interface Props {
   unitId: string;
@@ -38,8 +39,8 @@ export function TabletQrLoginBanner({ unitId, bonusPoints = 0, onLoginComplete, 
       setSessionToken(token);
       setTimeLeft(300);
 
-      // Build QR URL
-      const baseUrl = window.location.origin;
+      // Build QR URL - always use published URL so phone can access it
+      const baseUrl = getPublicAppUrl();
       const url = `${baseUrl}/qr-login/${unitId}?session=${token}`;
       setQrUrl(url);
 
