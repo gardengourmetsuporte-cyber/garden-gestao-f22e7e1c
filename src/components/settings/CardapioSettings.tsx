@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useGamificationAdmin } from '@/hooks/useGamificationAdmin';
 import { useUnit } from '@/contexts/UnitContext';
+import { ComandaQRGenerator } from '@/components/cardapio/ComandaQRGenerator';
 import { GamificationSettingsPanel } from '@/components/gamification/GamificationSettings';
 import { GamificationMetrics } from '@/components/gamification/GamificationMetrics';
 import { PrizeSheet } from '@/components/gamification/PrizeSheet';
@@ -457,6 +458,9 @@ export function CardapioSettings({ initialTab = null, embedded = false }: Cardap
               <p className="text-xs text-muted-foreground text-center py-4">Nenhuma mesa cadastrada</p>
             )}
           </div>
+
+          {/* Comandas Físicas */}
+          <ComandaQRGenerator />
         </div>
       )}
 

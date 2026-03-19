@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { useUnit } from '@/contexts/UnitContext';
 import { KDSStationsManager } from '@/components/menu-admin/KDSStationsManager';
-import { ComandaQRGenerator } from '@/components/cardapio/ComandaQRGenerator';
+
 import { QRCodeSVG } from 'qrcode.react';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -23,9 +23,8 @@ const LINKS_DATA = [
 
 const SECTIONS = [
   { id: 'kds-stations', icon: 'ChefHat', label: 'Pistas da Cozinha (KDS)', description: 'Setores configuráveis para agrupar ingredientes no KDS', settingsTab: null },
-  { id: 'comandas', icon: 'QrCode', label: 'Comandas Físicas', description: 'Gere e imprima QR codes para comandas numeradas (1-100)', settingsTab: null },
   { id: 'delivery', icon: 'Truck', label: 'Solução Delivery', description: 'Sobre, delivery & retirada, áreas, pagamento, horários', settingsTab: 'config' as const },
-  { id: 'tablet', icon: 'Tablet', label: 'Solução Tablet', description: 'Mesas, QR codes e chave Pix', settingsTab: 'mesas' as const },
+  { id: 'tablet', icon: 'Tablet', label: 'Solução Tablet', description: 'Mesas, comandas, QR codes e chave Pix', settingsTab: 'mesas' as const },
   { id: 'colibri', icon: 'Zap', label: 'Integração Colibri PDV', description: 'Conexão com PDV Colibri para envio automático de pedidos', settingsTab: 'pdv' as const },
   { id: 'qrcode', icon: 'ScanLine', label: 'Solução QR Code', description: 'Link externo para pedidos via celular do cliente', settingsTab: null },
   { id: 'rodizio', icon: 'all_inclusive', label: 'Rodízio', description: 'Preço fixo, regras e categorias', settingsTab: 'rodizio' as const },
@@ -112,8 +111,6 @@ export function CardapioConfigHub() {
               <AccordionContent className="px-4 pb-4 pt-0">
                 {section.id === 'kds-stations' ? (
                   <KDSStationsManager />
-                ) : section.id === 'comandas' ? (
-                  <ComandaQRGenerator />
                 ) : section.id === 'qrcode' ? (
                   <QRCodeBalcaoSection url={activeUnit ? `${baseUrl}/m/${activeUnit.id}?source=qrcode` : ''} />
                 ) : (
