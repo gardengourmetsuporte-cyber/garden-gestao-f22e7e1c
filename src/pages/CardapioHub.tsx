@@ -113,10 +113,18 @@ export default function CardapioHub() {
     const savedRecipe = data.id ? await updateRecipe(data) : await addRecipe(data);
     const savedRecipeId = savedRecipe?.id || data.id;
 
+    // Calculate cost_per_portion from ingredients
+    const totalCost = (data.ingredients || []).reduce((sum: number, ing: any) => sum + (ing.total_cost || 0), 0);
+    const costPerPortion = data.yield_quantity > 0 ? totalCost / data.yield_quantity : totalCost;
+
     if (recipeTargetProductId && savedRecipeId) {
       const { data: linkedRows, error: linkError } = await supabase
         .from('tablet_products')
-        .update({ recipe_id: savedRecipeId, updated_at: new Date().toISOString() })
+        .update({
+          recipe_id: savedRecipeId,
+          cost_per_portion: costPerPortion,
+          updated_at: new Date().toISOString(),
+        })
         .eq('id', recipeTargetProductId)
         .select('id');
 
@@ -126,6 +134,16 @@ export default function CardapioHub() {
       }
 
       await menuAdmin.fetchProducts();
+    } else if (savedRecipeId) {
+      // Update cost on any already-linked product
+      const linkedProduct = products.find(p => (p as any).recipe_id === savedRecipeId);
+      if (linkedProduct) {
+        await supabase
+          .from('tablet_products')
+          .update({ cost_per_portion: costPerPortion, updated_at: new Date().toISOString() })
+          .eq('id', linkedProduct.id);
+        await menuAdmin.fetchProducts();
+      }
     }
   };
 
