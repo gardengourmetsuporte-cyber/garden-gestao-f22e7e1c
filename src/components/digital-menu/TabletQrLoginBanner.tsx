@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { AppIcon } from '@/components/ui/app-icon';
 import { toast } from 'sonner';
+import { getPublicAppUrl } from '@/lib/publicAppUrl';
 
 interface Props {
   unitId: string;
