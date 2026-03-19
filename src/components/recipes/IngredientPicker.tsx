@@ -97,11 +97,8 @@ interface SubRecipeItem {
     return Object.entries(groups).sort((a, b) => a[1].name.localeCompare(b[1].name));
   }, [subRecipes, excludeRecipeIds, search]);
   
-  // Get the effective unit and price for recipe (prefer recipe-specific values)
   const getRecipeDisplay = (item: InventoryItem) => {
-    const unit = item.recipe_unit_type || item.unit_type;
-    const price = item.recipe_unit_price ?? item.unit_price;
-    return { unit, price };
+    return { unit: item.unit_type, price: item.unit_price };
   };
 
    const toggleCategory = (categoryId: string) => {

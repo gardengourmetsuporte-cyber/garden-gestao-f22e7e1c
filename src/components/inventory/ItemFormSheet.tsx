@@ -296,7 +296,7 @@ export function ItemFormSheet({
               {purchaseUnitLabel.trim() && (
                 <div className="space-y-2">
                   <Label htmlFor="purchaseToStockFactor" className="text-base font-medium">
-                    Qtd de {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'litros' : unitType === 'ml' ? 'ml' : 'unidades')} por {purchaseUnitLabel.trim()}
+                    Qtd de {unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'litros' : unitType === 'ml' ? 'ml' : 'unidades'} por {purchaseUnitLabel.trim()}
                   </Label>
                   <Input
                     id="purchaseToStockFactor"

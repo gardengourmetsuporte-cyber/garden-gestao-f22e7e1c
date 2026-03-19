@@ -96,13 +96,11 @@ import { useUnit } from '@/contexts/UnitContext';
      queryFn: async () => {
         let query = supabase
           .from('inventory_items')
-          .select(`
+           .select(`
             id,
             name,
             unit_type,
             unit_price,
-            recipe_unit_type,
-            recipe_unit_price,
             category:categories(id, name, color)
           `)
           .is('deleted_at' as any, null)
