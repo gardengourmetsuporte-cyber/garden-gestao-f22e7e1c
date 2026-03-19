@@ -77,8 +77,10 @@ export default function QrLogin() {
   const handleGoogleLogin = async () => {
     setStatus('logging_in');
     try {
+      const publicBase = getPublicAppUrl();
+      const redirectUrl = `${publicBase}/qr-login/${unitId}?session=${sessionToken}`;
       const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.href,
+        redirect_uri: redirectUrl,
       });
       if (result.error) {
         toast.error('Erro ao fazer login');
