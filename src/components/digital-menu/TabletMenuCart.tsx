@@ -71,13 +71,6 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
       });
   }, [customerUser, unitId]);
 
-  // Auto-send after comanda is scanned (handled via ref to avoid hoisting issues)
-  const sendAfterScanRef = useCallback(() => {
-    if (sendAfterScan && comandaNumber) {
-      setSendAfterScan(false);
-    }
-  }, [sendAfterScan, comandaNumber]);
-
   if (orderSent) {
     return (
       <div className="flex flex-col items-center justify-center px-6 py-16 text-center gap-5">
