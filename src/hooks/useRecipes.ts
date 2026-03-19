@@ -28,38 +28,33 @@ import { useUnit } from '@/contexts/UnitContext';
    const { data: recipes = [], isLoading: recipesLoading } = useQuery({
      queryKey: ['recipes', activeUnitId],
      queryFn: async () => {
-       const baseQuery = supabase
-         .from('recipes')
-         .select(`
-           *,
-           category:recipe_categories(*),
-           ingredients:recipe_ingredients!recipe_ingredients_recipe_id_fkey(
-             *,
-             item:inventory_items(
-              id,
-              name,
-              unit_type,
-              unit_price,
-              category:categories(name, color)
-            ),
-            source_recipe:recipes!recipe_ingredients_source_recipe_id_fkey(
-              id,
-              name,
-              yield_unit,
-              cost_per_portion,
-              category:recipe_categories(name, color)
-             )
-           )
-         `)
-         .order('name');
+       const { data, error } = await supabase
+          .from('recipes')
+          .select(`
+            *,
+            category:recipe_categories(*),
+            ingredients:recipe_ingredients!recipe_ingredients_recipe_id_fkey(
+              *,
+              item:inventory_items(
+               id,
+               name,
+               unit_type,
+               unit_price,
+               category:categories(name, color)
+             ),
+             source_recipe:recipes!recipe_ingredients_source_recipe_id_fkey(
+               id,
+               name,
+               yield_unit,
+               cost_per_portion,
+               category:recipe_categories(name, color)
+              )
+            )
+          `)
+          .order('name');
 
-       const query = activeUnitId
-         ? (baseQuery as any).eq('unit_id', activeUnitId)
-         : baseQuery;
-       
-       const { data, error } = await query;
-       if (error) throw error;
-       return data as Recipe[];
+        if (error) throw error;
+        return data as Recipe[];
      },
      enabled: !!activeUnitId,
    });
@@ -152,7 +147,6 @@ import { useUnit } from '@/contexts/UnitContext';
             total_cost,
             cost_per_portion,
             cost_updated_at: new Date().toISOString(),
-            unit_id: activeUnitId,
           })
          .select()
          .single();
@@ -326,7 +320,6 @@ import { useUnit } from '@/contexts/UnitContext';
             total_cost: existing.total_cost,
             cost_per_portion: existing.cost_per_portion,
             cost_updated_at: new Date().toISOString(),
-            unit_id: activeUnitId,
           })
          .select()
          .single();
@@ -399,7 +392,6 @@ import { useUnit } from '@/contexts/UnitContext';
           .insert({
             ...data,
             sort_order: (maxOrder?.sort_order ?? 0) + 1,
-            unit_id: activeUnitId,
           });
        
        if (error) throw error;
