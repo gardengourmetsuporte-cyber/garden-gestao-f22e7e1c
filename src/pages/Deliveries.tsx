@@ -348,8 +348,8 @@ export default function Deliveries() {
               <DeliveryMap
                 ref={mapHandleRef}
                 deliveries={deliveries}
-                unitName={activeUnit?.name || ''}
-                onStatusChange={(id, status) => updateStatus({ id, status })}
+                unitName={(activeUnit as any)?.store_info?.city || (activeUnit as any)?.city || activeUnit?.name || ''}
+                onStatusChange={(id, status) => { void updateStatus({ id, status }); }}
                 onRefresh={invalidate}
               />
             </div>
@@ -375,7 +375,7 @@ export default function Deliveries() {
                   deliveries={group.deliveries}
                   selectedIds={selectedIds}
                   dispatchMode={dispatchMode}
-                  onStatusChange={(id, status) => updateStatus({ id, status })}
+                  onStatusChange={(id, status) => { void updateStatus({ id, status }); }}
                   onCardClick={handleCardClick}
                   onSetLocation={setLocationPickerDelivery}
                   onEdit={setEditDelivery}
@@ -397,7 +397,7 @@ export default function Deliveries() {
                     key={delivery.id}
                     delivery={delivery}
                     selected={selectedIds.has(delivery.id)}
-                    onStatusChange={(id, status) => updateStatus({ id, status })}
+                    onStatusChange={(id, status) => { void updateStatus({ id, status }); }}
                     onCardClick={dispatchMode ? undefined : handleCardClick}
                     onSetLocation={setLocationPickerDelivery}
                     onEdit={setEditDelivery}
@@ -431,7 +431,7 @@ export default function Deliveries() {
         onOpenChange={(open) => { if (!open) setLocationPickerDelivery(null); }}
         delivery={locationPickerDelivery}
         onConfirm={(id, lat, lng) => updateAddress({ id, lat, lng })}
-        cityContext={(activeUnit as any)?.city || ''}
+        cityContext={(activeUnit as any)?.store_info?.city || (activeUnit as any)?.city || ''}
       />
 
       <DeliveryEditSheet
