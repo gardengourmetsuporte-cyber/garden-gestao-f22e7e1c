@@ -1,88 +1,58 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Plano: Sistema Profissional de Conversão de Unidades no Cadastro de Estoque
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+### Problema Atual
+O sistema tem dois campos de unidade no item de estoque:
+1. **Unidade de controle** (`unit_type`) — kg, g, L, ml, un
+2. **Unidade de compra** (`purchase_unit_label` + `purchase_to_stock_factor`) — campo de texto livre (ex: "caixa") + fator de conversão
 
----
+Falta uma camada clara de **3 níveis de unidade** que é o padrão profissional de sistemas de food service, necessário para a baixa automática funcionar corretamente.
 
-## Bloco de Relatórios Avançados ✅
+### Modelo Proposto: 3 Níveis de Unidade
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+```text
+┌──────────────────────────────────────────────────┐
+│  UNIDADE DE COMPRA (como você compra)            │
+│  Ex: Caixa com 24un, Saco de 5kg, Galão de 5L   │
+│  Campos: purchase_unit_label + purchase_qty      │
+├──────────────────────────────────────────────────┤
+│  UNIDADE DE ESTOQUE (como você controla)         │
+│  Ex: unidade, kg, litro                          │
+│  Campo: unit_type + unit_price (preço/unidade)   │
+├──────────────────────────────────────────────────┤
+│  UNIDADE DE RECEITA (como a ficha técnica usa)   │
+│  Ex: g, ml (subdivisões do estoque)              │
+│  Conversão automática: kg↔g, litro↔ml            │
+└──────────────────────────────────────────────────┘
+```
 
-## Dashboard Analytics ✅
+A conversão entre receita↔estoque já existe no código (`UNIT_CONVERSIONS` em `types/recipe.ts`). O que precisa melhorar é a **UX do cadastro** para tornar isso claro e profissional.
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+### Alterações
 
-## Operacional ✅
+#### 1. Redesign do `ItemFormSheet.tsx` — Cadastro mais guiado
+- Reorganizar o formulário em seções visuais claras:
+  - **Identificação**: Nome, Categoria, Fornecedor
+  - **Controle de Estoque**: Unidade de controle (chips), estoque atual, mínimo, preço por unidade
+  - **Conversão de Compra**: Sempre visível (não mais collapsible escondido). Layout visual tipo card com preview da conversão: "1 caixa = 24 unidades → R$ X por caixa"
+- Adicionar preview em tempo real da conversão (ex: "Ao usar 200g na receita, serão debitados 0.2 kg do estoque")
+- Manter os mesmos campos do banco (`purchase_unit_label`, `purchase_to_stock_factor`)
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+#### 2. Melhorar `IngredientRow.tsx` — Feedback visual de conversão
+- Exibir nota de conversão mais clara quando a unidade da receita difere da unidade de estoque
+- Ex: "200g = 0.2 kg no estoque" com ícone de seta
 
-## CRM / Clientes ✅
+#### 3. Nenhuma migração necessária
+- Os campos no banco já suportam o modelo de 3 níveis
+- `unit_type` + `unit_price` = estoque
+- `purchase_unit_label` + `purchase_to_stock_factor` = compra
+- Receita já usa conversão automática via `calculateIngredientCost()`
+- Triggers `auto_consume_stock_on_sale` e `auto_consume_stock_on_order` já fazem a conversão kg↔g e litro↔ml
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
+### Detalhes Técnicos
 
-## Funcionários ✅
+**Arquivos a editar:**
+- `src/components/inventory/ItemFormSheet.tsx` — Redesign completo do layout com seções visuais, preview de conversão sempre visível, exemplos contextuais
+- `src/components/recipes/IngredientRow.tsx` — Melhorar nota de conversão com feedback visual "X na receita = Y no estoque"
 
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
-
-## Produção Integrada ao Checklist ✅
-
-- Itens de checklist vinculados a itens de estoque (categoria Produção)
-- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
-- Entrada automática no estoque + registro de produção
-- Badge visual de produção nos itens vinculados
-- Configuração de vínculo no admin de checklists
-- Removido módulo Produção da página de Pedidos
