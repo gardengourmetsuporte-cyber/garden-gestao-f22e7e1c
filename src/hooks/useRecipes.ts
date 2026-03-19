@@ -125,7 +125,8 @@ import { useUnit } from '@/contexts/UnitContext';
        yield_quantity: number;
         yield_unit: string;
         min_ready_stock?: number;
-        preparation_notes?: string;
+        packaging_template_id?: string | null;
+        preparation_notes?: string | null;
        ingredients: Array<{
         item_id: string | null;
          quantity: number;
@@ -186,8 +187,8 @@ import { useUnit } from '@/contexts/UnitContext';
        queryClient.invalidateQueries({ queryKey: ['recipes'] });
        toast({ title: 'Ficha técnica criada com sucesso!' });
      },
-     onError: () => {
-       toast({ title: 'Erro ao criar ficha técnica', variant: 'destructive' });
+     onError: (error: any) => {
+       toast({ title: error?.message || 'Erro ao criar ficha técnica', variant: 'destructive' });
      },
    });
  
