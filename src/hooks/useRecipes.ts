@@ -147,7 +147,6 @@ import { useUnit } from '@/contexts/UnitContext';
             total_cost,
             cost_per_portion,
             cost_updated_at: new Date().toISOString(),
-            unit_id: activeUnitId,
           })
          .select()
          .single();
