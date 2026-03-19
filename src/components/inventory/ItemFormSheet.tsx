@@ -51,7 +51,7 @@ export function ItemFormSheet({
   const [currentStock, setCurrentStock] = useState('');
   const [minStock, setMinStock] = useState('');
   const [unitPrice, setUnitPrice] = useState('');
-  const [stockUnitLabel, setStockUnitLabel] = useState('');
+  
   const [purchaseUnitLabel, setPurchaseUnitLabel] = useState('');
   const [purchaseToStockFactor, setPurchaseToStockFactor] = useState('');
   const [showPurchaseSection, setShowPurchaseSection] = useState(false);
