@@ -96,8 +96,9 @@ export default function Recipes() {
   useFabAction({ icon: 'Plus', label: 'Nova Ficha', onClick: () => { setSelectedRecipe(null); setPreSelectedCategoryId(null); setSheetOpen(true); } }, []);
 
   const handleSave = async (data: any) => {
-    if (data.id) await updateRecipe(data);
-    else await addRecipe(data);
+    const { _cost_snapshot: _ignoredCostSnapshot, ...payload } = data || {};
+    if (payload.id) await updateRecipe(payload);
+    else await addRecipe(payload);
     setSheetOpen(false);
     setSelectedRecipe(null);
   };

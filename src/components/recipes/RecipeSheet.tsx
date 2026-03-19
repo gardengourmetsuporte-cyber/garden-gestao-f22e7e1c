@@ -294,6 +294,8 @@ export function RecipeSheet({
   const handleSubmit = async () => {
     if (!name.trim()) return;
 
+    const referenceSellingPrice = priceForFixedCost ?? typedSellingPrice ?? null;
+
     const data = {
       ...(recipe?.id && { id: recipe.id }),
       name: name.trim(),
@@ -303,6 +305,10 @@ export function RecipeSheet({
       min_ready_stock: parseInt(minReadyStock) || 0,
       packaging_template_id: packagingTemplateId || null,
       preparation_notes: notes.trim() || null,
+      _cost_snapshot: {
+        totalCostPerPortion,
+        referenceSellingPrice,
+      },
       ingredients: ingredients.map((ing) => ({
         ...(ing.id && { id: ing.id }),
         item_id: ing.item_id,

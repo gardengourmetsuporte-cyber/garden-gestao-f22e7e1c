@@ -110,8 +110,9 @@ export function useRecipeCostSettings() {
       fixedCostPerProduct = monthlyProducts > 0 ? monthlyFixedCost / monthlyProducts : 0;
     }
 
-    const taxAmount = ingredientCost * (effectiveSettings.tax_percentage / 100);
-    const cardFeeAmount = ingredientCost * (effectiveSettings.card_fee_percentage / 100);
+    const baseForSalesFees = sellingPrice && sellingPrice > 0 ? sellingPrice : ingredientCost;
+    const taxAmount = baseForSalesFees * (effectiveSettings.tax_percentage / 100);
+    const cardFeeAmount = baseForSalesFees * (effectiveSettings.card_fee_percentage / 100);
     const packagingCost = effectiveSettings.packaging_cost_per_unit;
 
     return {

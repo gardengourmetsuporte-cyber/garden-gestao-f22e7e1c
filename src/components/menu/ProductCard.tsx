@@ -164,20 +164,14 @@ function FichaTecnicaCard({
   const cost = (product as any).cost_per_portion || 0;
   const hasRecipe = !!(product as any).recipe_id;
   const price = product.price;
-  const margin = cost > 0 ? ((price - cost) / cost) * 100 : 0;
+  const margin = price > 0 ? ((price - cost) / price) * 100 : 0;
   const profit = price - cost;
 
-  const marginColor = margin >= 200
+  const marginColor = margin >= 30
     ? 'text-success'
-    : margin >= 100
+    : margin >= 15
       ? 'text-warning'
       : 'text-destructive';
-
-  const marginBg = margin >= 200
-    ? 'bg-success/15 text-success'
-    : margin >= 100
-      ? 'bg-warning/15 text-warning'
-      : 'bg-destructive/15 text-destructive';
 
   const cmv = price > 0 && cost > 0 ? (cost / price) * 100 : 0;
 
