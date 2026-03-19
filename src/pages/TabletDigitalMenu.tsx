@@ -184,13 +184,13 @@ export default function TabletDigitalMenu() {
     );
   }
 
-  const activeCategory = selectedCategory || categories[0]?.id || null;
-  const categoryGroups = groups.filter(g => g.category_id === activeCategory);
+  const activeCategory = selectedCategory || tCategories[0]?.id || null;
+  const categoryGroups = tGroups.filter(g => g.category_id === activeCategory);
   const categoryProducts = activeCategory
     ? categoryGroups.length > 0
-      ? categoryGroups.flatMap(g => getGroupProducts(g.id))
-      : products.filter(p => p.category === activeCategory)
-    : products;
+      ? categoryGroups.flatMap(g => tGetGroupProducts(g.id))
+      : tProducts.filter(p => p.category === activeCategory)
+    : tProducts;
 
   const logoUrl = unit?.store_info?.logo_url;
 
