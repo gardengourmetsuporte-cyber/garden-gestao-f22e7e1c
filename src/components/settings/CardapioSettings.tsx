@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTabletAdmin } from '@/hooks/useTabletAdmin';
 import { useGamificationAdmin } from '@/hooks/useGamificationAdmin';
 import { useUnit } from '@/contexts/UnitContext';
+import { ComandaQRGenerator } from '@/components/cardapio/ComandaQRGenerator';
 import { GamificationSettingsPanel } from '@/components/gamification/GamificationSettings';
 import { GamificationMetrics } from '@/components/gamification/GamificationMetrics';
 import { PrizeSheet } from '@/components/gamification/PrizeSheet';
