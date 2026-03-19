@@ -54,12 +54,21 @@ export function useMenuTranslation() {
 
       if (error) {
         console.error('Translation error:', error);
+        // On error, map missing texts to themselves so we don't retry forever
+        const fallback = { ...cached };
+        missing.forEach(t => { fallback[t] = t; });
+        cacheRef.current[locale] = fallback;
+        setTranslations(fallback);
         setIsTranslating(false);
         return;
       }
 
       const newTranslations = data?.translations || {};
-      const updated = { ...cached, ...newTranslations };
+      // Ensure all missing texts have a mapping (fallback to original if AI missed some)
+      const updated = { ...cached };
+      missing.forEach(t => {
+        updated[t] = newTranslations[t] || t;
+      });
       cacheRef.current[locale] = updated;
       saveCache(cacheRef.current);
       setTranslations(updated);
