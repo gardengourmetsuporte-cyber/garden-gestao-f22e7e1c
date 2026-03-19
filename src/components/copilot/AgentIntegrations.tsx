@@ -45,7 +45,7 @@ const INTEGRATIONS = [
     description: 'Envio automático de pedidos para o PDV Colibri',
     icon: 'Zap',
     color: '#8B5CF6',
-    configPath: '/menu-admin?section=colibri',
+    configPath: '/cardapio?section=config&configTab=pdv',
     status: 'available' as const,
   },
 ];

@@ -61,6 +61,14 @@ const SECTIONS = [
     settingsTab: 'rodizio' as const,
     links: [] as SectionLink[],
   },
+  {
+    id: 'pdv',
+    icon: 'Zap',
+    label: 'Integração PDV',
+    description: 'Envio automático de pedidos para o PDV Colibri',
+    settingsTab: 'pdv' as const,
+    links: [] as SectionLink[],
+  },
 ];
 
 export function CardapioConfigHub() {
