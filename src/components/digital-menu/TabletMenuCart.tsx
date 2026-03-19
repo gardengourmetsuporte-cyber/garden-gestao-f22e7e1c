@@ -39,6 +39,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [customerCoins, setCustomerCoins] = useState<number | null>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [comandaNumber, setComandaNumber] = useState<number | null>(null);
+  const [sendAfterScan, setSendAfterScan] = useState(false);
   const [paymentTiming, setPaymentTiming] = useState<'now' | 'later'>('later');
   const [showOnlinePayment, setShowOnlinePayment] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
