@@ -384,18 +384,9 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           )}
         </div>
 
-        {/* Comanda scan + Mesa info */}
-        <div className="px-4 pb-3 space-y-2">
-          {/* Show configured table number */}
-          {configuredTableNumber > 0 && (
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-secondary/40 border border-border/30">
-              <AppIcon name="TableBar" size={16} className="text-muted-foreground" />
-              <span className="text-sm font-semibold text-foreground">Mesa {configuredTableNumber}</span>
-            </div>
-          )}
-
-          {/* Comanda */}
-          {comandaNumber ? (
+        {/* Comanda result (shown after scan) */}
+        {comandaNumber && (
+          <div className="px-4 pb-3">
             <div className="flex items-center gap-2 p-2.5 rounded-xl bg-primary/5 border border-primary/20">
               <span className="text-sm font-black text-primary">#{comandaNumber}</span>
               <span className="flex-1 text-xs text-muted-foreground">Comanda escaneada</span>
@@ -403,13 +394,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 <AppIcon name="X" size={14} className="text-muted-foreground" />
               </button>
             </div>
-          ) : (
-            <Button variant="outline" size="sm" className="w-full rounded-xl" onClick={() => setShowScanner(true)}>
-              <AppIcon name="Camera" size={16} className="mr-1.5" />
-              Escanear Comanda
-            </Button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Coin option */}
         {customerUser && allProductsHaveCoinPrice && customerCoins !== null && (
