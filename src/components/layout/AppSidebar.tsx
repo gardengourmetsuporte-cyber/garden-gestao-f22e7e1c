@@ -73,23 +73,40 @@ export function AppSidebar() {
       {/* Brand Header */}
       <SidebarHeader className="p-0">
         <div
-          className="flex items-center gap-2.5 px-3 h-14 border-b border-sidebar-border"
+          className={cn(
+            "flex flex-col items-center border-b border-sidebar-border transition-all duration-300 overflow-hidden",
+            collapsed ? "py-3 px-2" : "py-5 px-4"
+          )}
           style={{
-            background: 'linear-gradient(145deg, hsl(var(--sidebar-background)), hsl(var(--sidebar-accent)))',
+            background: 'linear-gradient(165deg, hsl(var(--sidebar-background)), hsl(var(--sidebar-accent) / 0.6), hsl(var(--sidebar-background)))',
           }}
         >
           <button
             onClick={() => navigate('/')}
-            className="w-8 h-8 rounded-full overflow-hidden bg-white flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-sm"
+            className={cn(
+              "rounded-2xl overflow-hidden bg-white dark:bg-white/95 flex items-center justify-center active:scale-95 transition-all duration-300 shrink-0 shadow-lg shadow-primary/20 ring-2 ring-primary/20",
+              collapsed ? "w-9 h-9 rounded-full" : "w-14 h-14"
+            )}
           >
-            <img alt="Garden" className="w-6 h-6 object-contain" src={activeUnit?.store_info?.logo_url || gardenLogo} loading="lazy" decoding="async" />
+            <img
+              alt="Garden"
+              className={cn(
+                "object-contain transition-all duration-300",
+                collapsed ? "w-6 h-6" : "w-10 h-10"
+              )}
+              src={activeUnit?.store_info?.logo_url || gardenLogo}
+              loading="lazy"
+              decoding="async"
+            />
           </button>
           {!collapsed && (
-            <div className="flex-1 min-w-0 animate-fade-in">
-              <p className="text-[13px] font-bold text-sidebar-foreground truncate leading-tight">
+            <div className="mt-3 text-center animate-fade-in">
+              <p className="text-sm font-extrabold text-sidebar-foreground truncate leading-tight tracking-tight">
                 {activeUnit?.name || 'Garden'}
               </p>
-              <p className="text-[10px] text-sidebar-foreground/40 font-medium tracking-wide">Gestão Inteligente</p>
+              <p className="text-[10px] text-primary/70 font-semibold tracking-widest uppercase mt-0.5">
+                Gestão Inteligente
+              </p>
             </div>
           )}
         </div>
