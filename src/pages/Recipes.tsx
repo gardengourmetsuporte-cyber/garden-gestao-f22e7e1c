@@ -98,6 +98,8 @@ export default function Recipes() {
   const handleSave = async (data: any) => {
     if (data.id) await updateRecipe(data);
     else await addRecipe(data);
+    setSheetOpen(false);
+    setSelectedRecipe(null);
   };
 
   const handleDeleteConfirm = () => {
