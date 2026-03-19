@@ -403,9 +403,10 @@ export function useDeliveries() {
       const { ocrResult, photoUrl } = params;
 
       const normalizedCity = resolveGeocodeCity(ocrResult.city || '', activeUnit?.name || '');
+      const fallbackCity = normalizedCity || (activeUnit?.store_info as any)?.city || activeUnit?.city || '';
 
       // Geocode the address
-      const coords = await geocodeAddress(ocrResult.full_address, normalizedCity);
+      const coords = await geocodeAddress(ocrResult.full_address, fallbackCity);
 
       // Create or find address
       const { data: address, error: addrError } = await supabase
@@ -415,7 +416,7 @@ export function useDeliveries() {
           customer_name: ocrResult.customer_name,
           full_address: ocrResult.full_address,
           neighborhood: ocrResult.neighborhood,
-          city: normalizedCity,
+          city: fallbackCity,
           reference: ocrResult.reference || null,
           lat: coords?.lat ?? null,
           lng: coords?.lng ?? null,
@@ -456,18 +457,29 @@ export function useDeliveries() {
   // Update status
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: DeliveryStatus }) => {
+      if (!activeUnitId) throw new Error('Unidade não selecionada');
+
       const updates: Record<string, any> = { status };
       if (status === 'delivered') updates.delivered_at = new Date().toISOString();
-      if (status === 'out') updates.assigned_to = user!.id;
+
+      if (status === 'out') {
+        if (!user?.id) throw new Error('Usuário não autenticado');
+        updates.assigned_to = user.id;
+      }
 
       const { error } = await supabase
         .from('deliveries')
         .update(updates)
-        .eq('id', id);
+        .eq('id', id)
+        .eq('unit_id', activeUnitId);
+
       if (error) throw error;
     },
     onSuccess: () => {
       invalidate();
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Erro ao atualizar status da entrega');
     },
   });
 
@@ -510,7 +522,7 @@ export function useDeliveries() {
       customer_name: string;
       notes?: string;
     }) => {
-      const city = resolveGeocodeCity('', activeUnit?.name || '');
+      const city = (activeUnit?.store_info as any)?.city || activeUnit?.city || '';
       const coords = await geocodeAddress(params.full_address, city);
 
       const { data: address, error: addrError } = await supabase
