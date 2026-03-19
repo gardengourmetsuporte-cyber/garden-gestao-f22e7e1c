@@ -424,11 +424,13 @@ export default function CardapioHub() {
             setRecipeTargetProductId(null);
             setDefaultRecipeName('');
             setDefaultRecipeCategoryId(null);
+            setDefaultRecipeSellingPrice(null);
           }
         }}
         recipe={editingRecipe}
         defaultName={defaultRecipeName}
         defaultCategoryId={defaultRecipeCategoryId}
+        defaultSellingPrice={defaultRecipeSellingPrice}
         categories={recipeCategories}
         inventoryItems={recipeInventoryItems}
         subRecipes={getAvailableSubRecipes(editingRecipe?.id).map(r => ({
