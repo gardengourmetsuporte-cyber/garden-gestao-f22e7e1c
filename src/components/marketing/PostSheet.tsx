@@ -129,13 +129,16 @@ export function PostSheet({ open, onOpenChange, post, onSave, onPublish, uploadM
     return `${String(h).padStart(2, '0')}:${m}`;
   });
 
-  const handleApplyPost = (data: { title: string; caption: string; tags: string[]; image_prompt: string; best_time?: string }) => {
+  const handleApplyPost = (data: { title: string; caption: string; tags: string[]; image_prompt: string; best_time?: string; media_urls?: string[] }) => {
     setTitle(data.title);
     setCaption(data.caption);
     setTags(data.tags.join(', '));
     if (data.best_time) {
       setScheduledTime(data.best_time);
       if (!scheduledAt) setScheduledAt(new Date());
+    }
+    if (data.media_urls?.length) {
+      setMediaUrls(prev => [...prev, ...data.media_urls!]);
     }
     setMode('manual');
   };
