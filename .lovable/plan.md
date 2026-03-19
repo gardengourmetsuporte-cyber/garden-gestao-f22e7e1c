@@ -1,88 +1,27 @@
-## Sistema de Comandas Físicas com QR Code ✅
 
-### Implementado
 
-Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
+## Plano: Permitir unidade diferente na ficha técnica vs estoque
 
-### Fluxo
-1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
-2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
-3. Pedido é vinculado ao `comanda_number` automaticamente
-4. Na cobrança, todos os pedidos da mesma comanda são agrupados
+### Problema
+O Gouda Empanado está cadastrado no estoque como "unidade" (cada pacote = 1 un), mas na ficha técnica o usuário precisa usar "kg" como unidade do ingrediente. Atualmente, o seletor de unidade só mostra unidades "compatíveis" (unidade → só unidade, kg → kg/g, litro → litro/ml), impedindo essa conversão.
 
----
+### Solução
+O banco de dados já possui os campos `recipe_unit_type`, `recipe_unit_price` e `stock_to_recipe_factor` na tabela `inventory_items`, porém eles não estão sendo utilizados. O plano é ativar essa infraestrutura existente.
 
-## Bloco de Relatórios Avançados ✅
+### Alterações
 
-- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
-- Estoque Valorizado — valor total em estoque por categoria
-- Curva ABC — classificação Pareto de produtos por receita
-- Relatório de Funcionários — custos de folha por mês
-- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
+**1. `src/hooks/useRecipes.ts`** — Adicionar `recipe_unit_type` e `recipe_unit_price` ao SELECT da query de inventory items (linhas 99-105).
 
-## Dashboard Analytics ✅
+**2. `src/components/recipes/RecipeSheet.tsx`** — Em `handleAddInventoryItem`, usar `recipe_unit_type` e `recipe_unit_price` quando disponíveis no item, em vez de sempre usar `unit_type`/`unit_price`.
 
-- Heatmap de vendas (hora × dia da semana)
-- Comparativo mês a mês (variação %)
-- Break-even calculator
-- Multi-unit overview (visão consolidada de todas unidades)
+**3. `src/components/recipes/IngredientRow.tsx`** — Remover a restrição de unidades compatíveis (`filteredUnitOptions`), permitindo que o usuário escolha qualquer unidade (un, kg, g, L, ml). O cálculo de custo já suporta conversões entre famílias de unidade via `calculateIngredientCost`.
 
-## Operacional ✅
+**4. `src/types/recipe.ts`** — Atualizar `getCompatibleUnits` para retornar todas as unidades quando chamada, ou remover a restrição no IngredientRow. Opcionalmente, adicionar conversão entre "unidade" e "kg" quando o item tem `recipe_unit_type` configurado.
 
-- Contagem de estoque periódica (inventário físico)
-- Reservas de mesas com status management
-- Fila de espera digital
-- Mapa visual de mesas (salão com status)
-- Cupons de desconto para cardápio digital
-- Transferência de estoque entre unidades
+### Detalhes técnicos
 
-## CRM / Clientes ✅
+- O campo `recipe_unit_type` indica qual unidade o item usa em receitas (ex: "kg" mesmo que no estoque seja "unidade")
+- O campo `recipe_unit_price` indica o preço por essa unidade de receita (ex: R$ 77,99/kg)
+- O `IngredientRow` passará a mostrar **todas as 5 unidades** no seletor, independente da unidade base do estoque
+- O cálculo de custo continuará usando `calculateIngredientCost` que já faz conversão automática entre unidades da mesma família, e para famílias diferentes (un→kg), usará o `recipe_unit_price` como referência
 
-- Histórico de pedidos do cliente (POS + tablet)
-- Alertas de aniversário
-- LGPD: exportar/anonimizar dados do cliente
-- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
-
-## Funcionários ✅
-
-- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
-- Controle de validade com alertas de vencimento
-- Banco de horas (controle de horas extras)
-- Gestão de férias e ausências
-- Holerite digital (geração PDF)
-
-## Cardápio Digital ✅
-
-- Order tracker em tempo real (status do pedido via realtime)
-- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
-- Favoritos de cliente no cardápio
-
-## Sistema / UX ✅
-
-- Tour guiado interativo para novos usuários
-- Log de auditoria avançado com filtros de data e exportação CSV
-
-## Multi-Unit ✅
-
-- Ranking de unidades por performance
-- Replicação de cardápio entre unidades
-- Transferência de estoque entre unidades
-
-## NPS / Avaliações ✅
-
-- Widget de NPS pós-compra (0-10)
-- Dashboard de NPS (promotores, neutros, detratores)
-
-## Estoque Avançado ✅
-
-- Controle de lotes e validade (FIFO)
-- Alertas de vencimento (7 dias)
-
-## Produção Integrada ao Checklist ✅
-
-- Itens de checklist vinculados a itens de estoque (categoria Produção)
-- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
-- Entrada automática no estoque + registro de produção
-- Badge visual de produção nos itens vinculados
-- Configuração de vínculo no admin de checklists
-- Removido módulo Produção da página de Pedidos
