@@ -262,7 +262,7 @@ export default function TabletDigitalMenu() {
       {/* Search bar (collapsible) */}
       {searchOpen && (
         <div className="px-4 py-2.5 border-b border-border/20 bg-background/95 backdrop-blur-sm shrink-0 z-10">
-          <MenuSearch products={products} onSelectProduct={(p) => { setSelectedProduct(p); setSearchOpen(false); }} />
+          <MenuSearch products={tProducts} onSelectProduct={(p) => { setSelectedProduct(p); setSearchOpen(false); }} />
         </div>
       )}
 
