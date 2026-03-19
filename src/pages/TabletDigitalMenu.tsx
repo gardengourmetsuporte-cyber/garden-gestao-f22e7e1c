@@ -284,7 +284,7 @@ export default function TabletDigitalMenu() {
 
           {/* Category list */}
           <nav className="flex-1 px-3 pb-4 overflow-y-auto space-y-1.5">
-            {categories.map(cat => (
+            {tCategories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
