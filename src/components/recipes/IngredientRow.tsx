@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost, getCompatibleUnits } from '@/types/recipe';
+import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost } from '@/types/recipe';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 
