@@ -246,6 +246,11 @@ export function usePOSCheckout(deps: CheckoutDeps) {
         .from('pos_sales').update({ status: 'cancelled' })
         .eq('source_order_id', orderId).eq('unit_id', activeUnitId);
 
+      // Also cancel any associated delivery (linked by order_number = first 8 chars of order id)
+      await supabase
+        .from('deliveries').update({ status: 'cancelled' as any })
+        .eq('order_number', orderId.slice(0, 8)).eq('unit_id', activeUnitId);
+
       toast.success('Pedido cancelado!');
       clearCart();
       fetchPendingOrders();
