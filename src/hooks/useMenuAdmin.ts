@@ -52,6 +52,7 @@ export interface MenuProduct {
   created_at: string;
   option_group_count?: number;
   recipe_id?: string | null;
+  recipe_base_cost?: number | null;
   profit_margin?: number | null;
   cost_per_portion?: number;
 }
