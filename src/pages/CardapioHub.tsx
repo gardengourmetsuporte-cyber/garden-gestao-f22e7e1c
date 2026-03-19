@@ -19,6 +19,7 @@ import { OptionGroupSheet } from '@/components/menu/OptionGroupSheet';
 import { LinkOptionsDialog } from '@/components/menu/LinkOptionsDialog';
 
 import { RecipeSyncPanel } from '@/components/menu/RecipeSyncPanel';
+import { CardapioDesktopNav } from '@/components/cardapio/CardapioDesktopNav';
 import { FichaTecnicaHeader } from '@/components/menu/FichaTecnicaHeader';
 // UnifiedOrdersPanel removed — orders managed via PDV/KDS/Deliveries
 import { useRecipeMenuSync } from '@/hooks/useRecipeMenuSync';
