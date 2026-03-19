@@ -320,7 +320,6 @@ import { useUnit } from '@/contexts/UnitContext';
             total_cost: existing.total_cost,
             cost_per_portion: existing.cost_per_portion,
             cost_updated_at: new Date().toISOString(),
-            unit_id: activeUnitId,
           })
          .select()
          .single();
