@@ -114,18 +114,32 @@ export default function CardapioHub() {
   }, [recipes, recipeCategories]);
 
   const handleRecipeSave = async (data: any) => {
-    const savedRecipe = data.id ? await updateRecipe(data) : await addRecipe(data);
-    const savedRecipeId = savedRecipe?.id || data.id;
+    const { _cost_snapshot: costSnapshot, ...recipePayload } = data || {};
 
-    const ingredientTotalCost = (data.ingredients || []).reduce((sum: number, ing: any) => sum + (ing.total_cost || 0), 0);
-    const ingredientCostPerPortion = data.yield_quantity > 0 ? ingredientTotalCost / data.yield_quantity : ingredientTotalCost;
+    const savedRecipe = recipePayload.id ? await updateRecipe(recipePayload) : await addRecipe(recipePayload);
+    const savedRecipeId = savedRecipe?.id || recipePayload.id;
+
+    const ingredientTotalCost = (recipePayload.ingredients || []).reduce((sum: number, ing: any) => sum + (ing.total_cost || 0), 0);
+    const ingredientCostPerPortion = recipePayload.yield_quantity > 0
+      ? ingredientTotalCost / recipePayload.yield_quantity
+      : ingredientTotalCost;
 
     const targetProduct = recipeTargetProductId
       ? products.find(p => p.id === recipeTargetProductId)
       : products.find(p => (p as any).recipe_id === savedRecipeId);
 
-    const opCosts = calculateOperationalCosts(ingredientCostPerPortion, targetProduct?.price);
-    const fullCostPerPortion = ingredientCostPerPortion + opCosts.totalOperational;
+    const snapshotCost = typeof costSnapshot?.totalCostPerPortion === 'number'
+      ? costSnapshot.totalCostPerPortion
+      : null;
+    const snapshotSellingPrice = typeof costSnapshot?.referenceSellingPrice === 'number'
+      ? costSnapshot.referenceSellingPrice
+      : undefined;
+
+    const opCosts = calculateOperationalCosts(ingredientCostPerPortion, targetProduct?.price ?? snapshotSellingPrice);
+    const fallbackFullCostPerPortion = ingredientCostPerPortion + opCosts.totalOperational;
+    const fullCostPerPortion = snapshotCost && snapshotCost > 0
+      ? snapshotCost
+      : fallbackFullCostPerPortion;
 
     if (recipeTargetProductId && savedRecipeId) {
       const { data: linkedRows, error: linkError } = await supabase

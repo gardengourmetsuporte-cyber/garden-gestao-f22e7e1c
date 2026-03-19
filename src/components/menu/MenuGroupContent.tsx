@@ -127,11 +127,11 @@ function FichaGroupContent({
   const avgMargin = withCost.length > 0
     ? withCost.reduce((sum, p) => {
         const cost = (p as any).cost_per_portion || 0;
-        return sum + (cost > 0 ? ((p.price - cost) / cost) * 100 : 0);
+        return sum + (p.price > 0 ? ((p.price - cost) / p.price) * 100 : 0);
       }, 0) / withCost.length
     : 0;
 
-  const marginColor = avgMargin >= 200 ? 'text-success' : avgMargin >= 100 ? 'text-warning' : 'text-destructive';
+  const marginColor = avgMargin >= 30 ? 'text-success' : avgMargin >= 15 ? 'text-warning' : 'text-destructive';
 
   return (
     <div className="space-y-3">

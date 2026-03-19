@@ -174,14 +174,14 @@ export function MenuCategoryTree({
           }, 0) / withCost.length;
           const avgMargin = withCost.reduce((s, p) => {
             const cost = (p as any).cost_per_portion || 0;
-            return s + (cost > 0 ? ((p.price - cost) / cost) * 100 : 0);
+            return s + (p.price > 0 ? ((p.price - cost) / p.price) * 100 : 0);
           }, 0) / withCost.length;
           const linked = allProds.filter(p => !!(p as any).recipe_id).length;
           return { avgCMV, avgMargin, linked, total: allProds.length, withCost: withCost.length };
         })() : null;
 
         const catMarginColor = catStats
-          ? catStats.avgMargin >= 200 ? 'text-success' : catStats.avgMargin >= 100 ? 'text-warning' : 'text-destructive'
+          ? catStats.avgMargin >= 30 ? 'text-success' : catStats.avgMargin >= 15 ? 'text-warning' : 'text-destructive'
           : '';
 
         return (

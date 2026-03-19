@@ -19,14 +19,14 @@ export function FichaTecnicaHeader({ products, syncing, onRefreshCosts }: Props)
   const avgMargin = withCost.length > 0
     ? withCost.reduce((sum, p) => {
         const cost = (p as any).cost_per_portion || 0;
-        const margin = cost > 0 ? ((p.price - cost) / cost) * 100 : 0;
+        const margin = p.price > 0 ? ((p.price - cost) / p.price) * 100 : 0;
         return sum + margin;
       }, 0) / withCost.length
     : 0;
 
-  const marginColor = avgMargin >= 200
+  const marginColor = avgMargin >= 30
     ? 'text-success'
-    : avgMargin >= 100
+    : avgMargin >= 15
       ? 'text-warning'
       : 'text-destructive';
 
