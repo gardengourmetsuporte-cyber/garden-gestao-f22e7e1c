@@ -431,6 +431,7 @@ export default function Deliveries() {
         onOpenChange={(open) => { if (!open) setLocationPickerDelivery(null); }}
         delivery={locationPickerDelivery}
         onConfirm={(id, lat, lng) => updateAddress({ id, lat, lng })}
+        cityContext={(activeUnit as any)?.city || ''}
       />
 
       <DeliveryEditSheet
