@@ -5329,6 +5329,7 @@ export type Database = {
           created_at: string
           fixed_cost_category_ids: string[] | null
           id: string
+          monthly_fixed_cost_manual: number
           monthly_products_sold: number
           monthly_revenue: number
           packaging_cost_per_unit: number
@@ -5341,6 +5342,7 @@ export type Database = {
           created_at?: string
           fixed_cost_category_ids?: string[] | null
           id?: string
+          monthly_fixed_cost_manual?: number
           monthly_products_sold?: number
           monthly_revenue?: number
           packaging_cost_per_unit?: number
@@ -5353,6 +5355,7 @@ export type Database = {
           created_at?: string
           fixed_cost_category_ids?: string[] | null
           id?: string
+          monthly_fixed_cost_manual?: number
           monthly_products_sold?: number
           monthly_revenue?: number
           packaging_cost_per_unit?: number
