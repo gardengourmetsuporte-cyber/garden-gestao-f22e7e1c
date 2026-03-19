@@ -347,31 +347,53 @@ export function RecipeSheet({
             <div className="p-4 space-y-6 pb-24">
               {/* Basic Info */}
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nome da Receita</Label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Ex: X-Burguer Tradicional"
-                  />
-                </div>
+                {recipe ? (
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border/50">
+                    {(() => {
+                      const cat = categories.find(c => c.id === categoryId);
+                      return cat ? (
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                          style={{ background: cat.color }}
+                        >
+                          <AppIcon name={cat.icon || 'ChefHat'} size={14} className="text-white" />
+                        </div>
+                      ) : null;
+                    })()}
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground truncate">{name}</p>
+                      <p className="text-xs text-muted-foreground">{categories.find(c => c.id === categoryId)?.name || 'Sem categoria'}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nome da Receita</Label>
+                      <Input
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Ex: X-Burguer Tradicional"
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label>Categoria</Label>
-                  <Select value={categoryId} onValueChange={setCategoryId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div className="space-y-2">
+                      <Label>Categoria</Label>
+                      <Select value={categoryId} onValueChange={setCategoryId}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
