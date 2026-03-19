@@ -101,6 +101,8 @@ import { useUnit } from '@/contexts/UnitContext';
             name,
             unit_type,
             unit_price,
+            recipe_unit_type,
+            recipe_unit_price,
             category:categories(id, name, color)
           `)
           .is('deleted_at' as any, null)
