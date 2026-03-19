@@ -2,6 +2,7 @@ import { ReactNode, useState, useMemo, useEffect, lazy, Suspense } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import gardenLogo from '@/assets/logo.png';
 import { PageLoader } from '@/components/PageLoader';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { PageTransition } from './PageTransition';
 import { AppIcon } from '@/components/ui/app-icon';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
