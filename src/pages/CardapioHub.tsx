@@ -84,12 +84,15 @@ export default function CardapioHub() {
   } = useRecipes();
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+  const [recipeTargetProductId, setRecipeTargetProductId] = useState<string | null>(null);
 
   const [defaultRecipeName, setDefaultRecipeName] = useState('');
   const [defaultRecipeCategoryId, setDefaultRecipeCategoryId] = useState<string | null>(null);
 
   const handleEditRecipe = useCallback((product: MenuProduct) => {
     const recipeId = (product as any).recipe_id;
+    setRecipeTargetProductId(product.id);
+
     if (recipeId) {
       const recipe = recipes.find(r => r.id === recipeId) || null;
       setEditingRecipe(recipe);
@@ -102,12 +105,28 @@ export default function CardapioHub() {
       const matchedCat = recipeCategories.find(c => c.name.toLowerCase() === product.category?.toLowerCase());
       setDefaultRecipeCategoryId(matchedCat?.id || null);
     }
+
     setRecipeSheetOpen(true);
   }, [recipes, recipeCategories]);
 
   const handleRecipeSave = async (data: any) => {
-    if (data.id) await updateRecipe(data);
-    else await addRecipe(data);
+    const savedRecipe = data.id ? await updateRecipe(data) : await addRecipe(data);
+    const savedRecipeId = savedRecipe?.id || data.id;
+
+    if (recipeTargetProductId && savedRecipeId) {
+      const { data: linkedRows, error: linkError } = await supabase
+        .from('tablet_products')
+        .update({ recipe_id: savedRecipeId, updated_at: new Date().toISOString() })
+        .eq('id', recipeTargetProductId)
+        .select('id');
+
+      if (linkError) throw linkError;
+      if (!linkedRows || linkedRows.length === 0) {
+        throw new Error('Não foi possível vincular a ficha técnica ao produto.');
+      }
+
+      await menuAdmin.fetchProducts();
+    }
   };
 
   // Internal tab for cardápio content
@@ -373,7 +392,15 @@ export default function CardapioHub() {
       <LinkOptionsDialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen} optionGroup={linkingOG} categories={categories} groups={groups} products={products} linkedProductIds={linkingOG ? getLinkedProductIds(linkingOG.id) : []} onSave={(ogId, pids) => setProductOptionLinks(ogId, pids)} />
       <RecipeSheet
         open={recipeSheetOpen}
-        onOpenChange={setRecipeSheetOpen}
+        onOpenChange={(open) => {
+          setRecipeSheetOpen(open);
+          if (!open) {
+            setEditingRecipe(null);
+            setRecipeTargetProductId(null);
+            setDefaultRecipeName('');
+            setDefaultRecipeCategoryId(null);
+          }
+        }}
         recipe={editingRecipe}
         defaultName={defaultRecipeName}
         defaultCategoryId={defaultRecipeCategoryId}
