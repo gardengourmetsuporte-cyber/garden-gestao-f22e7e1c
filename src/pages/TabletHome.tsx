@@ -703,7 +703,7 @@ export default function TabletHome() {
                         <p className="text-sm text-white/70 mt-0.5">{game.description}</p>
                       </div>
                       <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-colors">
-                        <AppIcon name="PlayArrow" size={22} className="text-white" />
+                        <AppIcon name="Play" size={22} className="text-white" />
                       </div>
                     </button>
                   ))}
