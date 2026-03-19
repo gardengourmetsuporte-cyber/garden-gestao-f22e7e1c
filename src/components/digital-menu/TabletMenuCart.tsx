@@ -461,30 +461,28 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 </div>
               </button>
 
-              {/* Pagar agora (PIX) — only if ASAAS is active */}
-              {asaasActive && (
-                <button
-                  onClick={() => setPaymentTiming('now')}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
-                    paymentTiming === 'now' ? 'border-primary bg-primary/5' : 'border-border/40'
-                  }`}
-                >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                    paymentTiming === 'now' ? 'bg-primary/10' : 'bg-muted'
-                  }`}>
-                    <AppIcon name="QrCode" size={18} className={paymentTiming === 'now' ? 'text-primary' : 'text-muted-foreground'} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground">Pagar agora (PIX)</p>
-                    <p className="text-[11px] text-muted-foreground">QR Code instantâneo • confirmação automática</p>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    paymentTiming === 'now' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
-                  }`}>
-                    {paymentTiming === 'now' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
-                  </div>
-                </button>
-              )}
+              {/* Pagar agora (PIX) */}
+              <button
+                onClick={() => setPaymentTiming('now')}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
+                  paymentTiming === 'now' ? 'border-primary bg-primary/5' : 'border-border/40'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                  paymentTiming === 'now' ? 'bg-primary/10' : 'bg-muted'
+                }`}>
+                  <AppIcon name="QrCode" size={18} className={paymentTiming === 'now' ? 'text-primary' : 'text-muted-foreground'} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">Pagar agora (PIX)</p>
+                  <p className="text-[11px] text-muted-foreground">QR Code instantâneo</p>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  paymentTiming === 'now' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                }`}>
+                  {paymentTiming === 'now' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                </div>
+              </button>
             </div>
           </div>
         )}
