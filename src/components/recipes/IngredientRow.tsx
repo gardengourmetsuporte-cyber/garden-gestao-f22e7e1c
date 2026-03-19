@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost, getCompatibleUnits } from '@/types/recipe';
+import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost } from '@/types/recipe';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 
@@ -66,9 +66,8 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
   const displayUnit = baseUnit || 'unidade';
   const hasNoPrice = !isSubRecipe && (ingredient.item_price === null || ingredient.item_price === 0);
 
-  // Filter units by compatibility
-  const compatibleUnits = getCompatibleUnits(displayUnit);
-  const filteredUnitOptions = UNIT_OPTIONS.filter(u => compatibleUnits.includes(u.value));
+  // Show all unit options — recipe may use a different unit family than inventory
+  const filteredUnitOptions = UNIT_OPTIONS;
   const unitLabel = UNIT_OPTIONS.find(u => u.value === displayUnit)?.label || displayUnit;
 
   const handleQuantityChange = (value: string) => {
