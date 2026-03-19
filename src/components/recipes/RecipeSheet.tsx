@@ -64,6 +64,7 @@ interface RecipeSheetProps {
   isSaving: boolean;
   defaultCategoryId?: string | null;
   defaultName?: string;
+  defaultSellingPrice?: number | null;
   onUpdateItemPrice?: (itemId: string, newPrice: number) => Promise<void>;
   onUpdateItemUnit?: (itemId: string, unitType: string) => Promise<void>;
 }
@@ -79,6 +80,7 @@ export function RecipeSheet({
   isSaving,
   defaultCategoryId,
   defaultName,
+  defaultSellingPrice,
   onUpdateItemPrice,
   onUpdateItemUnit,
 }: RecipeSheetProps) {
@@ -96,8 +98,8 @@ export function RecipeSheet({
   const [packagingTemplateId, setPackagingTemplateId] = useState<string>('');
 
   const { activeUnit } = useUnit();
-   const { settings, calculateOperationalCosts } = useRecipeCostSettings();
-   const { templates: packagingTemplates, getTemplateCost } = usePackagingTemplates();
+  const { settings, calculateOperationalCosts } = useRecipeCostSettings();
+  const { templates: packagingTemplates, getTemplateCost } = usePackagingTemplates();
 
   // Load KDS stations
   const { data: kdsStations = [] } = useQuery({
@@ -117,6 +119,8 @@ export function RecipeSheet({
 
   // Reset form when recipe changes
   useEffect(() => {
+    const hasDefaultSellingPrice = !!defaultSellingPrice && defaultSellingPrice > 0;
+
     if (recipe) {
       setName(recipe.name);
       setCategoryId(recipe.category_id || '');
@@ -125,6 +129,8 @@ export function RecipeSheet({
       setNotes(recipe.preparation_notes || '');
       setMinReadyStock(String(recipe.min_ready_stock ?? 0));
       setPackagingTemplateId((recipe as any).packaging_template_id || '');
+      setSellingPrice(hasDefaultSellingPrice ? defaultSellingPrice!.toFixed(2) : '');
+      setMarginMode(hasDefaultSellingPrice ? 'price' : 'margin');
       setIngredients(
         (recipe.ingredients || []).map((ing) => ({
           id: ing.id,
@@ -151,9 +157,11 @@ export function RecipeSheet({
       setNotes('');
       setMinReadyStock('0');
       setPackagingTemplateId('');
+      setSellingPrice(hasDefaultSellingPrice ? defaultSellingPrice!.toFixed(2) : '');
+      setMarginMode(hasDefaultSellingPrice ? 'price' : 'margin');
       setIngredients([]);
     }
-  }, [recipe, open]);
+  }, [recipe, open, defaultName, defaultSellingPrice]);
 
   useEffect(() => {
     if (open && !recipe && defaultCategoryId) {
@@ -166,11 +174,15 @@ export function RecipeSheet({
   const portions = parseFloat(yieldQuantity) || 1;
   const costPerPortion = ingredientsCost / portions;
 
-  // Use selling price for proportional fixed cost only when user manually set a price
-  const priceForFixedCost = marginMode === 'price' ? (parseFloat(sellingPrice) || undefined) : undefined;
+  // Use the real menu selling price as reference for proportional fixed cost
+  const typedSellingPrice = parseFloat(sellingPrice) || undefined;
+  const priceForFixedCost = defaultSellingPrice && defaultSellingPrice > 0
+    ? defaultSellingPrice
+    : typedSellingPrice;
+
   const operationalCosts = useMemo(
     () => calculateOperationalCosts(costPerPortion, priceForFixedCost),
-    [costPerPortion, priceForFixedCost, settings]
+    [calculateOperationalCosts, costPerPortion, priceForFixedCost, settings]
   );
 
   const packagingCost = packagingTemplateId ? getTemplateCost(packagingTemplateId) : operationalCosts.packagingCost;
