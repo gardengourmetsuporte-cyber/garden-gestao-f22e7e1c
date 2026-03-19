@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
@@ -12,6 +13,27 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
 import type { User } from '@supabase/supabase-js';
+
+function buildPixPayload(pixKey: string, _pixKeyType: string, merchantName: string, amount: number): string {
+  const tlv = (id: string, val: string) => `${id}${val.length.toString().padStart(2, '0')}${val}`;
+  const gui = tlv('00', 'br.gov.bcb.pix');
+  const key = tlv('01', pixKey);
+  const mai = tlv('26', gui + key);
+  const mcc = tlv('52', '0000');
+  const cur = tlv('53', '986');
+  const amt = tlv('54', amount.toFixed(2));
+  const country = tlv('58', 'BR');
+  const name = tlv('59', merchantName.slice(0, 25));
+  const city = tlv('60', 'SAO PAULO');
+  const payload = '000201' + mai + mcc + cur + amt + country + name + city + '6304';
+  // CRC16 CCITT
+  let crc = 0xFFFF;
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) crc = crc & 0x8000 ? (crc << 1) ^ 0x1021 : crc << 1;
+  }
+  return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+}
 
 interface Props {
   cart: CartItem[];
