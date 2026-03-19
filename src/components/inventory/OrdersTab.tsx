@@ -226,27 +226,34 @@ export function OrdersTab({
               const isNoSupplier = supplierId === 'no-supplier';
 
               return (
-                <div key={supplierId} className="bg-card rounded-2xl border border-border/40 overflow-hidden relative">
-                  {/* Accent bar */}
-                  <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-primary" />
-
-                  <div className="flex items-center gap-3 pl-5 pr-4 py-3.5">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: isNoSupplier ? 'linear-gradient(135deg, #6B7280, #9CA3AF)' : 'linear-gradient(135deg, #14B8A6, #0EA5E9)' }}>
-                      <AppIcon name={isNoSupplier ? 'HelpCircle' : 'Truck'} size={20} className="text-white" />
+                <div key={supplierId} className="bg-card/80 rounded-2xl border border-border/40 shadow-sm shadow-black/5 overflow-hidden">
+                  <div className="flex items-center gap-3 px-4 py-3.5">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: isNoSupplier ? 'linear-gradient(135deg, hsl(var(--muted-foreground)), hsl(var(--muted-foreground) / 0.6))' : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent-foreground)))' }}>
+                      <AppIcon name={isNoSupplier ? 'HelpCircle' : 'Truck'} size={22} className="text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-foreground truncate">
-                        {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground">
-                        {supplierItems.length} item(ns) abaixo do mínimo
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-foreground truncate">
+                          {isNoSupplier ? 'Sem Fornecedor' : supplier?.name}
+                        </p>
+                        <span className={cn(
+                          "px-2 py-0.5 text-[10px] font-bold rounded-full shrink-0",
+                          supplierItems.length >= 5
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-warning/10 text-warning"
+                        )}>
+                          {supplierItems.length} baixo{supplierItems.length !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground truncate">
+                        {!isNoSupplier && supplier?.phone ? `📞 ${supplier.phone}` : 'Sem telefone'}
                       </p>
                     </div>
                     {!isNoSupplier && supplier && (
                       <Button
                         size="sm"
                         onClick={() => handleOpenOrder(supplier)}
-                        className="gap-1.5 shrink-0"
+                        className="gap-1.5 shrink-0 h-10"
                       >
                         <AppIcon name="Add" size={16} />
                         Pedir
@@ -254,15 +261,15 @@ export function OrdersTab({
                     )}
                   </div>
 
-                  <div className="px-4 pb-3 space-y-1">
+                  <div className="px-4 pb-3">
                     {supplierItems.slice(0, 3).map(item => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between py-2 border-t border-border/30 first:border-t-0"
+                        className="flex items-center justify-between py-2 border-t border-border/20"
                       >
-                        <span className="text-sm">{item.name}</span>
+                        <span className="text-xs text-muted-foreground">{item.name}</span>
                         <span className={cn(
-                          "text-sm font-medium tabular-nums",
+                          "text-xs font-semibold tabular-nums",
                           item.current_stock === 0 ? "text-destructive" : "text-warning"
                         )}>
                           {item.current_stock} / {item.min_stock} {item.unit_type}
@@ -270,7 +277,7 @@ export function OrdersTab({
                       </div>
                     ))}
                     {supplierItems.length > 3 && (
-                      <p className="text-xs text-muted-foreground pt-1">
+                      <p className="text-[11px] text-muted-foreground pt-1.5 border-t border-border/20">
                         +{supplierItems.length - 3} mais item(ns)
                       </p>
                     )}
