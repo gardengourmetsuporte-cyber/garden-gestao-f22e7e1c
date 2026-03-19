@@ -520,6 +520,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
             setComandaNumber(num);
             setShowScanner(false);
             toast.success(`Comanda #${num} escaneada!`);
+            setSendAfterScan(true);
           }}
           onCancel={() => setShowScanner(false)}
         />
