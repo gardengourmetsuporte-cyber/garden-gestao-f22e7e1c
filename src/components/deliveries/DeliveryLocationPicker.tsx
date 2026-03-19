@@ -39,6 +39,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   delivery: Delivery | null;
   onConfirm: (addressId: string, lat: number, lng: number) => Promise<void>;
+  cityContext?: string;
 }
 
 interface NominatimResult {
