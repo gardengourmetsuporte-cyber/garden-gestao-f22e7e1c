@@ -169,7 +169,8 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
     }
 
     const isOnlinePayment = paymentTiming === 'now' && asaasActive;
-    const paymentOption = isOnlinePayment ? 'pix' as const : 'presencial' as const;
+    const isPixManual = paymentTiming === 'now' && !asaasActive;
+    const paymentOption = (isOnlinePayment || isPixManual) ? 'pix' as const : 'presencial' as const;
 
     let lastError: any = null;
 
