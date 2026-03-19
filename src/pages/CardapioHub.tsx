@@ -251,7 +251,8 @@ export default function CardapioHub() {
   if (isConfigFromUrl) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-background pb-24">
+        <CardapioDesktopNav />
+        <div className="min-h-screen bg-background pb-24 lg:pb-6">
           <Suspense fallback={<div className="p-4 space-y-4"><Skeleton className="h-10 w-48 rounded-xl" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-24 w-full rounded-2xl" /></div>}>
             <CardapioConfigHubLazy />
           </Suspense>
