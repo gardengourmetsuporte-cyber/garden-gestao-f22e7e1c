@@ -77,9 +77,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
         <AppSidebar />
 
         <div className="flex-1 flex flex-col min-w-0">
-          {/* ======= Mobile Header ======= */}
+          {/* ======= Unified Header (Mobile + Desktop) ======= */}
           <header
-            className="lg:hidden fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out"
+            className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out lg:left-[--sidebar-width]  group-data-[state=collapsed]/sidebar-wrapper:lg:left-[--sidebar-width-icon]"
             style={{
               paddingTop: 'env(safe-area-inset-top)',
               background: isDashboard
@@ -88,13 +88,17 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               backdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
               WebkitBackdropFilter: isScrolled || !isDashboard ? 'blur(20px) saturate(1.4)' : 'none',
               borderBottom: isScrolled ? '1px solid hsl(var(--border))' : '1px solid transparent',
-              transition: 'background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease',
+              transition: 'background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, left 0.2s ease',
             }}
           >
             <div className="relative overflow-hidden">
               <div className="flex items-center justify-between h-12 px-3.5 relative z-10">
-                {/* Left: Logo pill */}
+                {/* Left: Logo pill (mobile) / Sidebar trigger + title (desktop) */}
                 <div className="flex items-center gap-1 relative" style={{ minWidth: '2.5rem' }}>
+                  {/* Desktop: sidebar trigger */}
+                  <SidebarTrigger className="hidden lg:flex mr-1 text-foreground/70 hover:text-foreground" />
+
+                  {/* Logo pill */}
                   <button
                     onClick={() => navigate('/')}
                     className={cn(
@@ -124,7 +128,7 @@ function AppLayoutContent({ children }: AppLayoutProps) {
                   </button>
                 </div>
 
-                {/* Right: Notifications + Profile */}
+                {/* Right: Theme toggle (desktop) + Notifications + Profile */}
                 <div className="flex items-center gap-0.5">
                   <NotificationBell />
                   <ProfileDropdown />
@@ -133,13 +137,10 @@ function AppLayoutContent({ children }: AppLayoutProps) {
             </div>
           </header>
 
-          {/* ======= Desktop Header ======= */}
-          <DesktopHeader />
-
           {/* ======= Main Content ======= */}
           <main
-            className="flex-1 lg:pt-0"
-            style={{ paddingTop: isLgScreen ? '0' : 'calc(env(safe-area-inset-top) + 3rem)' }}
+            className="flex-1"
+            style={{ paddingTop: 'calc(env(safe-area-inset-top) + 3rem)' }}
           >
             <PageTransition>
               {children}
