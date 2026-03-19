@@ -271,7 +271,24 @@ export default function TabletDigitalMenu() {
         </aside>
 
         {/* Scrollable products area */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto relative">
+          {/* Overlay when cart is open */}
+          {cartOpen && cartCount > 0 && (
+            <button
+              onClick={() => setCartOpen(false)}
+              className="absolute inset-0 z-20 flex items-center justify-center cursor-pointer"
+              style={{ background: 'hsl(var(--background) / 0.85)', backdropFilter: 'blur(4px)' }}
+            >
+              <div className="flex flex-col items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <AppIcon name="Restaurant" size={32} className="text-primary" />
+                </div>
+                <p className="text-base font-bold text-foreground">Clique aqui para continuar pedindo</p>
+                <p className="text-xs text-muted-foreground">O carrinho será minimizado</p>
+              </div>
+            </button>
+          )}
+
           <div className="p-5 lg:p-6">
             {/* Pending cart banner */}
             {cartCount > 0 && !cartOpen && (
