@@ -5054,6 +5054,53 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_login_sessions: {
+        Row: {
+          auth_user_id: string | null
+          completed_at: string | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string | null
+          expires_at: string
+          id: string
+          session_token: string
+          status: string
+          unit_id: string
+        }
+        Insert: {
+          auth_user_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          expires_at?: string
+          id?: string
+          session_token?: string
+          status?: string
+          unit_id: string
+        }
+        Update: {
+          auth_user_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          expires_at?: string
+          id?: string
+          session_token?: string
+          status?: string
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qr_login_sessions_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotation_items: {
         Row: {
           created_at: string
