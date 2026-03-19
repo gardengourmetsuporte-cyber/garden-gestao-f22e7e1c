@@ -292,6 +292,7 @@ function AuthenticatedRoutes() {
           <Route path="/recipes" element={<Navigate to="/cardapio" replace />} />
           <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
           <Route path="/tablet-admin" element={<Navigate to="/cardapio" replace />} />
+          <Route path="/menu-admin" element={<Navigate to="/cardapio" replace />} />
           <Route path="/cardapio" element={<ProtectedRoute><CardapioHub /></ProtectedRoute>} />
           <Route path="/marketing" element={<ProtectedRoute><Marketing /></ProtectedRoute>} />
           <Route path="/brand-core" element={<Navigate to="/marketing" replace />} />
