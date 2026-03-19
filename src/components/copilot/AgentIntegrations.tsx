@@ -39,6 +39,15 @@ const INTEGRATIONS = [
     configPath: '/delivery-hub',
     status: 'available' as const,
   },
+  {
+    id: 'colibri',
+    name: 'Colibri PDV',
+    description: 'Envio automático de pedidos para o PDV Colibri',
+    icon: 'Zap',
+    color: '#8B5CF6',
+    configPath: '/menu-admin?section=colibri',
+    status: 'available' as const,
+  },
 ];
 
 export function AgentIntegrations() {
