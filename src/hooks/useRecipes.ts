@@ -392,7 +392,6 @@ import { useUnit } from '@/contexts/UnitContext';
           .insert({
             ...data,
             sort_order: (maxOrder?.sort_order ?? 0) + 1,
-            unit_id: activeUnitId,
           });
        
        if (error) throw error;
