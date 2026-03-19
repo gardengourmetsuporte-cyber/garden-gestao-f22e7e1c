@@ -391,7 +391,7 @@ export const ICON_MAP: Record<string, string> = {
   Bug: 'pest_control',
   Wind: 'air',
 
-  // Material Symbol pass-through (used in digital menu)
+  // Material Symbol pass-through (used in digital menu & sidebar)
   EmojiEvents: 'emoji_events',
   Storefront: 'storefront',
   Casino: 'casino',
@@ -403,4 +403,10 @@ export const ICON_MAP: Record<string, string> = {
   ScanLine: 'document_scanner',
   Wand2: 'auto_fix_high',
   ImagePlus: 'add_photo_alternate',
+  Campaign: 'campaign',
+  TwoWheeler: 'two_wheeler',
+  Groups: 'groups',
+  CardGiftcard: 'card_giftcard',
+  PersonAdd: 'person_add',
+  Chat: 'chat',
 };
