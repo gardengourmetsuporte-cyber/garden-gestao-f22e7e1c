@@ -349,7 +349,7 @@ export default function TabletDigitalMenu() {
             {activeCategory && (
               <div className="mb-5">
                 <h2 className="text-lg font-bold text-foreground">
-                  {categories.find(c => c.id === activeCategory)?.name}
+                  {tCategories.find(c => c.id === activeCategory)?.name}
                 </h2>
               </div>
             )}
