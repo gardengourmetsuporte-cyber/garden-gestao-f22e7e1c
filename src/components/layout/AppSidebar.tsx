@@ -95,22 +95,6 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      {/* User card */}
-      {!collapsed && (
-        <div className="px-2 pt-2">
-          <button
-            onClick={() => navigate('/profile/me')}
-            className="flex items-center gap-3 px-2 py-2 w-full rounded-lg hover:bg-sidebar-accent transition-colors"
-          >
-            <RankedAvatar avatarUrl={profile?.avatar_url} earnedPoints={earnedPoints} size={32} />
-            <div className="text-left min-w-0 flex-1">
-              <p className="text-sm font-semibold text-sidebar-foreground truncate">{profile?.full_name || 'Usuário'}</p>
-              <p className="text-[11px] font-medium" style={{ color: rank.color }}>{rank.title} · {earnedPoints} pts</p>
-            </div>
-          </button>
-        </div>
-      )}
-
       <SidebarSeparator />
 
       {/* Navigation */}
