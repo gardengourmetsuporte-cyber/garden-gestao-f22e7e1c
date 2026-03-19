@@ -10,6 +10,7 @@ type MessageContent = string | Array<{ type: "text"; text: string } | { type: "i
 type IncomingMessage = { role: "user" | "assistant" | "system"; content: MessageContent };
 
 const CREATE_POST_INTENT_REGEX = /(crie|criar|gere|gerar|monta|elabore|post|legenda|promo(ção|cao)?|lançamento|lancamento)/i;
+const NO_PRODUCTS_CONTRADICTION_REGEX = /(não\s+(possui|tem).{0,20}produt|sem\s+produt|nenhum\s+produt)/i;
 
 function extractTextFromMessageContent(content: MessageContent): string {
   if (typeof content === "string") return content;
@@ -29,6 +30,23 @@ function getLastUserText(messages: IncomingMessage[]): string {
 function formatPrice(value: unknown): string {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed.toFixed(2) : "0.00";
+}
+
+function normalizeTextForMatch(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function hasRealProductMention(text: string, products: any[]): boolean {
+  const normalizedText = normalizeTextForMatch(text);
+  const names = products
+    .map((product) => String(product?.name || "").trim())
+    .filter((name) => name.length >= 3)
+    .slice(0, 60);
+
+  return names.some((name) => normalizedText.includes(normalizeTextForMatch(name)));
 }
 
 function buildFallbackPostData(unitName: string, products: any[]) {
@@ -103,10 +121,11 @@ serve(async (req) => {
         .limit(20),
       supabase
         .from("tablet_products")
-        .select("name, description, price, image_url, is_highlighted, category, is_active")
+        .select("name, description, price, image_url, is_highlighted, is_active, category")
         .eq("unit_id", unit_id)
         .eq("is_active", true)
         .order("is_highlighted", { ascending: false })
+        .order("updated_at", { ascending: false })
         .limit(80),
     ]);
 
@@ -142,7 +161,7 @@ serve(async (req) => {
 
     const referencesBlock = references.length > 0
       ? references
-          .map((ref: any) => `- [${ref.type}] ${ref.title || "Sem título"}: ${(ref.content || "").slice(0, 260)}`)
+          .map((reference: any) => `- [${reference.type}] ${reference.title || "Sem título"}: ${(reference.content || "").slice(0, 260)}`)
           .join("\n")
       : "Nenhuma referência textual cadastrada";
 
@@ -267,8 +286,8 @@ REGRAS OBRIGATÓRIAS:
         });
       }
 
-      const errText = await response.text();
-      console.error("AI gateway error:", response.status, errText);
+      const errorText = await response.text();
+      console.error("AI gateway error:", response.status, errorText);
       return new Response(JSON.stringify({ error: "Erro no serviço de IA" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -297,6 +316,18 @@ REGRAS OBRIGATÓRIAS:
 
     if (!postData && shouldForceCreatePost && products.length > 0) {
       postData = buildFallbackPostData(unitName, products);
+    }
+
+    if (postData && products.length > 0 && shouldForceCreatePost) {
+      const postText = `${String(postData.title || "")} ${String(postData.caption || "")}`;
+      if (!hasRealProductMention(postText, products)) {
+        postData = buildFallbackPostData(unitName, products);
+        text = "Perfeito! Ajustei o post para usar produtos reais do seu cardápio.";
+      }
+    }
+
+    if (products.length > 0 && NO_PRODUCTS_CONTRADICTION_REGEX.test(text)) {
+      text = "Perfeito! Criei um post com base no seu cardápio real e nas referências da marca.";
     }
 
     if ((!text || !text.trim()) && postData) {
