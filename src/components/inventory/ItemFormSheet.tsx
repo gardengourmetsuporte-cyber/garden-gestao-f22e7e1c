@@ -79,7 +79,7 @@ export function ItemFormSheet({
       setCurrentStock('');
       setMinStock('');
       setUnitPrice('');
-      setStockUnitLabel('');
+      
       setPurchaseUnitLabel('');
       setPurchaseToStockFactor('');
       setShowPurchaseSection(false);
