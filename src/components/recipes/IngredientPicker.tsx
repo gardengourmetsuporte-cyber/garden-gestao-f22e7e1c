@@ -8,15 +8,13 @@ import { formatCurrency } from '@/types/recipe';
 import { AppIcon } from '@/components/ui/app-icon';
  import { cn } from '@/lib/utils';
  
- interface InventoryItem {
-   id: string;
-   name: string;
-   unit_type: string;
-   unit_price: number;
-  recipe_unit_type?: string | null;
-  recipe_unit_price?: number | null;
-   category?: { id: string; name: string; color: string } | null;
- }
+interface InventoryItem {
+  id: string;
+  name: string;
+  unit_type: string;
+  unit_price: number;
+  category?: { id: string; name: string; color: string } | null;
+}
  
 interface SubRecipeItem {
   id: string;
@@ -99,11 +97,8 @@ interface SubRecipeItem {
     return Object.entries(groups).sort((a, b) => a[1].name.localeCompare(b[1].name));
   }, [subRecipes, excludeRecipeIds, search]);
   
-  // Get the effective unit and price for recipe (prefer recipe-specific values)
   const getRecipeDisplay = (item: InventoryItem) => {
-    const unit = item.recipe_unit_type || item.unit_type;
-    const price = item.recipe_unit_price ?? item.unit_price;
-    return { unit, price };
+    return { unit: item.unit_type, price: item.unit_price };
   };
 
    const toggleCategory = (categoryId: string) => {

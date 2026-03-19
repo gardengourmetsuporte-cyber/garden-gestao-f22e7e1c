@@ -51,7 +51,7 @@ export function ItemFormSheet({
   const [currentStock, setCurrentStock] = useState('');
   const [minStock, setMinStock] = useState('');
   const [unitPrice, setUnitPrice] = useState('');
-  const [stockUnitLabel, setStockUnitLabel] = useState('');
+  
   const [purchaseUnitLabel, setPurchaseUnitLabel] = useState('');
   const [purchaseToStockFactor, setPurchaseToStockFactor] = useState('');
   const [showPurchaseSection, setShowPurchaseSection] = useState(false);
@@ -67,7 +67,7 @@ export function ItemFormSheet({
       setCurrentStock(item.current_stock.toString());
       setMinStock(item.min_stock.toString());
       setUnitPrice(item.unit_price?.toString() || '');
-      setStockUnitLabel(item.stock_unit_label || '');
+      
       setPurchaseUnitLabel(item.purchase_unit_label || '');
       setPurchaseToStockFactor(item.purchase_to_stock_factor?.toString() || '');
       setShowPurchaseSection(!!item.purchase_unit_label || !!item.purchase_to_stock_factor);
@@ -79,7 +79,7 @@ export function ItemFormSheet({
       setCurrentStock('');
       setMinStock('');
       setUnitPrice('');
-      setStockUnitLabel('');
+      
       setPurchaseUnitLabel('');
       setPurchaseToStockFactor('');
       setShowPurchaseSection(false);
@@ -97,7 +97,7 @@ export function ItemFormSheet({
       current_stock: parseFloat(currentStock) || 0,
       min_stock: parseFloat(minStock) || 0,
       unit_price: unitPrice ? parseFloat(unitPrice) : null,
-      stock_unit_label: stockUnitLabel.trim() || null,
+      stock_unit_label: null,
       purchase_unit_label: purchaseUnitLabel.trim() || null,
       purchase_to_stock_factor: purchaseToStockFactor ? parseFloat(purchaseToStockFactor) : null,
     });
@@ -242,27 +242,10 @@ export function ItemFormSheet({
             </div>
           </div>
 
-          {/* Custom Stock Unit Label */}
-          <div className="space-y-2">
-            <Label htmlFor="stockUnitLabel" className="text-base font-medium">
-              Nome personalizado da unidade
-            </Label>
-            <Input
-              id="stockUnitLabel"
-              value={stockUnitLabel}
-              onChange={(e) => setStockUnitLabel(e.target.value)}
-              placeholder={unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'litro' : unitType === 'ml' ? 'ml' : 'unidade'}
-              className="input-large"
-            />
-            <p className="text-xs text-muted-foreground">
-              Ex: pacote, saco, bandeja. Deixe vazio para usar o padrão.
-            </p>
-          </div>
-
           {/* Unit Price */}
           <div className="space-y-2">
             <Label htmlFor="unitPrice" className="text-base font-medium">
-              Preço por {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'L' : unitType === 'ml' ? 'ml' : 'unidade')}
+              Preço por {unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'L' : unitType === 'ml' ? 'ml' : 'unidade'}
             </Label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
@@ -277,13 +260,6 @@ export function ItemFormSheet({
                 min={0}
               />
             </div>
-          </div>
-
-          {/* Recipe info note */}
-          <div className="rounded-xl bg-primary/5 border border-primary/20 p-3">
-            <p className="text-sm text-muted-foreground">
-              💡 Nas fichas técnicas, você poderá usar unidades compatíveis (ex: kg↔g, L↔ml) e a conversão será automática.
-            </p>
           </div>
 
           {/* Purchase unit section */}
@@ -301,7 +277,7 @@ export function ItemFormSheet({
             <CollapsibleContent className="pt-4 space-y-4">
               <p className="text-sm text-muted-foreground">
                 Configure a unidade usada para pedir ao fornecedor.
-                Ex: você compra por "caixa", cada caixa vem com 8 {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'litros' : unitType === 'ml' ? 'ml' : 'unidades')}.
+                Ex: você compra por "caixa", cada caixa vem com 8 {unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'litros' : unitType === 'ml' ? 'ml' : 'unidades'}.
               </p>
 
               <div className="space-y-2">
@@ -320,7 +296,7 @@ export function ItemFormSheet({
               {purchaseUnitLabel.trim() && (
                 <div className="space-y-2">
                   <Label htmlFor="purchaseToStockFactor" className="text-base font-medium">
-                    Qtd de {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'litros' : unitType === 'ml' ? 'ml' : 'unidades')} por {purchaseUnitLabel.trim()}
+                    Qtd de {unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'litros' : unitType === 'ml' ? 'ml' : 'unidades'} por {purchaseUnitLabel.trim()}
                   </Label>
                   <Input
                     id="purchaseToStockFactor"

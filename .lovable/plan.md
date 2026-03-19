@@ -1,99 +1,88 @@
+## Sistema de Comandas Físicas com QR Code ✅
 
+### Implementado
 
-## Plano: Simplificar Fichas Técnicas e Preparar para Baixa Automática
+Sistema de comandas físicas numeradas (1-100) com QR code para vincular pedidos e facilitar cobrança agrupada.
 
-### Problema Atual
-O sistema de unidades tem complexidade desnecessária que confunde o usuário e quebra a integração com vendas:
+### Fluxo
+1. Admin gera e imprime QR codes das comandas (Configurações → Comandas Físicas)
+2. Cliente faz pedido no tablet → ao finalizar, escaneia a comanda física com a câmera
+3. Pedido é vinculado ao `comanda_number` automaticamente
+4. Na cobrança, todos os pedidos da mesma comanda são agrupados
 
-1. **Campos redundantes no item de estoque**: `recipe_unit_type`, `recipe_unit_price`, `stock_unit_label`, `stock_to_recipe_factor` — o sistema de receitas já faz conversão automática (kg↔g, L↔ml)
-2. **Formulário de item sobrecarregado**: "Nome personalizado da unidade", "Preço por kg" com nota sobre fichas técnicas, seção "Configurar para Compras/Pedidos"
-3. **Trigger de baixa automática quebrado**: `auto_consume_stock_on_sale()` referencia `recipes.product_id` que NÃO EXISTE — o vínculo real é `tablet_products.recipe_id`
+---
 
-### O que muda
+## Bloco de Relatórios Avançados ✅
 
-#### 1. Simplificar formulário de item de estoque (`ItemFormSheet.tsx`)
-- **Remover** campo "Nome personalizado da unidade" (`stock_unit_label`)
-- **Remover** nota sobre fichas técnicas (o tip verde)
-- **Manter** seção "Configurar para Compras/Pedidos" (útil para pedidos a fornecedores)
-- Formulário fica: Nome → Categoria → Fornecedor → Tipo de Controle (un/kg/g/L/ml) → Estoque/Mínimo → Preço → Compras/Pedidos
+- CMV Report (Custo de Mercadoria Vendida) — cruza vendas × fichas técnicas
+- Estoque Valorizado — valor total em estoque por categoria
+- Curva ABC — classificação Pareto de produtos por receita
+- Relatório de Funcionários — custos de folha por mês
+- Página `/reports` com abas (Vendas | CMV | Estoque | ABC | Funcionários)
 
-#### 2. Remover campos obsoletos de `recipe_unit_type`/`recipe_unit_price` do frontend
-- **`RecipeSheet.tsx`**: Remover lógica `hasRecipeUnit` no `handleAddInventoryItem` — usar sempre `item.unit_type` e `item.unit_price` diretamente, a conversão já é feita pelo sistema de unidades compatíveis
-- **`IngredientPicker.tsx`**: Remover referências a `recipe_unit_type`/`recipe_unit_price`
-- **`useRecipes.ts`**: Remover select desses campos
-- **`UnitManagement.tsx`**: Remover replicação desses campos
+## Dashboard Analytics ✅
 
-#### 3. Corrigir trigger de baixa automática (migração SQL)
-O trigger atual está quebrado porque `recipes` não tem `product_id`. Corrigir para usar o caminho correto: `tablet_products.recipe_id → recipes.id → recipe_ingredients`.
+- Heatmap de vendas (hora × dia da semana)
+- Comparativo mês a mês (variação %)
+- Break-even calculator
+- Multi-unit overview (visão consolidada de todas unidades)
 
-```sql
-CREATE OR REPLACE FUNCTION public.auto_consume_stock_on_sale()
-RETURNS trigger
-LANGUAGE plpgsql SECURITY DEFINER
-SET search_path TO 'public'
-AS $$
-DECLARE
-  item RECORD;
-  ingredient RECORD;
-  sale_unit_id uuid;
-BEGIN
-  IF NEW.status != 'paid' THEN RETURN NEW; END IF;
-  IF OLD IS NOT NULL AND OLD.status = 'paid' THEN RETURN NEW; END IF;
+## Operacional ✅
 
-  sale_unit_id := NEW.unit_id;
+- Contagem de estoque periódica (inventário físico)
+- Reservas de mesas com status management
+- Fila de espera digital
+- Mapa visual de mesas (salão com status)
+- Cupons de desconto para cardápio digital
+- Transferência de estoque entre unidades
 
-  FOR item IN
-    SELECT si.product_id, si.quantity
-    FROM pos_sale_items si
-    WHERE si.sale_id = NEW.id AND si.product_id IS NOT NULL
-  LOOP
-    FOR ingredient IN
-      SELECT ri.item_id, ri.quantity as recipe_qty,
-             ri.unit_type as recipe_unit, r.yield_quantity,
-             inv.unit_type as inv_unit
-      FROM tablet_products tp
-      JOIN recipes r ON r.id = tp.recipe_id
-      JOIN recipe_ingredients ri ON ri.recipe_id = r.id
-      JOIN inventory_items inv ON inv.id = ri.item_id
-      WHERE tp.id = item.product_id
-        AND ri.source_type = 'inventory'
-        AND ri.item_id IS NOT NULL
-    LOOP
-      -- Convert recipe unit to inventory unit for deduction
-      UPDATE inventory_items
-      SET current_stock = GREATEST(0,
-        current_stock - (item.quantity::numeric / GREATEST(ingredient.yield_quantity, 1))
-        * CASE
-            WHEN ingredient.recipe_unit = ingredient.inv_unit THEN ingredient.recipe_qty
-            WHEN ingredient.recipe_unit = 'g' AND ingredient.inv_unit = 'kg' THEN ingredient.recipe_qty / 1000
-            WHEN ingredient.recipe_unit = 'kg' AND ingredient.inv_unit = 'g' THEN ingredient.recipe_qty * 1000
-            WHEN ingredient.recipe_unit = 'ml' AND ingredient.inv_unit = 'litro' THEN ingredient.recipe_qty / 1000
-            WHEN ingredient.recipe_unit = 'litro' AND ingredient.inv_unit = 'ml' THEN ingredient.recipe_qty * 1000
-            ELSE ingredient.recipe_qty
-          END
-      ), updated_at = now()
-      WHERE id = ingredient.item_id AND unit_id = sale_unit_id;
-    END LOOP;
-  END LOOP;
+## CRM / Clientes ✅
 
-  RETURN NEW;
-END;
-$$;
-```
+- Histórico de pedidos do cliente (POS + tablet)
+- Alertas de aniversário
+- LGPD: exportar/anonimizar dados do cliente
+- Cashback & regras de fidelidade (pontos por real, visitas, aniversário, cashback %)
 
-#### 4. Adicionar trigger para pedidos Tablet/Delivery também
-O trigger atual só cobre `pos_sales`. Criar trigger similar para `tablet_orders` quando status muda para `'delivered'` ou `'completed'`, garantindo baixa automática em todos os canais de venda.
+## Funcionários ✅
 
-### Arquivos alterados
-- `src/components/inventory/ItemFormSheet.tsx` — simplificar formulário
-- `src/components/recipes/RecipeSheet.tsx` — remover lógica `hasRecipeUnit`
-- `src/components/recipes/IngredientPicker.tsx` — limpar referências
-- `src/hooks/useRecipes.ts` — remover select de campos obsoletos
-- `src/components/settings/UnitManagement.tsx` — limpar replicação
-- **Migração SQL** — corrigir e expandir triggers de baixa automática
+- Upload e gestão de documentos (RG, CPF, ASO, contratos, etc)
+- Controle de validade com alertas de vencimento
+- Banco de horas (controle de horas extras)
+- Gestão de férias e ausências
+- Holerite digital (geração PDF)
 
-### Resultado
-- Formulário de item simplificado e profissional
-- Sistema de unidades limpo: apenas `unit_type` + `unit_price` no estoque, conversões automáticas nas receitas
-- Baixa automática funcionando para POS, Tablet e Delivery
+## Cardápio Digital ✅
 
+- Order tracker em tempo real (status do pedido via realtime)
+- Multi-idioma (PT-BR, EN, ES) com seletor de idioma
+- Favoritos de cliente no cardápio
+
+## Sistema / UX ✅
+
+- Tour guiado interativo para novos usuários
+- Log de auditoria avançado com filtros de data e exportação CSV
+
+## Multi-Unit ✅
+
+- Ranking de unidades por performance
+- Replicação de cardápio entre unidades
+- Transferência de estoque entre unidades
+
+## NPS / Avaliações ✅
+
+- Widget de NPS pós-compra (0-10)
+- Dashboard de NPS (promotores, neutros, detratores)
+
+## Estoque Avançado ✅
+
+- Controle de lotes e validade (FIFO)
+- Alertas de vencimento (7 dias)
+
+## Produção Integrada ao Checklist ✅
+
+- Itens de checklist vinculados a itens de estoque (categoria Produção)
+- Ao completar tarefa de produção, abre sheet para informar quantidade produzida
+- Entrada automática no estoque + registro de produção
+- Badge visual de produção nos itens vinculados
+- Configuração de vínculo no admin de checklists
+- Removido módulo Produção da página de Pedidos

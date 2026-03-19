@@ -140,7 +140,7 @@ async function cloneTemplates(sourceUnitId: string, targetUnitId: string, option
     }
 
     const { data: items } = await supabase.from('inventory_items')
-      .select('name, category_id, supplier_id, unit_type, unit_price, min_stock, recipe_unit_type, recipe_unit_price')
+      .select('name, category_id, supplier_id, unit_type, unit_price, min_stock')
       .eq('unit_id', sourceUnitId);
     if (items && items.length > 0) {
       const { error } = await supabase.from('inventory_items').insert(
@@ -149,7 +149,6 @@ async function cloneTemplates(sourceUnitId: string, targetUnitId: string, option
           category_id: item.category_id ? categoryMap.get(item.category_id) || null : null,
           supplier_id: item.supplier_id ? supplierMap.get(item.supplier_id) || null : null,
           unit_type: item.unit_type, unit_price: item.unit_price, min_stock: item.min_stock,
-          recipe_unit_type: item.recipe_unit_type, recipe_unit_price: item.recipe_unit_price,
           current_stock: 0, unit_id: targetUnitId,
         }))
       );
