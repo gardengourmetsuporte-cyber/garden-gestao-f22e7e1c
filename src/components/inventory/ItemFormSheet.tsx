@@ -67,7 +67,7 @@ export function ItemFormSheet({
       setCurrentStock(item.current_stock.toString());
       setMinStock(item.min_stock.toString());
       setUnitPrice(item.unit_price?.toString() || '');
-      setStockUnitLabel(item.stock_unit_label || '');
+      
       setPurchaseUnitLabel(item.purchase_unit_label || '');
       setPurchaseToStockFactor(item.purchase_to_stock_factor?.toString() || '');
       setShowPurchaseSection(!!item.purchase_unit_label || !!item.purchase_to_stock_factor);
