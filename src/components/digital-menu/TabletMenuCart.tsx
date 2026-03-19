@@ -3,7 +3,7 @@ import { CartItem } from '@/hooks/useDigitalMenu';
 import { Button } from '@/components/ui/button';
 import { AppIcon } from '@/components/ui/app-icon';
 import { CartItemsList } from '@/components/digital-menu/MenuCart';
-import { CustomerAuthBanner } from '@/components/digital-menu/CustomerAuthBanner';
+import { TabletQrLoginBanner } from '@/components/digital-menu/TabletQrLoginBanner';
 import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
 import { paymentOptionToBillingType } from '@/components/digital-menu/PaymentMethodSelector';
 import { OnlinePaymentSheet } from '@/components/digital-menu/OnlinePaymentSheet';
