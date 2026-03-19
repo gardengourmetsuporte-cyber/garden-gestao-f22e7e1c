@@ -10,7 +10,6 @@ import { CoinAnimationProvider, useCoinAnimation } from '@/contexts/CoinAnimatio
 import { CoinAnimationLayer } from '@/components/animations/CoinAnimation';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
-import { DesktopHeader } from './DesktopHeader';
 import { NotificationBell } from './NotificationBell';
 import { ProfileDropdown } from './ProfileDropdown';
 
