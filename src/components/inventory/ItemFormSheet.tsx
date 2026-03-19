@@ -242,27 +242,10 @@ export function ItemFormSheet({
             </div>
           </div>
 
-          {/* Custom Stock Unit Label */}
-          <div className="space-y-2">
-            <Label htmlFor="stockUnitLabel" className="text-base font-medium">
-              Nome personalizado da unidade
-            </Label>
-            <Input
-              id="stockUnitLabel"
-              value={stockUnitLabel}
-              onChange={(e) => setStockUnitLabel(e.target.value)}
-              placeholder={unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'litro' : unitType === 'ml' ? 'ml' : 'unidade'}
-              className="input-large"
-            />
-            <p className="text-xs text-muted-foreground">
-              Ex: pacote, saco, bandeja. Deixe vazio para usar o padrão.
-            </p>
-          </div>
-
           {/* Unit Price */}
           <div className="space-y-2">
             <Label htmlFor="unitPrice" className="text-base font-medium">
-              Preço por {stockUnitLabel.trim() || (unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'L' : unitType === 'ml' ? 'ml' : 'unidade')}
+              Preço por {unitType === 'kg' ? 'kg' : unitType === 'g' ? 'g' : unitType === 'litro' ? 'L' : unitType === 'ml' ? 'ml' : 'unidade'}
             </Label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">R$</span>
