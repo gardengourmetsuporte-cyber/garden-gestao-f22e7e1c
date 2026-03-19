@@ -117,7 +117,7 @@ export function AppSidebar() {
       {/* Navigation */}
       <SidebarContent>
         {/* Home */}
-        <SidebarGroup className="py-1">
+        <SidebarGroup className="pt-3 pb-1">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
