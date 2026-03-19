@@ -20,7 +20,7 @@ type MessageContent = string | Array<{ type: 'text'; text: string } | { type: 'i
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: MessageContent;
-  imagePreview?: string;
+  imagePreviews?: string[];
   postData?: PostData;
 }
 
@@ -35,8 +35,6 @@ const QUICK_PROMPTS = [
   { icon: 'BookOpen', label: 'Storytelling', color: 'text-blue-400', bg: 'bg-blue-500/10', prompt: 'Crie um post de storytelling contando um pouco sobre o negócio, bastidores ou a equipe.' },
   { icon: 'BarChart3', label: 'Engajamento', color: 'text-primary', bg: 'bg-primary/10', prompt: 'Crie um post interativo para engajar o público — pode ser enquete, pergunta, ou "isso ou aquilo".' },
 ];
-
-// Uses supabase.functions.invoke for proper auth
 
 function getTextContent(content: MessageContent): string {
   if (typeof content === 'string') return content;
@@ -57,7 +55,7 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [pendingImages, setPendingImages] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -69,81 +67,66 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
   }, [messages]);
 
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { toast.error('Selecione uma imagem'); return; }
-    if (file.size > 10 * 1024 * 1024) { toast.error('Imagem muito grande (máx 10MB)'); return; }
-    const base64 = await fileToBase64(file);
-    setPendingImage(base64);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    const newImages: string[] = [];
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) { toast.error('Selecione apenas imagens'); continue; }
+      if (file.size > 10 * 1024 * 1024) { toast.error(`${file.name} muito grande (máx 10MB)`); continue; }
+      const base64 = await fileToBase64(file);
+      newImages.push(base64);
+    }
+    
+    setPendingImages(prev => [...prev, ...newImages]);
     inputRef.current?.focus();
     if (imageInputRef.current) imageInputRef.current.value = '';
   };
 
-  const sendMessage = async (text: string) => {
-    if ((!text.trim() && !pendingImage) || isLoading) return;
+  const removePendingImage = (index: number) => {
+    setPendingImages(prev => prev.filter((_, i) => i !== index));
+  };
 
-    const hasImage = !!pendingImage;
-    const messageText = text.trim() || (hasImage ? 'Analise este criativo e reproduza um post similar usando os dados da minha marca.' : '');
+  const sendMessage = async (text: string) => {
+    if ((!text.trim() && pendingImages.length === 0) || isLoading) return;
+
+    const hasImages = pendingImages.length > 0;
+    const messageText = text.trim() || (hasImages ? 'Analise este(s) criativo(s) e reproduza um post similar usando os dados da minha marca.' : '');
 
     let content: MessageContent;
-    if (hasImage) {
+    if (hasImages) {
       content = [
         { type: 'text', text: messageText },
-        { type: 'image_url', image_url: { url: pendingImage! } },
+        ...pendingImages.map(img => ({ type: 'image_url' as const, image_url: { url: img } })),
       ];
     } else {
       content = messageText;
     }
 
-    const userMsg: ChatMessage = { role: 'user', content, imagePreview: pendingImage || undefined };
+    const userMsg: ChatMessage = { role: 'user', content, imagePreviews: hasImages ? [...pendingImages] : undefined };
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     setInput('');
-    setPendingImage(null);
+    setPendingImages([]);
     setIsLoading(true);
 
     try {
       const apiMessages = newMessages.map(m => ({
         role: m.role,
-        content: typeof m.content === 'string' ? m.content : m.content,
-        ...(m.imagePreview ? { imageUrl: m.imagePreview } : {}),
+        content: m.content,
       }));
 
-      const { data, error: fnError } = await supabase.functions.invoke('management-ai', {
+      const { data, error: fnError } = await supabase.functions.invoke('marketing-post-chat', {
         body: {
           messages: apiMessages,
-          context: { marketing_mode: true },
           unit_id: unitId,
         },
       });
 
       if (fnError) throw new Error(fnError.message || 'Erro ao chamar IA');
 
-      const responseText = data.suggestion || 'Desculpe, não consegui gerar uma resposta.';
-      
-      // Check if response contains a marketing post (tool call result)
-      let postData: PostData | undefined;
-      
-      // Try to detect structured post data from the response
-      const titleMatch = responseText.match(/\*\*(.+?)\*\*/);
-      if (data.action_executed && titleMatch) {
-        // The AI executed create_marketing_post tool
-        // Extract post data from the formatted response
-        const captionMatch = responseText.match(/📌.*?\n\n([\s\S]*?)(?:\n\n🏷️|$)/);
-        const tagsMatch = responseText.match(/🏷️ Tags: (.+)/);
-        const imagePromptMatch = responseText.match(/🎨 Prompt de imagem: (.+)/);
-        const bestTimeMatch = responseText.match(/⏰ Melhor horário: (.+)/);
-        
-        if (captionMatch) {
-          postData = {
-            title: titleMatch[1],
-            caption: captionMatch[1].trim(),
-            tags: tagsMatch ? tagsMatch[1].split(', ') : [],
-            image_prompt: imagePromptMatch ? imagePromptMatch[1] : '',
-            best_time: bestTimeMatch ? bestTimeMatch[1] : undefined,
-          };
-        }
-      }
+      const responseText = data?.text || 'Desculpe, não consegui gerar uma resposta.';
+      const postData = data?.postData || undefined;
 
       setMessages(prev => [...prev, { role: 'assistant', content: responseText, postData }]);
     } catch (e: any) {
@@ -157,8 +140,7 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      {/* Empty state with quick prompts */}
-      {messages.length === 0 && !pendingImage ? (
+      {messages.length === 0 && pendingImages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center px-4 gap-6">
           <div className="text-center space-y-2">
             <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg" style={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}>
@@ -166,7 +148,7 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
             </div>
             <h3 className="text-base font-semibold">Assistente de Marketing</h3>
             <p className="text-sm text-muted-foreground max-w-[280px]">
-              Descreva o post, envie uma referência visual ou escolha uma sugestão
+              Descreva o post, envie referências visuais ou escolha uma sugestão
             </p>
           </div>
 
@@ -187,7 +169,6 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
           </div>
         </div>
       ) : (
-        /* Messages area */
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-1 space-y-3 pb-2 min-h-0">
           {messages.map((msg, i) => (
             <div key={i} className={cn("flex", msg.role === 'user' ? 'justify-end' : 'justify-start')}>
@@ -197,9 +178,13 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
                   ? 'bg-primary text-primary-foreground rounded-br-md'
                   : 'bg-card border border-border/40 rounded-bl-md'
               )}>
-                {msg.imagePreview && (
-                  <div className="mb-2 rounded-xl overflow-hidden -mx-1 -mt-1">
-                    <img src={msg.imagePreview} alt="Referência" className="w-full max-h-40 object-cover" />
+                {msg.imagePreviews && msg.imagePreviews.length > 0 && (
+                  <div className={cn("mb-2 -mx-1 -mt-1 gap-1", msg.imagePreviews.length > 1 ? "grid grid-cols-2" : "")}>
+                    {msg.imagePreviews.map((img, idx) => (
+                      <div key={idx} className="rounded-xl overflow-hidden">
+                        <img src={img} alt={`Referência ${idx + 1}`} className="w-full max-h-40 object-cover" />
+                      </div>
+                    ))}
                   </div>
                 )}
                 {msg.role === 'assistant' ? (
@@ -236,18 +221,20 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
         </div>
       )}
 
-      {/* Pending image preview */}
-      {pendingImage && (
-        <div className="px-1 pt-2">
-          <div className="relative inline-block">
-            <img src={pendingImage} alt="Preview" className="h-16 rounded-xl border border-border/40 object-cover" />
-            <button
-              onClick={() => setPendingImage(null)}
-              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
-            >
-              <AppIcon name="X" size={10} />
-            </button>
-          </div>
+      {/* Pending images preview */}
+      {pendingImages.length > 0 && (
+        <div className="px-1 pt-2 flex gap-2 flex-wrap">
+          {pendingImages.map((img, idx) => (
+            <div key={idx} className="relative inline-block">
+              <img src={img} alt={`Preview ${idx + 1}`} className="h-16 rounded-xl border border-border/40 object-cover" />
+              <button
+                onClick={() => removePendingImage(idx)}
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"
+              >
+                <AppIcon name="X" size={10} />
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -257,6 +244,7 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
           ref={imageInputRef}
           type="file"
           accept="image/*"
+          multiple
           className="hidden"
           onChange={handleImageSelect}
         />
@@ -272,7 +260,7 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
             ref={inputRef}
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder={pendingImage ? "Descreva o que quer reproduzir..." : "Descreva o post que deseja..."}
+            placeholder={pendingImages.length > 0 ? "Descreva o que quer reproduzir..." : "Descreva o post que deseja..."}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
             disabled={isLoading}
             className="h-10 rounded-xl pr-12 bg-secondary/40 border-border/30"
@@ -280,7 +268,7 @@ export function PostAIChat({ unitId, onApplyPost }: PostAIChatProps) {
           <Button
             size="icon"
             onClick={() => sendMessage(input)}
-            disabled={(!input.trim() && !pendingImage) || isLoading}
+            disabled={(!input.trim() && pendingImages.length === 0) || isLoading}
             className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg"
           >
             <AppIcon name="Send" size={14} />

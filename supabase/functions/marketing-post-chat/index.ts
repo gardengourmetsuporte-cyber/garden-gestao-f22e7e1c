@@ -13,28 +13,47 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
 
     const { unit_id, messages } = await req.json();
     if (!unit_id) throw new Error("unit_id required");
     if (!messages || !Array.isArray(messages)) throw new Error("messages required");
 
     // Fetch brand context (RAG)
-    const [unitRes, brandRes, assetsRes, productsRes, recipesRes] = await Promise.all([
+    const [unitRes, brandRes, assetsRes, productsRes] = await Promise.all([
       supabase.from("units").select("name").eq("id", unit_id).maybeSingle(),
       supabase.from("brand_identity").select("*").eq("unit_id", unit_id).maybeSingle(),
       supabase.from("brand_assets").select("title, type, tags, file_url").eq("unit_id", unit_id).limit(10),
       supabase.from("tablet_products").select("name, description, price, image_url, is_highlight, category, is_active").eq("unit_id", unit_id).eq("is_active", true).limit(50),
-      supabase.from("recipes").select("name, description, cost_per_portion, yield_quantity").eq("unit_id", unit_id).limit(20),
     ]);
 
     const unitName = unitRes.data?.name || "Restaurante";
     const brand = brandRes.data;
     const assets = assetsRes.data || [];
     const products = productsRes.data || [];
-    const recipes = recipesRes.data || [];
 
     const today = new Date();
     const dayOfWeek = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"][today.getDay()];
@@ -49,10 +68,6 @@ serve(async (req) => {
       ? `PRODUTOS REAIS DO CARDÁPIO (${products.length} itens ativos):\n${products.map(formatProduct).join("\n")}`
       : "NENHUM PRODUTO CADASTRADO — NÃO mencione produtos específicos nos posts.";
 
-    const recipesBlock = recipes.length > 0
-      ? `FICHAS TÉCNICAS (custo real):\n${recipes.map((r: any) => `- ${r.name}: custo R$${r.cost_per_portion?.toFixed(2) || '?'}/porção`).join("\n")}`
-      : "";
-
     const systemPrompt = `Você é um assistente criativo de marketing digital para "${unitName}", especialista em redes sociais para restaurantes e food service no Brasil.
 
 CONTEXTO DA MARCA:
@@ -65,8 +80,6 @@ CONTEXTO DA MARCA:
 - Site: ${brand?.website_url || "não informado"}
 
 ${productsBlock}
-
-${recipesBlock}
 
 ASSETS VISUAIS DISPONÍVEIS:
 ${assets.length > 0 ? assets.map((a: any) => `- [${a.type}] ${a.title} (tags: ${a.tags?.join(', ')})`).join("\n") : "Nenhum asset cadastrado"}
@@ -82,10 +95,10 @@ REGRAS:
 8. Inclua um prompt de imagem em inglês para geração de arte quando usar create_post.
 9. Quando o usuário enviar uma IMAGEM de referência (criativo, arte, post de concorrente, etc.), analise o layout, estilo visual, cores, tipografia e tom da mensagem. Em seguida, REPRODUZA o conceito adaptado para "${unitName}" usando APENAS os dados reais (produtos, preços, marca). Descreva o que identificou na imagem e gere o post correspondente.`;
 
-    // Build AI messages - support multimodal content (images)
+    // Build AI messages - pass through multimodal content as-is
     const aiMessages: any[] = [
       { role: "system", content: systemPrompt },
-      ...messages,
+      ...messages.map((m: any) => ({ role: m.role, content: m.content })),
     ];
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -97,7 +110,6 @@ REGRAS:
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: aiMessages,
-        stream: true,
         tools: [
           {
             type: "function",
@@ -129,7 +141,7 @@ REGRAS:
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos de IA esgotados. Adicione créditos ao workspace." }), {
+        return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -140,8 +152,26 @@ REGRAS:
       });
     }
 
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+    const aiResult = await response.json();
+    const choice = aiResult.choices?.[0];
+    const message = choice?.message;
+
+    let text = message?.content || "";
+    let postData = null;
+
+    // Handle tool calls (create_post)
+    if (message?.tool_calls?.length > 0) {
+      for (const tc of message.tool_calls) {
+        if (tc.function?.name === "create_post") {
+          try {
+            postData = JSON.parse(tc.function.arguments);
+          } catch { /* ignore parse errors */ }
+        }
+      }
+    }
+
+    return new Response(JSON.stringify({ text, postData }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("marketing-post-chat error:", e);
