@@ -178,12 +178,23 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
 
     setIsSearching(true);
     try {
-      const searchWithCity = query.toLowerCase().includes('são joão') || query.toLowerCase().includes('sao joao')
-        ? query
-        : `${query}, São João da Boa Vista, SP, Brasil`;
+      // Clean query: remove "nº", "n°", "Nº" and other terms that confuse Nominatim
+      let cleanQuery = query
+        .replace(/\b[Nn][ºo°]?\s*/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+
+      // Append city context if not already present in query
+      const city = cityContext || '';
+      const hasCity = city && cleanQuery.toLowerCase().includes(city.toLowerCase().split(',')[0].split(' ')[0]);
+      if (city && !hasCity) {
+        cleanQuery = `${cleanQuery}, ${city}, Brasil`;
+      } else if (!cleanQuery.toLowerCase().includes('brasil')) {
+        cleanQuery = `${cleanQuery}, Brasil`;
+      }
 
       const params = new URLSearchParams({
-        q: searchWithCity,
+        q: cleanQuery,
         format: 'json',
         limit: '5',
         countrycodes: 'br',
@@ -201,7 +212,7 @@ export function DeliveryLocationPicker({ open, onOpenChange, delivery, onConfirm
     } finally {
       setIsSearching(false);
     }
-  }, []);
+  }, [cityContext]);
 
   const handleInputChange = useCallback((value: string) => {
     setSearchQuery(value);
