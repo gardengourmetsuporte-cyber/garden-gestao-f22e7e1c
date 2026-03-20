@@ -295,9 +295,9 @@ export default function InventoryPage() {
                       icon="Package"
                       title="Seu estoque está vazio"
                       subtitle="Cadastre o primeiro item para começar a controlar entradas e saídas."
-                      actionLabel={isAdmin ? "Cadastrar item" : undefined}
+                      actionLabel={canCreate ? "Cadastrar item" : undefined}
                       actionIcon="Plus"
-                      onAction={isAdmin ? handleAddItem : undefined}
+                      onAction={canCreate ? handleAddItem : undefined}
                       accent="primary"
                     />
                   ) : (
