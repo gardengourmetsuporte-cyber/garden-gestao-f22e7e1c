@@ -210,18 +210,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRole(r);
 
         let nextPlan = profilePlan;
-        if (!effectivePlanRef.current || effectivePlanRef.current === 'free') {
+        let nextPlanStatus = profilePlanStatus;
+        // Always try to resolve inherited plan for employees
+        if (profilePlan === 'free') {
           const inheritedPlan = await resolveInheritedUnitPlan(userId);
           if (inheritedPlan && inheritedPlan !== 'free') {
             nextPlan = inheritedPlan;
+            nextPlanStatus = 'active';
           }
-          setPlan(nextPlan);
-          setPlanStatus(profilePlanStatus);
-        } else {
-          nextPlan = effectivePlanRef.current;
         }
+        effectivePlanRef.current = nextPlan;
+        setPlan(nextPlan);
+        setPlanStatus(nextPlanStatus);
 
-        setCachedAuth(p, r, nextPlan, profilePlanStatus);
+        setCachedAuth(p, r, nextPlan, nextPlanStatus);
       } catch (err) {
         console.error('Failed to fetch user data:', err);
       } finally {
