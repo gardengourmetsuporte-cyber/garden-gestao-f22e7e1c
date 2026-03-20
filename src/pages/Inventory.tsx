@@ -411,7 +411,7 @@ export default function InventoryPage() {
             const result = await addSupplier({ name });
             return result ? { id: result.id } : null;
           }}
-          isAdmin={isAdmin}
+          isAdmin={canEdit}
         />
 
         <BatchMovementSheet
