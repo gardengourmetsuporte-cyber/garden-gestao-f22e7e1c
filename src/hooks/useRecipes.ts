@@ -437,6 +437,7 @@ import { useUnit } from '@/contexts/UnitContext';
      onSuccess: () => {
        queryClient.invalidateQueries({ queryKey: ['recipes'] });
        queryClient.invalidateQueries({ queryKey: ['inventory-items-for-recipes'] });
+       queryClient.invalidateQueries({ queryKey: ['inventory-items'] });
        toast({ title: 'Unidade base atualizada!' });
      },
      onError: (error: any) => {
@@ -461,6 +462,7 @@ import { useUnit } from '@/contexts/UnitContext';
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
       queryClient.invalidateQueries({ queryKey: ['inventory-items-for-recipes'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory-items'] });
       toast({ title: 'Preço atualizado em todas as receitas!' });
     },
     onError: (error: any) => {

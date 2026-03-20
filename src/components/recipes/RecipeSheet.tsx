@@ -132,22 +132,40 @@ export function RecipeSheet({
       setSellingPrice(hasDefaultSellingPrice ? defaultSellingPrice!.toFixed(2) : '');
       setMarginMode(hasDefaultSellingPrice ? 'price' : 'margin');
       setIngredients(
-        (recipe.ingredients || []).map((ing) => ({
-          id: ing.id,
-          source_type: (ing.source_type || 'inventory') as IngredientSourceType,
-          item_id: ing.item_id || null,
-          item_name: ing.item?.name || null,
-          item_unit: ing.item?.unit_type || null,
-          item_price: ing.unit_cost || ing.item?.unit_price || null,
-          source_recipe_id: ing.source_recipe_id || null,
-          source_recipe_name: ing.source_recipe?.name || null,
-          source_recipe_unit: ing.source_recipe?.yield_unit || null,
-          source_recipe_cost: ing.source_recipe?.cost_per_portion || null,
-          quantity: ing.quantity,
-          unit_type: ing.unit_type,
-          total_cost: ing.total_cost,
-          kds_station_id: (ing as any).kds_station_id || null,
-        }))
+        (recipe.ingredients || []).map((ing) => {
+          const sourceType = (ing.source_type || 'inventory') as IngredientSourceType;
+          const itemUnit = ing.item?.unit_type || null;
+          const itemPrice = sourceType === 'inventory'
+            ? (ing.item?.unit_price ?? ing.unit_cost ?? null)
+            : null;
+          const sourceRecipeUnit = ing.source_recipe?.yield_unit || null;
+          const sourceRecipeCost = ing.source_recipe?.cost_per_portion ?? null;
+
+          const recalculatedTotalCost = sourceType === 'inventory'
+            ? (itemUnit && itemPrice !== null
+                ? calculateIngredientCost(itemPrice, itemUnit, ing.quantity, ing.unit_type)
+                : ing.total_cost)
+            : (sourceRecipeUnit && sourceRecipeCost !== null
+                ? calculateSubRecipeCost(sourceRecipeCost, sourceRecipeUnit, ing.quantity, ing.unit_type)
+                : ing.total_cost);
+
+          return {
+            id: ing.id,
+            source_type: sourceType,
+            item_id: ing.item_id || null,
+            item_name: ing.item?.name || null,
+            item_unit: itemUnit,
+            item_price: itemPrice,
+            source_recipe_id: ing.source_recipe_id || null,
+            source_recipe_name: ing.source_recipe?.name || null,
+            source_recipe_unit: sourceRecipeUnit,
+            source_recipe_cost: sourceRecipeCost,
+            quantity: ing.quantity,
+            unit_type: ing.unit_type,
+            total_cost: recalculatedTotalCost,
+            kds_station_id: (ing as any).kds_station_id || null,
+          };
+        })
       );
     } else {
       setName(defaultName || '');
@@ -162,6 +180,34 @@ export function RecipeSheet({
       setIngredients([]);
     }
   }, [recipe, open, defaultName, defaultSellingPrice]);
+
+  useEffect(() => {
+    if (!open || inventoryItems.length === 0) return;
+
+    setIngredients((prev) => prev.map((ing) => {
+      if (ing.source_type !== 'inventory' || !ing.item_id) return ing;
+
+      const latestItem = inventoryItems.find((item) => item.id === ing.item_id);
+      if (!latestItem) return ing;
+
+      const latestUnit = latestItem.unit_type;
+      const latestPrice = latestItem.unit_price ?? 0;
+      const recalculatedCost = calculateIngredientCost(latestPrice, latestUnit, ing.quantity, ing.unit_type);
+
+      const unitChanged = ing.item_unit !== latestUnit;
+      const priceChanged = Math.abs((ing.item_price ?? 0) - latestPrice) > 0.0001;
+      const costChanged = Math.abs((ing.total_cost ?? 0) - recalculatedCost) > 0.0001;
+
+      if (!unitChanged && !priceChanged && !costChanged) return ing;
+
+      return {
+        ...ing,
+        item_unit: latestUnit,
+        item_price: latestPrice,
+        total_cost: recalculatedCost,
+      };
+    }));
+  }, [open, inventoryItems]);
 
   useEffect(() => {
     if (open && !recipe && defaultCategoryId) {

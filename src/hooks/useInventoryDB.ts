@@ -81,7 +81,9 @@ export function useInventoryDB() {
   const invalidateAll = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: itemsKey });
     queryClient.invalidateQueries({ queryKey: movementsKey });
-  }, [queryClient, activeUnitId]);
+    queryClient.invalidateQueries({ queryKey: ['inventory-items-for-recipes'] });
+    queryClient.invalidateQueries({ queryKey: ['recipes'] });
+  }, [queryClient, itemsKey, movementsKey]);
 
   const addItemMut = useMutation({
     mutationFn: async (item: {
