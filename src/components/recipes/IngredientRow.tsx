@@ -114,7 +114,67 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
     setShowGlobalWarning(true);
     setEditPopoverOpen(false);
   };
-...
+
+  const handleSaveGlobalChanges = async () => {
+    if (!ingredient.item_id) return;
+    setIsSaving(true);
+    try {
+      if (pendingChanges.price !== undefined && onUpdateGlobalPrice) {
+        await onUpdateGlobalPrice(ingredient.item_id, pendingChanges.price);
+      }
+      if (pendingChanges.unit && onUpdateItemUnit) {
+        await onUpdateItemUnit(ingredient.item_id, pendingChanges.unit);
+      }
+
+      const finalPrice = pendingChanges.price ?? ingredient.item_price ?? 0;
+      const finalBaseUnit = pendingChanges.unit ?? displayUnit;
+      const total_cost = calculateIngredientCost(finalPrice, finalBaseUnit, ingredient.quantity, ingredient.unit_type);
+
+      onChange({
+        ...(pendingChanges.price !== undefined ? { item_price: pendingChanges.price } : {}),
+        ...(pendingChanges.unit ? { item_unit: pendingChanges.unit } : {}),
+        total_cost,
+      });
+
+      setShowGlobalWarning(false);
+    } catch (err) {
+      console.error('Erro ao salvar alterações:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <div className={cn(
+        'p-3 rounded-xl border',
+        hasNoPrice ? 'border-amber-300 bg-amber-50/50 dark:border-amber-700 dark:bg-amber-950/20' : 'border-border bg-secondary/30'
+      )}>
+        {/* Header: Name + price inline + edit + remove */}
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className={cn(
+              'p-1.5 rounded-lg shrink-0',
+              isSubRecipe ? 'bg-accent/10 text-accent dark:bg-accent/20' : 'bg-primary/10 text-primary'
+            )}>
+              {isSubRecipe ? <AppIcon name="Soup" className="h-4 w-4" /> : <AppIcon name="Package" className="h-4 w-4" />}
+            </div>
+            <div className="min-w-0">
+              <p className="font-medium text-sm truncate">{displayName}</p>
+              <p className="text-xs text-muted-foreground">
+                {isSubRecipe ? 'Sub-receita' : (
+                  hasNoPrice ? (
+                    <span className="text-amber-500">Sem preço definido</span>
+                  ) : (
+                    <>{formatCurrency(basePrice)}/{unitLabel}</>
+                  )
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-0.5 shrink-0">
+            {/* Edit button - only for inventory items */}
             {!isSubRecipe && (onUpdateGlobalPrice || onUpdateItemUnit) && (
               <Popover modal={true} open={editPopoverOpen} onOpenChange={setEditPopoverOpen}>
                 <PopoverTrigger asChild>
@@ -216,8 +276,8 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
           <span className="text-muted-foreground text-sm">=</span>
 
           <p className={cn(
-            "text-sm font-bold flex-1 text-right",
-            hasNoPrice ? "text-amber-500" : "text-primary"
+            'text-sm font-bold flex-1 text-right',
+            hasNoPrice ? 'text-amber-500' : 'text-primary'
           )}>
             {hasNoPrice ? '—' : formatCurrency(ingredient.total_cost)}
           </p>
