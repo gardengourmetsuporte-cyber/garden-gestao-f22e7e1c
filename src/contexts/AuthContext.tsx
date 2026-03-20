@@ -150,16 +150,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const stripeStatus = data.subscribed ? 'active' : 'canceled';
 
         if (stripePlan === 'free') {
-          const currentEffective = effectivePlanRef.current;
-          const inheritedPlan = !currentEffective || currentEffective === 'free'
-            ? (user?.id ? await resolveInheritedUnitPlan(user.id) : null)
-            : currentEffective;
+          // Always re-resolve inherited plan for employees who don't have their own subscription
+          const inheritedPlan = user?.id ? await resolveInheritedUnitPlan(user.id) : null;
 
           if (inheritedPlan && inheritedPlan !== 'free') {
             setPlan(inheritedPlan);
-            setPlanStatus(stripeStatus);
+            setPlanStatus('active');
             setSubscriptionEnd(data.subscription_end || null);
-            setCachedAuth(profile, role, inheritedPlan, stripeStatus);
+            setCachedAuth(profile, role, inheritedPlan, 'active');
             return;
           }
         }
