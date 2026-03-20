@@ -37,20 +37,21 @@ export function useRecipeMenuSync(
   const { calculateOperationalCosts } = useRecipeCostSettings();
   const [syncing, setSyncing] = useState(false);
 
-  const getFullCost = useCallback((recipe: Recipe) => {
-    const linked = menuProducts.find(p => (p as any).recipe_id === recipe.id);
-    const sellingPrice = linked?.price;
+  const getFullCost = useCallback((recipe: Recipe, sellingPrice?: number) => {
     const opCosts = calculateOperationalCosts(recipe.cost_per_portion, sellingPrice);
     return recipe.cost_per_portion + opCosts.totalOperational;
-  }, [calculateOperationalCosts, menuProducts]);
+  }, [calculateOperationalCosts]);
 
   /** All active recipes enriched with sync status */
   const syncableRecipes: SyncableRecipe[] = recipes
     .filter(r => r.is_active)
     .map(r => {
       const linked = menuProducts.find(p => (p as any).recipe_id === r.id);
-      const fullCost = getFullCost(r);
-      const currentMargin = linked ? ((linked.price - fullCost) / fullCost) * 100 : undefined;
+      const fullCost = getFullCost(r, linked?.price);
+      const currentMargin = linked
+        ? (linked.price > 0 ? ((linked.price - fullCost) / linked.price) * 100 : 0)
+        : undefined;
+
       return {
         ...r,
         linkedProductId: linked?.id,
@@ -73,8 +74,8 @@ export function useRecipeMenuSync(
       let updated = 0;
 
       for (const recipe of toSync) {
-        const fullCost = getFullCost(recipe);
-        const price = Math.round(fullCost * (1 + opts.margin / 100) * 100) / 100;
+        const baseCost = getFullCost(recipe);
+        const price = Math.round(baseCost * (1 + opts.margin / 100) * 100) / 100;
         const existingProduct = menuProducts.find(p => (p as any).recipe_id === recipe.id);
 
         if (existingProduct) {
@@ -82,7 +83,7 @@ export function useRecipeMenuSync(
             await supabase.from('tablet_products').update({
               name: recipe.name,
               price,
-              cost_per_portion: fullCost,
+              cost_per_portion: baseCost,
               profit_margin: opts.margin,
               is_active: recipe.is_active,
               group_id: opts.groupId || existingProduct.group_id,
@@ -93,15 +94,15 @@ export function useRecipeMenuSync(
         } else {
           // Determine sort_order
           const groupProducts = menuProducts.filter(p => p.group_id === opts.groupId);
-          const maxOrder = groupProducts.length > 0 
-            ? Math.max(...groupProducts.map(p => p.sort_order)) + 1 
+          const maxOrder = groupProducts.length > 0
+            ? Math.max(...groupProducts.map(p => p.sort_order)) + 1
             : 0;
 
           await supabase.from('tablet_products').insert({
             unit_id: activeUnitId,
             name: recipe.name,
             price,
-            cost_per_portion: fullCost,
+            cost_per_portion: baseCost,
             profit_margin: opts.margin,
             recipe_id: recipe.id,
             group_id: opts.groupId,
@@ -146,17 +147,17 @@ export function useRecipeMenuSync(
       for (const prod of linkedProducts) {
         const recipe = recipes.find(r => r.id === (prod as any).recipe_id);
         if (!recipe) continue;
-        const fullCost = getFullCost(recipe);
-        const margin = (prod as any).profit_margin ?? 300;
-        const newPrice = Math.round(fullCost * (1 + margin / 100) * 100) / 100;
+
+        // Recalculate operational cost using current menu price, but NEVER auto-overwrite product price here
+        const fullCost = getFullCost(recipe, prod.price);
+
         await supabase.from('tablet_products').update({
           cost_per_portion: fullCost,
-          price: newPrice,
           updated_at: new Date().toISOString(),
         }).eq('id', prod.id);
         count++;
       }
-      toast.success(`${count} produto(s) atualizados com novos custos.`);
+      toast.success(`${count} produto(s) com custos atualizados.`);
       onRefresh();
     } catch (err: any) {
       toast.error('Erro ao atualizar custos: ' + err.message);
