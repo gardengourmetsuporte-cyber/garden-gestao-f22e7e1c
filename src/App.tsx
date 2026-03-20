@@ -1,6 +1,6 @@
 // App entry
 import { lazy, Suspense, useEffect } from "react";
-import { enterImmersiveMode } from "@/lib/native";
+import { enterImmersiveMode, isNative } from "@/lib/native";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -337,7 +337,34 @@ function AuthenticatedRoutes() {
 
 const App = () => {
   useEffect(() => {
-    enterImmersiveMode();
+    void enterImmersiveMode();
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void enterImmersiveMode();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    let cleanupAppListener: (() => void) | undefined;
+
+    if (isNative) {
+      import('@capacitor/app').then(({ App: CapacitorApp }) => {
+        const appStateSub = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+          if (isActive) {
+            void enterImmersiveMode();
+          }
+        });
+        cleanupAppListener = () => {
+          void appStateSub.then((sub) => sub.remove());
+        };
+      }).catch(() => {});
+    }
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      cleanupAppListener?.();
+    };
   }, []);
 
   return (
