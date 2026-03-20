@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -15,6 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost } from '@/types/recipe';
+import { parseLocalizedNumber } from '@/lib/number';
 import { cn } from '@/lib/utils';
 import { AppIcon } from '@/components/ui/app-icon';
 
@@ -71,7 +71,7 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
   const unitLabel = UNIT_OPTIONS.find(u => u.value === displayUnit)?.label || displayUnit;
 
   const handleQuantityChange = (value: string) => {
-    const quantity = parseFloat(value) || 0;
+    const quantity = parseLocalizedNumber(value);
     const total_cost = isSubRecipe
       ? calculateSubRecipeCost(basePrice, displayUnit, quantity, ingredient.unit_type)
       : calculateIngredientCost(basePrice, displayUnit, quantity, ingredient.unit_type);
@@ -90,14 +90,8 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
     setNewBaseUnit(displayUnit);
   };
 
-  const parseDecimalValue = (value: string) => {
-    const cleaned = value.replace(/[^\d,.-]/g, '').replace(',', '.');
-    const parsed = Number(cleaned);
-    return Number.isFinite(parsed) ? parsed : 0;
-  };
-
   const handleConfirmEdit = () => {
-    const newPrice = parseDecimalValue(newPriceValue);
+    const newPrice = parseLocalizedNumber(newPriceValue);
     const currentPrice = Number(ingredient.item_price ?? 0);
     const unitChanged = newBaseUnit !== displayUnit;
     const priceChanged = Math.abs(newPrice - currentPrice) > 0.0001;
