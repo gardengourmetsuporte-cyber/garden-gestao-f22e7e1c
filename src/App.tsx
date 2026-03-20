@@ -1,6 +1,6 @@
 // App entry
 import { lazy, Suspense, useEffect } from "react";
-import { enterImmersiveMode } from "@/lib/native";
+import { enterImmersiveMode, isNative } from "@/lib/native";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
