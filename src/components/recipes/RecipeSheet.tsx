@@ -184,29 +184,36 @@ export function RecipeSheet({
   useEffect(() => {
     if (!open || inventoryItems.length === 0) return;
 
-    setIngredients((prev) => prev.map((ing) => {
-      if (ing.source_type !== 'inventory' || !ing.item_id) return ing;
+    setIngredients((prev) => {
+      let hasChanges = false;
 
-      const latestItem = inventoryItems.find((item) => item.id === ing.item_id);
-      if (!latestItem) return ing;
+      const next = prev.map((ing) => {
+        if (ing.source_type !== 'inventory' || !ing.item_id) return ing;
 
-      const latestUnit = latestItem.unit_type;
-      const latestPrice = latestItem.unit_price ?? 0;
-      const recalculatedCost = calculateIngredientCost(latestPrice, latestUnit, ing.quantity, ing.unit_type);
+        const latestItem = inventoryItems.find((item) => item.id === ing.item_id);
+        if (!latestItem) return ing;
 
-      const unitChanged = ing.item_unit !== latestUnit;
-      const priceChanged = Math.abs((ing.item_price ?? 0) - latestPrice) > 0.0001;
-      const costChanged = Math.abs((ing.total_cost ?? 0) - recalculatedCost) > 0.0001;
+        const latestUnit = latestItem.unit_type;
+        const latestPrice = Number(latestItem.unit_price ?? 0);
+        const recalculatedCost = calculateIngredientCost(latestPrice, latestUnit, ing.quantity, ing.unit_type);
 
-      if (!unitChanged && !priceChanged && !costChanged) return ing;
+        const unitChanged = ing.item_unit !== latestUnit;
+        const priceChanged = Math.abs((ing.item_price ?? 0) - latestPrice) > 0.0001;
+        const costChanged = Math.abs((ing.total_cost ?? 0) - recalculatedCost) > 0.0001;
 
-      return {
-        ...ing,
-        item_unit: latestUnit,
-        item_price: latestPrice,
-        total_cost: recalculatedCost,
-      };
-    }));
+        if (!unitChanged && !priceChanged && !costChanged) return ing;
+
+        hasChanges = true;
+        return {
+          ...ing,
+          item_unit: latestUnit,
+          item_price: latestPrice,
+          total_cost: recalculatedCost,
+        };
+      });
+
+      return hasChanges ? next : prev;
+    });
   }, [open, inventoryItems]);
 
   useEffect(() => {
