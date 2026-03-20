@@ -161,18 +161,11 @@ function FichaTecnicaCard({
   onEditRecipe?: (product: MenuProduct) => void;
   onEdit: () => void;
 }) {
-  const { calculateOperationalCosts } = useRecipeCostSettings();
-
   const hasRecipe = !!(product as any).recipe_id;
   const price = Number(product.price || 0);
-  const recipeBaseCost = Number((product as any).recipe_base_cost ?? 0);
   const savedCost = Number((product as any).cost_per_portion || 0);
 
-  const realCost = hasRecipe && recipeBaseCost > 0
-    ? recipeBaseCost + calculateOperationalCosts(recipeBaseCost, price).totalOperational
-    : savedCost;
-
-  const cost = Number.isFinite(realCost) ? realCost : 0;
+  const cost = Number.isFinite(savedCost) ? savedCost : 0;
   const margin = price > 0 ? ((price - cost) / price) * 100 : 0;
   const profit = price - cost;
 
