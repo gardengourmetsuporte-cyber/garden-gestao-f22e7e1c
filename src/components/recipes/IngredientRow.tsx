@@ -85,16 +85,22 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
     onChange({ unit_type, total_cost });
   };
 
-  const handleOpenEditPopover = () => {
+  const prepareEditValues = () => {
     setNewPriceValue(String(ingredient.item_price || ''));
     setNewBaseUnit(displayUnit);
-    setEditPopoverOpen(true);
+  };
+
+  const parseDecimalValue = (value: string) => {
+    const cleaned = value.replace(/[^\d,.-]/g, '').replace(',', '.');
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) ? parsed : 0;
   };
 
   const handleConfirmEdit = () => {
-    const newPrice = parseFloat(newPriceValue) || 0;
+    const newPrice = parseDecimalValue(newPriceValue);
+    const currentPrice = Number(ingredient.item_price ?? 0);
     const unitChanged = newBaseUnit !== displayUnit;
-    const priceChanged = newPrice !== ingredient.item_price;
+    const priceChanged = Math.abs(newPrice - currentPrice) > 0.0001;
 
     if (!priceChanged && !unitChanged) {
       setEditPopoverOpen(false);
@@ -141,15 +147,15 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
   return (
     <>
       <div className={cn(
-        "p-3 rounded-xl border",
-        hasNoPrice ? "border-amber-300 bg-amber-50/50 dark:border-amber-700 dark:bg-amber-950/20" : "border-border bg-secondary/30"
+        'p-3 rounded-xl border',
+        hasNoPrice ? 'border-amber-300 bg-amber-50/50 dark:border-amber-700 dark:bg-amber-950/20' : 'border-border bg-secondary/30'
       )}>
         {/* Header: Name + price inline + edit + remove */}
         <div className="flex items-center justify-between gap-2 mb-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <div className={cn(
-              "p-1.5 rounded-lg shrink-0",
-              isSubRecipe ? "bg-accent/10 text-accent dark:bg-accent/20" : "bg-primary/10 text-primary"
+              'p-1.5 rounded-lg shrink-0',
+              isSubRecipe ? 'bg-accent/10 text-accent dark:bg-accent/20' : 'bg-primary/10 text-primary'
             )}>
               {isSubRecipe ? <AppIcon name="Soup" className="h-4 w-4" /> : <AppIcon name="Package" className="h-4 w-4" />}
             </div>
@@ -170,16 +176,14 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
           <div className="flex items-center gap-0.5 shrink-0">
             {/* Edit button - only for inventory items */}
             {!isSubRecipe && (onUpdateGlobalPrice || onUpdateItemUnit) && (
-              <Popover modal={true} open={editPopoverOpen} onOpenChange={(open) => {
-                if (open) handleOpenEditPopover();
-                else setEditPopoverOpen(false);
-              }}>
+              <Popover modal={true} open={editPopoverOpen} onOpenChange={setEditPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7 text-muted-foreground hover:text-primary"
+                    onClick={prepareEditValues}
                   >
                     <AppIcon name="Pencil" className="h-3.5 w-3.5" />
                   </Button>
@@ -272,8 +276,8 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
           <span className="text-muted-foreground text-sm">=</span>
 
           <p className={cn(
-            "text-sm font-bold flex-1 text-right",
-            hasNoPrice ? "text-amber-500" : "text-primary"
+            'text-sm font-bold flex-1 text-right',
+            hasNoPrice ? 'text-amber-500' : 'text-primary'
           )}>
             {hasNoPrice ? '—' : formatCurrency(ingredient.total_cost)}
           </p>

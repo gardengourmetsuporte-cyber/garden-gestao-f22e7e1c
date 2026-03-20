@@ -423,40 +423,48 @@ import { useUnit } from '@/contexts/UnitContext';
    // Update inventory item base unit for recipes
    const updateItemUnitMutation = useMutation({
       mutationFn: async ({ itemId, unitType }: { itemId: string; unitType: string }) => {
-        const { error } = await supabase
+        const { data: updatedRows, error } = await supabase
           .from('inventory_items')
           .update({ unit_type: unitType } as any)
-          .eq('id', itemId);
+          .eq('id', itemId)
+          .select('id');
 
         if (error) throw error;
+        if (!updatedRows || updatedRows.length === 0) {
+          throw new Error('Sem permissão para atualizar a unidade deste item.');
+        }
       },
      onSuccess: () => {
        queryClient.invalidateQueries({ queryKey: ['recipes'] });
        queryClient.invalidateQueries({ queryKey: ['inventory-items-for-recipes'] });
        toast({ title: 'Unidade base atualizada!' });
      },
-     onError: () => {
-       toast({ title: 'Erro ao atualizar unidade', variant: 'destructive' });
+     onError: (error: any) => {
+       toast({ title: error?.message || 'Erro ao atualizar unidade', variant: 'destructive' });
      },
    });
 
    // Update inventory item price globally
    const updateItemPriceMutation = useMutation({
      mutationFn: async ({ itemId, price }: { itemId: string; price: number }) => {
-       const { error } = await supabase
+       const { data: updatedRows, error } = await supabase
          .from('inventory_items')
          .update({ unit_price: price })
-         .eq('id', itemId);
+         .eq('id', itemId)
+         .select('id');
 
        if (error) throw error;
+       if (!updatedRows || updatedRows.length === 0) {
+         throw new Error('Sem permissão para atualizar o preço deste item.');
+       }
      },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
       queryClient.invalidateQueries({ queryKey: ['inventory-items-for-recipes'] });
       toast({ title: 'Preço atualizado em todas as receitas!' });
     },
-    onError: () => {
-      toast({ title: 'Erro ao atualizar preço', variant: 'destructive' });
+    onError: (error: any) => {
+      toast({ title: error?.message || 'Erro ao atualizar preço', variant: 'destructive' });
     },
   });
 
