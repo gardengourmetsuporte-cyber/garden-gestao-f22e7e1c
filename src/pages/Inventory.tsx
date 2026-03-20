@@ -364,7 +364,7 @@ export default function InventoryPage() {
                                 <ItemCard
                                   item={item}
                                   onClick={() => handleItemClick(item)}
-                                  onEdit={isAdmin ? () => handleEditItem(item) : undefined}
+                                  onEdit={canEdit ? () => handleEditItem(item) : undefined}
                                 />
                               </div>
                             ))}
