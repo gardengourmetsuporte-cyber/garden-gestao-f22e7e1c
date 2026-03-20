@@ -126,7 +126,7 @@ export default function InventoryPage() {
   const handleFabAdd = () => {
     handleAddItem();
   };
-  useFabAction(isAdmin ? { icon: 'Plus', label: 'Novo Item', onClick: handleFabAdd } : null, [isAdmin, items.length, showTemplates]);
+  useFabAction(canCreate ? { icon: 'Plus', label: 'Novo Item', onClick: handleFabAdd } : null, [canCreate, items.length, showTemplates]);
 
   const handleSaveItem = async (data: {
     name: string; category_id: string | null; supplier_id: string | null;
