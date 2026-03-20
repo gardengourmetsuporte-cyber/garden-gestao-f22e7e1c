@@ -9,16 +9,26 @@ export const platform = Capacitor.getPlatform();
 
 /**
  * Enter immersive fullscreen mode on native platforms.
- * Hides the status bar and (on Android) the navigation bar.
+ * Hides status bar on native and navigation bar on Android.
  */
 export async function enterImmersiveMode() {
   if (!isNative) return;
+
   try {
     const { StatusBar } = await import('@capacitor/status-bar');
     await StatusBar.setOverlaysWebView({ overlay: true });
     await StatusBar.hide();
   } catch {
-    // plugin not available
+    // status bar plugin not available
+  }
+
+  if (platform === 'android') {
+    try {
+      const { Fullscreen } = await import('@boengli/capacitor-fullscreen');
+      await Fullscreen.activateImmersiveMode();
+    } catch {
+      // fullscreen plugin not available
+    }
   }
 }
 

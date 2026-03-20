@@ -337,7 +337,34 @@ function AuthenticatedRoutes() {
 
 const App = () => {
   useEffect(() => {
-    enterImmersiveMode();
+    void enterImmersiveMode();
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void enterImmersiveMode();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    let cleanupAppListener: (() => void) | undefined;
+
+    if (isNative) {
+      import('@capacitor/app').then(({ App: CapacitorApp }) => {
+        const appStateSub = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+          if (isActive) {
+            void enterImmersiveMode();
+          }
+        });
+        cleanupAppListener = () => {
+          void appStateSub.then((sub) => sub.remove());
+        };
+      }).catch(() => {});
+    }
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      cleanupAppListener?.();
+    };
   }, []);
 
   return (
