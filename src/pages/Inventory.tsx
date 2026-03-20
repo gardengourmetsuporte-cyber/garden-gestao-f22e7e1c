@@ -8,6 +8,7 @@ import { useFabAction } from '@/contexts/FabActionContext';
 import { useCategories } from '@/hooks/useCategories';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserModules } from '@/hooks/useAccessLevels';
 import { StatsCard } from '@/components/inventory/StatsCard';
 import { ItemCard } from '@/components/inventory/ItemCard';
 import { SearchBar } from '@/components/inventory/SearchBar';
@@ -35,6 +36,10 @@ export default function InventoryPage() {
   const location = useLocation();
   const [invSearchParams, setInvSearchParams] = useSearchParams();
   const { isAdmin } = useAuth();
+  const { hasAccess } = useUserModules();
+  const canCreate = isAdmin || hasAccess('inventory.create');
+  const canEdit = isAdmin || hasAccess('inventory.create');
+  const canMove = isAdmin || hasAccess('inventory.movements');
   const {
     items, movements, isLoading,
     addItem, updateItem, deleteItem,
@@ -121,7 +126,7 @@ export default function InventoryPage() {
   const handleFabAdd = () => {
     handleAddItem();
   };
-  useFabAction(isAdmin ? { icon: 'Plus', label: 'Novo Item', onClick: handleFabAdd } : null, [isAdmin, items.length, showTemplates]);
+  useFabAction(canCreate ? { icon: 'Plus', label: 'Novo Item', onClick: handleFabAdd } : null, [canCreate, items.length, showTemplates]);
 
   const handleSaveItem = async (data: {
     name: string; category_id: string | null; supplier_id: string | null;
@@ -290,9 +295,9 @@ export default function InventoryPage() {
                       icon="Package"
                       title="Seu estoque está vazio"
                       subtitle="Cadastre o primeiro item para começar a controlar entradas e saídas."
-                      actionLabel={isAdmin ? "Cadastrar item" : undefined}
+                      actionLabel={canCreate ? "Cadastrar item" : undefined}
                       actionIcon="Plus"
-                      onAction={isAdmin ? handleAddItem : undefined}
+                      onAction={canCreate ? handleAddItem : undefined}
                       accent="primary"
                     />
                   ) : (
@@ -359,7 +364,7 @@ export default function InventoryPage() {
                                 <ItemCard
                                   item={item}
                                   onClick={() => handleItemClick(item)}
-                                  onEdit={isAdmin ? () => handleEditItem(item) : undefined}
+                                  onEdit={canEdit ? () => handleEditItem(item) : undefined}
                                 />
                               </div>
                             ))}
@@ -406,7 +411,7 @@ export default function InventoryPage() {
             const result = await addSupplier({ name });
             return result ? { id: result.id } : null;
           }}
-          isAdmin={isAdmin}
+          isAdmin={canEdit}
         />
 
         <BatchMovementSheet
