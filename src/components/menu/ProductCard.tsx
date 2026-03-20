@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { AppIcon } from '@/components/ui/app-icon';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { useRecipeCostSettings } from '@/hooks/useRecipeCostSettings';
 import type { MenuProduct } from '@/hooks/useMenuAdmin';
 
 interface Props {
