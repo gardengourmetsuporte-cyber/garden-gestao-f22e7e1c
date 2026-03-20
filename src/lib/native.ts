@@ -8,6 +8,21 @@ export const isNative = Capacitor.isNativePlatform();
 export const platform = Capacitor.getPlatform();
 
 /**
+ * Enter immersive fullscreen mode on native platforms.
+ * Hides the status bar and (on Android) the navigation bar.
+ */
+export async function enterImmersiveMode() {
+  if (!isNative) return;
+  try {
+    const { StatusBar } = await import('@capacitor/status-bar');
+    await StatusBar.setOverlaysWebView({ overlay: true });
+    await StatusBar.hide();
+  } catch {
+    // plugin not available
+  }
+}
+
+/**
  * Trigger a light haptic feedback.
  * Uses native Haptics on iOS/Android, falls back to navigator.vibrate on web.
  */
