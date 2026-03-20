@@ -8,6 +8,7 @@ import { useFabAction } from '@/contexts/FabActionContext';
 import { useCategories } from '@/hooks/useCategories';
 import { useSuppliers } from '@/hooks/useSuppliers';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserModules } from '@/hooks/useAccessLevels';
 import { StatsCard } from '@/components/inventory/StatsCard';
 import { ItemCard } from '@/components/inventory/ItemCard';
 import { SearchBar } from '@/components/inventory/SearchBar';
