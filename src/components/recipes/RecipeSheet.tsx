@@ -220,11 +220,14 @@ export function RecipeSheet({
   const portions = parseFloat(yieldQuantity) || 1;
   const costPerPortion = ingredientsCost / portions;
 
-  // Use the real menu selling price as reference for proportional fixed cost
-  const typedSellingPrice = parseFloat(sellingPrice) || undefined;
-  const priceForFixedCost = defaultSellingPrice && defaultSellingPrice > 0
-    ? defaultSellingPrice
-    : typedSellingPrice;
+  // Use current typed selling price first; fallback to menu default only when empty
+  const parsedSellingPrice = parseFloat(sellingPrice);
+  const typedSellingPrice = Number.isFinite(parsedSellingPrice) && parsedSellingPrice > 0
+    ? parsedSellingPrice
+    : undefined;
+  const priceForFixedCost = typedSellingPrice ?? (
+    defaultSellingPrice && defaultSellingPrice > 0 ? defaultSellingPrice : undefined
+  );
 
   const operationalCosts = useMemo(
     () => calculateOperationalCosts(costPerPortion, priceForFixedCost),
