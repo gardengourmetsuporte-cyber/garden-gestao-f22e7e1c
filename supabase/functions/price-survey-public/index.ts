@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
       .select(`
         id, survey_id, supplier_id, status, responded_at,
         supplier:suppliers(id, name, phone),
-        survey:price_surveys(id, title, unit_id, status, notes)
+        survey:price_surveys(id, title, unit_id, status, notes, category_ids)
       `)
       .eq("token", token)
       .single();
@@ -47,16 +47,23 @@ Deno.serve(async (req) => {
 
     const unitId = (surveySupplier.survey as any)?.unit_id;
     const supplierId = surveySupplier.supplier_id;
+    const categoryIds: string[] = (surveySupplier.survey as any)?.category_ids || [];
 
     // ========== GET: Return inventory items grouped by category ==========
     if (req.method === "GET") {
       // Get all inventory items for this unit
-      const { data: items, error: itemsError } = await supabase
+      let itemsQuery = supabase
         .from("inventory_items")
         .select("id, name, unit_type, unit_price, current_stock, min_stock, category_id")
         .eq("unit_id", unitId)
         .order("name");
 
+      // Filter by selected categories if any were specified
+      if (categoryIds.length > 0) {
+        itemsQuery = itemsQuery.in("category_id", categoryIds);
+      }
+
+      const { data: items, error: itemsError } = await itemsQuery;
       if (itemsError) throw itemsError;
 
       // Get categories
