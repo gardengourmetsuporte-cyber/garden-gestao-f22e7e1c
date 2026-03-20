@@ -25,7 +25,7 @@ export function PriceSurveyList({ suppliers }: Props) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [detailSurvey, setDetailSurvey] = useState<any>(null);
 
-  const handleCreate = async (data: { title: string; supplierIds: string[]; notes?: string }) => {
+  const handleCreate = async (data: { title: string; supplierIds: string[]; categoryIds: string[]; notes?: string }) => {
     return await createSurvey.mutateAsync(data);
   };
 

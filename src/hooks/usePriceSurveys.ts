@@ -62,11 +62,11 @@ export function usePriceSurveys() {
   });
 
   const createSurvey = useMutation({
-    mutationFn: async (params: { title: string; supplierIds: string[]; notes?: string }) => {
+    mutationFn: async (params: { title: string; supplierIds: string[]; categoryIds?: string[]; notes?: string }) => {
       if (!unitId || !user) throw new Error('No unit/user');
       const { data: survey, error } = await supabase
         .from('price_surveys' as any)
-        .insert({ user_id: user.id, unit_id: unitId, title: params.title, notes: params.notes || null, status: 'sent' })
+        .insert({ user_id: user.id, unit_id: unitId, title: params.title, notes: params.notes || null, status: 'sent', category_ids: params.categoryIds || [] })
         .select()
         .single();
       if (error) throw error;

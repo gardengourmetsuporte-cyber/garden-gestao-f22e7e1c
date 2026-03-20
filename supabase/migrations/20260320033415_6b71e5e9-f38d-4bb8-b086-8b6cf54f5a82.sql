@@ -1,0 +1,1 @@
+ALTER TABLE public.price_surveys ADD COLUMN category_ids text[] DEFAULT '{}'::text[];

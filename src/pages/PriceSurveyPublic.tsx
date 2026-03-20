@@ -240,13 +240,8 @@ export default function PriceSurveyPublic() {
         </div>
       </div>
 
-      {/* Mark all button */}
-      <div className="px-4 pt-3">
-        <Button variant="outline" size="sm" className="w-full" onClick={markAll}>
-          <AppIcon name="CheckCheck" size={16} className="mr-2" />
-          Marcar todos como disponíveis
-        </Button>
-      </div>
+      {/* Spacer */}
+      <div className="pt-2" />
 
       {/* Items grouped by category */}
       <div className="px-4 pt-3 space-y-4">
