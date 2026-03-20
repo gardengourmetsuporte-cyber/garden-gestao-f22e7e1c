@@ -4858,6 +4858,7 @@ export type Database = {
       }
       price_surveys: {
         Row: {
+          category_ids: string[] | null
           created_at: string
           id: string
           notes: string | null
@@ -4868,6 +4869,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          category_ids?: string[] | null
           created_at?: string
           id?: string
           notes?: string | null
@@ -4878,6 +4880,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          category_ids?: string[] | null
           created_at?: string
           id?: string
           notes?: string | null
