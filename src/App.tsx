@@ -179,9 +179,9 @@ function ProtectedRoute({ children, skipOnboarding }: { children: React.ReactNod
 function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handler = (e: PromiseRejectionEvent) => {
-      const msg = String(e.reason?.message || e.reason || "");
+      const errMsg = String(e.reason?.message || e.reason || "");
       // Auto-reload on dynamic import failures (stale cache / deploy)
-      if (msg.includes("Failed to fetch dynamically imported module") || msg.includes("Loading chunk")) {
+      if (errMsg.includes("Failed to fetch dynamically imported module") || errMsg.includes("Loading chunk")) {
         e.preventDefault();
         const key = "unhandled_import_reload";
         const count = parseInt(sessionStorage.getItem(key) || "0", 10);
@@ -194,8 +194,12 @@ function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
         }
         return;
       }
+      // Suppress noisy non-critical errors (subscription checks, network blips)
+      const isSilent = errMsg.includes('check-subscription') || errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError') || errMsg.includes('Load failed') || errMsg.includes('FunctionsHttpError') || errMsg.includes('FunctionsRelayError');
       console.error("[Unhandled rejection]", e.reason);
-      toast.error("Ocorreu um erro inesperado.");
+      if (!isSilent) {
+        toast.error("Ocorreu um erro inesperado.");
+      }
       e.preventDefault();
     };
     window.addEventListener("unhandledrejection", handler);
