@@ -150,16 +150,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const stripeStatus = data.subscribed ? 'active' : 'canceled';
 
         if (stripePlan === 'free') {
-          const currentEffective = effectivePlanRef.current;
-          const inheritedPlan = !currentEffective || currentEffective === 'free'
-            ? (user?.id ? await resolveInheritedUnitPlan(user.id) : null)
-            : currentEffective;
+          // Always re-resolve inherited plan for employees who don't have their own subscription
+          const inheritedPlan = user?.id ? await resolveInheritedUnitPlan(user.id) : null;
 
           if (inheritedPlan && inheritedPlan !== 'free') {
             setPlan(inheritedPlan);
-            setPlanStatus(stripeStatus);
+            setPlanStatus('active');
             setSubscriptionEnd(data.subscription_end || null);
-            setCachedAuth(profile, role, inheritedPlan, stripeStatus);
+            setCachedAuth(profile, role, inheritedPlan, 'active');
             return;
           }
         }
@@ -212,18 +210,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRole(r);
 
         let nextPlan = profilePlan;
-        if (!effectivePlanRef.current || effectivePlanRef.current === 'free') {
+        let nextPlanStatus = profilePlanStatus;
+        // Always try to resolve inherited plan for employees
+        if (profilePlan === 'free') {
           const inheritedPlan = await resolveInheritedUnitPlan(userId);
           if (inheritedPlan && inheritedPlan !== 'free') {
             nextPlan = inheritedPlan;
+            nextPlanStatus = 'active';
           }
-          setPlan(nextPlan);
-          setPlanStatus(profilePlanStatus);
-        } else {
-          nextPlan = effectivePlanRef.current;
         }
+        effectivePlanRef.current = nextPlan;
+        setPlan(nextPlan);
+        setPlanStatus(nextPlanStatus);
 
-        setCachedAuth(p, r, nextPlan, profilePlanStatus);
+        setCachedAuth(p, r, nextPlan, nextPlanStatus);
       } catch (err) {
         console.error('Failed to fetch user data:', err);
       } finally {
