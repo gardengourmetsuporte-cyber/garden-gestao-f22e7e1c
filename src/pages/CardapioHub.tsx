@@ -141,13 +141,33 @@ export default function CardapioHub() {
       ? snapshotCost
       : fallbackFullCostPerPortion;
 
+    const resolvedSellingPrice = typeof snapshotSellingPrice === 'number' && snapshotSellingPrice > 0
+      ? snapshotSellingPrice
+      : targetProduct?.price;
+
+    const resolvedMargin = resolvedSellingPrice && resolvedSellingPrice > 0
+      ? ((resolvedSellingPrice - fullCostPerPortion) / resolvedSellingPrice) * 100
+      : undefined;
+
+    const productUpdatePayload: Record<string, any> = {
+      cost_per_portion: fullCostPerPortion,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (resolvedSellingPrice && resolvedSellingPrice > 0) {
+      productUpdatePayload.price = resolvedSellingPrice;
+    }
+
+    if (typeof resolvedMargin === 'number' && Number.isFinite(resolvedMargin)) {
+      productUpdatePayload.profit_margin = Math.round(resolvedMargin * 100) / 100;
+    }
+
     if (recipeTargetProductId && savedRecipeId) {
       const { data: linkedRows, error: linkError } = await supabase
         .from('tablet_products')
         .update({
           recipe_id: savedRecipeId,
-          cost_per_portion: fullCostPerPortion,
-          updated_at: new Date().toISOString(),
+          ...productUpdatePayload,
         })
         .eq('id', recipeTargetProductId)
         .select('id');
@@ -161,7 +181,7 @@ export default function CardapioHub() {
     } else if (savedRecipeId && targetProduct) {
       await supabase
         .from('tablet_products')
-        .update({ cost_per_portion: fullCostPerPortion, updated_at: new Date().toISOString() })
+        .update(productUpdatePayload)
         .eq('id', targetProduct.id);
 
       await menuAdmin.fetchProducts();
