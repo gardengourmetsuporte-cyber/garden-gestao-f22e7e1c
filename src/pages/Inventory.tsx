@@ -36,6 +36,10 @@ export default function InventoryPage() {
   const location = useLocation();
   const [invSearchParams, setInvSearchParams] = useSearchParams();
   const { isAdmin } = useAuth();
+  const { hasAccess } = useUserModules();
+  const canCreate = isAdmin || hasAccess('inventory.create');
+  const canEdit = isAdmin || hasAccess('inventory.create');
+  const canMove = isAdmin || hasAccess('inventory.movements');
   const {
     items, movements, isLoading,
     addItem, updateItem, deleteItem,
