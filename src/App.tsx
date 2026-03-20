@@ -194,8 +194,14 @@ function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
         }
         return;
       }
-      console.error("[Unhandled rejection]", e.reason);
-      toast.error("Ocorreu um erro inesperado.");
+      const reason = e.reason;
+      const msg = reason?.message || String(reason || '');
+      // Suppress noisy non-critical errors (subscription checks, network blips)
+      const isSilent = msg.includes('check-subscription') || msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed') || msg.includes('FunctionsHttpError') || msg.includes('FunctionsRelayError');
+      console.error("[Unhandled rejection]", reason);
+      if (!isSilent) {
+        toast.error("Ocorreu um erro inesperado.");
+      }
       e.preventDefault();
     };
     window.addEventListener("unhandledrejection", handler);
