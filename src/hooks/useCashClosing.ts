@@ -139,11 +139,8 @@ export function useCashClosing() {
         .eq('id', closingId);
       if (updateError) throw updateError;
 
-      const closing = closings.find(c => c.id === closingId);
-      if (closing && !closing.financial_integrated) {
-        await integrateWithFinancial(closing);
-      }
       invalidate();
+      toast.success('Fechamento aprovado! Clique em "Integrar ao financeiro" para lançar.');
       return true;
     } catch {
       toast.error('Erro ao aprovar fechamento');
