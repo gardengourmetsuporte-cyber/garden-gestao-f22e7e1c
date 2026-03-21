@@ -228,7 +228,10 @@ export function ManualDeliverySheet({ open, onOpenChange, onSubmit, isPending }:
       setNotes('');
       setGeoResult(null);
       onOpenChange(false);
-    } catch {}
+    } catch (err) {
+      console.error('[ManualDeliverySheet] Error creating delivery:', err);
+      toast.error('Erro ao criar entrega');
+    }
   };
 
   const canSubmit = orderNumber.trim().length > 0 && address.trim().length > 0 && !isPending;
