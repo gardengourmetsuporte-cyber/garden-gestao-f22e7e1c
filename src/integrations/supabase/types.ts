@@ -1913,6 +1913,30 @@ export type Database = {
           },
         ]
       }
+      edge_function_rate_limits: {
+        Row: {
+          function_name: string
+          id: string
+          request_count: number
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          function_name: string
+          id?: string
+          request_count?: number
+          user_id: string
+          window_start?: string
+        }
+        Update: {
+          function_name?: string
+          id?: string
+          request_count?: number
+          user_id?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       employee_documents: {
         Row: {
           created_at: string
@@ -2345,6 +2369,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      error_logs: {
+        Row: {
+          created_at: string
+          error_message: string
+          error_stack: string | null
+          id: string
+          metadata: Json | null
+          module: string | null
+          url: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message: string
+          error_stack?: string | null
+          id?: string
+          metadata?: Json | null
+          module?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string
+          error_stack?: string | null
+          id?: string
+          metadata?: Json | null
+          module?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       finance_accounts: {
         Row: {
@@ -7747,6 +7807,7 @@ export type Database = {
         Args: { p_ids: string[]; p_orders: number[] }
         Returns: undefined
       }
+      cleanup_rate_limits: { Args: never; Returns: undefined }
       delete_unit_cascade: { Args: { p_unit_id: string }; Returns: undefined }
       get_chat_conversation_type: {
         Args: { _conversation_id: string }
