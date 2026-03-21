@@ -1208,7 +1208,9 @@ export function ChecklistView({
                                     <div className={cn(
                                       "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-white shadow-md transition-all duration-300 mt-0.5",
                                       isContested ? "bg-amber-500 shadow-amber-500/30"
-                                        : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
+                                        : wasSkipped ? "bg-destructive shadow-destructive/30" 
+                                        : (completion as any)?.completion_note === 'already_ready' ? "bg-amber-500 shadow-amber-500/30"
+                                        : "bg-success shadow-success/30",
                                       isJustCompleted && "scale-125"
                                     )}>
                                       {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : <AppIcon name="Check" className="w-4 h-4" />}
