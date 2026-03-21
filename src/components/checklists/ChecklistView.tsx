@@ -308,7 +308,7 @@ export function ChecklistView({
       }
     }
 
-    executeComplete(itemId, points, configuredPoints, completedByUserId, buttonElement, isSkipped);
+    executeComplete(itemId, points, configuredPoints, completedByUserId, buttonElement, isSkipped, undefined, isAlreadyReady);
   };
 
   const executeComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean, photoUrl?: string) => {
