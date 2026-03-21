@@ -311,7 +311,7 @@ export function ChecklistView({
     executeComplete(itemId, points, configuredPoints, completedByUserId, buttonElement, isSkipped, undefined, isAlreadyReady);
   };
 
-  const executeComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean, photoUrl?: string) => {
+  const executeComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean, photoUrl?: string, isAlreadyReady?: boolean) => {
     // Haptic feedback
     if (navigator.vibrate) navigator.vibrate(10);
 
