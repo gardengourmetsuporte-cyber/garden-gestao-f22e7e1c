@@ -1212,10 +1212,12 @@ export function ChecklistView({
                                           "flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 border transition-all duration-300",
                                           isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                             : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
+                                            : (completion as any)?.completion_note === 'already_ready' ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                             : "bg-primary/10 text-primary border-primary/20"
                                         )}>
                                           {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
                                             : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
+                                            : (completion as any)?.completion_note === 'already_ready' ? (<><AppIcon name="package_2" className="w-3 h-3" /><span>já pronto</span></>)
                                             : (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>)}
                                         </div>
                                         )}
