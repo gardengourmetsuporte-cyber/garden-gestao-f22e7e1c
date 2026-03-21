@@ -32,6 +32,23 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
+    // Auth + rate limit
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "");
+      const supabaseAdmin = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } }
+      );
+      const { data: userData } = await supabaseAdmin.auth.getUser(token);
+      if (userData?.user?.id && isRateLimited(userData.user.id)) {
+        return new Response(JSON.stringify({ error: "Limite de requisições excedido" }), {
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const { descriptions, categories, suppliers, employees } = await req.json();
 
     if (!descriptions || !Array.isArray(descriptions) || descriptions.length === 0) {
