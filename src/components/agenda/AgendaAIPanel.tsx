@@ -17,6 +17,13 @@ interface AISuggestion {
   enabled: boolean;
 }
 
+interface AIEvaluation {
+  score: number;
+  strengths: string[];
+  weaknesses: string[];
+  tips: string[];
+}
+
 interface AgendaAIPanelProps {
   tasks: ManagerTask[];
 }
@@ -28,6 +35,19 @@ const PRIORITY_COLORS: Record<string, string> = {
   low: 'bg-muted text-muted-foreground border-border/40',
 };
 
+function getScoreColor(score: number) {
+  if (score >= 7) return { ring: 'text-emerald-500', bg: 'bg-emerald-500/10', text: 'text-emerald-600' };
+  if (score >= 4) return { ring: 'text-amber-500', bg: 'bg-amber-500/10', text: 'text-amber-600' };
+  return { ring: 'text-destructive', bg: 'bg-destructive/10', text: 'text-destructive' };
+}
+
+function getScoreLabel(score: number) {
+  if (score >= 8) return 'Excelente';
+  if (score >= 6) return 'Boa';
+  if (score >= 4) return 'Regular';
+  return 'Precisa melhorar';
+}
+
 export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -36,6 +56,7 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<AISuggestion[]>([]);
   const [summary, setSummary] = useState('');
+  const [evaluation, setEvaluation] = useState<AIEvaluation | null>(null);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -85,6 +106,7 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
 
       setSuggestions(aiSuggestions);
       setSummary(data.summary || '');
+      setEvaluation(data.evaluation || null);
       setReviewOpen(true);
     } catch (err: any) {
       const msg = err?.message?.includes('429')
@@ -116,6 +138,7 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
       await queryClient.invalidateQueries({ queryKey: ['manager-tasks'] });
       setReviewOpen(false);
       setSuggestions([]);
+      setEvaluation(null);
       toast.success(`${data.updated_count} tarefa(s) atualizada(s)!`);
     } catch {
       toast.error('Erro ao aplicar mudanças.');
@@ -138,10 +161,12 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
     return Math.floor((new Date(today).getTime() - new Date(date).getTime()) / 86400000);
   };
 
+  const scoreColors = evaluation ? getScoreColor(evaluation.score) : null;
+
   return (
     <>
       <div className="space-y-3">
-        {/* Copilot IA Card — clean */}
+        {/* Copilot IA Card */}
         <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-secondary/50">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, #8B5CF6, #EC4899)' }}>
@@ -208,13 +233,78 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
           <SheetHeader className="text-left pb-2">
             <SheetTitle className="flex items-center gap-2">
               <AppIcon name="Sparkles" size={20} className="text-primary" />
-              Sugestões da IA
+              Análise da IA
             </SheetTitle>
             <SheetDescription>{summary}</SheetDescription>
           </SheetHeader>
 
-          <div className="flex-1 overflow-y-auto space-y-2 py-3">
-            {changedSuggestions.length === 0 && suggestions.length > 0 && (
+          <div className="flex-1 overflow-y-auto space-y-4 py-3">
+
+            {/* === Evaluation Section === */}
+            {evaluation && (
+              <div className="space-y-3">
+                {/* Score */}
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/40">
+                  <div className={cn("w-16 h-16 rounded-full flex flex-col items-center justify-center border-[3px] shrink-0", scoreColors?.bg, scoreColors?.ring)} style={{ borderColor: 'currentColor' }}>
+                    <span className={cn("text-xl font-black leading-none", scoreColors?.text)}>{evaluation.score}</span>
+                    <span className="text-[8px] font-bold text-muted-foreground uppercase">/10</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={cn("text-sm font-bold", scoreColors?.text)}>{getScoreLabel(evaluation.score)}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Nível de organização da sua agenda</p>
+                  </div>
+                </div>
+
+                {/* Strengths */}
+                {evaluation.strengths.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-bold text-emerald-600 flex items-center gap-1.5">
+                      <AppIcon name="CheckCircle2" size={13} className="text-emerald-500" />
+                      Pontos fortes
+                    </p>
+                    {evaluation.strengths.map((s, i) => (
+                      <p key={i} className="text-xs text-foreground/80 pl-5">• {s}</p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Weaknesses */}
+                {evaluation.weaknesses.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-bold text-destructive flex items-center gap-1.5">
+                      <AppIcon name="AlertTriangle" size={13} className="text-destructive" />
+                      Pontos fracos
+                    </p>
+                    {evaluation.weaknesses.map((w, i) => (
+                      <p key={i} className="text-xs text-foreground/80 pl-5">• {w}</p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Tips */}
+                {evaluation.tips.length > 0 && (
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-bold text-primary flex items-center gap-1.5">
+                      <AppIcon name="Lightbulb" size={13} className="text-primary" />
+                      Dicas
+                    </p>
+                    {evaluation.tips.map((t, i) => (
+                      <p key={i} className="text-xs text-foreground/80 pl-5">• {t}</p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Separator */}
+                {suggestions.length > 0 && (
+                  <div className="border-t border-border/50 pt-2">
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Sugestões de prioridade</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* === Suggestions Section === */}
+            {changedSuggestions.length === 0 && suggestions.length > 0 && !evaluation && (
               <div className="text-center py-8">
                 <AppIcon name="CheckCircle2" size={32} className="text-primary mx-auto mb-2" />
                 <p className="text-sm font-medium text-foreground">Suas prioridades já estão ótimas!</p>
@@ -240,7 +330,6 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
                       <p className="text-sm font-semibold text-foreground truncate">{task.title}</p>
                       <p className="text-xs text-muted-foreground mt-1">{suggestion.reason}</p>
 
-                      {/* Priority change indicator */}
                       <div className="flex items-center gap-2 mt-2">
                         <span className={cn("px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border", PRIORITY_COLORS[task.priority])}>
                           {PRIORITY_LABELS[task.priority]}
@@ -279,28 +368,30 @@ export function AgendaAIPanel({ tasks }: AgendaAIPanelProps) {
               className="flex-1 h-12 rounded-xl"
               onClick={() => setReviewOpen(false)}
             >
-              Cancelar
+              Fechar
             </Button>
-            <Button
-              className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20"
-              disabled={isApplying || enabledCount === 0}
-              onClick={handleApprove}
-            >
-              {isApplying ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Aplicando...
-                </>
-              ) : (
-                <>
-                  <AppIcon name="Check" size={16} className="mr-1" />
-                  Aplicar {enabledCount > 0 ? `(${enabledCount})` : ''}
-                </>
-              )}
-            </Button>
+            {changedSuggestions.length > 0 && (
+              <Button
+                className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20"
+                disabled={isApplying || enabledCount === 0}
+                onClick={handleApprove}
+              >
+                {isApplying ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Aplicando...
+                  </>
+                ) : (
+                  <>
+                    <AppIcon name="Check" size={16} className="mr-1" />
+                    Aplicar {enabledCount > 0 ? `(${enabledCount})` : ''}
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         </SheetContent>
       </Sheet>

@@ -11,7 +11,6 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // Auth
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
@@ -31,7 +30,7 @@ serve(async (req) => {
 
     const { tasks, apply, approved_tasks } = await req.json();
 
-    // === APPLY MODE: user approved suggestions ===
+    // === APPLY MODE ===
     if (apply && Array.isArray(approved_tasks)) {
       const validTasks = approved_tasks.filter((t: any) =>
         t.id && ["low", "medium", "high"].includes(t.suggested_priority)
@@ -45,7 +44,7 @@ serve(async (req) => {
       });
     }
 
-    // === SUGGEST MODE: analyze and return suggestions ===
+    // === SUGGEST MODE ===
     if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
       return new Response(JSON.stringify({ error: "No tasks provided" }), { status: 400, headers: corsHeaders });
     }
@@ -61,16 +60,23 @@ serve(async (req) => {
       return `- "${t.title}" | Prioridade: ${t.priority} | Data: ${t.due_date || "sem data"} | Categoria: ${t.category_name || "nenhuma"} | Notas: ${t.notes || "nenhuma"} | Atraso: ${overdueDays > 0 ? overdueDays + " dias" : "no prazo"} | ID: ${t.id}`;
     }).join("\n");
 
-    const systemPrompt = `Você é um assistente de gestão especializado em priorização de tarefas para donos de negócios de food service. Analise as tarefas pendentes e reorganize por prioridade real considerando:
+    const systemPrompt = `Você é um assistente de gestão especializado em priorização de tarefas para donos de negócios de food service. Analise as tarefas pendentes e:
 
-1. Tarefas atrasadas (maior urgência)
-2. Tarefas com data de hoje
-3. Impacto no negócio (financeiro > operacional > administrativo)
-4. Tarefas sem data (menor urgência)
+1. Reorganize por prioridade real considerando:
+   - Tarefas atrasadas (maior urgência)
+   - Tarefas com data de hoje
+   - Impacto no negócio (financeiro > operacional > administrativo)
+   - Tarefas sem data (menor urgência)
+
+2. Faça uma avaliação geral da agenda do gestor:
+   - Identifique pontos fortes (ex: boa organização por categorias, datas bem definidas)
+   - Identifique pontos fracos (ex: muitas tarefas atrasadas, falta de priorização)
+   - Dê dicas práticas e actionáveis para melhorar a gestão
+   - Atribua uma nota de 1 a 10 para o nível de organização
 
 Hoje é ${today} (${dayOfWeek}).
 
-Use a ferramenta reprioritize_tasks para retornar as prioridades atualizadas.`;
+Use a ferramenta reprioritize_tasks para retornar as prioridades atualizadas e a avaliação.`;
 
     const userPrompt = `Analise e repriorize estas tarefas pendentes:\n\n${tasksSummary}`;
 
@@ -94,7 +100,7 @@ Use a ferramenta reprioritize_tasks para retornar as prioridades atualizadas.`;
             type: "function",
             function: {
               name: "reprioritize_tasks",
-              description: "Retorna a lista de tarefas com prioridades atualizadas e um resumo da análise.",
+              description: "Retorna a lista de tarefas com prioridades atualizadas, um resumo, e uma avaliação geral da agenda.",
               parameters: {
                 type: "object",
                 properties: {
@@ -112,8 +118,32 @@ Use a ferramenta reprioritize_tasks para retornar as prioridades atualizadas.`;
                     },
                   },
                   summary: { type: "string", description: "Resumo geral da análise em 1-2 frases" },
+                  evaluation: {
+                    type: "object",
+                    description: "Avaliação geral da agenda do gestor",
+                    properties: {
+                      score: { type: "number", description: "Nota de organização de 1 a 10" },
+                      strengths: {
+                        type: "array",
+                        items: { type: "string" },
+                        description: "Lista de pontos fortes da agenda (2-4 itens curtos)",
+                      },
+                      weaknesses: {
+                        type: "array",
+                        items: { type: "string" },
+                        description: "Lista de pontos fracos da agenda (2-4 itens curtos)",
+                      },
+                      tips: {
+                        type: "array",
+                        items: { type: "string" },
+                        description: "Lista de dicas práticas para melhorar (2-4 itens curtos)",
+                      },
+                    },
+                    required: ["score", "strengths", "weaknesses", "tips"],
+                    additionalProperties: false,
+                  },
                 },
-                required: ["tasks", "summary"],
+                required: ["tasks", "summary", "evaluation"],
                 additionalProperties: false,
               },
             },
@@ -152,10 +182,10 @@ Use a ferramenta reprioritize_tasks para retornar as prioridades atualizadas.`;
       t.id && ["low", "medium", "high"].includes(t.suggested_priority)
     ) || [];
 
-    // Return suggestions WITHOUT applying
     return new Response(JSON.stringify({
       suggestions: validTasks,
       summary: result.summary || "Análise concluída.",
+      evaluation: result.evaluation || null,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
