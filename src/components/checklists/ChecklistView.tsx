@@ -272,7 +272,7 @@ export function ChecklistView({
     return isItemCompleted(itemId);
   }, [isItemCompleted, optimisticToggles]);
 
-  const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean) => {
+  const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean, isAlreadyReady?: boolean) => {
     // Check if item has linked inventory item (production) and is not being unchecked or skipped
     if (!isSkipped) {
       const linkedItem = sectors.flatMap(s =>
