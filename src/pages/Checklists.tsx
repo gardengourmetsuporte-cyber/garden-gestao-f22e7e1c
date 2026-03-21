@@ -221,10 +221,10 @@ export default function ChecklistsPage() {
                               key={sector.id}
                               onClick={() => { setSelectedSectorId(sector.id); setSelectedSubcategoryId(null); }}
                               className={cn(
-                                "flex items-center px-3.5 py-1.5 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95",
+                                "flex items-center px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95",
                                 isSelected
-                                  ? "bg-foreground text-background"
-                                  : "bg-foreground/[0.07] text-muted-foreground hover:bg-foreground/[0.12]"
+                                  ? "bg-primary/15 text-primary"
+                                  : "bg-foreground/[0.06] text-muted-foreground hover:bg-foreground/[0.10]"
                               )}
                             >
                               {sector.name}
@@ -244,10 +244,10 @@ export default function ChecklistsPage() {
                             <button
                               onClick={() => setSelectedSubcategoryId(null)}
                               className={cn(
-                                "px-3 py-1 rounded-full text-[11px] font-medium whitespace-nowrap transition-all shrink-0 active:scale-95",
+                                "px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95",
                                 !selectedSubcategoryId
                                   ? "bg-primary/15 text-primary"
-                                  : "bg-foreground/[0.05] text-muted-foreground hover:bg-foreground/[0.08]"
+                                  : "bg-foreground/[0.06] text-muted-foreground hover:bg-foreground/[0.10]"
                               )}
                             >
                               Todos
@@ -257,10 +257,10 @@ export default function ChecklistsPage() {
                                 key={sub.id}
                                 onClick={() => setSelectedSubcategoryId(sub.id)}
                                 className={cn(
-                                  "px-3 py-1 rounded-full text-[11px] font-medium whitespace-nowrap transition-all shrink-0 active:scale-95",
+                                  "px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all shrink-0 active:scale-95",
                                   selectedSubcategoryId === sub.id
                                     ? "bg-primary/15 text-primary"
-                                    : "bg-foreground/[0.05] text-muted-foreground hover:bg-foreground/[0.08]"
+                                    : "bg-foreground/[0.06] text-muted-foreground hover:bg-foreground/[0.10]"
                                 )}
                               >
                                 {sub.name}
