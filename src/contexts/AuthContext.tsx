@@ -309,19 +309,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Poll subscription every 15min when logged in (reduced from 5min to lower backend load at scale)
+  // Check subscription only ONCE after login (not polling).
+  // Webhook handles plan updates in real-time. Only re-check on login + unit switch.
   useEffect(() => {
     if (user) {
+      // Single delayed check after login to sync Stripe state
       const timeout = setTimeout(() => refreshSubscription(), 10_000);
-      subIntervalRef.current = setInterval(refreshSubscription, 900_000);
-      return () => {
-        clearTimeout(timeout);
-        if (subIntervalRef.current) clearInterval(subIntervalRef.current);
-      };
-    } else {
-      if (subIntervalRef.current) clearInterval(subIntervalRef.current);
+      return () => clearTimeout(timeout);
     }
-  }, [user, refreshSubscription]);
+  }, [user?.id]); // Only re-run when user changes (login/logout), NOT on refreshSubscription reference change
 
   // Re-validate user data when tab regains focus (debounced to avoid rapid re-fetches)
   useEffect(() => {

@@ -200,7 +200,9 @@ export function useTabletOrder(unitId: string) {
           setOrderStatus('queued_offline');
           toast.success('Pedido salvo offline!', { description: 'Será enviado quando a conexão voltar.' });
           return { orderId: offlineId };
-        } catch {}
+        } catch (offlineErr) {
+          console.error('[useTabletOrder] Failed to save offline order:', offlineErr);
+        }
       }
       console.error('Error creating order:', err);
       throw err;

@@ -197,6 +197,10 @@ function UnhandledRejectionGuard({ children }: { children: React.ReactNode }) {
       // Suppress noisy non-critical errors (subscription checks, network blips)
       const isSilent = errMsg.includes('check-subscription') || errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError') || errMsg.includes('Load failed') || errMsg.includes('FunctionsHttpError') || errMsg.includes('FunctionsRelayError');
       console.error("[Unhandled rejection]", e.reason);
+      // Log to error monitoring for production diagnostics
+      import('@/lib/errorMonitor').then(({ captureError }) => {
+        captureError(e.reason, { module: 'unhandled_rejection' });
+      }).catch(() => {});
       if (!isSilent) {
         toast.error("Ocorreu um erro inesperado.");
       }

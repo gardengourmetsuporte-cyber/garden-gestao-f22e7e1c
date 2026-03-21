@@ -257,7 +257,9 @@ export default function DigitalMenu() {
     setWonPrize(prize);
     try {
       await recordPlay.mutateAsync({ order_id: gameOrderId.trim(), customer_name: gameName.trim() || undefined, prize });
-    } catch {}
+    } catch (err) {
+      console.error('[DigitalMenu] Failed to record game play:', err);
+    }
     setGamePhase('result');
   };
 

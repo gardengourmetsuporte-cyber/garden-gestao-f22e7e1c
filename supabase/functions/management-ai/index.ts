@@ -1280,15 +1280,15 @@ serve(async (req) => {
 
     const sbAuth = getSupabaseAdmin();
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await sbAuth.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims?.sub) {
+    const { data: userData, error: userError } = await sbAuth.auth.getUser(token);
+    if (userError || !userData?.user?.id) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const user_id = claimsData.claims.sub as string;
+    const user_id = userData.user.id;
 
     // ── Rate Limiting ──
     if (isUserRateLimited(user_id)) {
