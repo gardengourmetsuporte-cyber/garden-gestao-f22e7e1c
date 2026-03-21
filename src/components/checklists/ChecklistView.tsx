@@ -659,6 +659,8 @@ export function ChecklistView({
                               !isContested && (canToggle || isAdmin) && "active:scale-[0.97] hover:shadow-md",
                               !isContested && wasSkipped
                                 ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
+                                : !isContested && (completion as any)?.completion_note === 'already_ready'
+                                ? "bg-gradient-to-r from-amber-500/15 to-amber-500/5 border-2 border-amber-500/30"
                                 : !isContested && "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
                               isJustCompleted && "animate-scale-in",
                               openPopover === item.id && !isContested && "ring-2 ring-primary/30"
