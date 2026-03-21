@@ -45,19 +45,19 @@ serve(async (req) => {
       });
     }
 
-    // Use getClaims for faster validation (no network round-trip to auth server)
+    // Use getUser for proper session validation (verifies revocation/bans)
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabaseAdmin.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims?.sub) {
-      // Expired/invalid session: return free and let frontend continue gracefully
+    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
+    if (userError || !userData?.user) {
+      // Expired/invalid/revoked session: return free and let frontend continue gracefully
       return new Response(JSON.stringify({ subscribed: false, plan: "free", subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
-    const userId = claimsData.claims.sub as string;
-    const userEmail = claimsData.claims.email as string;
+    const userId = userData.user.id;
+    const userEmail = userData.user.email;
     if (!userEmail) {
       return new Response(JSON.stringify({ subscribed: false, plan: "free", subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

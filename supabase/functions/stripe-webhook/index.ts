@@ -50,9 +50,13 @@ serve(async (req) => {
         }
       }
 
-      // Find user by email and update profile
-      const { data: users } = await supabaseAdmin.auth.admin.listUsers();
-      const user = users?.users?.find(u => u.email === customerEmail);
+      // Find user by email via auth admin API (filtered, not loading all users)
+      const { data: userList } = await supabaseAdmin.auth.admin.listUsers({
+        filter: customerEmail,
+        page: 1,
+        perPage: 1,
+      });
+      const user = userList?.users?.[0];
 
       if (user) {
         await supabaseAdmin.from("profiles").update({
