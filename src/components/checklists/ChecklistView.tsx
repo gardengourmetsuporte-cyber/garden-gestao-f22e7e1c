@@ -26,7 +26,7 @@ interface ChecklistViewProps {
   date: string;
   completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
-  onToggleItem: (itemId: string, points: number, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean) => Promise<void>;
+  onToggleItem: (itemId: string, points: number, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean, isAlreadyReady?: boolean) => Promise<void>;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
@@ -272,9 +272,9 @@ export function ChecklistView({
     return isItemCompleted(itemId);
   }, [isItemCompleted, optimisticToggles]);
 
-  const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean) => {
+  const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean, isAlreadyReady?: boolean) => {
     // Check if item has linked inventory item (production) and is not being unchecked or skipped
-    if (!isSkipped) {
+    if (!isSkipped && !isAlreadyReady) {
       const linkedItem = sectors.flatMap(s =>
         (s.subcategories || []).flatMap(sub =>
           (sub.items || []).filter(i => i.id === itemId && (i as any).linked_inventory_item_id)
@@ -292,7 +292,7 @@ export function ChecklistView({
     }
 
     // Check if item requires photo and is not being unchecked or skipped
-    if (!isSkipped) {
+    if (!isSkipped && !isAlreadyReady) {
       const itemRequiresPhoto = sectors.some(s => 
         s.subcategories?.some(sub => 
           sub.items?.some(i => i.id === itemId && (i as any).requires_photo === true)
@@ -308,10 +308,10 @@ export function ChecklistView({
       }
     }
 
-    executeComplete(itemId, points, configuredPoints, completedByUserId, buttonElement, isSkipped);
+    executeComplete(itemId, points, configuredPoints, completedByUserId, buttonElement, isSkipped, undefined, isAlreadyReady);
   };
 
-  const executeComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean, photoUrl?: string) => {
+  const executeComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean, photoUrl?: string, isAlreadyReady?: boolean) => {
     // Haptic feedback
     if (navigator.vibrate) navigator.vibrate(10);
 
@@ -347,7 +347,7 @@ export function ChecklistView({
         }, i * 100);
       }
     }
-    onToggleItem(itemId, isSkipped ? 0 : points, completedByUserId, isSkipped, photoUrl);
+    onToggleItem(itemId, isSkipped ? 0 : points, completedByUserId, isSkipped, photoUrl, undefined, undefined, isAlreadyReady);
     setOpenPopover(null);
     setExpandedPeopleFor(null);
   };
@@ -659,6 +659,8 @@ export function ChecklistView({
                               !isContested && (canToggle || isAdmin) && "active:scale-[0.97] hover:shadow-md",
                               !isContested && wasSkipped
                                 ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
+                                : !isContested && (completion as any)?.completion_note === 'already_ready'
+                                ? "bg-gradient-to-r from-amber-500/15 to-amber-500/5 border-2 border-amber-500/30"
                                 : !isContested && "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
                               isJustCompleted && "animate-scale-in",
                               openPopover === item.id && !isContested && "ring-2 ring-primary/30"
@@ -671,7 +673,7 @@ export function ChecklistView({
                                 : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
                               isJustCompleted && "scale-125"
                             )}>
-                              {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : <AppIcon name="Check" className="w-4 h-4" />}
+                              {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : (completion as any)?.completion_note === 'already_ready' ? <AppIcon name="package_2" size={16} /> : <AppIcon name="Check" className="w-4 h-4" />}
                             </div>
                             <div className="flex-1 min-w-0 text-left">
                               <div className="flex items-start justify-between gap-2">
@@ -682,16 +684,18 @@ export function ChecklistView({
                                     <span className="text-sm font-bold">{pointsAwarded}</span>
                                   </div>
                                 ) : (
-                                <div className={cn(
-                                  "flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 border transition-all duration-300",
-                                  isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                                    : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
-                                    : "bg-primary/10 text-primary border-primary/20"
-                                 )}>
-                                  {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
-                                    : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
-                                    : (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>)}
-                                </div>
+                                        <div className={cn(
+                                          "flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 border transition-all duration-300",
+                                          isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                            : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
+                                            : (completion as any)?.completion_note === 'already_ready' ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                            : "bg-primary/10 text-primary border-primary/20"
+                                        )}>
+                                          {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
+                                            : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
+                                            : (completion as any)?.completion_note === 'already_ready' ? (<><AppIcon name="package_2" className="w-3 h-3" /><span>já pronto</span></>)
+                                            : (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>)}
+                                        </div>
                                 )}
                               </div>
                               {isContested && contestedReason && (
@@ -1069,30 +1073,40 @@ export function ChecklistView({
                             {!isAdmin && (
                               <>
                                 <button onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, undefined, e.currentTarget)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]">
-                                  <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-5 h-5 text-success-foreground" /></div>
-                                  <div className="flex-1"><p className="font-semibold text-success">Concluí agora</p>
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-4 h-4 text-success-foreground" /></div>
+                                  <div className="flex-1"><p className="font-semibold text-success text-sm">Concluí agora</p>
                                     {configuredPoints > 0 ? (
                                       <div className="flex items-center gap-1 mt-0.5"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: getItemPointsColors(configuredPoints).color }} />
                                         <span className="text-xs font-bold" style={{ color: getItemPointsColors(configuredPoints).color }}>+{configuredPoints}</span></div>
                                     ) : (<span className="text-xs text-muted-foreground">Tarefa sem pontos</span>)}
                                   </div>
                                 </button>
-                                <div className="border-t border-border" />
+                                <button onClick={(e) => handleComplete(item.id, Math.ceil(configuredPoints / 2), configuredPoints, undefined, e.currentTarget, false, true)}
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center"><AppIcon name="package_2" size={16} className="text-amber-500" /></div>
+                                  <div><p className="font-semibold text-amber-600 dark:text-amber-400 text-sm">Já estava pronto</p><p className="text-xs text-muted-foreground">Sobrou do dia anterior</p></div>
+                                </button>
+                                <div className="border-t border-border/50" />
                                 <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget, true)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                  <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
-                                  <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-4 h-4 text-destructive" /></div>
+                                  <div><p className="font-semibold text-destructive text-sm">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                 </button>
                               </>
                             )}
                             {isAdmin && (
                               <>
-                                <div className="border-t border-border" />
+                                <button onClick={(e) => handleComplete(item.id, Math.ceil(configuredPoints / 2), configuredPoints, currentUserId, e.currentTarget, false, true)}
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center"><AppIcon name="package_2" size={16} className="text-amber-500" /></div>
+                                  <div><p className="font-semibold text-amber-600 dark:text-amber-400 text-sm">Já estava pronto</p><p className="text-xs text-muted-foreground">Sobrou do dia anterior</p></div>
+                                </button>
+                                <div className="border-t border-border/50" />
                                 <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                  <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
-                                  <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-4 h-4 text-destructive" /></div>
+                                  <div><p className="font-semibold text-destructive text-sm">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                 </button>
                               </>
                             )}
@@ -1183,6 +1197,8 @@ export function ChecklistView({
                                       !isContested && (canToggle || isAdmin) && "active:scale-[0.97] hover:shadow-md",
                                       !isContested && wasSkipped
                                         ? "bg-gradient-to-r from-destructive/15 to-destructive/5 border-2 border-destructive/30"
+                                        : !isContested && (completion as any)?.completion_note === 'already_ready'
+                                        ? "bg-gradient-to-r from-amber-500/15 to-amber-500/5 border-2 border-amber-500/30"
                                         : !isContested && "bg-gradient-to-r from-success/15 to-success/5 border-2 border-success/30",
                                       isJustCompleted && "animate-scale-in",
                                       openPopover === item.id && !isContested && "ring-2 ring-primary/30"
@@ -1192,10 +1208,12 @@ export function ChecklistView({
                                     <div className={cn(
                                       "w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-white shadow-md transition-all duration-300 mt-0.5",
                                       isContested ? "bg-amber-500 shadow-amber-500/30"
-                                        : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
+                                        : wasSkipped ? "bg-destructive shadow-destructive/30" 
+                                        : (completion as any)?.completion_note === 'already_ready' ? "bg-amber-500 shadow-amber-500/30"
+                                        : "bg-success shadow-success/30",
                                       isJustCompleted && "scale-125"
                                     )}>
-                                      {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : <AppIcon name="Check" className="w-4 h-4" />}
+                                      {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : (completion as any)?.completion_note === 'already_ready' ? <AppIcon name="package_2" size={16} /> : <AppIcon name="Check" className="w-4 h-4" />}
                                     </div>
                                     <div className="flex-1 min-w-0 text-left">
                                       <div className="flex items-start justify-between gap-2">
@@ -1210,10 +1228,12 @@ export function ChecklistView({
                                           "flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium shrink-0 border transition-all duration-300",
                                           isContested ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                             : wasSkipped ? "bg-destructive/10 text-destructive border-destructive/20"
+                                            : (completion as any)?.completion_note === 'already_ready' ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                             : "bg-primary/10 text-primary border-primary/20"
                                         )}>
                                           {isContested ? (<><AppIcon name="AlertTriangle" className="w-3 h-3" /><span>contestado</span></>)
                                             : wasSkipped ? (<><AppIcon name="X" className="w-3 h-3" /><span>não concluído</span></>) 
+                                            : (completion as any)?.completion_note === 'already_ready' ? (<><AppIcon name="package_2" className="w-3 h-3" /><span>já pronto</span></>)
                                             : (<><AppIcon name="RefreshCw" className="w-3 h-3" /><span>pronto</span></>)}
                                         </div>
                                         )}
@@ -1555,9 +1575,9 @@ export function ChecklistView({
                                     {!isAdmin && (
                                       <>
                                         <button onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, undefined, e.currentTarget)}
-                                          className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]">
-                                          <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-5 h-5 text-success-foreground" /></div>
-                                          <div className="flex-1"><p className="font-semibold text-success">Concluí agora</p>
+                                          className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]">
+                                          <div className="w-8 h-8 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-4 h-4 text-success-foreground" /></div>
+                                          <div className="flex-1"><p className="font-semibold text-success text-sm">Concluí agora</p>
                                             {configuredPoints > 0 ? (
                                               <div className="flex items-center gap-0.5 mt-0.5">
                                                 {isBonus ? <AppIcon name="Zap" className="w-3 h-3" style={{ color: getItemPointsColors(configuredPoints).color }} /> : (
@@ -1570,21 +1590,31 @@ export function ChecklistView({
                                             ) : (<span className="text-xs text-muted-foreground">Tarefa sem pontos</span>)}
                                           </div>
                                         </button>
-                                        <div className="border-t border-border" />
+                                        <button onClick={(e) => handleComplete(item.id, Math.ceil(configuredPoints / 2), configuredPoints, undefined, e.currentTarget, false, true)}
+                                          className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]">
+                                          <div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center"><AppIcon name="package_2" size={16} className="text-amber-500" /></div>
+                                          <div><p className="font-semibold text-amber-600 dark:text-amber-400 text-sm">Já estava pronto</p><p className="text-xs text-muted-foreground">Sobrou do dia anterior</p></div>
+                                        </button>
+                                        <div className="border-t border-border/50" />
                                         <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget, true)}
-                                          className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                          <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
-                                          <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                          className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
+                                          <div className="w-8 h-8 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-4 h-4 text-destructive" /></div>
+                                          <div><p className="font-semibold text-destructive text-sm">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                         </button>
                                       </>
                                     )}
                                     {isAdmin && (
                                       <>
-                                        <div className="border-t border-border" />
+                                        <button onClick={(e) => handleComplete(item.id, Math.ceil(configuredPoints / 2), configuredPoints, currentUserId, e.currentTarget, false, true)}
+                                          className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]">
+                                          <div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center"><AppIcon name="package_2" size={16} className="text-amber-500" /></div>
+                                          <div><p className="font-semibold text-amber-600 dark:text-amber-400 text-sm">Já estava pronto</p><p className="text-xs text-muted-foreground">Sobrou do dia anterior</p></div>
+                                        </button>
+                                        <div className="border-t border-border/50" />
                                         <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}
-                                          className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                          <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
-                                          <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                          className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
+                                          <div className="w-8 h-8 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-4 h-4 text-destructive" /></div>
+                                          <div><p className="font-semibold text-destructive text-sm">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                         </button>
                                       </>
                                     )}

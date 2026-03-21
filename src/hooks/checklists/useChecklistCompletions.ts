@@ -25,7 +25,7 @@ export function useChecklistCompletions({
     itemId: string, checklistType: ChecklistType, date: string,
     isAdmin?: boolean, points: number = 1, completedByUserId?: string,
     isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean,
-    bypassGrace?: boolean
+    bypassGrace?: boolean, isAlreadyReady?: boolean
   ) => {
     const existingCompletions = completions.filter(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
@@ -118,11 +118,12 @@ export function useChecklistCompletions({
         .upsert({
           item_id: itemId, checklist_type: checklistType,
           completed_by: targetUserId, date,
-          awarded_points: !isSkipped && points > 0,
+          awarded_points: isAlreadyReady ? false : (!isSkipped && points > 0),
           points_awarded: isSkipped ? 0 : points,
           is_skipped: isSkipped || false,
           unit_id: activeUnitId,
           ...(photoUrl ? { photo_url: photoUrl } : {}),
+          ...(isAlreadyReady ? { completion_note: 'already_ready' } : {}),
         } as any, { onConflict: 'item_id,completed_by,date,checklist_type' });
       if (error) throw error;
     }

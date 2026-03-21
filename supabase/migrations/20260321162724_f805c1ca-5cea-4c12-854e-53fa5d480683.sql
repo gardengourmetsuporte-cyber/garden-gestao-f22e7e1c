@@ -1,0 +1,1 @@
+ALTER TABLE public.checklist_completions ADD COLUMN IF NOT EXISTS completion_note text;

@@ -246,10 +246,10 @@ export function useChecklistPage() {
   }, [currentDate, activeUnitId, checklistType, queryClient, fetchCompletions]);
 
   // Handlers
-  const handleToggleItem = useCallback(async (itemId: string, points: number = 1, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean) => {
+  const handleToggleItem = useCallback(async (itemId: string, points: number = 1, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean, isAlreadyReady?: boolean) => {
     lastManualToggleRef.current = Date.now();
     try {
-      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points, completedByUserId, isSkipped, photoUrl, preserveTimerOnUncheck, bypassGrace);
+      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points, completedByUserId, isSkipped, photoUrl, preserveTimerOnUncheck, bypassGrace, isAlreadyReady);
     } catch (error: any) {
       toast.error(error.message || 'Erro ao marcar item');
     }
