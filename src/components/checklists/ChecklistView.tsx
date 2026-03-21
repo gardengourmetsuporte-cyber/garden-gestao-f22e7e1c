@@ -673,7 +673,7 @@ export function ChecklistView({
                                 : wasSkipped ? "bg-destructive shadow-destructive/30" : "bg-success shadow-success/30",
                               isJustCompleted && "scale-125"
                             )}>
-                              {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : <AppIcon name="Check" className="w-4 h-4" />}
+                              {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : (completion as any)?.completion_note === 'already_ready' ? <AppIcon name="package_2" size={16} /> : <AppIcon name="Check" className="w-4 h-4" />}
                             </div>
                             <div className="flex-1 min-w-0 text-left">
                               <div className="flex items-start justify-between gap-2">
@@ -1213,7 +1213,7 @@ export function ChecklistView({
                                         : "bg-success shadow-success/30",
                                       isJustCompleted && "scale-125"
                                     )}>
-                                      {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : <AppIcon name="Check" className="w-4 h-4" />}
+                                      {isContested ? <AppIcon name="AlertTriangle" className="w-4 h-4" /> : wasSkipped ? <AppIcon name="X" className="w-4 h-4" /> : (completion as any)?.completion_note === 'already_ready' ? <AppIcon name="package_2" size={16} /> : <AppIcon name="Check" className="w-4 h-4" />}
                                     </div>
                                     <div className="flex-1 min-w-0 text-left">
                                       <div className="flex items-start justify-between gap-2">
