@@ -25,7 +25,7 @@ export function useChecklistCompletions({
     itemId: string, checklistType: ChecklistType, date: string,
     isAdmin?: boolean, points: number = 1, completedByUserId?: string,
     isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean,
-    bypassGrace?: boolean
+    bypassGrace?: boolean, isAlreadyReady?: boolean
   ) => {
     const existingCompletions = completions.filter(
       c => c.item_id === itemId && c.checklist_type === checklistType && c.date === date
