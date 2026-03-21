@@ -26,7 +26,7 @@ interface ChecklistViewProps {
   date: string;
   completions: ChecklistCompletion[];
   isItemCompleted: (itemId: string) => boolean;
-  onToggleItem: (itemId: string, points: number, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean) => Promise<void>;
+  onToggleItem: (itemId: string, points: number, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean, isAlreadyReady?: boolean) => Promise<void>;
   getCompletionProgress: (sectorId: string) => { completed: number; total: number };
   currentUserId?: string;
   isAdmin: boolean;
