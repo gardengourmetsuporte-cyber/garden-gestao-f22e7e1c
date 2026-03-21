@@ -1071,30 +1071,40 @@ export function ChecklistView({
                             {!isAdmin && (
                               <>
                                 <button onClick={(e) => handleComplete(item.id, configuredPoints, configuredPoints, undefined, e.currentTarget)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]">
-                                  <div className="w-10 h-10 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-5 h-5 text-success-foreground" /></div>
-                                  <div className="flex-1"><p className="font-semibold text-success">Concluí agora</p>
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-success/10 hover:bg-success/20 text-left transition-all duration-200 border-2 border-success/30 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-success rounded-xl flex items-center justify-center shadow-lg shadow-success/20"><AppIcon name="Check" className="w-4 h-4 text-success-foreground" /></div>
+                                  <div className="flex-1"><p className="font-semibold text-success text-sm">Concluí agora</p>
                                     {configuredPoints > 0 ? (
                                       <div className="flex items-center gap-1 mt-0.5"><div className="w-2 h-2 rounded-full" style={{ backgroundColor: getItemPointsColors(configuredPoints).color }} />
                                         <span className="text-xs font-bold" style={{ color: getItemPointsColors(configuredPoints).color }}>+{configuredPoints}</span></div>
                                     ) : (<span className="text-xs text-muted-foreground">Tarefa sem pontos</span>)}
                                   </div>
                                 </button>
-                                <div className="border-t border-border" />
+                                <button onClick={(e) => handleComplete(item.id, Math.ceil(configuredPoints / 2), configuredPoints, undefined, e.currentTarget, false, true)}
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center"><AppIcon name="package_2" size={16} className="text-amber-500" /></div>
+                                  <div><p className="font-semibold text-amber-600 dark:text-amber-400 text-sm">Já estava pronto</p><p className="text-xs text-muted-foreground">Sobrou do dia anterior</p></div>
+                                </button>
+                                <div className="border-t border-border/50" />
                                 <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, undefined, e.currentTarget, true)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                  <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
-                                  <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-4 h-4 text-destructive" /></div>
+                                  <div><p className="font-semibold text-destructive text-sm">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                 </button>
                               </>
                             )}
                             {isAdmin && (
                               <>
-                                <div className="border-t border-border" />
+                                <button onClick={(e) => handleComplete(item.id, Math.ceil(configuredPoints / 2), configuredPoints, currentUserId, e.currentTarget, false, true)}
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center"><AppIcon name="package_2" size={16} className="text-amber-500" /></div>
+                                  <div><p className="font-semibold text-amber-600 dark:text-amber-400 text-sm">Já estava pronto</p><p className="text-xs text-muted-foreground">Sobrou do dia anterior</p></div>
+                                </button>
+                                <div className="border-t border-border/50" />
                                 <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}
-                                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
-                                  <div className="w-10 h-10 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-5 h-5 text-destructive" /></div>
-                                  <div><p className="font-semibold text-destructive">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
+                                  className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-destructive/5 hover:bg-destructive/10 text-left transition-all duration-200 border border-destructive/20 active:scale-[0.97]">
+                                  <div className="w-8 h-8 bg-destructive/15 rounded-xl flex items-center justify-center"><AppIcon name="X" className="w-4 h-4 text-destructive" /></div>
+                                  <div><p className="font-semibold text-destructive text-sm">Não concluído</p><p className="text-xs text-muted-foreground">Sem pontos</p></div>
                                 </button>
                               </>
                             )}
