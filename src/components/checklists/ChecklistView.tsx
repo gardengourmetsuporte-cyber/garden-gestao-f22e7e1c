@@ -292,7 +292,7 @@ export function ChecklistView({
     }
 
     // Check if item requires photo and is not being unchecked or skipped
-    if (!isSkipped) {
+    if (!isSkipped && !isAlreadyReady) {
       const itemRequiresPhoto = sectors.some(s => 
         s.subcategories?.some(sub => 
           sub.items?.some(i => i.id === itemId && (i as any).requires_photo === true)
