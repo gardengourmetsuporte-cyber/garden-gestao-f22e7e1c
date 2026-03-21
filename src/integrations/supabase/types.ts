@@ -581,6 +581,7 @@ export type Database = {
           checklist_type: Database["public"]["Enums"]["checklist_type"]
           completed_at: string
           completed_by: string
+          completion_note: string | null
           contested_at: string | null
           contested_by: string | null
           contested_reason: string | null
@@ -599,6 +600,7 @@ export type Database = {
           checklist_type: Database["public"]["Enums"]["checklist_type"]
           completed_at?: string
           completed_by: string
+          completion_note?: string | null
           contested_at?: string | null
           contested_by?: string | null
           contested_reason?: string | null
@@ -617,6 +619,7 @@ export type Database = {
           checklist_type?: Database["public"]["Enums"]["checklist_type"]
           completed_at?: string
           completed_by?: string
+          completion_note?: string | null
           contested_at?: string | null
           contested_by?: string | null
           contested_reason?: string | null
