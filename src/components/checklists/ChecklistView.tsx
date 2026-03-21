@@ -274,7 +274,7 @@ export function ChecklistView({
 
   const handleComplete = (itemId: string, points: number, configuredPoints: number, completedByUserId?: string, buttonElement?: HTMLElement, isSkipped?: boolean, isAlreadyReady?: boolean) => {
     // Check if item has linked inventory item (production) and is not being unchecked or skipped
-    if (!isSkipped) {
+    if (!isSkipped && !isAlreadyReady) {
       const linkedItem = sectors.flatMap(s =>
         (s.subcategories || []).flatMap(sub =>
           (sub.items || []).filter(i => i.id === itemId && (i as any).linked_inventory_item_id)
