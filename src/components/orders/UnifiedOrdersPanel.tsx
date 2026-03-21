@@ -339,6 +339,15 @@ function TabletOrderDetailSheet({ order, onClose, onStatusUpdated }: {
         .eq('id', order.id);
       if (error) throw error;
 
+      // Sync cancellation to linked delivery (order_number = first 8 chars of order id)
+      if (newStatus === 'cancelled' && order.unit_id) {
+        await supabase
+          .from('deliveries')
+          .update({ status: 'cancelled' as any })
+          .eq('order_number', order.id.slice(0, 8))
+          .eq('unit_id', order.unit_id);
+      }
+
       const updated = { ...order, status: newStatus };
       onStatusUpdated(updated);
       toast.success(`Pedido ${statusLabel[newStatus]?.toLowerCase() || 'atualizado'}`);
