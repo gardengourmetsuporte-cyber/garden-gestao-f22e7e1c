@@ -347,7 +347,7 @@ export function ChecklistView({
         }, i * 100);
       }
     }
-    onToggleItem(itemId, isSkipped ? 0 : points, completedByUserId, isSkipped, photoUrl);
+    onToggleItem(itemId, isSkipped ? 0 : points, completedByUserId, isSkipped, photoUrl, undefined, undefined, isAlreadyReady);
     setOpenPopover(null);
     setExpandedPeopleFor(null);
   };
