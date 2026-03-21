@@ -60,9 +60,7 @@ serve(async (req) => {
     const { prompt, unit_id } = await req.json();
     if (!prompt || !unit_id) throw new Error("prompt and unit_id required");
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = supabaseAdmin;
 
     // Fetch brand context for visual consistency
     const { data: brand } = await supabase
