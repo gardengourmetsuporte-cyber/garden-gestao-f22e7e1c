@@ -1619,8 +1619,12 @@ export function ChecklistView({
                                       <>
                                         <button onClick={(e) => handleComplete(item.id, Math.ceil(configuredPoints / 2), configuredPoints, currentUserId, e.currentTarget, false, true)}
                                           className="w-full flex items-center gap-3 p-2.5 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-left transition-all duration-200 border border-amber-500/20 active:scale-[0.97]">
-                                          <div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center"><AppIcon name="package_2" size={16} className="text-amber-500" /></div>
-                                          <div><p className="font-semibold text-amber-600 dark:text-amber-400 text-sm">Já estava pronto</p><p className="text-xs text-muted-foreground">Sobrou do dia anterior</p></div>
+                                          <div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center"><AppIcon name="event_available" size={16} className="text-amber-500" /></div>
+                                          <div className="flex-1"><p className="font-semibold text-amber-600 dark:text-amber-400 text-sm">Já estava pronto</p>
+                                            {Math.ceil(configuredPoints / 2) > 0 ? (
+                                              <span className="text-xs font-bold text-amber-500/70">+{Math.ceil(configuredPoints / 2)} pts</span>
+                                            ) : (<span className="text-xs text-muted-foreground">Sem pontos</span>)}
+                                          </div>
                                         </button>
                                         <div className="border-t border-border/50" />
                                         <button onClick={(e) => handleComplete(item.id, 0, configuredPoints, currentUserId, e.currentTarget, true)}

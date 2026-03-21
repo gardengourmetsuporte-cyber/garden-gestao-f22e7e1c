@@ -172,6 +172,8 @@ function AppLayoutContent({ children }: AppLayoutProps) {
           />
         )}
 
+        {/* Hidden points-counter anchor for mobile coin animations */}
+        {!isLgScreen && <div id="points-counter" className="fixed top-3 right-14 w-0 h-0 pointer-events-none" />}
         <CoinAnimationLayer />
         <PushNotificationPrompt />
         <OfflineBanner />
