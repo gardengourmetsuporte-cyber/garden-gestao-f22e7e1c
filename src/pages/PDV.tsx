@@ -126,9 +126,14 @@ export default function PDV() {
     setActiveOrderId(order.id);
     setOriginalCartSize(order.items.length);
     setOrdersOpen(false);
-    // Directly open payment flow
-    setSaleSourceAction('charge');
-    setSaleSourceOpen(true);
+    // Set source from existing order and go directly to payment
+    const orderSource = (order.source as 'balcao' | 'mesa' | 'delivery' | 'ficha') || 'balcao';
+    pos.setSaleSource(orderSource);
+    if (order.customer_name) pos.setCustomerName(order.customer_name);
+    if (order.customer_phone) pos.setDeliveryPhone(order.customer_phone);
+    if (order.customer_address) pos.setDeliveryAddress(order.customer_address);
+    if (order.table_number) pos.setTableNumber(order.table_number);
+    setPaymentOpen(true);
   };
 
   const handleLoadOrder = (order: PendingOrder) => {
@@ -435,7 +440,15 @@ export default function PDV() {
                     </div>
                     {/* Finalize / Cobrar */}
                     <button
-                      onClick={() => { setSaleSourceAction('charge'); setSaleSourceOpen(true); }}
+                      onClick={() => {
+                        if (activeOrderId) {
+                          // Existing order: skip source selection, go to payment
+                          setPaymentOpen(true);
+                        } else {
+                          setSaleSourceAction('charge');
+                          setSaleSourceOpen(true);
+                        }
+                      }}
                       className="h-10 px-5 rounded-xl bg-primary text-primary-foreground text-sm font-bold flex items-center gap-1.5 active:scale-95 shadow-sm shrink-0"
                     >
                       <AppIcon name="Banknote" size={16} />
