@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -179,22 +180,23 @@ function buildPixPayload(pixKey: string, _pixKeyType: string, merchantName: stri
 }
 
 // ─── Bill Panel (Minha Conta) ───
-function BillPanel({ unitId, mesa, storeInfo, storeName, onClose }: {
-  unitId: string; mesa: string; storeInfo: Record<string, any> | null; storeName: string; onClose: () => void;
+function BillPanel({ unitId, mesa, storeInfo, storeName, onClose, comandaNumber }: {
+  unitId: string; mesa: string; storeInfo: Record<string, any> | null; storeName: string; onClose: () => void; comandaNumber: number | null;
 }) {
   const mesaNum = parseInt(mesa, 10);
   const [selectedPayment, setSelectedPayment] = useState<'pix' | 'waiter' | null>(null);
 
   const { data: orders, isLoading } = useQuery({
-    queryKey: ['tablet-bill-orders', unitId, mesaNum],
+    queryKey: ['tablet-bill-orders', unitId, mesaNum, comandaNumber],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('tablet_orders')
         .select('id, status, total, created_at, customer_name, comanda_number, tablet_order_items(id, quantity, unit_price, notes, tablet_products(name))')
         .eq('unit_id', unitId)
         .eq('table_number', mesaNum)
-        .in('status', ['confirmed', 'preparing', 'ready', 'pending'])
-        .order('created_at', { ascending: true });
+        .in('status', ['confirmed', 'preparing', 'ready', 'pending']);
+      if (comandaNumber) query = query.eq('comanda_number', comandaNumber);
+      const { data, error } = await query.order('created_at', { ascending: true });
       if (error) throw error;
       return (data ?? []) as any[];
     },
@@ -250,7 +252,7 @@ function BillPanel({ unitId, mesa, storeInfo, storeName, onClose }: {
         </button>
         <div>
           <h2 className="text-base font-bold text-foreground">Minha Conta</h2>
-          <p className="text-[11px] text-muted-foreground">Mesa {mesa} • {hasOrders ? `${orders.length} pedido(s)` : 'Sem pedidos'}</p>
+          <p className="text-[11px] text-muted-foreground">{comandaNumber ? `Comanda ${comandaNumber} • Mesa ${mesa}` : `Mesa ${mesa}`} • {hasOrders ? `${orders.length} pedido(s)` : 'Sem pedidos'}</p>
         </div>
       </div>
 
@@ -463,6 +465,8 @@ export default function TabletHome() {
   const [showConfig, setShowConfig] = useState(!initialMesa);
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [activeGame, setActiveGame] = useState<string | null>(null);
+  const [showBillScanner, setShowBillScanner] = useState(false);
+  const [billComanda, setBillComanda] = useState<number | null>(null);
 
   useEffect(() => {
     if (unitId) { try { localStorage.setItem(TABLET_UNIT_KEY, unitId); } catch {} }
@@ -561,7 +565,7 @@ export default function TabletHome() {
         <div className="px-6 pb-2 md:hidden">
           <div className="grid grid-cols-2 gap-2">
             <button
-              onClick={() => setActivePanel(activePanel === 'bill' ? null : 'bill')}
+              onClick={() => { if (activePanel === 'bill') { setActivePanel(null); } else { setShowBillScanner(true); } }}
               className={cn(
                 'h-10 rounded-full border text-xs font-bold transition-colors',
                 activePanel === 'bill'
@@ -638,7 +642,7 @@ export default function TabletHome() {
         {/* Top right buttons */}
         <div className="absolute top-0 right-0 z-10 pr-5 pt-[max(env(safe-area-inset-top,12px),16px)] flex items-center gap-2">
           <button
-            onClick={() => setActivePanel(activePanel === 'bill' ? null : 'bill')}
+            onClick={() => { if (activePanel === 'bill') { setActivePanel(null); } else { setShowBillScanner(true); } }}
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 rounded-full border backdrop-blur-xl transition-colors',
               activePanel === 'bill'
@@ -673,7 +677,8 @@ export default function TabletHome() {
               mesa={mesa}
               storeInfo={unit?.store_info as Record<string, any> | null}
               storeName={unit?.name || 'Loja'}
-              onClose={() => setActivePanel(null)}
+              onClose={() => { setActivePanel(null); setBillComanda(null); }}
+              comandaNumber={billComanda}
             />
           )}
           {activePanel === 'orders' && unitId && mesa && (
@@ -721,6 +726,18 @@ export default function TabletHome() {
           onConfirm={handleConfigConfirm}
           onCancel={mesa ? () => setShowConfig(false) : undefined}
           unitId={unitId}
+        />
+      )}
+
+      {showBillScanner && unitId && (
+        <ComandaScanner
+          unitId={unitId}
+          onScan={(num) => {
+            setBillComanda(num);
+            setShowBillScanner(false);
+            setActivePanel('bill');
+          }}
+          onCancel={() => setShowBillScanner(false)}
         />
       )}
     </div>
