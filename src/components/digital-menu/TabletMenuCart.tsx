@@ -6,7 +6,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { CartItemsList } from '@/components/digital-menu/MenuCart';
 import { TabletQrLoginBanner } from '@/components/digital-menu/TabletQrLoginBanner';
 import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
-import { paymentOptionToBillingType } from '@/components/digital-menu/PaymentMethodSelector';
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
