@@ -96,6 +96,7 @@ describe('usePOSCart', () => {
       customer_address: null,
       table_number: null,
       order_number: null,
+      comanda_number: null,
       total: 80,
       status: 'pending',
       created_at: '2026-03-12T00:00:00Z',
