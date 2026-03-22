@@ -33,6 +33,7 @@ export interface PendingOrder {
   customer_address: string | null;
   table_number: number | null;
   order_number: number | null;
+  comanda_number: number | null;
   total: number;
   status: string;
   created_at: string;

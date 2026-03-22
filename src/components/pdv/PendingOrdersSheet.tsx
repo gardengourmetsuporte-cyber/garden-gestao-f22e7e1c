@@ -554,8 +554,15 @@ export function PendingOrdersSheet({ open, onOpenChange, orders, loading, onLoad
                               {/* Info */}
                               <div className="space-y-0.5">
                                 <p className="text-sm font-bold text-foreground truncate">
-                                  {sourceKey === 'mesa' && order.table_number ? `Mesa ${order.table_number}` : cfg.label}
+                                  {sourceKey === 'ficha' && order.comanda_number
+                                    ? `Comanda ${order.comanda_number}`
+                                    : sourceKey === 'mesa' && order.table_number
+                                      ? `Mesa ${order.table_number}`
+                                      : cfg.label}
                                 </p>
+                                {order.source === 'mesa_levar' && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-500 font-semibold">Para levar</span>
+                                )}
                                 {order.customer_name && (
                                   <p className="text-[11px] text-muted-foreground truncate">{order.customer_name}</p>
                                 )}
