@@ -12,7 +12,7 @@ export function usePOSOrders(activeUnitId: string | null) {
 
     const { data: tabletData } = await supabase
       .from('tablet_orders')
-      .select('id, source, customer_name, customer_phone, customer_address, table_number, order_number, total, status, created_at, tablet_order_items(quantity, unit_price, tablet_products(name))')
+      .select('id, source, customer_name, customer_phone, customer_address, table_number, order_number, comanda_number, total, status, created_at, tablet_order_items(quantity, unit_price, tablet_products(name))')
       .eq('unit_id', activeUnitId)
       .in('status', ['pending', 'confirmed', 'preparing', 'ready'])
       .order('created_at', { ascending: false });
