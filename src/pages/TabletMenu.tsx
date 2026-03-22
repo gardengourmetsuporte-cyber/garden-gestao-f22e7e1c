@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useTabletOrder, CartItem } from '@/hooks/useTabletOrder';
 import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
