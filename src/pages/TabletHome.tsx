@@ -252,7 +252,7 @@ function BillPanel({ unitId, mesa, storeInfo, storeName, onClose, comandaNumber 
         </button>
         <div>
           <h2 className="text-base font-bold text-foreground">Minha Conta</h2>
-          <p className="text-[11px] text-muted-foreground">Mesa {mesa} • {hasOrders ? `${orders.length} pedido(s)` : 'Sem pedidos'}</p>
+          <p className="text-[11px] text-muted-foreground">{comandaNumber ? `Comanda ${comandaNumber} • Mesa ${mesa}` : `Mesa ${mesa}`} • {hasOrders ? `${orders.length} pedido(s)` : 'Sem pedidos'}</p>
         </div>
       </div>
 
