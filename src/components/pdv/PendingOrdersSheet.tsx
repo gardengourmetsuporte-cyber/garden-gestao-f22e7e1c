@@ -159,10 +159,15 @@ function OrderDetailSheet({
                 <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                   {isDelivery ? (
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold">Entrega</span>
+                  ) : sourceKey === 'ficha' && order.comanda_number ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">Comanda {order.comanda_number}</span>
                   ) : sourceKey === 'mesa' && order.table_number ? (
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">Mesa {order.table_number}</span>
                   ) : (
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground font-semibold">{cfg.label}</span>
+                  )}
+                  {order.source === 'mesa_levar' && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-500 font-semibold">Para levar</span>
                   )}
                 </div>
               </div>
