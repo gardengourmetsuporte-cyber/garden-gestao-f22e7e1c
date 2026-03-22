@@ -582,6 +582,7 @@ export default function PDV() {
           pos.setTableNumber(data.tableNumber);
           pos.setDeliveryPhone(data.deliveryPhone);
           pos.setDeliveryAddress(data.deliveryAddress);
+          pos.setFichaNumber(data.fichaNumber);
           setSaleSourceOpen(false);
 
           if (saleSourceAction === 'charge') {
