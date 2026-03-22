@@ -253,15 +253,6 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           );
           if (itemsError) throw new Error(itemsError.message);
 
-          // If online payment via ASAAS, show ASAAS PIX QR code
-          if (isOnlinePayment) {
-            const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
-            setPendingOrderId((order as any).id);
-            setPendingOrderNumber(orderNum);
-            setShowOnlinePayment(true);
-            setSending(false);
-            return;
-          }
 
           // If manual PIX (no ASAAS), show unit's own PIX key QR
           if (isPixManual) {
