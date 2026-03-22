@@ -565,7 +565,7 @@ export default function TabletHome() {
         <div className="px-6 pb-2 md:hidden">
           <div className="grid grid-cols-2 gap-2">
             <button
-              onClick={() => setActivePanel(activePanel === 'bill' ? null : 'bill')}
+              onClick={() => { if (activePanel === 'bill') { setActivePanel(null); } else { setShowBillScanner(true); } }}
               className={cn(
                 'h-10 rounded-full border text-xs font-bold transition-colors',
                 activePanel === 'bill'
