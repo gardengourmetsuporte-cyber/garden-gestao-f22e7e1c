@@ -677,7 +677,8 @@ export default function TabletHome() {
               mesa={mesa}
               storeInfo={unit?.store_info as Record<string, any> | null}
               storeName={unit?.name || 'Loja'}
-              onClose={() => setActivePanel(null)}
+              onClose={() => { setActivePanel(null); setBillComanda(null); }}
+              comandaNumber={billComanda}
             />
           )}
           {activePanel === 'orders' && unitId && mesa && (
