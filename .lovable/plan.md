@@ -1,24 +1,38 @@
 
 
-# Cobrar pedido existente — Pular "Modo da Venda"
+# Fix: AlertDialogs travando a tela no Fechamento de Caixa
 
 ## Problema
-Ao clicar em "Cobrar" num pedido existente, o sistema abre o `SaleSourceSheet` (Modo da Venda), pedindo para escolher Balcão/Mesa/Delivery/Ficha. Isso não faz sentido porque o pedido já tem um canal definido — só precisa ir direto para o pagamento.
+Os `AlertDialog` de exclusão e divergência estão renderizados **dentro** do `ScrollArea` do Sheet. Isso causa conflito de portal/z-index — o dialog abre "preso" dentro do Sheet e trava a interação.
 
 ## Correção
 
-### `src/pages/PDV.tsx`
+### `src/components/cashClosing/CashClosingDetail.tsx`
 
-**`handleChargeOrder`** (linha 124-132): Em vez de abrir o SaleSourceSheet, ir direto para o pagamento:
-- Carregar o pedido no carrinho (já faz)
-- Setar o `saleSource` baseado no source do pedido existente
-- Abrir `setPaymentOpen(true)` diretamente, sem passar pelo SaleSourceSheet
+Mover os dois `AlertDialog` (Delete Dialog linhas 625-644 e Divergent Dialog linhas 590-623) para **fora** do `ScrollArea`, retornando-os como fragmento no nível raiz do componente.
 
-**Botão "Cobrar" no carrinho** (linha 436-440): Quando já tem um `activeOrderId` (pedido carregado), pular o SaleSourceSheet e ir direto para pagamento. Só abrir o SaleSourceSheet quando for venda nova (sem `activeOrderId`).
-
-### Lógica:
+Estrutura atual:
 ```
-Se activeOrderId existe → ir direto pro pagamento
-Se não → abrir SaleSourceSheet normalmente
+<ScrollArea>
+  ... conteúdo ...
+  <AlertDialog delete />
+  <AlertDialog divergent />
+</ScrollArea>
 ```
+
+Estrutura corrigida:
+```
+<>
+  <ScrollArea>
+    ... conteúdo ...
+  </ScrollArea>
+  <AlertDialog delete />
+  <AlertDialog divergent />
+</>
+```
+
+Isso permite que o Radix AlertDialog use seu portal corretamente, sem ficar bloqueado pelo overflow do ScrollArea.
+
+### Arquivo editado
+1. **`src/components/cashClosing/CashClosingDetail.tsx`** — envolver retorno em Fragment, mover os 2 AlertDialogs para fora do ScrollArea
 
