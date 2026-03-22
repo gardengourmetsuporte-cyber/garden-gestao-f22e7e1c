@@ -126,9 +126,14 @@ export default function PDV() {
     setActiveOrderId(order.id);
     setOriginalCartSize(order.items.length);
     setOrdersOpen(false);
-    // Directly open payment flow
-    setSaleSourceAction('charge');
-    setSaleSourceOpen(true);
+    // Set source from existing order and go directly to payment
+    const orderSource = (order.source as 'balcao' | 'mesa' | 'delivery' | 'ficha') || 'balcao';
+    pos.setSaleSource(orderSource);
+    if (order.customer_name) pos.setCustomerName(order.customer_name);
+    if (order.customer_phone) pos.setDeliveryPhone(order.customer_phone);
+    if (order.customer_address) pos.setDeliveryAddress(order.customer_address);
+    if (order.table_number) pos.setTableNumber(order.table_number);
+    setPaymentOpen(true);
   };
 
   const handleLoadOrder = (order: PendingOrder) => {
