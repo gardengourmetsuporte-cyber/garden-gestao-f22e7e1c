@@ -164,10 +164,11 @@ export function usePOSCheckout(deps: CheckoutDeps, onOrderCancelled?: (orderId: 
       table_number: tableNumber || 0,
       status: 'pending',
       total,
-      source: saleSource,
+      source: saleSource === 'ficha' ? 'qrcode' : saleSource,
       customer_name: customerName.trim() || null,
       customer_phone: saleSource === 'delivery' ? deliveryPhone.replace(/\D/g, '') : null,
       customer_address: saleSource === 'delivery' ? deliveryAddress.trim() : null,
+      comanda_number: saleSource === 'ficha' ? fichaNumber : null,
     };
 
     if (paymentInfo) {
