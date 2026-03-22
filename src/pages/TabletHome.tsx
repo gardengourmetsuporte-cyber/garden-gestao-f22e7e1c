@@ -642,7 +642,7 @@ export default function TabletHome() {
         {/* Top right buttons */}
         <div className="absolute top-0 right-0 z-10 pr-5 pt-[max(env(safe-area-inset-top,12px),16px)] flex items-center gap-2">
           <button
-            onClick={() => setActivePanel(activePanel === 'bill' ? null : 'bill')}
+            onClick={() => { if (activePanel === 'bill') { setActivePanel(null); } else { setShowBillScanner(true); } }}
             className={cn(
               'flex items-center gap-2 px-4 py-2.5 rounded-full border backdrop-blur-xl transition-colors',
               activePanel === 'bill'
