@@ -565,25 +565,6 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         />
       )}
 
-      {/* Online Payment Sheet (PIX QR Code) */}
-      {showOnlinePayment && pendingOrderId && pendingOrderNumber && (
-        <OnlinePaymentSheet
-          orderId={pendingOrderId}
-          orderNumber={pendingOrderNumber}
-          total={cartTotal}
-          unitId={unitId}
-          billingType="PIX"
-          onPaymentConfirmed={() => {
-            setShowOnlinePayment(false);
-            setOrderSent(pendingOrderNumber);
-          }}
-          onCancel={() => {
-            setShowOnlinePayment(false);
-            setPendingOrderId(null);
-            setPendingOrderNumber(null);
-          }}
-        />
-      )}
 
       {/* Manual PIX QR Code (unit's own PIX key) */}
       {showManualPix && pendingOrderNumber && (
