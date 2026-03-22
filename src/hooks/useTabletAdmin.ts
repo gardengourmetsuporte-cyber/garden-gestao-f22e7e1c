@@ -28,6 +28,7 @@ export interface TabletOrderAdmin {
   id: string;
   unit_id: string;
   table_number: number;
+  comanda_number?: number;
   status: string;
   total: number;
   error_message: string | null;

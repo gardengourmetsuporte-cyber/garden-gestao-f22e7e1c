@@ -96,13 +96,14 @@ function getOrderChannel(order: OrderItem): Channel {
   if (order.source === 'ifood') return 'ifood';
   if (order.source === 'delivery') return 'delivery';
   if (order.source === 'balcao' || order.source === 'qrcode') return 'balcao';
-  if ((order.table_number ?? 0) > 0) return 'mesa';
+  if ((order.comanda_number ?? 0) > 0 || (order.table_number ?? 0) > 0) return 'comanda';
   return 'balcao';
 }
 
 function getSourceLabel(order: OrderItem) {
   if (order.source === 'ifood') return order.customer_name || 'iFood';
   if (order.source === 'delivery') return order.customer_name || 'Delivery';
+  if ((order.comanda_number ?? 0) > 0) return `Comanda ${order.comanda_number}`;
   if ((order.table_number ?? 0) > 0) return `Mesa ${order.table_number}`;
   if (order.customer_name) return order.customer_name;
   return 'Balcão';
@@ -112,7 +113,7 @@ function getSourceIcon(ch: Channel) {
   switch (ch) {
     case 'ifood': return 'ShoppingBag';
     case 'delivery': return 'Truck';
-    case 'mesa': return 'RestaurantMenu';
+    case 'comanda': return 'Receipt';
     default: return 'Storefront';
   }
 }
