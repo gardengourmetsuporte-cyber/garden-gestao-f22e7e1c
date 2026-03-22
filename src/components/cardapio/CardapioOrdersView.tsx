@@ -19,6 +19,7 @@ interface OrderItem {
   status: string;
   source?: string;
   table_number?: number;
+  comanda_number?: number;
   customer_name?: string;
   tablet_order_items?: any[];
 }
@@ -48,12 +49,12 @@ const STATUS_CONFIG: Record<string, { label: string; icon: string }> = {
 };
 
 /* ─── Channels ─── */
-type Channel = 'todos' | 'delivery' | 'mesa' | 'balcao' | 'ifood';
+type Channel = 'todos' | 'delivery' | 'comanda' | 'balcao' | 'ifood';
 
 const CHANNELS: { id: Channel; label: string }[] = [
   { id: 'todos', label: 'Todos' },
   { id: 'delivery', label: 'Delivery' },
-  { id: 'mesa', label: 'Mesa' },
+  { id: 'comanda', label: 'Comanda' },
   { id: 'balcao', label: 'Balcão' },
   { id: 'ifood', label: 'iFood' },
 ];
@@ -95,13 +96,14 @@ function getOrderChannel(order: OrderItem): Channel {
   if (order.source === 'ifood') return 'ifood';
   if (order.source === 'delivery') return 'delivery';
   if (order.source === 'balcao' || order.source === 'qrcode') return 'balcao';
-  if ((order.table_number ?? 0) > 0) return 'mesa';
+  if ((order.comanda_number ?? 0) > 0 || (order.table_number ?? 0) > 0) return 'comanda';
   return 'balcao';
 }
 
 function getSourceLabel(order: OrderItem) {
   if (order.source === 'ifood') return order.customer_name || 'iFood';
   if (order.source === 'delivery') return order.customer_name || 'Delivery';
+  if ((order.comanda_number ?? 0) > 0) return `Comanda ${order.comanda_number}`;
   if ((order.table_number ?? 0) > 0) return `Mesa ${order.table_number}`;
   if (order.customer_name) return order.customer_name;
   return 'Balcão';
@@ -111,7 +113,7 @@ function getSourceIcon(ch: Channel) {
   switch (ch) {
     case 'ifood': return 'ShoppingBag';
     case 'delivery': return 'Truck';
-    case 'mesa': return 'RestaurantMenu';
+    case 'comanda': return 'Receipt';
     default: return 'Storefront';
   }
 }
@@ -165,7 +167,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   }, [selectedDate, dateFilter]);
 
   const channelCounts = useMemo(() => {
-    const counts: Record<Channel, number> = { todos: 0, delivery: 0, mesa: 0, balcao: 0, ifood: 0 };
+    const counts: Record<Channel, number> = { todos: 0, delivery: 0, comanda: 0, balcao: 0, ifood: 0 };
     const rangeOrders = allOrders.filter(o => {
       const d = new Date(o.created_at);
       return isWithinInterval(d, { start: dateRange.start, end: dateRange.end });
@@ -570,7 +572,7 @@ function OrderDetailSheet({ order, onClose }: { order: OrderItem | null; onClose
             <div className="flex items-center gap-1.5">
               <AppIcon name={getSourceIcon(ch)} size={14} className="text-foreground" />
               <span className="text-sm font-semibold">
-                {ch === 'ifood' ? 'iFood' : ch === 'delivery' ? 'Delivery' : ch === 'mesa' ? 'Mesa' : 'Balcão'}
+                {ch === 'ifood' ? 'iFood' : ch === 'delivery' ? 'Delivery' : ch === 'comanda' ? 'Comanda' : 'Balcão'}
               </span>
             </div>
           </div>
