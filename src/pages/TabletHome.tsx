@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
