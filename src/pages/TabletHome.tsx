@@ -465,6 +465,8 @@ export default function TabletHome() {
   const [showConfig, setShowConfig] = useState(!initialMesa);
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [activeGame, setActiveGame] = useState<string | null>(null);
+  const [showBillScanner, setShowBillScanner] = useState(false);
+  const [billComanda, setBillComanda] = useState<number | null>(null);
 
   useEffect(() => {
     if (unitId) { try { localStorage.setItem(TABLET_UNIT_KEY, unitId); } catch {} }
