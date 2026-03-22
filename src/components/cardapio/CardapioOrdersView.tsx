@@ -167,7 +167,7 @@ export function CardapioOrdersView({ orders, hubOrders = [] }: Props) {
   }, [selectedDate, dateFilter]);
 
   const channelCounts = useMemo(() => {
-    const counts: Record<Channel, number> = { todos: 0, delivery: 0, mesa: 0, balcao: 0, ifood: 0 };
+    const counts: Record<Channel, number> = { todos: 0, delivery: 0, comanda: 0, balcao: 0, ifood: 0 };
     const rangeOrders = allOrders.filter(o => {
       const d = new Date(o.created_at);
       return isWithinInterval(d, { start: dateRange.start, end: dateRange.end });
