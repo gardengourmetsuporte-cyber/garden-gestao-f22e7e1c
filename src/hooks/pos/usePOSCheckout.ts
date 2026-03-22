@@ -24,7 +24,7 @@ interface CheckoutDeps {
   fetchPendingOrders: () => Promise<void>;
 }
 
-export function usePOSCheckout(deps: CheckoutDeps) {
+export function usePOSCheckout(deps: CheckoutDeps, onOrderCancelled?: (orderId: string) => void) {
   const { isConnected } = useOnlineStatus();
   const [savingSale, setSavingSale] = useState(false);
 
@@ -238,6 +238,9 @@ export function usePOSCheckout(deps: CheckoutDeps) {
     const { activeUnitId, clearCart, fetchPendingOrders } = deps;
     if (!activeUnitId) return false;
     try {
+      // Optimistically remove from local list immediately
+      if (onOrderCancelled) onOrderCancelled(orderId);
+
       const { error: orderErr } = await supabase
         .from('tablet_orders').update({ status: 'cancelled' }).eq('id', orderId);
       if (orderErr) throw orderErr;
