@@ -1,28 +1,24 @@
 
 
-# Minha Conta → Scanner de Comanda → Conta Específica
+# Cobrar pedido existente — Pular "Modo da Venda"
 
 ## Problema
-Atualmente, "Minha Conta" abre diretamente o painel com TODOS os pedidos da mesa. Mas uma mesa pode ter múltiplas comandas, então o cliente precisa escanear/digitar o número da comanda para ver apenas os pedidos dela.
+Ao clicar em "Cobrar" num pedido existente, o sistema abre o `SaleSourceSheet` (Modo da Venda), pedindo para escolher Balcão/Mesa/Delivery/Ficha. Isso não faz sentido porque o pedido já tem um canal definido — só precisa ir direto para o pagamento.
 
-## Solução
+## Correção
 
-### 1. Fluxo novo
-- Clicar em "Minha Conta" → abre o `ComandaScanner` (câmera + opção manual)
-- Após escanear/digitar o número da comanda → abre o `BillPanel` filtrando por `comanda_number` em vez de apenas `table_number`
+### `src/pages/PDV.tsx`
 
-### 2. `TabletHome.tsx`
-- Adicionar state `billComanda: number | null` para armazenar a comanda selecionada
-- Ao clicar em "Minha Conta" (3 pontos: mobile, desktop, e menu grid), em vez de `setActivePanel('bill')`, abrir o scanner
-- Adicionar state `showBillScanner: boolean`
-- No `onScan` do scanner: setar `billComanda`, fechar scanner, abrir painel bill
-- Importar `ComandaScanner`
+**`handleChargeOrder`** (linha 124-132): Em vez de abrir o SaleSourceSheet, ir direto para o pagamento:
+- Carregar o pedido no carrinho (já faz)
+- Setar o `saleSource` baseado no source do pedido existente
+- Abrir `setPaymentOpen(true)` diretamente, sem passar pelo SaleSourceSheet
 
-### 3. `BillPanel` — filtrar por comanda
-- Receber prop `comandaNumber: number | null`
-- Na query, quando `comandaNumber` está definido, adicionar `.eq('comanda_number', comandaNumber)` ao filtro
-- Exibir "Comanda X" no subtítulo em vez de apenas "Mesa Y"
+**Botão "Cobrar" no carrinho** (linha 436-440): Quando já tem um `activeOrderId` (pedido carregado), pular o SaleSourceSheet e ir direto para pagamento. Só abrir o SaleSourceSheet quando for venda nova (sem `activeOrderId`).
 
-### Arquivos a editar
-1. **`src/pages/TabletHome.tsx`** — states, scanner, filtro no BillPanel
+### Lógica:
+```
+Se activeOrderId existe → ir direto pro pagamento
+Se não → abrir SaleSourceSheet normalmente
+```
 
