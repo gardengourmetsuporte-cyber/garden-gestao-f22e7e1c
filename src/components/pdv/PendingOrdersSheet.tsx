@@ -44,6 +44,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const SOURCE_CONFIG: Record<string, { icon: string; label: string }> = {
+  ficha: { icon: 'Receipt', label: 'Fichas/Comandas' },
   mesa: { icon: 'UtensilsCrossed', label: 'Mesas' },
   delivery: { icon: 'Truck', label: 'Delivery' },
   ifood: { icon: 'Truck', label: 'iFood' },
@@ -53,6 +54,7 @@ const SOURCE_CONFIG: Record<string, { icon: string; label: string }> = {
 
 function getSourceKey(order: PendingOrder): string {
   const s = order.source?.toLowerCase() || 'outros';
+  if (s.includes('qrcode') || s.includes('ficha')) return 'ficha';
   if (s.includes('ifood')) return 'ifood';
   if (s.includes('delivery') || s.includes('rappi') || s.includes('uber')) return 'delivery';
   if (s.includes('mesa') || s.includes('table')) return 'mesa';
