@@ -177,8 +177,9 @@ import { AppIcon } from '@/components/ui/app-icon';
    const canEdit = closing.status === 'pending';
    const canDelete = isAdmin || closing.status === 'pending';
  
-   return (
-     <ScrollArea className="h-[calc(90vh-80px)] pr-4">
+    return (
+      <>
+      <ScrollArea className="h-[calc(90vh-80px)] pr-4">
        <div className="space-y-4 pb-6 pt-4">
          {/* Status Badge + Actions */}
          <div className="flex items-center justify-between">
