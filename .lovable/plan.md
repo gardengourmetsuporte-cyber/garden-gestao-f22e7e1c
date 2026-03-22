@@ -1,31 +1,28 @@
 
 
-# Correção do ComandaScanner — Manual e Fluxo Pós-Scan
+# Minha Conta → Scanner de Comanda → Conta Específica
 
-## Problemas Identificados
+## Problema
+Atualmente, "Minha Conta" abre diretamente o painel com TODOS os pedidos da mesa. Mas uma mesa pode ter múltiplas comandas, então o cliente precisa escanear/digitar o número da comanda para ver apenas os pedidos dela.
 
-1. **"Digitar manualmente" bloqueado**: O botão fica atrás dos elementos DOM criados pelo `html5-qrcode` (a biblioteca cria overlays internos que cobrem o botão). Precisa de `z-10` e `relative` para garantir que fique clicável.
+## Solução
 
-2. **Tela preta após scan/manual**: Após escanear ou digitar o número da comanda, o `handleSend()` é chamado mas se falhar (erro de rede, RLS, timeout), o scanner fecha e o usuário fica preso — sem mensagem de sucesso nem de erro visível.
+### 1. Fluxo novo
+- Clicar em "Minha Conta" → abre o `ComandaScanner` (câmera + opção manual)
+- Após escanear/digitar o número da comanda → abre o `BillPanel` filtrando por `comanda_number` em vez de apenas `table_number`
 
-3. **Layout lado-a-lado no desktop/mobile**: O painel de instruções (`w-[45%]`) ocupa quase metade da tela e não faz sentido em telas pequenas. Precisa ser responsivo.
+### 2. `TabletHome.tsx`
+- Adicionar state `billComanda: number | null` para armazenar a comanda selecionada
+- Ao clicar em "Minha Conta" (3 pontos: mobile, desktop, e menu grid), em vez de `setActivePanel('bill')`, abrir o scanner
+- Adicionar state `showBillScanner: boolean`
+- No `onScan` do scanner: setar `billComanda`, fechar scanner, abrir painel bill
+- Importar `ComandaScanner`
 
-## Correções
+### 3. `BillPanel` — filtrar por comanda
+- Receber prop `comandaNumber: number | null`
+- Na query, quando `comandaNumber` está definido, adicionar `.eq('comanda_number', comandaNumber)` ao filtro
+- Exibir "Comanda X" no subtítulo em vez de apenas "Mesa Y"
 
-### 1. `ComandaScanner.tsx` — Layout e z-index
-- Adicionar `z-10` ao botão "Digitar manualmente" para ficar acima do scanner
-- Esconder o painel de instruções (direito) em telas menores que `lg` — usar `hidden lg:flex`
-- No modo manual, centralizar o formulário ocupando toda a largura disponível
-
-### 2. `TabletMenuCart.tsx` — Fluxo pós-scan resiliente
-- Envolver o `handleSend(num)` no `onScan` com try/catch para que se falhar, mostre toast de erro e mantenha o comanda number (não perca o estado)
-- Se o pedido falhar, não fechar o scanner imediatamente — manter o número e permitir re-tentativa
-- Garantir que o `setSending(false)` sempre execute no finally (já está OK)
-
-### 3. `TabletMenu.tsx` — Mesmo ajuste
-- No `onScan`, após setar o `comandaNumber`, disparar o submit do pedido com tratamento de erro
-
-## Arquivos a editar
-1. **`src/components/digital-menu/ComandaScanner.tsx`** — z-index no botão, layout responsivo
-2. **`src/components/digital-menu/TabletMenuCart.tsx`** — try/catch no onScan handler
+### Arquivos a editar
+1. **`src/pages/TabletHome.tsx`** — states, scanner, filtro no BillPanel
 
