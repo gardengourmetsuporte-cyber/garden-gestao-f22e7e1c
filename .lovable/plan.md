@@ -1,17 +1,27 @@
 
 
-# Fix: Número da ficha não é salvo ao confirmar o modo de venda
+# Substituir opção de pagamento por "Comer aqui / Levar"
 
-## Problema
-No `PDV.tsx` linha 577-584, quando o `SaleSourceSheet` confirma, os dados são aplicados ao estado do POS. Porém, o `fichaNumber` retornado pelo sheet **não é setado** — falta `pos.setFichaNumber(data.fichaNumber)`. Por isso, quando `sendOrder()` executa, `fichaNumber` continua `null` e o sistema exibe "Informe o número da ficha" mesmo que o usuário já tenha digitado.
+## O que muda
 
-## Correção
+Remover a seção "Quando pagar?" (linhas 487-539 do `TabletMenuCart.tsx`) e substituir por uma seleção "Comer aqui ou levar?", que já existe como state (`orderType`) mas não tem UI visível no checkout.
 
-### `src/pages/PDV.tsx` (linha ~584)
-Adicionar uma linha após `pos.setDeliveryAddress(data.deliveryAddress)`:
-```typescript
-pos.setFichaNumber(data.fichaNumber);
-```
+O pagamento será sempre "pagar depois" (hardcoded `paymentTiming = 'later'`).
 
-Uma linha. Isso é tudo.
+## Correções
+
+### `src/components/digital-menu/TabletMenuCart.tsx`
+
+1. **Remover** a seção "Quando pagar?" (linhas 487-539) inteira
+2. **Forçar** `paymentTiming` para sempre ser `'later'` (remover o state ou setar fixo)
+3. **Adicionar** no lugar a seção "Comer aqui ou levar?" com dois botões:
+   - **Comer aqui** — ícone `UtensilsCrossed`, seta `orderType = 'dine-in'`
+   - **Para levar** — ícone `ShoppingBag`, seta `orderType = 'takeout'`
+   - Mesmo visual dos botões atuais de pagamento (radio-style cards)
+4. **Remover** referências ao `OnlinePaymentSheet` e lógica de PIX online que ficam dependentes de `paymentTiming === 'now'` (tornam-se dead code)
+
+O `orderType` já é usado na linha 230 para definir o `source` como `'mesa_levar'` ou `'mesa'`, então a cozinha já consegue diferenciar.
+
+### Arquivo
+1. **`src/components/digital-menu/TabletMenuCart.tsx`** — substituir seção de pagamento por seleção de tipo de consumo
 
