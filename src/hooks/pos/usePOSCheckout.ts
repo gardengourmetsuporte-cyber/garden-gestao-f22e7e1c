@@ -238,6 +238,9 @@ export function usePOSCheckout(deps: CheckoutDeps) {
     const { activeUnitId, clearCart, fetchPendingOrders } = deps;
     if (!activeUnitId) return false;
     try {
+      // Optimistically remove from local list immediately
+      if (onOrderCancelled) onOrderCancelled(orderId);
+
       const { error: orderErr } = await supabase
         .from('tablet_orders').update({ status: 'cancelled' }).eq('id', orderId);
       if (orderErr) throw orderErr;

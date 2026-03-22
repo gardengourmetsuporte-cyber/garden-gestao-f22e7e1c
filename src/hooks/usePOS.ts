@@ -15,7 +15,7 @@ export function usePOS() {
 
   const { products, categories, loadingProducts } = usePOSProducts(activeUnitId);
   const cartHook = usePOSCart();
-  const { pendingOrders, loadingOrders, fetchPendingOrders } = usePOSOrders(activeUnitId);
+  const { pendingOrders, loadingOrders, fetchPendingOrders, removeOrderLocally } = usePOSOrders(activeUnitId);
 
   const { savingSale, finalizeSale, sendOrder, cancelOrder, validatePinWithPermission } = usePOSCheckout({
     activeUnitId,
