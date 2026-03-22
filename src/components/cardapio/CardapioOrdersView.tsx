@@ -95,7 +95,8 @@ function normalizeHubOrders(hubOrders: HubOrder[]): OrderItem[] {
 function getOrderChannel(order: OrderItem): Channel {
   if (order.source === 'ifood') return 'ifood';
   if (order.source === 'delivery') return 'delivery';
-  if (order.source === 'balcao' || order.source === 'qrcode') return 'balcao';
+  if (order.source === 'qrcode') return 'comanda';
+  if (order.source === 'balcao') return 'balcao';
   if ((order.comanda_number ?? 0) > 0 || (order.table_number ?? 0) > 0) return 'comanda';
   return 'balcao';
 }
