@@ -180,22 +180,23 @@ function buildPixPayload(pixKey: string, _pixKeyType: string, merchantName: stri
 }
 
 // ─── Bill Panel (Minha Conta) ───
-function BillPanel({ unitId, mesa, storeInfo, storeName, onClose }: {
-  unitId: string; mesa: string; storeInfo: Record<string, any> | null; storeName: string; onClose: () => void;
+function BillPanel({ unitId, mesa, storeInfo, storeName, onClose, comandaNumber }: {
+  unitId: string; mesa: string; storeInfo: Record<string, any> | null; storeName: string; onClose: () => void; comandaNumber: number | null;
 }) {
   const mesaNum = parseInt(mesa, 10);
   const [selectedPayment, setSelectedPayment] = useState<'pix' | 'waiter' | null>(null);
 
   const { data: orders, isLoading } = useQuery({
-    queryKey: ['tablet-bill-orders', unitId, mesaNum],
+    queryKey: ['tablet-bill-orders', unitId, mesaNum, comandaNumber],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('tablet_orders')
         .select('id, status, total, created_at, customer_name, comanda_number, tablet_order_items(id, quantity, unit_price, notes, tablet_products(name))')
         .eq('unit_id', unitId)
         .eq('table_number', mesaNum)
-        .in('status', ['confirmed', 'preparing', 'ready', 'pending'])
-        .order('created_at', { ascending: true });
+        .in('status', ['confirmed', 'preparing', 'ready', 'pending']);
+      if (comandaNumber) query = query.eq('comanda_number', comandaNumber);
+      const { data, error } = await query.order('created_at', { ascending: true });
       if (error) throw error;
       return (data ?? []) as any[];
     },
