@@ -141,8 +141,8 @@ export function ComandaScanner({ unitId, onScan, onCancel }: Props) {
         )}
       </div>
 
-      {/* Right: Instructions panel */}
-      <div className="w-[45%] max-w-[420px] bg-card flex flex-col items-center justify-center px-10 py-8 text-center shrink-0">
+      {/* Right: Instructions panel — hidden on small screens */}
+      <div className="hidden lg:flex w-[45%] max-w-[420px] bg-card flex-col items-center justify-center px-10 py-8 text-center shrink-0">
         <h2 className="text-xl font-bold text-foreground leading-snug">
           Posicione o QR Code com o código virado para a frente do tablet no local indicado
         </h2>
