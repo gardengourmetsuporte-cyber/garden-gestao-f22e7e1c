@@ -7,8 +7,6 @@ import { CartItemsList } from '@/components/digital-menu/MenuCart';
 import { TabletQrLoginBanner } from '@/components/digital-menu/TabletQrLoginBanner';
 import { ComandaScanner } from '@/components/digital-menu/ComandaScanner';
 import { paymentOptionToBillingType } from '@/components/digital-menu/PaymentMethodSelector';
-import { OnlinePaymentSheet } from '@/components/digital-menu/OnlinePaymentSheet';
-import { useAsaasConfig } from '@/hooks/useAsaasConfig';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatCurrency as formatPrice } from '@/lib/format';
@@ -61,12 +59,10 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [customerCoins, setCustomerCoins] = useState<number | null>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [comandaNumber, setComandaNumber] = useState<number | null>(null);
-  const [paymentTiming, setPaymentTiming] = useState<'now' | 'later'>('later');
-  const [showOnlinePayment, setShowOnlinePayment] = useState(false);
+  const paymentTiming = 'later' as const;
   const [showManualPix, setShowManualPix] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
-  const { asaasActive } = useAsaasConfig(unitId);
 
   // Load unit's PIX key for manual PIX
   const [unitPixKey, setUnitPixKey] = useState<string | null>(null);
@@ -208,9 +204,9 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
       // keep prop fallback
     }
 
-    const isOnlinePayment = paymentTiming === 'now' && asaasActive;
-    const isPixManual = paymentTiming === 'now' && !asaasActive;
-    const paymentOption = (isOnlinePayment || isPixManual) ? 'pix' as const : 'presencial' as const;
+    const isOnlinePayment = false;
+    const isPixManual = false;
+    const paymentOption = 'presencial' as const;
 
     let lastError: any = null;
 
@@ -257,15 +253,6 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           );
           if (itemsError) throw new Error(itemsError.message);
 
-          // If online payment via ASAAS, show ASAAS PIX QR code
-          if (isOnlinePayment) {
-            const orderNum = (order as any).order_number ? `${(order as any).order_number}` : (order as any).id.slice(0, 8);
-            setPendingOrderId((order as any).id);
-            setPendingOrderNumber(orderNum);
-            setShowOnlinePayment(true);
-            setSending(false);
-            return;
-          }
 
           // If manual PIX (no ASAAS), show unit's own PIX key QR
           if (isPixManual) {
@@ -484,59 +471,55 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           </div>
         )}
 
-        {/* Payment timing: Pagar agora vs Pagar depois */}
-        {!payWithCoins && (
-          <div className="px-4 pb-3 space-y-2">
-            <h3 className="text-sm font-bold text-foreground">Quando pagar?</h3>
-            <div className="space-y-1.5">
-              {/* Pagar depois */}
-              <button
-                onClick={() => setPaymentTiming('later')}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
-                  paymentTiming === 'later' ? 'border-primary bg-primary/5' : 'border-border/40'
-                }`}
-              >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                  paymentTiming === 'later' ? 'bg-primary/10' : 'bg-muted'
-                }`}>
-                  <AppIcon name="Banknote" size={18} className={paymentTiming === 'later' ? 'text-primary' : 'text-muted-foreground'} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">Pagar depois</p>
-                  <p className="text-[11px] text-muted-foreground">Pague no caixa ao final</p>
-                </div>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                  paymentTiming === 'later' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
-                }`}>
-                  {paymentTiming === 'later' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
-                </div>
-              </button>
+        {/* Order type: Comer aqui vs Para levar */}
+        <div className="px-4 pb-3 space-y-2">
+          <h3 className="text-sm font-bold text-foreground">Como deseja consumir?</h3>
+          <div className="space-y-1.5">
+            <button
+              onClick={() => setOrderType('dine-in')}
+              className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
+                orderType === 'dine-in' ? 'border-primary bg-primary/5' : 'border-border/40'
+              }`}
+            >
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                orderType === 'dine-in' ? 'bg-primary/10' : 'bg-muted'
+              }`}>
+                <AppIcon name="UtensilsCrossed" size={18} className={orderType === 'dine-in' ? 'text-primary' : 'text-muted-foreground'} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">Comer aqui</p>
+                <p className="text-[11px] text-muted-foreground">Consumir no local</p>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                orderType === 'dine-in' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+              }`}>
+                {orderType === 'dine-in' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+              </div>
+            </button>
 
-              {/* Pagar agora (PIX) */}
-              <button
-                onClick={() => setPaymentTiming('now')}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
-                  paymentTiming === 'now' ? 'border-primary bg-primary/5' : 'border-border/40'
-                }`}
-              >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                  paymentTiming === 'now' ? 'bg-primary/10' : 'bg-muted'
-                }`}>
-                  <AppIcon name="QrCode" size={18} className={paymentTiming === 'now' ? 'text-primary' : 'text-muted-foreground'} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">Pagar agora (PIX)</p>
-                  <p className="text-[11px] text-muted-foreground">QR Code instantâneo</p>
-                </div>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                  paymentTiming === 'now' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
-                }`}>
-                  {paymentTiming === 'now' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
-                </div>
-              </button>
-            </div>
+            <button
+              onClick={() => setOrderType('takeout')}
+              className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
+                orderType === 'takeout' ? 'border-primary bg-primary/5' : 'border-border/40'
+              }`}
+            >
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                orderType === 'takeout' ? 'bg-primary/10' : 'bg-muted'
+              }`}>
+                <AppIcon name="ShoppingBag" size={18} className={orderType === 'takeout' ? 'text-primary' : 'text-muted-foreground'} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">Para levar</p>
+                <p className="text-[11px] text-muted-foreground">Embalar para viagem</p>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                orderType === 'takeout' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+              }`}>
+                {orderType === 'takeout' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+              </div>
+            </button>
           </div>
-        )}
+        </div>
       </div>
 
       {/* ─── Sticky Bottom Actions ─── */}
@@ -560,9 +543,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           )}
           {payWithCoins
             ? `Pagar com ${coinTotal} moedas`
-            : paymentTiming === 'now'
-              ? `Pagar ${formatPrice(cartTotal)} via PIX`
-              : 'Enviar pedido'}
+            : 'Enviar pedido'}
         </Button>
       </div>
 
@@ -584,25 +565,6 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
         />
       )}
 
-      {/* Online Payment Sheet (PIX QR Code) */}
-      {showOnlinePayment && pendingOrderId && pendingOrderNumber && (
-        <OnlinePaymentSheet
-          orderId={pendingOrderId}
-          orderNumber={pendingOrderNumber}
-          total={cartTotal}
-          unitId={unitId}
-          billingType="PIX"
-          onPaymentConfirmed={() => {
-            setShowOnlinePayment(false);
-            setOrderSent(pendingOrderNumber);
-          }}
-          onCancel={() => {
-            setShowOnlinePayment(false);
-            setPendingOrderId(null);
-            setPendingOrderNumber(null);
-          }}
-        />
-      )}
 
       {/* Manual PIX QR Code (unit's own PIX key) */}
       {showManualPix && pendingOrderNumber && (
