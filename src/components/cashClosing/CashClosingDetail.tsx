@@ -581,67 +581,68 @@ import { AppIcon } from '@/components/ui/app-icon';
                ) : (
                  <AppIcon name="CheckCircle2" className="w-4 h-4 mr-2" />
                )}
-               Aprovar
-             </Button>
-           </div>
-         )}
-       </div>
- 
-       {/* Divergent Dialog */}
-       <AlertDialog open={showDivergentDialog} onOpenChange={setShowDivergentDialog}>
-         <AlertDialogContent>
-           <AlertDialogHeader>
-             <AlertDialogTitle>Marcar como Divergente</AlertDialogTitle>
-             <AlertDialogDescription>
-               Informe o motivo da divergência. Esta informação será visível para o funcionário.
-             </AlertDialogDescription>
-           </AlertDialogHeader>
-           <div className="py-4">
-             <Label>Motivo da divergência *</Label>
-             <Textarea
-               placeholder="Descreva o problema encontrado..."
-               value={divergentNotes}
-               onChange={(e) => setDivergentNotes(e.target.value)}
-               rows={3}
-               className="mt-2"
-             />
-           </div>
-           <AlertDialogFooter>
-             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-             <AlertDialogAction
-               onClick={handleMarkDivergent}
-               disabled={isMarkingDivergent || !divergentNotes.trim()}
-               className="bg-destructive hover:bg-destructive/90"
-             >
-               {isMarkingDivergent ? (
-                 <AppIcon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
-               ) : null}
-               Confirmar Divergência
-             </AlertDialogAction>
-           </AlertDialogFooter>
-         </AlertDialogContent>
-       </AlertDialog>
- 
-       {/* Delete Dialog */}
-       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-         <AlertDialogContent>
-           <AlertDialogHeader>
-             <AlertDialogTitle>Excluir Fechamento</AlertDialogTitle>
-             <AlertDialogDescription>
-               Tem certeza que deseja excluir este fechamento? Esta ação não pode ser desfeita.
-             </AlertDialogDescription>
-           </AlertDialogHeader>
-           <AlertDialogFooter>
-             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-             <AlertDialogAction
-               onClick={handleDelete}
-               className="bg-destructive hover:bg-destructive/90"
-             >
-               Excluir
-             </AlertDialogAction>
-           </AlertDialogFooter>
-         </AlertDialogContent>
-       </AlertDialog>
-     </ScrollArea>
-   );
- }
+        Aprovar
+              </Button>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+
+      {/* Divergent Dialog */}
+      <AlertDialog open={showDivergentDialog} onOpenChange={setShowDivergentDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Marcar como Divergente</AlertDialogTitle>
+            <AlertDialogDescription>
+              Informe o motivo da divergência. Esta informação será visível para o funcionário.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Label>Motivo da divergência *</Label>
+            <Textarea
+              placeholder="Descreva o problema encontrado..."
+              value={divergentNotes}
+              onChange={(e) => setDivergentNotes(e.target.value)}
+              rows={3}
+              className="mt-2"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleMarkDivergent}
+              disabled={isMarkingDivergent || !divergentNotes.trim()}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isMarkingDivergent ? (
+                <AppIcon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
+              ) : null}
+              Confirmar Divergência
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Fechamento</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este fechamento? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
