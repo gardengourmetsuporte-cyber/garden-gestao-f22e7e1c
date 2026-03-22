@@ -24,7 +24,7 @@ interface CheckoutDeps {
   fetchPendingOrders: () => Promise<void>;
 }
 
-export function usePOSCheckout(deps: CheckoutDeps) {
+export function usePOSCheckout(deps: CheckoutDeps, onOrderCancelled?: (orderId: string) => void) {
   const { isConnected } = useOnlineStatus();
   const [savingSale, setSavingSale] = useState(false);
 

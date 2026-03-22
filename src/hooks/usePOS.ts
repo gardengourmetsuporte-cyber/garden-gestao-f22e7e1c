@@ -34,7 +34,7 @@ export function usePOS() {
     deliveryAddress: cartHook.deliveryAddress,
     clearCart: cartHook.clearCart,
     fetchPendingOrders,
-  });
+  }, removeOrderLocally);
 
   return {
     products, categories, loadingProducts,
