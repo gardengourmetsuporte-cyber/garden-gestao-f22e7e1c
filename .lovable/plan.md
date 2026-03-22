@@ -1,38 +1,31 @@
 
 
-# Fix: AlertDialogs travando a tela no Fechamento de Caixa
+# Tablet orders devem entrar como Ficha quando têm comanda
 
 ## Problema
-Os `AlertDialog` de exclusão e divergência estão renderizados **dentro** do `ScrollArea` do Sheet. Isso causa conflito de portal/z-index — o dialog abre "preso" dentro do Sheet e trava a interação.
+No `TabletMenuCart.tsx` linha 230, o source é sempre `'mesa'` ou `'mesa_levar'`, ignorando se o pedido tem `comanda_number`. Isso faz os pedidos do tablet aparecerem como "Mesa" no PDV e no painel de pedidos, em vez de "Ficha/Comanda".
 
-## Correção
+Além disso, no `CardapioOrdersView.tsx` linha 98, `source === 'qrcode'` está mapeado para o canal `'balcao'` em vez de `'comanda'`.
 
-### `src/components/cashClosing/CashClosingDetail.tsx`
+## Correções
 
-Mover os dois `AlertDialog` (Delete Dialog linhas 625-644 e Divergent Dialog linhas 590-623) para **fora** do `ScrollArea`, retornando-os como fragmento no nível raiz do componente.
-
-Estrutura atual:
+### 1. `src/components/digital-menu/TabletMenuCart.tsx` (linha 230)
+Mudar a lógica de source para considerar a comanda:
 ```
-<ScrollArea>
-  ... conteúdo ...
-  <AlertDialog delete />
-  <AlertDialog divergent />
-</ScrollArea>
+source: comanda ? 'qrcode' : (orderType === 'takeout' ? 'mesa_levar' : 'mesa')
 ```
+Quando o pedido tem número de comanda, o source é `'qrcode'` (que é o source já usado pelo QR Code balcão e reconhecido no sistema todo). Sem comanda, mantém o comportamento atual.
 
-Estrutura corrigida:
+### 2. `src/components/cardapio/CardapioOrdersView.tsx` (linha 98)
+Mover `'qrcode'` do canal `'balcao'` para o canal `'comanda'`:
 ```
-<>
-  <ScrollArea>
-    ... conteúdo ...
-  </ScrollArea>
-  <AlertDialog delete />
-  <AlertDialog divergent />
-</>
+if (order.source === 'balcao') return 'balcao';
+if (order.source === 'qrcode') return 'comanda';
 ```
 
-Isso permite que o Radix AlertDialog use seu portal corretamente, sem ficar bloqueado pelo overflow do ScrollArea.
+Isso garante que pedidos com comanda apareçam na aba correta do painel de pedidos.
 
-### Arquivo editado
-1. **`src/components/cashClosing/CashClosingDetail.tsx`** — envolver retorno em Fragment, mover os 2 AlertDialogs para fora do ScrollArea
+### Arquivos
+1. **`src/components/digital-menu/TabletMenuCart.tsx`** — source condicional baseado em comanda
+2. **`src/components/cardapio/CardapioOrdersView.tsx`** — qrcode vai para canal comanda
 
