@@ -49,12 +49,12 @@ const STATUS_CONFIG: Record<string, { label: string; icon: string }> = {
 };
 
 /* ─── Channels ─── */
-type Channel = 'todos' | 'delivery' | 'mesa' | 'balcao' | 'ifood';
+type Channel = 'todos' | 'delivery' | 'comanda' | 'balcao' | 'ifood';
 
 const CHANNELS: { id: Channel; label: string }[] = [
   { id: 'todos', label: 'Todos' },
   { id: 'delivery', label: 'Delivery' },
-  { id: 'mesa', label: 'Mesa' },
+  { id: 'comanda', label: 'Comanda' },
   { id: 'balcao', label: 'Balcão' },
   { id: 'ifood', label: 'iFood' },
 ];
