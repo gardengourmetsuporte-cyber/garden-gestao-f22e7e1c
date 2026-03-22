@@ -572,7 +572,7 @@ function OrderDetailSheet({ order, onClose }: { order: OrderItem | null; onClose
             <div className="flex items-center gap-1.5">
               <AppIcon name={getSourceIcon(ch)} size={14} className="text-foreground" />
               <span className="text-sm font-semibold">
-                {ch === 'ifood' ? 'iFood' : ch === 'delivery' ? 'Delivery' : ch === 'mesa' ? 'Mesa' : 'Balcão'}
+                {ch === 'ifood' ? 'iFood' : ch === 'delivery' ? 'Delivery' : ch === 'comanda' ? 'Comanda' : 'Balcão'}
               </span>
             </div>
           </div>
