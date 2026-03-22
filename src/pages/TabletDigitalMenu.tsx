@@ -388,7 +388,7 @@ export default function TabletDigitalMenu() {
         </main>
 
         {/* ─── Right Cart Panel (persistent, Goomer-style) ─── */}
-        {cartOpen && (cartCount > 0 || cart.length === 0) && (
+        {cartOpen && (cartCount > 0 || cartOpen) && (
           <aside className="w-[380px] flex flex-col border-l border-border/20 bg-card shrink-0 animate-in slide-in-from-right-5 duration-300">
             <TabletMenuCart
               cart={cart}
