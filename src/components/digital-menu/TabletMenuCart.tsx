@@ -543,9 +543,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           )}
           {payWithCoins
             ? `Pagar com ${coinTotal} moedas`
-            : paymentTiming === 'now'
-              ? `Pagar ${formatPrice(cartTotal)} via PIX`
-              : 'Enviar pedido'}
+            : 'Enviar pedido'}
         </Button>
       </div>
 
