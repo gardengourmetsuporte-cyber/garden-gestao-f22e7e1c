@@ -570,11 +570,15 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
       {showScanner && (
         <ComandaScanner
           unitId={unitId}
-          onScan={(num) => {
+          onScan={async (num) => {
             setComandaNumber(num);
             setShowScanner(false);
             toast.success(`Comanda #${num} escaneada!`);
-            handleSend(num);
+            try {
+              await handleSend(num);
+            } catch (err: any) {
+              toast.error('Erro ao enviar pedido: ' + (err?.message || 'tente novamente'));
+            }
           }}
           onCancel={() => setShowScanner(false)}
         />

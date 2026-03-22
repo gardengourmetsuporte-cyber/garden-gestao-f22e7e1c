@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useTabletOrder, CartItem } from '@/hooks/useTabletOrder';
 import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
@@ -277,9 +278,14 @@ export default function TabletMenu() {
       {showScanner && unitId && (
         <ComandaScanner
           unitId={unitId}
-          onScan={(num) => {
+          onScan={async (num) => {
             setComandaNumber(num);
             setShowScanner(false);
+            try {
+              await handleFinalize();
+            } catch (err: any) {
+              toast.error('Erro ao enviar pedido: ' + (err?.message || 'tente novamente'));
+            }
           }}
           onCancel={() => setShowScanner(false)}
         />

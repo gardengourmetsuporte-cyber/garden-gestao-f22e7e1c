@@ -100,7 +100,7 @@ export function ComandaScanner({ unitId, onScan, onCancel }: Props) {
             {/* Toggle to manual */}
             <button
               onClick={() => { scannerRef.current?.stop().catch(() => {}); setManualMode(true); setError(null); }}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-lg text-white text-xs font-semibold hover:bg-white/20 transition-colors"
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 relative px-4 py-2 rounded-xl bg-white/10 backdrop-blur-lg text-white text-xs font-semibold hover:bg-white/20 transition-colors"
             >
               <AppIcon name="Keyboard" size={14} className="inline mr-1.5" />
               Digitar manualmente
@@ -141,8 +141,8 @@ export function ComandaScanner({ unitId, onScan, onCancel }: Props) {
         )}
       </div>
 
-      {/* Right: Instructions panel */}
-      <div className="w-[45%] max-w-[420px] bg-card flex flex-col items-center justify-center px-10 py-8 text-center shrink-0">
+      {/* Right: Instructions panel — hidden on small screens */}
+      <div className="hidden lg:flex w-[45%] max-w-[420px] bg-card flex-col items-center justify-center px-10 py-8 text-center shrink-0">
         <h2 className="text-xl font-bold text-foreground leading-snug">
           Posicione o QR Code com o código virado para a frente do tablet no local indicado
         </h2>
