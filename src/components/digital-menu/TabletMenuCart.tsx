@@ -227,7 +227,7 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
                 comanda_number: comanda || null,
                 status: isOnlinePayment ? 'awaiting_payment' : isPixManual ? 'confirmed' : (shouldAutoConfirm ? 'confirmed' : 'awaiting_confirmation'),
                 total: payWithCoins ? 0 : cartTotal,
-                source: orderType === 'takeout' ? 'mesa_levar' : 'mesa',
+                source: comanda ? 'qrcode' : (orderType === 'takeout' ? 'mesa_levar' : 'mesa'),
                 customer_name: finalName,
                 customer_email: customerUser?.email || null,
                 notes: orderNotes,
