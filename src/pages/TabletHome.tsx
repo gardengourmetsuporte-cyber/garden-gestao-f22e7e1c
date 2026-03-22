@@ -728,6 +728,18 @@ export default function TabletHome() {
           unitId={unitId}
         />
       )}
+
+      {showBillScanner && unitId && (
+        <ComandaScanner
+          unitId={unitId}
+          onScan={(num) => {
+            setBillComanda(num);
+            setShowBillScanner(false);
+            setActivePanel('bill');
+          }}
+          onCancel={() => setShowBillScanner(false)}
+        />
+      )}
     </div>
   );
 }
