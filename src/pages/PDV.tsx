@@ -126,13 +126,19 @@ export default function PDV() {
     setActiveOrderId(order.id);
     setOriginalCartSize(order.items.length);
     setOrdersOpen(false);
-    // Set source from existing order and go directly to payment
-    const orderSource = (order.source as 'balcao' | 'mesa' | 'delivery' | 'ficha') || 'balcao';
+    // Map qrcode → ficha, mesa_levar → mesa for POS source
+    const rawSource = order.source?.toLowerCase() || 'balcao';
+    const orderSource: 'balcao' | 'mesa' | 'delivery' | 'ficha' =
+      (rawSource === 'qrcode' || rawSource === 'ficha') ? 'ficha'
+      : rawSource.includes('mesa') ? 'mesa'
+      : rawSource.includes('delivery') ? 'delivery'
+      : (rawSource as any) || 'balcao';
     pos.setSaleSource(orderSource);
     if (order.customer_name) pos.setCustomerName(order.customer_name);
     if (order.customer_phone) pos.setDeliveryPhone(order.customer_phone);
     if (order.customer_address) pos.setDeliveryAddress(order.customer_address);
     if (order.table_number) pos.setTableNumber(order.table_number);
+    if (order.comanda_number) pos.setFichaNumber(order.comanda_number);
     setPaymentOpen(true);
   };
 
