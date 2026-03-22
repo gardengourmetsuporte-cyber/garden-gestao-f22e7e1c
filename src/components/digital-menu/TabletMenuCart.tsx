@@ -61,12 +61,10 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
   const [customerCoins, setCustomerCoins] = useState<number | null>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [comandaNumber, setComandaNumber] = useState<number | null>(null);
-  const [paymentTiming, setPaymentTiming] = useState<'now' | 'later'>('later');
-  const [showOnlinePayment, setShowOnlinePayment] = useState(false);
+  const paymentTiming = 'later' as const;
   const [showManualPix, setShowManualPix] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [pendingOrderNumber, setPendingOrderNumber] = useState<string | null>(null);
-  const { asaasActive } = useAsaasConfig(unitId);
 
   // Load unit's PIX key for manual PIX
   const [unitPixKey, setUnitPixKey] = useState<string | null>(null);
