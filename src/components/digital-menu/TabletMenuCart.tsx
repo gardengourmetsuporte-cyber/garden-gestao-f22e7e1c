@@ -482,59 +482,55 @@ export function TabletMenuCart({ cart, cartTotal, unitId, autoConfirm = false, c
           </div>
         )}
 
-        {/* Payment timing: Pagar agora vs Pagar depois */}
-        {!payWithCoins && (
-          <div className="px-4 pb-3 space-y-2">
-            <h3 className="text-sm font-bold text-foreground">Quando pagar?</h3>
-            <div className="space-y-1.5">
-              {/* Pagar depois */}
-              <button
-                onClick={() => setPaymentTiming('later')}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
-                  paymentTiming === 'later' ? 'border-primary bg-primary/5' : 'border-border/40'
-                }`}
-              >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                  paymentTiming === 'later' ? 'bg-primary/10' : 'bg-muted'
-                }`}>
-                  <AppIcon name="Banknote" size={18} className={paymentTiming === 'later' ? 'text-primary' : 'text-muted-foreground'} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">Pagar depois</p>
-                  <p className="text-[11px] text-muted-foreground">Pague no caixa ao final</p>
-                </div>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                  paymentTiming === 'later' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
-                }`}>
-                  {paymentTiming === 'later' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
-                </div>
-              </button>
+        {/* Order type: Comer aqui vs Para levar */}
+        <div className="px-4 pb-3 space-y-2">
+          <h3 className="text-sm font-bold text-foreground">Como deseja consumir?</h3>
+          <div className="space-y-1.5">
+            <button
+              onClick={() => setOrderType('dine-in')}
+              className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
+                orderType === 'dine-in' ? 'border-primary bg-primary/5' : 'border-border/40'
+              }`}
+            >
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                orderType === 'dine-in' ? 'bg-primary/10' : 'bg-muted'
+              }`}>
+                <AppIcon name="UtensilsCrossed" size={18} className={orderType === 'dine-in' ? 'text-primary' : 'text-muted-foreground'} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">Comer aqui</p>
+                <p className="text-[11px] text-muted-foreground">Consumir no local</p>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                orderType === 'dine-in' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+              }`}>
+                {orderType === 'dine-in' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+              </div>
+            </button>
 
-              {/* Pagar agora (PIX) */}
-              <button
-                onClick={() => setPaymentTiming('now')}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
-                  paymentTiming === 'now' ? 'border-primary bg-primary/5' : 'border-border/40'
-                }`}
-              >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                  paymentTiming === 'now' ? 'bg-primary/10' : 'bg-muted'
-                }`}>
-                  <AppIcon name="QrCode" size={18} className={paymentTiming === 'now' ? 'text-primary' : 'text-muted-foreground'} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">Pagar agora (PIX)</p>
-                  <p className="text-[11px] text-muted-foreground">QR Code instantâneo</p>
-                </div>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                  paymentTiming === 'now' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
-                }`}>
-                  {paymentTiming === 'now' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
-                </div>
-              </button>
-            </div>
+            <button
+              onClick={() => setOrderType('takeout')}
+              className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all active:scale-[0.98] text-left ${
+                orderType === 'takeout' ? 'border-primary bg-primary/5' : 'border-border/40'
+              }`}
+            >
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                orderType === 'takeout' ? 'bg-primary/10' : 'bg-muted'
+              }`}>
+                <AppIcon name="ShoppingBag" size={18} className={orderType === 'takeout' ? 'text-primary' : 'text-muted-foreground'} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">Para levar</p>
+                <p className="text-[11px] text-muted-foreground">Embalar para viagem</p>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                orderType === 'takeout' ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+              }`}>
+                {orderType === 'takeout' && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+              </div>
+            </button>
           </div>
-        )}
+        </div>
       </div>
 
       {/* ─── Sticky Bottom Actions ─── */}
