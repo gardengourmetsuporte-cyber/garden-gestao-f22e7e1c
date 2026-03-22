@@ -19,6 +19,7 @@ interface OrderItem {
   status: string;
   source?: string;
   table_number?: number;
+  comanda_number?: number;
   customer_name?: string;
   tablet_order_items?: any[];
 }
