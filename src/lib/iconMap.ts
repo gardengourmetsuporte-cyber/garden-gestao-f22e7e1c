@@ -99,6 +99,7 @@ export const ICON_MAP: Record<string, string> = {
   LayoutDashboard: 'space_dashboard',
   Menu: 'menu',
   X: 'close',
+  Ban: 'block',
   ChevronRight: 'chevron_right',
   ChevronDown: 'expand_more',
   ChevronUp: 'expand_less',
