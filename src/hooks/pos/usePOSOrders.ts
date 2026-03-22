@@ -81,5 +81,9 @@ export function usePOSOrders(activeUnitId: string | null) {
     return () => { supabase.removeChannel(channel); };
   }, [activeUnitId, fetchPendingOrders]);
 
-  return { pendingOrders, loadingOrders, fetchPendingOrders };
+  const removeOrderLocally = useCallback((orderId: string) => {
+    setPendingOrders(prev => prev.filter(o => o.id !== orderId));
+  }, []);
+
+  return { pendingOrders, loadingOrders, fetchPendingOrders, removeOrderLocally };
 }
