@@ -218,7 +218,7 @@ export function useChecklistPage() {
       fetchCompletions(currentDate, checklistType);
       queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, checklistType, activeUnitId] });
     })();
-  }, [deadlinePassed, currentDate, checklistType, sectors, completions, completionsFetched, user?.id, isAdmin, activeUnitId, fetchCompletions, queryClient, deadlineSettings]);
+  }, [deadlinePassed, currentDate, checklistType, sectors, completions, completionsFetched, user?.id, canManageChecklist, activeUnitId, fetchCompletions, queryClient, deadlineSettings]);
 
   // Realtime — debounced to prevent render storms from bulk operations
   useEffect(() => {
