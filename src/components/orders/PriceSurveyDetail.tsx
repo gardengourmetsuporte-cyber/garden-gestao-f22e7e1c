@@ -281,8 +281,25 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
               <p className="text-sm">Nenhuma resposta com preços ainda</p>
             </div>
           )}
+
+          {/* Generate Orders Button */}
+          {allItems.length > 0 && (
+            <Button
+              onClick={() => setGenerateOpen(true)}
+              className="w-full h-12 text-sm font-bold gap-2"
+            >
+              <AppIcon name="ShoppingCart" size={16} />
+              Gerar Pedidos com Melhor Preço
+            </Button>
+          )}
         </section>
       )}
+
+      <GenerateOrdersFromSurveySheet
+        open={generateOpen}
+        onOpenChange={setGenerateOpen}
+        items={orderItems}
+      />
     </div>
   );
 }
