@@ -203,7 +203,7 @@ export function MyPayslips() {
               </div>
               {payment.receipt_url && (
                 <button
-                  onClick={() => setViewingReceipt(payment.receipt_url)}
+                  onClick={() => setViewingReceipt(signedUrls[payment.id] || payment.receipt_url)}
                   className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors"
                 >
                   <AppIcon name="Image" size={16} />
