@@ -120,6 +120,23 @@ export function useOrders() {
     onSuccess: invalidate,
   });
 
+  const addOrderItemsMut = useMutation({
+    mutationFn: async ({ orderId, items }: { orderId: string; items: { item_id: string; quantity: number; notes?: string }[] }) => {
+      const rows = items.map(i => ({ order_id: orderId, item_id: i.item_id, quantity: i.quantity, notes: i.notes, unit_id: activeUnitId }));
+      const { error } = await supabase.from('order_items').insert(rows);
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+
+  const removeOrderItemMut = useMutation({
+    mutationFn: async (orderItemId: string) => {
+      const { error } = await supabase.from('order_items').delete().eq('id', orderItemId);
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+
   return {
     orders,
     isLoading,
