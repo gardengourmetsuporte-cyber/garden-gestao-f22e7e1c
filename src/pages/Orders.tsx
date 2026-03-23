@@ -25,6 +25,7 @@ import { QuotationList } from '@/components/orders/QuotationList';
 import { useShoppingList } from '@/hooks/useShoppingList';
 import { PriceTrackingTab } from '@/components/orders/PriceTrackingTab';
 import { SupplierProfileSheet } from '@/components/orders/SupplierProfileSheet';
+import { EditDraftOrderSheet } from '@/components/orders/EditDraftOrderSheet';
 
 import { useFabAction } from '@/contexts/FabActionContext';
 import { normalizePhone } from '@/lib/normalizePhone';
@@ -33,7 +34,7 @@ export default function OrdersPage() {
   const { isAdmin } = useAuth();
   const { items, registerMovement } = useInventoryDB();
   const { suppliers, addSupplier, updateSupplier, deleteSupplier } = useSuppliers();
-  const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
+  const { orders, createOrder, updateOrderStatus, deleteOrder, updateOrderItem, addOrderItems, removeOrderItem, refetch: refetchOrders } = useOrders();
   const { addInvoice, invoices, deleteInvoice, payInvoiceWithTransaction } = useSupplierInvoices();
   const { createQuotation } = useQuotations();
   const { items: shoppingListItems, removeFromList, clearList, isLoading: shoppingListLoading } = useShoppingList();
@@ -53,7 +54,8 @@ export default function OrdersPage() {
   const [cotationStep, setCotationStep] = useState(false);
   const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
   const [isCreatingQuotation, setIsCreatingQuotation] = useState(false);
-
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [editSheetOpen, setEditSheetOpen] = useState(false);
   // Supplier profile states
   const [profileSheetOpen, setProfileSheetOpen] = useState(false);
   const [profileSupplier, setProfileSupplier] = useState<Supplier | null>(null);
@@ -710,14 +712,24 @@ export default function OrdersPage() {
                                         </Button>
                                       </>
                                     )}
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={(e) => { e.stopPropagation(); deleteOrder(order.id); }}
-                                      className="text-destructive hover:text-destructive rounded-xl ml-auto"
-                                    >
-                                      <AppIcon name="Trash2" size={16} />
-                                    </Button>
+                                     {order.status === 'draft' && (
+                                       <Button
+                                         size="sm"
+                                         variant="ghost"
+                                         onClick={(e) => { e.stopPropagation(); setEditingOrder(order); setEditSheetOpen(true); }}
+                                         className="rounded-xl"
+                                       >
+                                         <AppIcon name="Pencil" size={16} />
+                                       </Button>
+                                     )}
+                                     <Button
+                                       size="sm"
+                                       variant="ghost"
+                                       onClick={(e) => { e.stopPropagation(); deleteOrder(order.id); }}
+                                       className="text-destructive hover:text-destructive rounded-xl ml-auto"
+                                     >
+                                       <AppIcon name="Trash2" size={16} />
+                                     </Button>
                                   </div>
                                 </div>
                               </CollapsibleContent>
@@ -997,6 +1009,18 @@ export default function OrdersPage() {
             )}
           </SheetContent>
         </Sheet>
+      {editingOrder && (
+        <EditDraftOrderSheet
+          open={editSheetOpen}
+          onOpenChange={setEditSheetOpen}
+          order={editingOrder}
+          inventoryItems={items}
+          onUpdateItem={updateOrderItem}
+          onRemoveItem={removeOrderItem}
+          onAddItems={addOrderItems}
+          onRefetch={refetchOrders}
+        />
+      )}
       </div>
     </AppLayout>
   );
