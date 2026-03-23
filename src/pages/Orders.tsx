@@ -25,6 +25,7 @@ import { QuotationList } from '@/components/orders/QuotationList';
 import { useShoppingList } from '@/hooks/useShoppingList';
 import { PriceTrackingTab } from '@/components/orders/PriceTrackingTab';
 import { SupplierProfileSheet } from '@/components/orders/SupplierProfileSheet';
+import { EditDraftOrderSheet } from '@/components/orders/EditDraftOrderSheet';
 
 import { useFabAction } from '@/contexts/FabActionContext';
 import { normalizePhone } from '@/lib/normalizePhone';
