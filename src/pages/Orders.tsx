@@ -33,7 +33,7 @@ export default function OrdersPage() {
   const { isAdmin } = useAuth();
   const { items, registerMovement } = useInventoryDB();
   const { suppliers, addSupplier, updateSupplier, deleteSupplier } = useSuppliers();
-  const { orders, createOrder, updateOrderStatus, deleteOrder, refetch: refetchOrders } = useOrders();
+  const { orders, createOrder, updateOrderStatus, deleteOrder, updateOrderItem, addOrderItems, removeOrderItem, refetch: refetchOrders } = useOrders();
   const { addInvoice, invoices, deleteInvoice, payInvoiceWithTransaction } = useSupplierInvoices();
   const { createQuotation } = useQuotations();
   const { items: shoppingListItems, removeFromList, clearList, isLoading: shoppingListLoading } = useShoppingList();
@@ -53,7 +53,8 @@ export default function OrdersPage() {
   const [cotationStep, setCotationStep] = useState(false);
   const [extraSuppliers, setExtraSuppliers] = useState<string[]>([]);
   const [isCreatingQuotation, setIsCreatingQuotation] = useState(false);
-
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [editSheetOpen, setEditSheetOpen] = useState(false);
   // Supplier profile states
   const [profileSheetOpen, setProfileSheetOpen] = useState(false);
   const [profileSupplier, setProfileSupplier] = useState<Supplier | null>(null);
