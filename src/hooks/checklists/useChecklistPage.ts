@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useChecklists } from '@/hooks/useChecklists';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserModules } from '@/hooks/useAccessLevels';
 import { useUnit } from '@/contexts/UnitContext';
 import { ChecklistType } from '@/types/database';
 import { useFabAction } from '@/contexts/FabActionContext';
@@ -14,6 +15,8 @@ import { useChecklistTimer, ItemTimeStats } from '@/hooks/checklists/useChecklis
 
 export function useChecklistPage() {
   const { isAdmin, user } = useAuth();
+  const { hasAccess } = useUserModules();
+  const canManageChecklist = isAdmin || hasAccess('checklists.manage');
   const {
     sectors, completions, completionsFetched, isLoading,
     addSector, updateSector, deleteSector, reorderSectors,
@@ -62,7 +65,7 @@ export function useChecklistPage() {
   const settingsType = checklistType;
   const setSettingsType = setChecklistType;
 
-  useFabAction(isAdmin ? { icon: settingsMode ? 'X' : 'Settings', label: settingsMode ? 'Voltar' : 'Configurar', onClick: () => setSettingsMode(!settingsMode) } : null, [isAdmin, settingsMode]);
+  useFabAction(canManageChecklist ? { icon: settingsMode ? 'X' : 'Settings', label: settingsMode ? 'Voltar' : 'Configurar', onClick: () => setSettingsMode(!settingsMode) } : null, [canManageChecklist, settingsMode]);
 
   // Fetch completions for abertura & fechamento to show progress on cards
   const { data: aberturaCompletions = [] } = useQuery({
@@ -163,7 +166,7 @@ export function useChecklistPage() {
     if (autoClosedRef.current === key) return;
     if (!deadlinePassed || !user?.id || !activeUnitId) return;
     if (sectors.length === 0 || !completionsFetched) return;
-    if (!isAdmin) { autoClosedRef.current = key; return; }
+    if (!canManageChecklist) { autoClosedRef.current = key; return; }
     if (!shouldAutoClose(currentDate, checklistType, deadlineSettings)) { autoClosedRef.current = key; return; }
 
     // Don't auto-close if someone toggled an item in the last 10 minutes (active usage)
@@ -215,7 +218,7 @@ export function useChecklistPage() {
       fetchCompletions(currentDate, checklistType);
       queryClient.invalidateQueries({ queryKey: ['card-completions', currentDate, checklistType, activeUnitId] });
     })();
-  }, [deadlinePassed, currentDate, checklistType, sectors, completions, completionsFetched, user?.id, isAdmin, activeUnitId, fetchCompletions, queryClient, deadlineSettings]);
+  }, [deadlinePassed, currentDate, checklistType, sectors, completions, completionsFetched, user?.id, canManageChecklist, activeUnitId, fetchCompletions, queryClient, deadlineSettings]);
 
   // Realtime — debounced to prevent render storms from bulk operations
   useEffect(() => {
@@ -249,11 +252,11 @@ export function useChecklistPage() {
   const handleToggleItem = useCallback(async (itemId: string, points: number = 1, completedByUserId?: string, isSkipped?: boolean, photoUrl?: string, preserveTimerOnUncheck?: boolean, bypassGrace?: boolean, isAlreadyReady?: boolean) => {
     lastManualToggleRef.current = Date.now();
     try {
-      await toggleCompletion(itemId, checklistType, currentDate, isAdmin, points, completedByUserId, isSkipped, photoUrl, preserveTimerOnUncheck, bypassGrace, isAlreadyReady);
+      await toggleCompletion(itemId, checklistType, currentDate, canManageChecklist, points, completedByUserId, isSkipped, photoUrl, preserveTimerOnUncheck, bypassGrace, isAlreadyReady);
     } catch (error: any) {
       toast.error(error.message || 'Erro ao marcar item');
     }
-  }, [toggleCompletion, checklistType, currentDate, isAdmin]);
+  }, [toggleCompletion, checklistType, currentDate, canManageChecklist]);
 
   const handleAddSector = useCallback(async (data: { name: string; color: string }) => {
     const scope = settingsType === 'bonus' ? 'bonus' : 'standard';
@@ -359,7 +362,7 @@ export function useChecklistPage() {
 
   return {
     // State
-    isAdmin, user, sectors, completions, completionsFetched, isLoading,
+    isAdmin: canManageChecklist, user, sectors, completions, completionsFetched, isLoading,
     settingsMode, setSettingsMode, checklistType, setChecklistType,
     selectedDate, setSelectedDate, currentDate,
     settingsType, setSettingsType,
