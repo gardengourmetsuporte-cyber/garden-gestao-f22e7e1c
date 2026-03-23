@@ -124,7 +124,7 @@ export function usePriceSurveys() {
       supplierIds.length > 0
         ? supabase.from('price_survey_responses' as any).select('*').in('survey_supplier_id', supplierIds)
         : Promise.resolve({ data: [] }),
-      supabase.from('inventory_items').select('id, name, unit_type, category_id, category:categories(id, name, color)').eq('unit_id', unitId),
+      supabase.from('inventory_items').select('id, name, unit_type, category_id, min_stock, current_stock, supplier_id, category:categories(id, name, color)').eq('unit_id', unitId),
     ]);
 
     return { ...(survey as object), responses: responsesResult.data || [], inventoryItems: itemsResult.data || [] } as any;

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { normalizePhone } from '@/lib/normalizePhone';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { GenerateOrdersFromSurveySheet, SurveyOrderItem } from './GenerateOrdersFromSurveySheet';
 
 interface Props {
   survey: any;
@@ -15,6 +16,7 @@ interface Props {
 
 export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
   const [search, setSearch] = useState('');
+  const [generateOpen, setGenerateOpen] = useState(false);
 
   const inventoryItems: any[] = survey.inventoryItems || [];
   const surveySuppliers = survey.price_survey_suppliers || [];
@@ -79,6 +81,30 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
     });
     return savings;
   }, [allItems, itemPriceMap]);
+
+  // Build order items: best price per item + inventory data
+  const orderItems: SurveyOrderItem[] = useMemo(() => {
+    return allItems.map(item => {
+      const prices = (itemPriceMap[item.id] || []).filter(p => p.hasItem && p.unitPrice > 0);
+      if (prices.length === 0) return null;
+      const best = prices.reduce((a, b) => a.unitPrice <= b.unitPrice ? a : b);
+      const inv = inventoryItems.find((i: any) => i.id === item.id);
+      const minStock = inv?.min_stock ?? 0;
+      const currentStock = inv?.current_stock ?? 0;
+      const suggestedQty = Math.max(0, minStock - currentStock);
+      return {
+        itemId: item.id,
+        itemName: item.name,
+        unitType: item.unitType,
+        currentStock,
+        minStock,
+        suggestedQty,
+        unitPrice: best.unitPrice,
+        supplierId: best.supplierId,
+        supplierName: best.supplierName,
+      } as SurveyOrderItem;
+    }).filter(Boolean) as SurveyOrderItem[];
+  }, [allItems, itemPriceMap, inventoryItems]);
 
   const handleResendToSupplier = (ss: any) => {
     const phone = normalizePhone(ss.supplier?.phone);
@@ -279,8 +305,25 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
               <p className="text-sm">Nenhuma resposta com preços ainda</p>
             </div>
           )}
+
+          {/* Generate Orders Button */}
+          {allItems.length > 0 && (
+            <Button
+              onClick={() => setGenerateOpen(true)}
+              className="w-full h-12 text-sm font-bold gap-2"
+            >
+              <AppIcon name="ShoppingCart" size={16} />
+              Gerar Pedidos com Melhor Preço
+            </Button>
+          )}
         </section>
       )}
+
+      <GenerateOrdersFromSurveySheet
+        open={generateOpen}
+        onOpenChange={setGenerateOpen}
+        items={orderItems}
+      />
     </div>
   );
 }
