@@ -7,9 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { AppIcon } from '@/components/ui/app-icon';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 export function MyPayslips() {
   const { myEmployee, isLoading: loadingEmployee } = useEmployees();
