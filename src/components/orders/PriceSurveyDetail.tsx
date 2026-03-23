@@ -16,6 +16,7 @@ interface Props {
 
 export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
   const [search, setSearch] = useState('');
+  const [generateOpen, setGenerateOpen] = useState(false);
 
   const inventoryItems: any[] = survey.inventoryItems || [];
   const surveySuppliers = survey.price_survey_suppliers || [];
