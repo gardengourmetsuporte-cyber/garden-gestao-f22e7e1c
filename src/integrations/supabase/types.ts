@@ -7872,6 +7872,10 @@ export type Database = {
         Args: { p_customer_id: string; p_unit_id: string }
         Returns: number
       }
+      has_module_access: {
+        Args: { _module: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
