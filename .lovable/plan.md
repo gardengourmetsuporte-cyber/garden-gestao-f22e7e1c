@@ -1,72 +1,51 @@
 
 
-# Auditoria Completa dos Fluxos de Pedidos — Bugs Encontrados
+# Gerar Pedidos a partir da Pesquisa Global
 
-Após análise detalhada de todos os fluxos (Tablet → PDV → KDS), identifiquei os seguintes problemas:
+## O que será feito
 
----
+Adicionar um botão "Gerar Pedidos" na tela de detalhe da Pesquisa Global (`PriceSurveyDetail.tsx`) que:
 
-## Bug 1: PDV `sendOrder` não grava `comanda_number` quando source é `ficha`
+1. Para cada item com respostas, seleciona o fornecedor com **menor preço**
+2. Calcula a **quantidade sugerida** baseada no estoque mínimo: `max(0, min_stock - current_stock)`
+3. Agrupa os itens por fornecedor vencedor
+4. Abre um **Sheet de revisão** onde o usuário pode editar quantidades antes de confirmar
+5. Ao confirmar, cria pedidos rascunho (draft) no Centro de Pedidos, um por fornecedor
 
-**Onde**: `src/hooks/pos/usePOSCheckout.ts` linhas 162-171
+## Fluxo do Usuário
 
-Quando o PDV envia um pedido no modo Ficha, o `orderData` não inclui `comanda_number: fichaNumber`. O campo `fichaNumber` está disponível no state mas nunca é inserido no banco. O pedido entra sem comanda e aparece genérico no KDS.
-
-**Fix**: Adicionar `comanda_number: saleSource === 'ficha' ? fichaNumber : null` ao `orderData`.
-
----
-
-## Bug 2: `OrderDetailSheet` não mostra comanda no badge para fichas
-
-**Onde**: `src/components/pdv/PendingOrdersSheet.tsx` linhas 159-167
-
-Quando o pedido é do tipo `ficha` com `comanda_number`, o detalhe do pedido mostra apenas "Fichas/Comandas" genérico em vez de "Comanda X". Falta a verificação `sourceKey === 'ficha' && order.comanda_number`.
-
-**Fix**: Adicionar condição para exibir `Comanda ${order.comanda_number}` no badge de info do detalhe.
-
----
-
-## Bug 3: `mesa_levar` não é diferenciado no `OrderDetailSheet`
-
-**Onde**: `src/components/pdv/PendingOrdersSheet.tsx` linhas 159-167
-
-O badge "Para levar" aparece nos cards da lista (linha 563-564) mas **não** no sheet de detalhe do pedido. Quando o operador abre o detalhe, perde essa informação.
-
-**Fix**: Adicionar badge "Para levar" no `OrderDetailSheet` quando `order.source === 'mesa_levar'`.
-
----
-
-## Bug 4: `renderOrderCard` (modo lista) não mostra comanda nem "Para levar"
-
-**Onde**: `src/components/pdv/PendingOrdersSheet.tsx` linhas 419-452
-
-O modo lista (`viewMode === 'list'`) não tem os mesmos indicadores que o modo blocks. Falta exibir `Comanda X` para fichas e "Para levar" para `mesa_levar`.
-
-**Fix**: Adicionar mesma lógica do modo blocks no `renderOrderCard`.
-
----
-
-## Bug 5: `auto_accept_tablet_order` trigger não reconhece `mesa_levar` nem `qrcode`
-
-**Onde**: Trigger SQL `auto_accept_tablet_order`
-
-O trigger só auto-confirma `mesa` e `balcao`:
-```sql
-IF NEW.source IN ('mesa', 'balcao') AND ...
+```text
+Pesquisa Global (detalhe)
+  → Botão "Gerar Pedidos" (aparece quando há respostas)
+  → Sheet com lista editável agrupada por fornecedor
+    - Cada item mostra: nome, estoque atual, mínimo, qtd sugerida (editável)
+    - Pode remover itens que não quer pedir
+    - Mostra preço unitário do fornecedor vencedor
+  → "Confirmar" → cria pedidos draft → toast sucesso
 ```
-Pedidos com `source = 'mesa_levar'` ou `source = 'qrcode'` ficam como `pending` em vez de auto-confirmar, exigindo confirmação manual desnecessária.
 
-**Fix**: Migration para adicionar `'mesa_levar'` e `'qrcode'` à lista de sources auto-confirmados.
+## Arquivos
 
----
+### 1. Novo: `src/components/orders/GenerateOrdersFromSurveySheet.tsx`
+- Sheet/bottom-sheet com a lista de itens agrupada por fornecedor
+- Cada fornecedor é uma seção com seus itens
+- Campos editáveis de quantidade (Input number)
+- Botão remover item
+- Totais por fornecedor
+- Botão "Gerar X Pedidos"
+- Usa `useOrders().createOrder` para criar os pedidos
 
-## Resumo de Correções
+### 2. Editar: `src/components/orders/PriceSurveyDetail.tsx`
+- Adicionar botão "Gerar Pedidos" abaixo da tabela de comparação
+- State para controlar abertura do sheet
+- Passar dados necessários (itens com melhor preço, inventário com min_stock/current_stock) para o sheet
 
-| # | Arquivo | Mudança |
-|---|---------|---------|
-| 1 | `usePOSCheckout.ts` | Adicionar `comanda_number` ao `orderData` do `sendOrder` |
-| 2-4 | `PendingOrdersSheet.tsx` | Exibir comanda e "Para levar" no detalhe e modo lista |
-| 5 | Migration SQL | Atualizar trigger para incluir `mesa_levar` e `qrcode` |
+### 3. Editar: `src/hooks/usePriceSurveys.ts`
+- No `fetchSurveyDetail`, incluir `min_stock, current_stock, supplier_id` no select de `inventory_items` (já traz `id, name, unit_type`)
 
-5 bugs em 2 arquivos + 1 migration.
+## Lógica de seleção
+
+- Para cada item respondido, pegar o fornecedor com menor `unit_price` (onde `has_item = true`)
+- Quantidade sugerida = `max(0, min_stock - current_stock)`, mínimo 1 se o item tem déficit
+- O usuário pode alterar antes de enviar
 
