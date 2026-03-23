@@ -82,6 +82,30 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
     return savings;
   }, [allItems, itemPriceMap]);
 
+  // Build order items: best price per item + inventory data
+  const orderItems: SurveyOrderItem[] = useMemo(() => {
+    return allItems.map(item => {
+      const prices = (itemPriceMap[item.id] || []).filter(p => p.hasItem && p.unitPrice > 0);
+      if (prices.length === 0) return null;
+      const best = prices.reduce((a, b) => a.unitPrice <= b.unitPrice ? a : b);
+      const inv = inventoryItems.find((i: any) => i.id === item.id);
+      const minStock = inv?.min_stock ?? 0;
+      const currentStock = inv?.current_stock ?? 0;
+      const suggestedQty = Math.max(0, minStock - currentStock);
+      return {
+        itemId: item.id,
+        itemName: item.name,
+        unitType: item.unitType,
+        currentStock,
+        minStock,
+        suggestedQty,
+        unitPrice: best.unitPrice,
+        supplierId: best.supplierId,
+        supplierName: best.supplierName,
+      } as SurveyOrderItem;
+    }).filter(Boolean) as SurveyOrderItem[];
+  }, [allItems, itemPriceMap, inventoryItems]);
+
   const handleResendToSupplier = (ss: any) => {
     const phone = normalizePhone(ss.supplier?.phone);
     if (!phone) { toast.error('Sem telefone cadastrado'); return; }
