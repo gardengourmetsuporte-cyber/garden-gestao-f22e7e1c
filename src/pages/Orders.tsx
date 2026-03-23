@@ -712,14 +712,24 @@ export default function OrdersPage() {
                                         </Button>
                                       </>
                                     )}
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={(e) => { e.stopPropagation(); deleteOrder(order.id); }}
-                                      className="text-destructive hover:text-destructive rounded-xl ml-auto"
-                                    >
-                                      <AppIcon name="Trash2" size={16} />
-                                    </Button>
+                                     {order.status === 'draft' && (
+                                       <Button
+                                         size="sm"
+                                         variant="ghost"
+                                         onClick={(e) => { e.stopPropagation(); setEditingOrder(order); setEditSheetOpen(true); }}
+                                         className="rounded-xl"
+                                       >
+                                         <AppIcon name="Pencil" size={16} />
+                                       </Button>
+                                     )}
+                                     <Button
+                                       size="sm"
+                                       variant="ghost"
+                                       onClick={(e) => { e.stopPropagation(); deleteOrder(order.id); }}
+                                       className="text-destructive hover:text-destructive rounded-xl ml-auto"
+                                     >
+                                       <AppIcon name="Trash2" size={16} />
+                                     </Button>
                                   </div>
                                 </div>
                               </CollapsibleContent>
@@ -999,6 +1009,18 @@ export default function OrdersPage() {
             )}
           </SheetContent>
         </Sheet>
+      {editingOrder && (
+        <EditDraftOrderSheet
+          open={editSheetOpen}
+          onOpenChange={setEditSheetOpen}
+          order={editingOrder}
+          inventoryItems={items}
+          onUpdateItem={updateOrderItem}
+          onRemoveItem={removeOrderItem}
+          onAddItems={addOrderItems}
+          onRefetch={refetchOrders}
+        />
+      )}
       </div>
     </AppLayout>
   );
