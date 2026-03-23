@@ -15,6 +15,8 @@ import { useChecklistTimer, ItemTimeStats } from '@/hooks/checklists/useChecklis
 
 export function useChecklistPage() {
   const { isAdmin, user } = useAuth();
+  const { hasAccess } = useUserModules();
+  const canManageChecklist = isAdmin || hasAccess('checklists.manage');
   const {
     sectors, completions, completionsFetched, isLoading,
     addSector, updateSector, deleteSector, reorderSectors,
