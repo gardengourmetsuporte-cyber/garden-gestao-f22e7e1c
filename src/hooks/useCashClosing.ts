@@ -135,7 +135,7 @@ export function useCashClosing() {
     try {
       const { error: updateError } = await supabase
         .from('cash_closings' as any)
-        .update({ status: 'approved', validated_by: user.id, validated_at: new Date().toISOString() } as any)
+        .update({ status: 'approved', validated_by: user.id, validated_at: new Date().toISOString(), financial_integrated: false } as any)
         .eq('id', closingId);
       if (updateError) throw updateError;
 

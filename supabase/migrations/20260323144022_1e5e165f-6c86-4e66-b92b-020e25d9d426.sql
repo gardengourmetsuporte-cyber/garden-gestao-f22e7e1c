@@ -1,0 +1,1 @@
+UPDATE cash_closings SET financial_integrated = false WHERE status = 'approved' AND financial_integrated = true;
