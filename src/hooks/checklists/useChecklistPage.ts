@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useChecklists } from '@/hooks/useChecklists';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserModules } from '@/hooks/useAccessLevels';
 import { useUnit } from '@/contexts/UnitContext';
 import { ChecklistType } from '@/types/database';
 import { useFabAction } from '@/contexts/FabActionContext';
