@@ -147,6 +147,10 @@ export function useOrders() {
     deleteOrder: (orderId: string) => deleteOrderMut.mutateAsync(orderId),
     updateOrderItem: (itemId: string, updates: { quantity?: number; notes?: string }) =>
       updateOrderItemMut.mutateAsync({ itemId, updates }),
+    addOrderItems: (orderId: string, items: { item_id: string; quantity: number }[]) =>
+      addOrderItemsMut.mutateAsync({ orderId, items }),
+    removeOrderItem: (orderItemId: string) =>
+      removeOrderItemMut.mutateAsync(orderItemId),
     refetch: invalidate,
   };
 }
