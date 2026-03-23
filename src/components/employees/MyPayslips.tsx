@@ -7,15 +7,39 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { AppIcon } from '@/components/ui/app-icon';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 export function MyPayslips() {
   const { myEmployee, isLoading: loadingEmployee } = useEmployees();
   const { payments, isLoading: loadingPayments } = useEmployeePayments(myEmployee?.id);
   const [expandedPayments, setExpandedPayments] = useState<Set<string>>(new Set());
   const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
+
+  // Generate signed URLs for all receipts
+  useEffect(() => {
+    if (!payments.length) return;
+    const receipts = payments.filter(p => p.receipt_url).map(p => ({ id: p.id, url: p.receipt_url! }));
+    if (!receipts.length) return;
+
+    const resolveUrls = async () => {
+      const resolved: Record<string, string> = {};
+      for (const r of receipts) {
+        const match = r.url.match(/cash-receipts\/(.+?)(\?.*)?$/);
+        if (match) {
+          const { data } = await supabase.storage.from('cash-receipts').createSignedUrl(match[1], 3600);
+          if (data?.signedUrl) resolved[r.id] = data.signedUrl;
+        } else {
+          resolved[r.id] = r.url;
+        }
+      }
+      setSignedUrls(resolved);
+    };
+    resolveUrls();
+  }, [payments]);
   
 
   const toggleExpand = (paymentId: string) => {
@@ -141,8 +165,8 @@ export function MyPayslips() {
                       {payment.fgts_amount > 0 && (<div className="text-sm p-2 bg-emerald-500/10 rounded-lg"><div className="flex justify-between"><span className="text-emerald-600">FGTS depositado</span><span className="text-emerald-600 font-medium">{formatCurrency(payment.fgts_amount)}</span></div></div>)}
                       <div className="p-3 bg-primary/10 rounded-lg"><div className="flex justify-between items-center"><span className="font-semibold">Líquido a Receber</span><span className="font-bold text-lg text-primary">{formatCurrency(payment.net_salary)}</span></div></div>
                       {payment.receipt_url && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setViewingReceipt(payment.receipt_url); }}
+                         <button
+                          onClick={(e) => { e.stopPropagation(); setViewingReceipt(signedUrls[payment.id] || payment.receipt_url); }}
                           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors"
                         >
                           <AppIcon name="Image" size={16} />
@@ -179,7 +203,7 @@ export function MyPayslips() {
               </div>
               {payment.receipt_url && (
                 <button
-                  onClick={() => setViewingReceipt(payment.receipt_url)}
+                  onClick={() => setViewingReceipt(signedUrls[payment.id] || payment.receipt_url)}
                   className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors"
                 >
                   <AppIcon name="Image" size={16} />
