@@ -17,6 +17,29 @@ export function MyPayslips() {
   const { payments, isLoading: loadingPayments } = useEmployeePayments(myEmployee?.id);
   const [expandedPayments, setExpandedPayments] = useState<Set<string>>(new Set());
   const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
+
+  // Generate signed URLs for all receipts
+  useEffect(() => {
+    if (!payments.length) return;
+    const receipts = payments.filter(p => p.receipt_url).map(p => ({ id: p.id, url: p.receipt_url! }));
+    if (!receipts.length) return;
+
+    const resolveUrls = async () => {
+      const resolved: Record<string, string> = {};
+      for (const r of receipts) {
+        const match = r.url.match(/cash-receipts\/(.+?)(\?.*)?$/);
+        if (match) {
+          const { data } = await supabase.storage.from('cash-receipts').createSignedUrl(match[1], 3600);
+          if (data?.signedUrl) resolved[r.id] = data.signedUrl;
+        } else {
+          resolved[r.id] = r.url;
+        }
+      }
+      setSignedUrls(resolved);
+    };
+    resolveUrls();
+  }, [payments]);
   
 
   const toggleExpand = (paymentId: string) => {
