@@ -127,24 +127,26 @@ export function EmployeeWarnings() {
       {/* Manual Card */}
       <InternalManual />
 
-      {/* Stats + Infractions in same row concept */}
-      <div className="grid grid-cols-4 gap-1.5">
-        {[
-          { label: 'Verbais', value: totalVerbal, color: 'text-foreground' },
-          { label: 'Escritas', value: totalWritten, color: 'text-foreground' },
-          { label: 'Suspensões', value: totalSuspension, color: 'text-foreground' },
-          { label: 'Pendentes', value: totalPending, color: totalPending > 0 ? 'text-warning' : 'text-foreground' },
-        ].map(s => (
-          <div key={s.label} className="bg-secondary/50 rounded-xl py-2.5 px-2 text-center">
-            <p className={cn("text-lg font-extrabold tabular-nums", s.color)} style={{ letterSpacing: '-0.03em' }}>
-              {s.value}
-            </p>
-            <p className="text-[8px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">
-              {s.label}
-            </p>
-          </div>
-        ))}
-      </div>
+      {/* Stats (admin only) */}
+      {isAdmin && (
+        <div className="grid grid-cols-4 gap-1.5">
+          {[
+            { label: 'Verbais', value: totalVerbal, color: 'text-foreground' },
+            { label: 'Escritas', value: totalWritten, color: 'text-foreground' },
+            { label: 'Suspensões', value: totalSuspension, color: 'text-foreground' },
+            { label: 'Pendentes', value: totalPending, color: totalPending > 0 ? 'text-warning' : 'text-foreground' },
+          ].map(s => (
+            <div key={s.label} className="bg-secondary/50 rounded-xl py-2.5 px-2 text-center">
+              <p className={cn("text-lg font-extrabold tabular-nums", s.color)} style={{ letterSpacing: '-0.03em' }}>
+                {s.value}
+              </p>
+              <p className="text-[8px] font-medium text-muted-foreground uppercase tracking-wider mt-0.5">
+                {s.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Infractions Guide — Collapsible */}
       <Collapsible className="group">
