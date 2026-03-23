@@ -165,8 +165,8 @@ export function MyPayslips() {
                       {payment.fgts_amount > 0 && (<div className="text-sm p-2 bg-emerald-500/10 rounded-lg"><div className="flex justify-between"><span className="text-emerald-600">FGTS depositado</span><span className="text-emerald-600 font-medium">{formatCurrency(payment.fgts_amount)}</span></div></div>)}
                       <div className="p-3 bg-primary/10 rounded-lg"><div className="flex justify-between items-center"><span className="font-semibold">Líquido a Receber</span><span className="font-bold text-lg text-primary">{formatCurrency(payment.net_salary)}</span></div></div>
                       {payment.receipt_url && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setViewingReceipt(payment.receipt_url); }}
+                         <button
+                          onClick={(e) => { e.stopPropagation(); setViewingReceipt(signedUrls[payment.id] || payment.receipt_url); }}
                           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors"
                         >
                           <AppIcon name="Image" size={16} />
