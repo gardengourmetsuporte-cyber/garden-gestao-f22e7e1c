@@ -75,7 +75,7 @@ export function GenerateOrdersFromSurveySheet({ open, onOpenChange, items: initi
       for (const group of validGroups) {
         const orderItems = group.items
           .filter(i => i.qty > 0)
-          .map(i => ({ item_id: i.itemId, quantity: i.qty }));
+          .map(i => ({ item_id: i.itemId, quantity: i.qty, unit_price: i.unitPrice }));
         if (orderItems.length > 0) {
           await createOrder(group.supplierId, orderItems);
         }

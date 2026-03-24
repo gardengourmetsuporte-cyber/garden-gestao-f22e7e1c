@@ -48,7 +48,7 @@ export function useOrders() {
   const createOrderMut = useMutation({
     mutationFn: async ({ supplierId, items }: {
       supplierId: string;
-      items: { item_id: string; quantity: number; notes?: string }[];
+      items: { item_id: string; quantity: number; notes?: string; unit_price?: number }[];
     }) => {
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
@@ -69,6 +69,7 @@ export function useOrders() {
         quantity: item.quantity,
         notes: item.notes,
         unit_id: activeUnitId,
+        ...(item.unit_price != null ? { unit_price: item.unit_price } : {}),
       }));
 
       const { data: itemsData, error: itemsError } = await supabase
@@ -140,7 +141,7 @@ export function useOrders() {
   return {
     orders,
     isLoading,
-    createOrder: (supplierId: string, items: { item_id: string; quantity: number; notes?: string }[]) =>
+    createOrder: (supplierId: string, items: { item_id: string; quantity: number; notes?: string; unit_price?: number }[]) =>
       createOrderMut.mutateAsync({ supplierId, items }),
     updateOrderStatus: (orderId: string, status: OrderStatus) =>
       updateOrderStatusMut.mutateAsync({ orderId, status }),
