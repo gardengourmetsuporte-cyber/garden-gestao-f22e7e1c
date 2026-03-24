@@ -130,11 +130,34 @@ export function usePriceSurveys() {
     return { ...(survey as object), responses: responsesResult.data || [], inventoryItems: itemsResult.data || [] } as any;
   };
 
+  const updatePricesFromSurvey = useMutation({
+    mutationFn: async (items: Array<{ itemId: string; unitPrice: number; supplierId: string }>) => {
+      const results = await Promise.all(
+        items.map(item =>
+          supabase
+            .from('inventory_items')
+            .update({ unit_price: item.unitPrice, supplier_id: item.supplierId })
+            .eq('id', item.itemId)
+            .select('id')
+        )
+      );
+      const errors = results.filter(r => r.error);
+      if (errors.length > 0) throw new Error(`${errors.length} itens falharam`);
+      return items.length;
+    },
+    onSuccess: (count) => {
+      qc.invalidateQueries({ queryKey: ['inventory-items'] });
+      toast.success(`${count} preços atualizados no estoque!`);
+    },
+    onError: (err: any) => toast.error(err.message || 'Erro ao atualizar preços'),
+  });
+
   return {
     surveys: surveys as PriceSurvey[],
     isLoading,
     createSurvey,
     deleteSurvey,
     fetchSurveyDetail,
+    updatePricesFromSurvey,
   };
 }
