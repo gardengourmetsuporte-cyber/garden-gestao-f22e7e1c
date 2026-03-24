@@ -18,6 +18,7 @@ interface Props {
 export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
   const [search, setSearch] = useState('');
   const [generateOpen, setGenerateOpen] = useState(false);
+  const { updatePricesFromSurvey } = usePriceSurveys();
 
   const inventoryItems: any[] = survey.inventoryItems || [];
   const surveySuppliers = survey.price_survey_suppliers || [];
@@ -307,15 +308,39 @@ export function PriceSurveyDetail({ survey, suppliers, onBack }: Props) {
             </div>
           )}
 
-          {/* Generate Orders Button */}
+          {/* Action Buttons */}
           {allItems.length > 0 && (
-            <Button
-              onClick={() => setGenerateOpen(true)}
-              className="w-full h-12 text-sm font-bold gap-2"
-            >
-              <AppIcon name="ShoppingCart" size={16} />
-              Gerar Pedidos com Melhor Preço
-            </Button>
+            <div className="space-y-2">
+              <Button
+                onClick={() => {
+                  const items = orderItems.map(i => ({
+                    itemId: i.itemId,
+                    unitPrice: i.unitPrice,
+                    supplierId: i.supplierId,
+                  }));
+                  if (items.length === 0) {
+                    toast.error('Nenhum item com preço para atualizar');
+                    return;
+                  }
+                  if (confirm(`Atualizar preços de ${items.length} itens no estoque com o melhor preço da pesquisa?`)) {
+                    updatePricesFromSurvey.mutate(items);
+                  }
+                }}
+                variant="outline"
+                disabled={updatePricesFromSurvey.isPending}
+                className="w-full h-12 text-sm font-bold gap-2"
+              >
+                <AppIcon name="RefreshCw" size={16} className={updatePricesFromSurvey.isPending ? 'animate-spin' : ''} />
+                {updatePricesFromSurvey.isPending ? 'Atualizando...' : 'Atualizar Preços no Estoque'}
+              </Button>
+              <Button
+                onClick={() => setGenerateOpen(true)}
+                className="w-full h-12 text-sm font-bold gap-2"
+              >
+                <AppIcon name="ShoppingCart" size={16} />
+                Gerar Pedidos com Melhor Preço
+              </Button>
+            </div>
           )}
         </section>
       )}
