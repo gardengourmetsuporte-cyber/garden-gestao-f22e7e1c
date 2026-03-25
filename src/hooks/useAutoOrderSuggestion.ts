@@ -17,6 +17,7 @@ export interface AutoOrderItem {
   purchaseToStockFactor: number | null;
   suggestedPurchaseQty: number | null;
   stockUnitLabel: string | null;
+  unitPrice: number;
 }
 
 export interface AutoOrderSuggestion {
@@ -112,6 +113,7 @@ export function useAutoOrderSuggestion() {
         purchaseToStockFactor: purchaseFactor,
         suggestedPurchaseQty: purchaseFactor && purchaseFactor > 0 ? Math.ceil(finalQty / purchaseFactor) : null,
         stockUnitLabel: (item as any).stock_unit_label || null,
+        unitPrice: item.unit_price ?? 0,
       });
     });
 
@@ -142,6 +144,7 @@ export function useAutoOrderSuggestion() {
     const orderItems = suggestion.items.map(i => ({
       item_id: i.itemId,
       quantity: i.suggestedQuantity > 0 ? i.suggestedQuantity : i.minStock,
+      unit_price: i.unitPrice > 0 ? i.unitPrice : undefined,
     }));
     await createOrder(suggestion.supplierId, orderItems);
   };
