@@ -32,6 +32,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { formatCurrency } from '@/lib/format';
 import { CategoryGroup } from './CategoryGroup';
 import { SalesForecastPanel } from './SalesForecastPanel';
+import { useSalesForecast, DailyForecast } from '@/hooks/useSalesForecast';
+import { formatCurrencyCompact } from '@/lib/format';
 
 type ViewMode = 'grouped' | 'list';
 
