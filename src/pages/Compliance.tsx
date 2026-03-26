@@ -3,6 +3,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { ObligationChecklistCard } from '@/components/compliance/ObligationChecklistCard';
 import { ObligationSheet } from '@/components/compliance/ObligationSheet';
+import { CompanyProfileSheet } from '@/components/compliance/CompanyProfileSheet';
 import { useObligations, getObligationStatus, OBLIGATION_TEMPLATES, OBLIGATION_CATEGORIES, getCategoryConfig } from '@/hooks/useObligations';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -18,6 +19,7 @@ const STATUS_FILTERS = [
 export default function Compliance() {
   const { obligations, isLoading, createObligation, updateObligation, deleteObligation } = useObligations();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [editingTemplate, setEditingTemplate] = useState<typeof OBLIGATION_TEMPLATES[number] | null>(null);
   const [search, setSearch] = useState('');
