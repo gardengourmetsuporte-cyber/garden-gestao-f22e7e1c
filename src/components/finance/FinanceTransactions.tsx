@@ -32,6 +32,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { formatCurrency } from '@/lib/format';
 import { CategoryGroup } from './CategoryGroup';
 import { SalesForecastPanel } from './SalesForecastPanel';
+import { useSalesForecast, DailyForecast } from '@/hooks/useSalesForecast';
+import { formatCurrencyCompact } from '@/lib/format';
 
 type ViewMode = 'grouped' | 'list';
 
@@ -194,6 +196,15 @@ export function FinanceTransactions({
 }: FinanceTransactionsProps) {
   const [showForecast, setShowForecast] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+
+  const forecastData = useSalesForecast({
+    selectedMonth,
+    totalBalance: totalBalance ?? 0,
+    monthStats,
+    unitId,
+    isPersonal,
+    enabled: showForecast && totalBalance !== undefined,
+  });
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     try { return (localStorage.getItem('finance_view_mode') as ViewMode) || 'grouped'; } catch { return 'grouped'; }
   });
@@ -386,13 +397,7 @@ export function FinanceTransactions({
 
         {/* Forecast Panel */}
         {showForecast && totalBalance !== undefined && (
-          <SalesForecastPanel
-            selectedMonth={selectedMonth}
-            totalBalance={totalBalance}
-            monthStats={monthStats}
-            unitId={unitId}
-            isPersonal={isPersonal}
-          />
+          <SalesForecastPanel forecast={forecastData} />
         )}
 
         {/* Transactions List with DnD */}
@@ -429,9 +434,23 @@ export function FinanceTransactions({
                             {getDateLabel(dateStr)}
                           </span>
                         </div>
-                        <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? 'text-success' : 'text-destructive')}>
-                          {formatCurrency(dayTotal)}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? 'text-success' : 'text-destructive')}>
+                            {formatCurrency(dayTotal)}
+                          </span>
+                          {showForecast && forecastData.dailyForecasts[dateStr] && (
+                            <span className="flex items-center gap-1 text-[10px] text-primary/70 font-medium">
+                              <AppIcon name="TrendingUp" size={10} />
+                              +{formatCurrencyCompact(forecastData.dailyForecasts[dateStr].forecastIncome)}
+                              <span className="text-muted-foreground">→</span>
+                              <span className={cn(
+                                forecastData.dailyForecasts[dateStr].projectedBalance >= 0 ? 'text-success/70' : 'text-destructive/70'
+                              )}>
+                                {formatCurrencyCompact(forecastData.dailyForecasts[dateStr].projectedBalance)}
+                              </span>
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {groupByCategory(transactions, categories).map(group => (
@@ -509,9 +528,23 @@ export function FinanceTransactions({
                           {getDateLabel(dateStr)}
                         </span>
                       </div>
-                      <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? 'text-success' : 'text-destructive')}>
-                        {formatCurrency(dayTotal)}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? 'text-success' : 'text-destructive')}>
+                          {formatCurrency(dayTotal)}
+                        </span>
+                        {showForecast && forecastData.dailyForecasts[dateStr] && (
+                          <span className="flex items-center gap-1 text-[10px] text-primary/70 font-medium">
+                            <AppIcon name="TrendingUp" size={10} />
+                            +{formatCurrencyCompact(forecastData.dailyForecasts[dateStr].forecastIncome)}
+                            <span className="text-muted-foreground">→</span>
+                            <span className={cn(
+                              forecastData.dailyForecasts[dateStr].projectedBalance >= 0 ? 'text-success/70' : 'text-destructive/70'
+                            )}>
+                              {formatCurrencyCompact(forecastData.dailyForecasts[dateStr].projectedBalance)}
+                            </span>
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="mt-1 space-y-0.5">
