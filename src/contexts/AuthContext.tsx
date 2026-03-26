@@ -420,6 +420,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         plan,
         planStatus,
         subscriptionEnd,
+        trialEndsAt,
         isPro,
         isBusiness,
         isFree,
