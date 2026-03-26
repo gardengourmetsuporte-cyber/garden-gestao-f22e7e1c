@@ -261,9 +261,17 @@ export function FinanceTransactions({
     return result;
   }, [transactionsByDate, filters]);
 
+  // Merge forecast-only future days into the date list
   const sortedDates = useMemo(() => {
-    return Object.keys(filteredTransactionsByDate).sort((a, b) => b.localeCompare(a));
-  }, [filteredTransactionsByDate]);
+    const realDates = new Set(Object.keys(filteredTransactionsByDate));
+    const allDates = new Set(realDates);
+
+    if (showForecast) {
+      Object.keys(forecastData.dailyForecasts).forEach(d => allDates.add(d));
+    }
+
+    return Array.from(allDates).sort((a, b) => b.localeCompare(a));
+  }, [filteredTransactionsByDate, showForecast, forecastData.dailyForecasts]);
 
   const hasTransactions = sortedDates.length > 0;
   const hasActiveFilters = filters.status !== 'all' || filters.type !== 'all' || filters.categoryId || filters.accountId;
