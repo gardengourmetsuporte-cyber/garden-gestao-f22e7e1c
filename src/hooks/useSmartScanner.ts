@@ -159,7 +159,9 @@ export function useSmartScanner() {
           }
 
           toast.success('Pagamento lançado com sucesso!');
-          queryClient.invalidateQueries({ queryKey: ['finance'] });
+          queryClient.invalidateQueries({ queryKey: ['finance-transactions'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['finance-accounts'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['personal-finance-transactions'], exact: false });
           queryClient.invalidateQueries({ queryKey: ['employee-payments'] });
           break;
         }
@@ -208,7 +210,9 @@ export function useSmartScanner() {
           }
 
           toast.success('Nota fiscal processada!');
-          queryClient.invalidateQueries({ queryKey: ['finance'] });
+          queryClient.invalidateQueries({ queryKey: ['finance-transactions'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['finance-accounts'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['personal-finance-transactions'], exact: false });
           queryClient.invalidateQueries({ queryKey: ['inventory'] });
           break;
         }
@@ -226,7 +230,9 @@ export function useSmartScanner() {
           });
 
           toast.success('Boleto lançado como despesa futura!');
-          queryClient.invalidateQueries({ queryKey: ['finance'] });
+          queryClient.invalidateQueries({ queryKey: ['finance-transactions'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['finance-accounts'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['personal-finance-transactions'], exact: false });
           break;
         }
 
@@ -292,7 +298,9 @@ export function useSmartScanner() {
           });
 
           toast.success('Despesa lançada!');
-          queryClient.invalidateQueries({ queryKey: ['finance'] });
+          queryClient.invalidateQueries({ queryKey: ['finance-transactions'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['finance-accounts'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['personal-finance-transactions'], exact: false });
           break;
         }
 

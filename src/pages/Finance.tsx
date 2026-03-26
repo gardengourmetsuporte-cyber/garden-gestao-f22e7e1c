@@ -358,6 +358,7 @@ export default function Finance() {
         onAddSupplier={handleQuickAddSupplier}
         onAddEmployee={handleQuickAddEmployee}
         onSave={handleSaveTransaction}
+        onAdd={addTransaction}
         onDelete={deleteTransaction}
         editingTransaction={editingTransaction}
         onUpdateRecurring={updateRecurringTransaction}

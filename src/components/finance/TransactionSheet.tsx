@@ -45,6 +45,7 @@ interface TransactionSheetProps {
   onAddSupplier?: (name: string) => Promise<{ id: string; name: string }>;
   onAddEmployee?: (name: string) => Promise<void>;
   onSave: (data: TransactionFormData) => Promise<void>;
+  onAdd?: (data: TransactionFormData) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   editingTransaction?: FinanceTransaction | null;
   onUpdateRecurring?: (id: string, data: Partial<TransactionFormData>, mode: RecurringEditMode) => Promise<void>;
@@ -76,6 +77,7 @@ export function TransactionSheet({
   onAddSupplier,
   onAddEmployee,
   onSave,
+  onAdd,
   onDelete,
   editingTransaction,
   onUpdateRecurring,
@@ -306,6 +308,7 @@ export function TransactionSheet({
         const groupId = crypto.randomUUID();
         const count = parseInt(recurringCount);
         const today = startOfDay(new Date());
+        const createFn = onAdd || onSave;
 
         for (let i = 0; i < count; i++) {
           let txDate = date;
@@ -327,7 +330,7 @@ export function TransactionSheet({
 
           const txIsPaid = (i === 0 && startOfDay(txDate) <= today) ? isPaid : false;
 
-          await onSave({
+          const txData = {
             ...baseData,
             description: `${description.trim()} (${i + 1}/${count})`,
             date: format(txDate, 'yyyy-MM-dd'),
@@ -337,7 +340,15 @@ export function TransactionSheet({
             installment_number: i + 1,
             total_installments: count,
             installment_group_id: groupId,
-          });
+          };
+
+          if (i === 0 && editingTransaction) {
+            // First installment: update the existing transaction
+            await onSave(txData);
+          } else {
+            // Remaining installments: always INSERT as new
+            await createFn(txData);
+          }
         }
       } else {
         await onSave(baseData);

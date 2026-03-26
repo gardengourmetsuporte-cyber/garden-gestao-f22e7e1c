@@ -225,6 +225,7 @@ export default function PersonalFinance() {
         suppliers={[]}
         employees={[]}
         onSave={handleSaveTransaction}
+        onAdd={addTransaction}
         onDelete={deleteTransaction}
         editingTransaction={editingTransaction}
         onUpdateRecurring={updateRecurringTransaction}
