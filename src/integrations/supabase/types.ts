@@ -960,6 +960,44 @@ export type Database = {
           },
         ]
       }
+      company_documents: {
+        Row: {
+          created_at: string
+          file_type: string | null
+          file_url: string
+          id: string
+          name: string
+          unit_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_type?: string | null
+          file_url: string
+          id?: string
+          name: string
+          unit_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_type?: string | null
+          file_url?: string
+          id?: string
+          name?: string
+          unit_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_documents_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       copilot_agent_config: {
         Row: {
           active_hours: Json | null

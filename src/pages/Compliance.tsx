@@ -3,6 +3,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { AppIcon } from '@/components/ui/app-icon';
 import { ObligationChecklistCard } from '@/components/compliance/ObligationChecklistCard';
 import { ObligationSheet } from '@/components/compliance/ObligationSheet';
+import { CompanyProfileSheet } from '@/components/compliance/CompanyProfileSheet';
 import { useObligations, getObligationStatus, OBLIGATION_TEMPLATES, OBLIGATION_CATEGORIES, getCategoryConfig } from '@/hooks/useObligations';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -18,6 +19,7 @@ const STATUS_FILTERS = [
 export default function Compliance() {
   const { obligations, isLoading, createObligation, updateObligation, deleteObligation } = useObligations();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [editingTemplate, setEditingTemplate] = useState<typeof OBLIGATION_TEMPLATES[number] | null>(null);
   const [search, setSearch] = useState('');
@@ -87,6 +89,17 @@ export default function Compliance() {
 
   return (
     <AppLayout>
+      {/* Header with Ficha Cadastral button */}
+      <div className="px-4 mb-3 flex items-center gap-2">
+        <button
+          onClick={() => setProfileOpen(true)}
+          className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 text-primary rounded-xl text-sm font-medium hover:bg-primary/20 transition-colors"
+        >
+          <AppIcon name="Building2" size={16} />
+          Ficha Cadastral
+        </button>
+      </div>
+
       {/* Progress bar */}
       <div className="px-4 mb-3">
         <div className="bg-card rounded-2xl border border-border/30 p-4">
@@ -212,6 +225,8 @@ export default function Compliance() {
         }}
         onDelete={deleteObligation}
       />
+
+      <CompanyProfileSheet open={profileOpen} onOpenChange={setProfileOpen} />
     </AppLayout>
   );
 }
