@@ -528,9 +528,23 @@ export function FinanceTransactions({
                           {getDateLabel(dateStr)}
                         </span>
                       </div>
-                      <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? 'text-success' : 'text-destructive')}>
-                        {formatCurrency(dayTotal)}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? 'text-success' : 'text-destructive')}>
+                          {formatCurrency(dayTotal)}
+                        </span>
+                        {showForecast && forecastData.dailyForecasts[dateStr] && (
+                          <span className="flex items-center gap-1 text-[10px] text-primary/70 font-medium">
+                            <AppIcon name="TrendingUp" size={10} />
+                            +{formatCurrencyCompact(forecastData.dailyForecasts[dateStr].forecastIncome)}
+                            <span className="text-muted-foreground">→</span>
+                            <span className={cn(
+                              forecastData.dailyForecasts[dateStr].projectedBalance >= 0 ? 'text-success/70' : 'text-destructive/70'
+                            )}>
+                              {formatCurrencyCompact(forecastData.dailyForecasts[dateStr].projectedBalance)}
+                            </span>
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="mt-1 space-y-0.5">
