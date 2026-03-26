@@ -451,6 +451,7 @@ export function FinanceTransactions({
                             </span>
                           )}
                         </div>
+                      </div>
 
                       {groupByCategory(transactions, categories).map(group => (
                         <CategoryGroup
