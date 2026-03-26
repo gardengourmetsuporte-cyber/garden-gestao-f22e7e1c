@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useUnit } from '@/hooks/useUnit';
+import { useUnit } from '@/contexts/UnitContext';
 import { toast } from 'sonner';
 
 export interface CompanyProfileData {
