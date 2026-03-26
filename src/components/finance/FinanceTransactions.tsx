@@ -397,13 +397,7 @@ export function FinanceTransactions({
 
         {/* Forecast Panel */}
         {showForecast && totalBalance !== undefined && (
-          <SalesForecastPanel
-            selectedMonth={selectedMonth}
-            totalBalance={totalBalance}
-            monthStats={monthStats}
-            unitId={unitId}
-            isPersonal={isPersonal}
-          />
+          <SalesForecastPanel forecast={forecastData} />
         )}
 
         {/* Transactions List with DnD */}
