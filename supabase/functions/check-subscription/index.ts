@@ -38,18 +38,15 @@ serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      // No session/token: treat as free instead of error to avoid frontend hard failures
       return new Response(JSON.stringify({ subscribed: false, plan: "free", subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
-    // Use getUser for proper session validation (verifies revocation/bans)
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
     if (userError || !userData?.user) {
-      // Expired/invalid/revoked session: return free and let frontend continue gracefully
       return new Response(JSON.stringify({ subscribed: false, plan: "free", subscription_end: null }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -70,9 +67,51 @@ serve(async (req) => {
     // Check if user has a manual override (stripe_customer_id is null but plan is not free)
     const { data: currentProfile } = await supabaseAdmin
       .from("profiles")
-      .select("plan, plan_status, stripe_customer_id")
+      .select("plan, plan_status, stripe_customer_id, trial_ends_at")
       .eq("user_id", userId)
       .maybeSingle();
+
+    // ===== TRIAL CHECK =====
+    if (currentProfile?.trial_ends_at) {
+      const trialEnd = new Date(currentProfile.trial_ends_at);
+      const now = new Date();
+
+      if (trialEnd > now) {
+        // Trial is still active
+        logStep("Active trial found", { trial_ends_at: currentProfile.trial_ends_at });
+
+        // Ensure profile reflects trialing state
+        if (currentProfile.plan !== 'business' || currentProfile.plan_status !== 'trialing') {
+          await supabaseAdmin.from("profiles").update({
+            plan: "business",
+            plan_status: "trialing",
+          }).eq("user_id", userId);
+        }
+
+        return new Response(JSON.stringify({
+          subscribed: true,
+          plan: "business",
+          subscription_end: currentProfile.trial_ends_at,
+          trial: true,
+          trial_ends_at: currentProfile.trial_ends_at,
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      } else {
+        // Trial expired — clear trial and continue to Stripe check
+        logStep("Trial expired, reverting to free");
+        await supabaseAdmin.from("profiles").update({
+          plan: "free",
+          plan_status: "expired",
+          trial_ends_at: null,
+        }).eq("user_id", userId);
+        // Update currentProfile locally so downstream logic uses the correct state
+        currentProfile.plan = "free";
+        currentProfile.plan_status = "expired";
+        currentProfile.trial_ends_at = null;
+      }
+    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: userEmail, limit: 1 });
@@ -177,7 +216,6 @@ serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
     
-    // Return 401 for auth errors so frontend can handle gracefully (logout/redirect)
     const isAuthError = errorMessage.includes("Authentication error") || 
                         errorMessage.includes("session") ||
                         errorMessage.includes("not authenticated");
