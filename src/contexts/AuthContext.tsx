@@ -16,6 +16,7 @@ interface AuthContextType {
   plan: PlanTier;
   planStatus: string;
   subscriptionEnd: string | null;
+  trialEndsAt: string | null;
   isPro: boolean;
   isBusiness: boolean;
   isFree: boolean;
