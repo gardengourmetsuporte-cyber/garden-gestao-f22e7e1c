@@ -341,6 +341,15 @@ export function FinanceTransactions({
               <AppIcon name={viewMode === 'grouped' ? 'List' : 'LayoutGrid'} size={16} />
             </Button>
             <Button
+              variant={showForecast ? "default" : "outline"}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setShowForecast(v => !v)}
+              title="Previsão de vendas"
+            >
+              <AppIcon name="TrendingUp" size={16} />
+            </Button>
+            <Button
               variant="outline"
               size="sm"
               onClick={() => {
