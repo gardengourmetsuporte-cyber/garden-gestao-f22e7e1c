@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (profilesError || !memberProfiles?.length) return rpcPlan;
 
       const activePlans = memberProfiles
-        .filter((p) => (p.plan_status ?? 'active') === 'active')
+        .filter((p) => ['active', 'trialing'].includes(p.plan_status ?? 'active'))
         .map((p) => (p.plan as PlanTier) || 'free');
 
       const inferredPlan: PlanTier = activePlans.includes('business')
