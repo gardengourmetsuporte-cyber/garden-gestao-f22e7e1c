@@ -384,6 +384,17 @@ export function FinanceTransactions({
           </div>
         </div>
 
+        {/* Forecast Panel */}
+        {showForecast && totalBalance !== undefined && (
+          <SalesForecastPanel
+            selectedMonth={selectedMonth}
+            totalBalance={totalBalance}
+            monthStats={monthStats}
+            unitId={unitId}
+            isPersonal={isPersonal}
+          />
+        )}
+
         {/* Transactions List with DnD */}
         {hasTransactions ? (
           viewMode === 'grouped' ? (
