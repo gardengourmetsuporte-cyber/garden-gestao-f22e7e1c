@@ -130,7 +130,15 @@ export function SalesForecastPanel({ selectedMonth, totalBalance, monthStats, un
       const isToday = dateStr === format(today, 'yyyy-MM-dd');
       const isFuture = isAfter(d, today);
 
-      if (isFuture) {
+      if (isToday) {
+        // Today's sales already happened, just mark the current balance
+        points.push({
+          day: dayNum,
+          label: format(d, 'dd/MM'),
+          real: 0,
+          balance: Math.round(balanceTracker * 100) / 100,
+        });
+      } else if (isFuture) {
         const forecastIncome = avgByDow[dow] || 0;
         const pendingExp = pendingByDate[dateStr] || 0;
         balanceTracker += forecastIncome - pendingExp;
@@ -138,14 +146,6 @@ export function SalesForecastPanel({ selectedMonth, totalBalance, monthStats, un
           day: dayNum,
           label: format(d, 'dd/MM'),
           forecast: Math.round(forecastIncome),
-          balance: Math.round(balanceTracker * 100) / 100,
-        });
-      } else if (isToday) {
-        points.push({
-          day: dayNum,
-          label: format(d, 'dd/MM'),
-          real: 0, // Today marker
-          forecast: Math.round(avgByDow[dow] || 0),
           balance: Math.round(balanceTracker * 100) / 100,
         });
       }
