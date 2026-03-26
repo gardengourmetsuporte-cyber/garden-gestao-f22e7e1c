@@ -284,6 +284,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setPlan('free');
             setPlanStatus('active');
             setSubscriptionEnd(null);
+            setTrialEndsAt(null);
             effectivePlanRef.current = null;
             setIsLoading(false);
           }
