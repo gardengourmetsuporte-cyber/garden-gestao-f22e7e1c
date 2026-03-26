@@ -526,8 +526,8 @@ export function FinanceTransactions({
             /* FLAT LIST MODE — sorted by category within each day, no drag */
             <div className="px-4 pb-32 space-y-4">
               {sortedDates.map(dateStr => {
-                const transactions = filteredTransactionsByDate[dateStr];
-                // Sort by category order: expenses first, then income, then transfers; within same type sort by parent category name then subcategory
+                const transactions = filteredTransactionsByDate[dateStr] || [];
+                const hasTxns = transactions.length > 0;
                 const sorted = [...transactions].sort((a, b) => {
                   const typeOrder = (t: FinanceTransaction) => t.type === 'transfer' ? 2 : (t.type === 'expense' || t.type === 'credit_card') ? 0 : 1;
                   const ta = typeOrder(a);
@@ -543,6 +543,10 @@ export function FinanceTransactions({
                   if (t.type === 'expense' || t.type === 'credit_card') return sum - Number(t.amount);
                   return sum;
                 }, 0);
+                const fc = showForecast ? forecastData.dailyForecasts[dateStr] : undefined;
+                const isForecastOnly = !hasTxns && !!fc;
+
+                if (isForecastOnly && dateStr < todayStr) return null;
 
                 return (
                   <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined} className="space-y-1">
@@ -560,43 +564,63 @@ export function FinanceTransactions({
                           {getDateLabel(dateStr)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      {hasTxns && (
                         <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? 'text-success' : 'text-destructive')}>
                           {formatCurrency(dayTotal)}
                         </span>
-                        {showForecast && forecastData.dailyForecasts[dateStr] && (
-                          <span className="flex items-center gap-1 text-[10px] text-primary/70 font-medium">
-                            <AppIcon name="TrendingUp" size={10} />
-                            +{formatCurrencyCompact(forecastData.dailyForecasts[dateStr].forecastIncome)}
-                            <span className="text-muted-foreground">→</span>
-                            <span className={cn(
-                              forecastData.dailyForecasts[dateStr].projectedBalance >= 0 ? 'text-success/70' : 'text-destructive/70'
-                            )}>
-                              {formatCurrencyCompact(forecastData.dailyForecasts[dateStr].projectedBalance)}
-                            </span>
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
 
-                    <div className="mt-1 space-y-0.5">
-                      {sorted.map(transaction => (
-                        <div key={transaction.id} className="relative">
-                          {transaction.is_recurring && transaction.installment_group_id && (
-                            <Badge variant="outline" className="absolute top-1.5 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
-                              <AppIcon name="Repeat" size={10} className="mr-0.5" />
-                              {transaction.installment_number}/{transaction.total_installments}
-                            </Badge>
-                          )}
-                          <TransactionItem
-                            transaction={transaction}
-                            onClick={() => onTransactionClick(transaction)}
-                            onTogglePaid={onTogglePaid}
-                            onDelete={onDeleteTransaction}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                    {/* Forecast bar */}
+                    {fc && (
+                      <div className={cn(
+                        "mx-1 px-3 py-2 rounded-lg flex items-center justify-between text-[11px] font-medium",
+                        isForecastOnly
+                          ? "bg-primary/5 border border-primary/10"
+                          : "bg-muted/50"
+                      )}>
+                        {hasTxns ? (
+                          <span className="flex items-center gap-1 text-destructive/80">
+                            <AppIcon name="ArrowDown" size={10} />
+                            {formatCurrencyCompact(Math.abs(dayTotal))}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground italic">Sem gastos</span>
+                        )}
+                        <span className="flex items-center gap-1 text-success/80">
+                          <AppIcon name="TrendingUp" size={10} />
+                          +{formatCurrencyCompact(fc.forecastIncome)}
+                        </span>
+                        <span className={cn(
+                          "flex items-center gap-1 font-bold",
+                          fc.projectedBalance >= 0 ? 'text-primary' : 'text-destructive'
+                        )}>
+                          <AppIcon name="Wallet" size={10} />
+                          {formatCurrencyCompact(fc.projectedBalance)}
+                        </span>
+                      </div>
+                    )}
+
+                    {hasTxns && (
+                      <div className="mt-1 space-y-0.5">
+                        {sorted.map(transaction => (
+                          <div key={transaction.id} className="relative">
+                            {transaction.is_recurring && transaction.installment_group_id && (
+                              <Badge variant="outline" className="absolute top-1.5 right-2 text-[10px] px-1.5 py-0 z-10 bg-background">
+                                <AppIcon name="Repeat" size={10} className="mr-0.5" />
+                                {transaction.installment_number}/{transaction.total_installments}
+                              </Badge>
+                            )}
+                            <TransactionItem
+                              transaction={transaction}
+                              onClick={() => onTransactionClick(transaction)}
+                              onTogglePaid={onTogglePaid}
+                              onDelete={onDeleteTransaction}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
