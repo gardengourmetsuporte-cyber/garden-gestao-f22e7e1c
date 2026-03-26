@@ -196,6 +196,15 @@ export function FinanceTransactions({
 }: FinanceTransactionsProps) {
   const [showForecast, setShowForecast] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+
+  const forecastData = useSalesForecast({
+    selectedMonth,
+    totalBalance: totalBalance ?? 0,
+    monthStats,
+    unitId,
+    isPersonal,
+    enabled: showForecast && totalBalance !== undefined,
+  });
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     try { return (localStorage.getItem('finance_view_mode') as ViewMode) || 'grouped'; } catch { return 'grouped'; }
   });
