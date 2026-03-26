@@ -418,13 +418,19 @@ export function FinanceTransactions({
               onDragEnd={handleDragEnd}
             >
               <div className="px-4 pb-32 space-y-4">
-                {sortedDates.map(dateStr => {
-                  const transactions = filteredTransactionsByDate[dateStr];
+              {sortedDates.map(dateStr => {
+                  const transactions = filteredTransactionsByDate[dateStr] || [];
+                  const hasTxns = transactions.length > 0;
                   const dayTotal = transactions.reduce((sum, t) => {
                     if (t.type === 'income') return sum + Number(t.amount);
                     if (t.type === 'expense' || t.type === 'credit_card') return sum - Number(t.amount);
                     return sum;
                   }, 0);
+                  const fc = showForecast ? forecastData.dailyForecasts[dateStr] : undefined;
+                  const isForecastOnly = !hasTxns && !!fc;
+
+                  // Skip forecast-only days that are in the past
+                  if (isForecastOnly && dateStr < todayStr) return null;
 
                   return (
                     <div key={dateStr} ref={dateStr === todayStr ? todayRef : undefined} className="space-y-1">
@@ -442,26 +448,44 @@ export function FinanceTransactions({
                             {getDateLabel(dateStr)}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        {hasTxns && (
                           <span className={cn("text-sm font-bold font-display", dayTotal >= 0 ? 'text-success' : 'text-destructive')}>
                             {formatCurrency(dayTotal)}
                           </span>
-                          {showForecast && forecastData.dailyForecasts[dateStr] && (
-                            <span className="flex items-center gap-1 text-[10px] text-primary/70 font-medium">
-                              <AppIcon name="TrendingUp" size={10} />
-                              +{formatCurrencyCompact(forecastData.dailyForecasts[dateStr].forecastIncome)}
-                              <span className="text-muted-foreground">→</span>
-                              <span className={cn(
-                                forecastData.dailyForecasts[dateStr].projectedBalance >= 0 ? 'text-success/70' : 'text-destructive/70'
-                              )}>
-                                {formatCurrencyCompact(forecastData.dailyForecasts[dateStr].projectedBalance)}
-                              </span>
-                            </span>
-                          )}
-                        </div>
+                        )}
                       </div>
 
-                      {groupByCategory(transactions, categories).map(group => (
+                      {/* Forecast bar */}
+                      {fc && (
+                        <div className={cn(
+                          "mx-1 px-3 py-2 rounded-lg flex items-center justify-between text-[11px] font-medium",
+                          isForecastOnly
+                            ? "bg-primary/5 border border-primary/10"
+                            : "bg-muted/50"
+                        )}>
+                          {hasTxns ? (
+                            <span className="flex items-center gap-1 text-destructive/80">
+                              <AppIcon name="ArrowDown" size={10} />
+                              {formatCurrencyCompact(Math.abs(dayTotal))}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground italic">Sem gastos</span>
+                          )}
+                          <span className="flex items-center gap-1 text-success/80">
+                            <AppIcon name="TrendingUp" size={10} />
+                            +{formatCurrencyCompact(fc.forecastIncome)}
+                          </span>
+                          <span className={cn(
+                            "flex items-center gap-1 font-bold",
+                            fc.projectedBalance >= 0 ? 'text-primary' : 'text-destructive'
+                          )}>
+                            <AppIcon name="Wallet" size={10} />
+                            {formatCurrencyCompact(fc.projectedBalance)}
+                          </span>
+                        </div>
+                      )}
+
+                      {hasTxns && groupByCategory(transactions, categories).map(group => (
                         <CategoryGroup
                           key={group.key}
                           category={group.category}
