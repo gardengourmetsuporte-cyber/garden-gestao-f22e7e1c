@@ -188,7 +188,11 @@ export function FinanceTransactions({
   canRedo,
   onUndo,
   onRedo,
+  totalBalance,
+  unitId,
+  isPersonal,
 }: FinanceTransactionsProps) {
+  const [showForecast, setShowForecast] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     try { return (localStorage.getItem('finance_view_mode') as ViewMode) || 'grouped'; } catch { return 'grouped'; }
