@@ -1,47 +1,39 @@
 
 
-# Trial de 14 Dias para Novos Usuários
+# Melhorar Visualização de Previsões nos Headers Diários
 
-## O que será feito
+## Problemas atuais
+1. Dias futuros sem despesas não aparecem na lista (só aparecem dias com transações reais)
+2. A visualização da previsão está confusa - mistura dados reais com previstos sem separação clara
 
-1. Adicionar coluna `trial_ends_at` na tabela `profiles` para rastrear quando o trial expira
-2. Alterar a função `handle_new_user` para que novos usuários recebam `plan = 'business'`, `plan_status = 'trialing'` e `trial_ends_at = now() + 14 days`
-3. Atualizar `check-subscription` para verificar o trial: se `trial_ends_at` existe e não expirou, retornar plano business/trialing; se expirou, reverter para free
-4. Criar um banner `TrialBanner` que mostra o countdown dos dias restantes do trial
-5. Integrar o banner no layout do dashboard
+## Solução
 
-## Arquivos
+### 1. Injetar dias futuros sem transações na lista
+No `FinanceTransactions.tsx`, quando `showForecast` está ativo, adicionar ao `sortedDates` todos os dias futuros do mês que têm forecast mas não têm transações. Assim o usuário vê **todos os dias restantes** com suas previsões.
 
-### 1. Migração SQL
-- `ALTER TABLE profiles ADD COLUMN trial_ends_at timestamptz DEFAULT NULL`
-- Atualizar `handle_new_user` para setar `plan='business'`, `plan_status='trialing'`, `trial_ends_at = now() + interval '14 days'` no INSERT de profiles
-
-### 2. Editar: `supabase/functions/check-subscription/index.ts`
-- Antes de verificar Stripe, checar se `trial_ends_at` existe no profile
-- Se `trial_ends_at > now()` → retornar `{ subscribed: true, plan: 'business', trial: true, trial_ends_at }`
-- Se `trial_ends_at <= now()` → atualizar profile para `plan='free'`, `plan_status='expired'` e continuar fluxo normal
-
-### 3. Novo: `src/components/layout/TrialBanner.tsx`
-- Lê `planStatus` e `subscriptionEnd`/`trialEndsAt` do AuthContext
-- Mostra banner com countdown: "Seu período de teste expira em X dias"
-- Link para página de planos
-- Cores amber/warning, dismissível por sessão
-
-### 4. Editar: `src/contexts/AuthContext.tsx`
-- Adicionar `trialEndsAt: string | null` ao contexto
-- Popular a partir do retorno de `check-subscription` ou do profile
-
-### 5. Editar: `src/components/layout/AppLayout.tsx` ou `AdminDashboard.tsx`
-- Renderizar `<TrialBanner />` quando `planStatus === 'trialing'`
-
-## Fluxo do novo usuário
+### 2. Redesenhar o header do dia com previsão
+Quando o modo previsão está ativo, o header de cada dia futuro mostrará de forma clara e separada:
 
 ```text
-Signup → handle_new_user trigger
-  → profile criado com plan='business', plan_status='trialing', trial_ends_at=+14d
-  → auto_provision_unit cria a loja
-  → Usuário entra com acesso completo (business)
-  → Banner mostra "X dias restantes"
-  → Após 14 dias, check-subscription detecta expiração → plan='free'
+QUINTA-FEIRA, 27 DE MARÇO
+  Gastos: -R$ 6.339    |    Prev. entrada: +R$ 1.400    |    Saldo prev: R$ 11.000
 ```
+
+- **Linha 1**: Data (como já é)
+- **Linha 2**: Card compacto abaixo do nome do dia com 3 informações:
+  - Gasto real do dia (vermelho) - soma das transações existentes
+  - Previsão de entrada (verde) - baseado na média do dia da semana
+  - Saldo projetado acumulado (azul/verde ou vermelho se negativo)
+
+Para dias sem transações, mostra apenas as previsões num card estilizado com fundo sutil.
+
+### Arquivos a editar
+
+1. **`src/components/finance/FinanceTransactions.tsx`**
+   - Criar lista `allDates` que mescla `sortedDates` com dias futuros do forecast quando `showForecast` ativo
+   - Redesenhar o badge de forecast para layout em linha clara abaixo do header
+   - Para dias sem transações, renderizar apenas o header com previsão (sem lista de itens)
+
+2. **`src/hooks/useSalesForecast.ts`**
+   - Sem alterações necessárias - já gera forecasts para todos os dias futuros
 
