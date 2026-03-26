@@ -89,6 +89,17 @@ export default function Compliance() {
 
   return (
     <AppLayout>
+      {/* Header with Ficha Cadastral button */}
+      <div className="px-4 mb-3 flex items-center gap-2">
+        <button
+          onClick={() => setProfileOpen(true)}
+          className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 text-primary rounded-xl text-sm font-medium hover:bg-primary/20 transition-colors"
+        >
+          <AppIcon name="Building2" size={16} />
+          Ficha Cadastral
+        </button>
+      </div>
+
       {/* Progress bar */}
       <div className="px-4 mb-3">
         <div className="bg-card rounded-2xl border border-border/30 p-4">
@@ -214,6 +225,8 @@ export default function Compliance() {
         }}
         onDelete={deleteObligation}
       />
+
+      <CompanyProfileSheet open={profileOpen} onOpenChange={setProfileOpen} />
     </AppLayout>
   );
 }
