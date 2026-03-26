@@ -41,8 +41,7 @@ const EMPTY_PROFILE: CompanyProfileData = {
 };
 
 export function useCompanyProfile() {
-  const { currentUnit } = useUnit();
-  const unitId = currentUnit?.id;
+  const { activeUnitId: unitId } = useUnit();
   const queryClient = useQueryClient();
 
   // Fetch profile from store_info
