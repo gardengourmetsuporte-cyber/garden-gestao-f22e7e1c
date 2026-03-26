@@ -31,6 +31,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { formatCurrency } from '@/lib/format';
 import { CategoryGroup } from './CategoryGroup';
+import { SalesForecastPanel } from './SalesForecastPanel';
 
 type ViewMode = 'grouped' | 'list';
 
@@ -166,6 +167,9 @@ interface FinanceTransactionsProps {
   canRedo?: boolean;
   onUndo?: () => void;
   onRedo?: () => void;
+  totalBalance?: number;
+  unitId?: string | null;
+  isPersonal?: boolean;
 }
 
 export function FinanceTransactions({
@@ -184,7 +188,11 @@ export function FinanceTransactions({
   canRedo,
   onUndo,
   onRedo,
+  totalBalance,
+  unitId,
+  isPersonal,
 }: FinanceTransactionsProps) {
+  const [showForecast, setShowForecast] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     try { return (localStorage.getItem('finance_view_mode') as ViewMode) || 'grouped'; } catch { return 'grouped'; }
@@ -333,6 +341,15 @@ export function FinanceTransactions({
               <AppIcon name={viewMode === 'grouped' ? 'List' : 'LayoutGrid'} size={16} />
             </Button>
             <Button
+              variant={showForecast ? "default" : "outline"}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setShowForecast(v => !v)}
+              title="Previsão de vendas"
+            >
+              <AppIcon name="TrendingUp" size={16} />
+            </Button>
+            <Button
               variant="outline"
               size="sm"
               onClick={() => {
@@ -366,6 +383,17 @@ export function FinanceTransactions({
             </Button>
           </div>
         </div>
+
+        {/* Forecast Panel */}
+        {showForecast && totalBalance !== undefined && (
+          <SalesForecastPanel
+            selectedMonth={selectedMonth}
+            totalBalance={totalBalance}
+            monthStats={monthStats}
+            unitId={unitId}
+            isPersonal={isPersonal}
+          />
+        )}
 
         {/* Transactions List with DnD */}
         {hasTransactions ? (

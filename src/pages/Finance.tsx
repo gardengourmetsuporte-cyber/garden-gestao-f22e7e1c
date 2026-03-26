@@ -288,6 +288,8 @@ export default function Finance() {
               canRedo={canRedo}
               onUndo={undo}
               onRedo={redo}
+              totalBalance={totalBalance}
+              unitId={activeUnitId}
            />
         )}
 
