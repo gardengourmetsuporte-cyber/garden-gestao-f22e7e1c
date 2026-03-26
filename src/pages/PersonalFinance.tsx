@@ -161,6 +161,8 @@ export default function PersonalFinance() {
             canRedo={canRedo}
             onUndo={undo}
             onRedo={redo}
+            totalBalance={totalBalance}
+            isPersonal
           />
         )}
 
