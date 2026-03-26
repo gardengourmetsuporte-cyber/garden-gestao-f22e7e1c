@@ -31,6 +31,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { formatCurrency } from '@/lib/format';
 import { CategoryGroup } from './CategoryGroup';
+import { SalesForecastPanel } from './SalesForecastPanel';
 
 type ViewMode = 'grouped' | 'list';
 
@@ -166,6 +167,9 @@ interface FinanceTransactionsProps {
   canRedo?: boolean;
   onUndo?: () => void;
   onRedo?: () => void;
+  totalBalance?: number;
+  unitId?: string | null;
+  isPersonal?: boolean;
 }
 
 export function FinanceTransactions({
