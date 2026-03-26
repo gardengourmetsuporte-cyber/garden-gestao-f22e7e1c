@@ -308,7 +308,13 @@ export function TransactionSheet({
         const groupId = crypto.randomUUID();
         const count = parseInt(recurringCount);
         const today = startOfDay(new Date());
-        const createFn = onAdd || onSave;
+        const createFn = editingTransaction ? onAdd : onSave;
+
+        // Segurança: ao editar uma transação existente, parcelas futuras DEVEM ser inseridas
+        // como novas linhas. Nunca cair em fallback para onSave para evitar sobrescrita em loop.
+        if (editingTransaction && !createFn) {
+          throw new Error('Não foi possível criar as parcelas futuras nesta tela.');
+        }
 
         for (let i = 0; i < count; i++) {
           let txDate = date;

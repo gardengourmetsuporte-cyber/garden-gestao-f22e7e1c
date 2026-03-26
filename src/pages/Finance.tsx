@@ -343,13 +343,20 @@ export default function Finance() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onAddTransaction={handleAddTransaction}
-        onReceiptCapture={() => { setReceiptInitialImage(null); setReceiptSheetOpen(true); }}
+        onReceiptCapture={() => {
+          setEditingTransaction(null);
+          setReceiptInitialImage(null);
+          setReceiptSheetOpen(true);
+        }}
       />
 
       {/* Transaction Sheet */}
       <TransactionSheet
         open={transactionSheetOpen}
-        onOpenChange={setTransactionSheetOpen}
+        onOpenChange={(open) => {
+          setTransactionSheetOpen(open);
+          if (!open) setEditingTransaction(null);
+        }}
         defaultType={transactionType}
         categories={categories}
         accounts={accounts}
@@ -386,7 +393,7 @@ export default function Finance() {
         onOpenChange={setReceiptSheetOpen}
         categories={categories}
         accounts={accounts}
-        onSave={handleSaveTransaction}
+        onSave={addTransaction}
         initialImage={receiptInitialImage}
       />
     </AppLayout>

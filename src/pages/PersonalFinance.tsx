@@ -212,13 +212,19 @@ export default function PersonalFinance() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onAddTransaction={handleAddTransaction}
-        onReceiptCapture={() => setReceiptSheetOpen(true)}
+        onReceiptCapture={() => {
+          setEditingTransaction(null);
+          setReceiptSheetOpen(true);
+        }}
         variant="personal"
       />
 
       <TransactionSheet
         open={transactionSheetOpen}
-        onOpenChange={setTransactionSheetOpen}
+        onOpenChange={(open) => {
+          setTransactionSheetOpen(open);
+          if (!open) setEditingTransaction(null);
+        }}
         defaultType={transactionType}
         categories={categories}
         accounts={accounts}
@@ -247,7 +253,7 @@ export default function PersonalFinance() {
         onOpenChange={setReceiptSheetOpen}
         categories={categories}
         accounts={accounts}
-        onSave={handleSaveTransaction}
+        onSave={addTransaction}
       />
     </AppLayout>
   );
