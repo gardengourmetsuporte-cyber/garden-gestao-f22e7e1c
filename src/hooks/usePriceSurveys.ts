@@ -147,6 +147,8 @@ export function usePriceSurveys() {
     },
     onSuccess: (count) => {
       qc.invalidateQueries({ queryKey: ['inventory-items'] });
+      qc.invalidateQueries({ queryKey: ['price-tracking'] });
+      qc.invalidateQueries({ queryKey: ['report-inventory-valuation'] });
       toast.success(`${count} preços atualizados no estoque!`);
     },
     onError: (err: any) => toast.error(err.message || 'Erro ao atualizar preços'),
