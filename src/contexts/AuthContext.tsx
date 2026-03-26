@@ -230,6 +230,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         effectivePlanRef.current = nextPlan;
         setPlan(nextPlan);
         setPlanStatus(nextPlanStatus);
+        // Set trial info from profile
+        setTrialEndsAt(p?.trial_ends_at || null);
 
         setCachedAuth(p, r, nextPlan, nextPlanStatus);
       } catch (err) {
