@@ -16,6 +16,7 @@ interface AuthContextType {
   plan: PlanTier;
   planStatus: string;
   subscriptionEnd: string | null;
+  trialEndsAt: string | null;
   isPro: boolean;
   isBusiness: boolean;
   isFree: boolean;
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [plan, setPlan] = useState<PlanTier>((cached?.plan as PlanTier) ?? 'free');
   const [planStatus, setPlanStatus] = useState<string>(cached?.planStatus ?? 'active');
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
+  const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   // Unit-level role set by UnitContext to override global isAdmin determination
   const [unitRole, setUnitRoleState] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (profilesError || !memberProfiles?.length) return rpcPlan;
 
       const activePlans = memberProfiles
-        .filter((p) => (p.plan_status ?? 'active') === 'active')
+        .filter((p) => ['active', 'trialing'].includes(p.plan_status ?? 'active'))
         .map((p) => (p.plan as PlanTier) || 'free');
 
       const inferredPlan: PlanTier = activePlans.includes('business')
@@ -149,8 +151,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const stripePlan = (data.plan as PlanTier) || 'free';
         const stripeStatus = data.subscribed ? 'active' : 'canceled';
 
+        // Handle trial info from check-subscription
+        if (data.trial && data.trial_ends_at) {
+          setTrialEndsAt(data.trial_ends_at);
+        } else {
+          setTrialEndsAt(null);
+        }
+
         if (stripePlan === 'free') {
-          // Always re-resolve inherited plan for employees who don't have their own subscription
           const inheritedPlan = user?.id ? await resolveInheritedUnitPlan(user.id) : null;
 
           if (inheritedPlan && inheritedPlan !== 'free') {
@@ -163,9 +171,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         setPlan(stripePlan);
-        setPlanStatus(stripeStatus);
+        setPlanStatus(data.trial ? 'trialing' : stripeStatus);
         setSubscriptionEnd(data.subscription_end || null);
-        setCachedAuth(profile, role, stripePlan, stripeStatus);
+        setCachedAuth(profile, role, stripePlan, data.trial ? 'trialing' : stripeStatus);
       }
     } catch (err) {
       console.error('Failed to check subscription:', err);
@@ -222,6 +230,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         effectivePlanRef.current = nextPlan;
         setPlan(nextPlan);
         setPlanStatus(nextPlanStatus);
+        // Set trial info from profile
+        setTrialEndsAt(p?.trial_ends_at || null);
 
         setCachedAuth(p, r, nextPlan, nextPlanStatus);
       } catch (err) {
@@ -274,6 +284,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setPlan('free');
             setPlanStatus('active');
             setSubscriptionEnd(null);
+            setTrialEndsAt(null);
             effectivePlanRef.current = null;
             setIsLoading(false);
           }
@@ -362,6 +373,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPlan('free');
     setPlanStatus('active');
     setSubscriptionEnd(null);
+    setTrialEndsAt(null);
     setUnitRoleState(null);
     effectivePlanRef.current = null;
     clearCachedAuth();
@@ -412,6 +424,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         plan,
         planStatus,
         subscriptionEnd,
+        trialEndsAt,
         isPro,
         isBusiness,
         isFree,

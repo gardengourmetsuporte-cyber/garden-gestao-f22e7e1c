@@ -5033,6 +5033,7 @@ export type Database = {
           plan_status: string
           selected_frame: string | null
           stripe_customer_id: string | null
+          trial_ends_at: string | null
           updated_at: string
           user_id: string
         }
@@ -5047,6 +5048,7 @@ export type Database = {
           plan_status?: string
           selected_frame?: string | null
           stripe_customer_id?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -5061,6 +5063,7 @@ export type Database = {
           plan_status?: string
           selected_frame?: string | null
           stripe_customer_id?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id?: string
         }

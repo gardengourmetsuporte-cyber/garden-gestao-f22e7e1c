@@ -12,6 +12,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { NotificationBell } from './NotificationBell';
 import { ProfileDropdown } from './ProfileDropdown';
+import { TrialBanner } from './TrialBanner';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnit } from '@/contexts/UnitContext';
@@ -146,6 +147,9 @@ function AppLayoutContent({ children }: AppLayoutProps) {
               </div>
             </div>
           </header>
+
+          {/* ======= Trial Banner ======= */}
+          <TrialBanner />
 
           {/* ======= Main Content ======= */}
           <main
