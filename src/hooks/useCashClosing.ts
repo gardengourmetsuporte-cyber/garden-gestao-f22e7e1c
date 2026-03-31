@@ -548,6 +548,12 @@ export function useCashClosing() {
       }
 
       await supabase.from('cash_closings' as any).update({ financial_integrated: true } as any).eq('id', closing.id);
+      
+      // Invalidate finance caches so transactions appear immediately
+      queryClient.invalidateQueries({ queryKey: ['finance-transactions'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['finance-accounts'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['personal-finance-transactions'], exact: false });
+      
       toast.success(`${transactions.length} lançamentos financeiros criados`, {
         action: {
           label: 'Ver no Financeiro',
