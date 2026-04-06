@@ -42,6 +42,8 @@ const formatCompact = (value: number) => {
   return value.toFixed(0);
 };
 
+const normalizeName = (v?: string | null) => (v || '').trim().toLocaleLowerCase('pt-BR');
+
 // Custom tooltip component
 function CustomTooltip({ active, payload, label, labelFormatter }: any) {
   if (!active || !payload?.length) return null;
