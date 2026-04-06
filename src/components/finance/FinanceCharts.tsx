@@ -336,7 +336,7 @@ export function FinanceCharts({
                 <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
                   {displayData.map((item) => {
                     const pendingItem = !drillDownCategory
-                      ? pendingCategoryData.find(p => normalizeCategoryName(p.category.name) === normalizeCategoryName(item.category.name))
+                      ? pendingCategoryData.find(p => normalizeName(p.category.name) === normalizeName(item.category.name))
                       : null;
                     return (
                       <button
