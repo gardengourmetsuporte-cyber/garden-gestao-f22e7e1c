@@ -361,6 +361,8 @@ export function useFinanceStats(
   return {
     expensesByCategory,
     incomeByCategory,
+    pendingExpensesByCategory,
+    pendingIncomeByCategory,
     getSubcategoryStats,
     getSupplierStats,
     getEmployeeStats,
