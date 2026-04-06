@@ -491,22 +491,32 @@ export function FinanceCharts({
             )}
 
             {/* Summary stats below chart */}
-            {mergedTimelineData.length > 0 && (
-              <div className="grid grid-cols-2 gap-2">
-                <div className="card-base p-3 text-center">
-                  <p className="text-xs text-muted-foreground mb-0.5">Receita total</p>
-                  <p className="text-sm font-bold tabular-nums" style={{ color: '#22c55e' }}>
-                    {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.income, 0))}
-                  </p>
+            {mergedTimelineData.length > 0 && (() => {
+              const totalPendingInc = mergedTimelineData.reduce((s, d) => s + d.pendingIncome, 0);
+              const totalPendingExp = mergedTimelineData.reduce((s, d) => s + d.pendingExpense, 0);
+              return (
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="card-base p-3 text-center">
+                    <p className="text-xs text-muted-foreground mb-0.5">Receita confirmada</p>
+                    <p className="text-sm font-bold tabular-nums" style={{ color: '#22c55e' }}>
+                      {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.income, 0))}
+                    </p>
+                    {totalPendingInc > 0 && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">+ {formatCurrency(totalPendingInc)} pendente</p>
+                    )}
+                  </div>
+                  <div className="card-base p-3 text-center">
+                    <p className="text-xs text-muted-foreground mb-0.5">Despesa confirmada</p>
+                    <p className="text-sm font-bold tabular-nums" style={{ color: '#ef4444' }}>
+                      {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.expense, 0))}
+                    </p>
+                    {totalPendingExp > 0 && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">+ {formatCurrency(totalPendingExp)} pendente</p>
+                    )}
+                  </div>
                 </div>
-                <div className="card-base p-3 text-center">
-                  <p className="text-xs text-muted-foreground mb-0.5">Despesa total</p>
-                  <p className="text-sm font-bold tabular-nums" style={{ color: '#ef4444' }}>
-                    {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.expense, 0))}
-                  </p>
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         )}
 
