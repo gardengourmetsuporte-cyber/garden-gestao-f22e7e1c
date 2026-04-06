@@ -320,8 +320,13 @@ export function FinanceCharts({
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Total</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Confirmado</p>
                     <p className="text-base font-bold text-foreground tabular-nums">{formatCurrency(displayTotal)}</p>
+                    {pendingTotal > 0 && !drillDownCategory && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        + {formatCurrency(pendingTotal)} <span className="opacity-70">pendente</span>
+                      </p>
+                    )}
                   </div>
                 </div>
 
