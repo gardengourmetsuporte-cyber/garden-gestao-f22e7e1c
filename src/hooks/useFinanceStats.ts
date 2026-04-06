@@ -267,41 +267,102 @@ export function useFinanceStats(
       .sort((a, b) => b.amount - a.amount);
   }, [transactions, resolveParentCategory, normalizeCategoryName]);
 
-  // Daily expenses for timeline
+  // Daily expenses for timeline (paid + pending separate)
   const dailyExpenses = useMemo(() => {
-    const byDate: Record<string, number> = {};
+    const byDate: Record<string, { paid: number; pending: number }> = {};
     
     transactions
-      .filter(t => (t.type === 'expense' || t.type === 'credit_card') && t.is_paid)
+      .filter(t => t.type === 'expense' || t.type === 'credit_card')
       .forEach(t => {
-        if (!byDate[t.date]) byDate[t.date] = 0;
-        byDate[t.date] += Number(t.amount);
+        if (!byDate[t.date]) byDate[t.date] = { paid: 0, pending: 0 };
+        if (t.is_paid) {
+          byDate[t.date].paid += Number(t.amount);
+        } else {
+          byDate[t.date].pending += Number(t.amount);
+        }
       });
     
     return Object.entries(byDate)
-      .map(([date, amount]) => ({ date, amount }))
+      .map(([date, { paid, pending }]) => ({ date, amount: paid, pending }))
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [transactions]);
 
-  // Daily income for timeline
+  // Daily income for timeline (paid + pending separate)
   const dailyIncome = useMemo(() => {
-    const byDate: Record<string, number> = {};
+    const byDate: Record<string, { paid: number; pending: number }> = {};
     
     transactions
-      .filter(t => t.type === 'income' && t.is_paid)
+      .filter(t => t.type === 'income')
       .forEach(t => {
-        if (!byDate[t.date]) byDate[t.date] = 0;
-        byDate[t.date] += Number(t.amount);
+        if (!byDate[t.date]) byDate[t.date] = { paid: 0, pending: 0 };
+        if (t.is_paid) {
+          byDate[t.date].paid += Number(t.amount);
+        } else {
+          byDate[t.date].pending += Number(t.amount);
+        }
       });
     
     return Object.entries(byDate)
-      .map(([date, amount]) => ({ date, amount }))
+      .map(([date, { paid, pending }]) => ({ date, amount: paid, pending }))
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [transactions]);
+
+  // Pending category stats
+  const pendingExpensesByCategory = useMemo((): CategoryStats[] => {
+    const pendingTransactions = transactions.filter(
+      t => (t.type === 'expense' || t.type === 'credit_card') && !t.is_paid
+    );
+    const totalPending = pendingTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+    const byCategory: Record<string, { amount: number; count: number; category: FinanceCategory }> = {};
+    pendingTransactions.forEach(t => {
+      const categoryData = resolveParentCategory(t.category);
+      if (categoryData) {
+        const categoryKey = normalizeCategoryName(categoryData.name) || categoryData.id;
+        if (!byCategory[categoryKey]) byCategory[categoryKey] = { amount: 0, count: 0, category: categoryData };
+        byCategory[categoryKey].amount += Number(t.amount);
+        byCategory[categoryKey].count += 1;
+      }
+    });
+    return Object.values(byCategory)
+      .map(item => ({
+        category: item.category,
+        amount: item.amount,
+        percentage: totalPending > 0 ? (item.amount / totalPending) * 100 : 0,
+        transactionCount: item.count
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  }, [transactions, resolveParentCategory, normalizeCategoryName]);
+
+  const pendingIncomeByCategory = useMemo((): CategoryStats[] => {
+    const pendingTransactions = transactions.filter(
+      t => t.type === 'income' && !t.is_paid
+    );
+    const totalPending = pendingTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+    const byCategory: Record<string, { amount: number; count: number; category: FinanceCategory }> = {};
+    pendingTransactions.forEach(t => {
+      const categoryData = resolveParentCategory(t.category);
+      if (categoryData) {
+        const categoryKey = normalizeCategoryName(categoryData.name) || categoryData.id;
+        if (!byCategory[categoryKey]) byCategory[categoryKey] = { amount: 0, count: 0, category: categoryData };
+        byCategory[categoryKey].amount += Number(t.amount);
+        byCategory[categoryKey].count += 1;
+      }
+    });
+    return Object.values(byCategory)
+      .map(item => ({
+        category: item.category,
+        amount: item.amount,
+        percentage: totalPending > 0 ? (item.amount / totalPending) * 100 : 0,
+        transactionCount: item.count
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  }, [transactions, resolveParentCategory, normalizeCategoryName]);
 
   return {
     expensesByCategory,
     incomeByCategory,
+    pendingExpensesByCategory,
+    pendingIncomeByCategory,
     getSubcategoryStats,
     getSupplierStats,
     getEmployeeStats,

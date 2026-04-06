@@ -150,6 +150,8 @@ export default function Finance() {
     incomeByCategory,
     dailyExpenses,
     dailyIncome,
+    pendingExpensesByCategory,
+    pendingIncomeByCategory,
     getSubcategoryStats,
     getSupplierStats,
     getEmployeeStats
@@ -300,6 +302,8 @@ export default function Finance() {
             onMonthChange={setSelectedMonth}
             expensesByCategory={expensesByCategory}
             incomeByCategory={incomeByCategory}
+            pendingExpensesByCategory={pendingExpensesByCategory}
+            pendingIncomeByCategory={pendingIncomeByCategory}
             dailyExpenses={dailyExpenses}
             dailyIncome={dailyIncome}
             getSubcategoryStats={getSubcategoryStats}

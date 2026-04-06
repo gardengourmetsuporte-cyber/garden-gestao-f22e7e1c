@@ -20,8 +20,10 @@ interface FinanceChartsProps {
   onMonthChange: (date: Date) => void;
   expensesByCategory: CategoryStats[];
   incomeByCategory: CategoryStats[];
-  dailyExpenses: { date: string; amount: number }[];
-  dailyIncome: { date: string; amount: number }[];
+  pendingExpensesByCategory?: CategoryStats[];
+  pendingIncomeByCategory?: CategoryStats[];
+  dailyExpenses: { date: string; amount: number; pending?: number }[];
+  dailyIncome: { date: string; amount: number; pending?: number }[];
   getSubcategoryStats: (parentId: string, type?: 'expense' | 'income') => CategoryStats[];
   getSupplierStats: (categoryId: string) => EntityStats[];
   getEmployeeStats: (categoryId: string) => EntityStats[];
@@ -40,6 +42,8 @@ const formatCompact = (value: number) => {
   return value.toFixed(0);
 };
 
+const normalizeName = (v?: string | null) => (v || '').trim().toLocaleLowerCase('pt-BR');
+
 // Custom tooltip component
 function CustomTooltip({ active, payload, label, labelFormatter }: any) {
   if (!active || !payload?.length) return null;
@@ -57,6 +61,8 @@ export function FinanceCharts({
   onMonthChange,
   expensesByCategory,
   incomeByCategory,
+  pendingExpensesByCategory = [],
+  pendingIncomeByCategory = [],
   dailyExpenses,
   dailyIncome,
   getSubcategoryStats,
@@ -76,8 +82,10 @@ export function FinanceCharts({
   const annualStats = useAnnualFinanceStats(selectedMonth.getFullYear(), categoriesProp, unitId, isPersonal);
 
   const categoryData = dataType === 'expense' ? expensesByCategory : incomeByCategory;
+  const pendingCategoryData = dataType === 'expense' ? pendingExpensesByCategory : pendingIncomeByCategory;
   const subcategoryData = drillDownCategory ? getSubcategoryStats(drillDownCategory.id, dataType) : [];
   const displayData = drillDownCategory ? subcategoryData : categoryData;
+  const pendingTotal = pendingCategoryData.reduce((sum, c) => sum + c.amount, 0);
   const displayTotal = displayData.reduce((sum, c) => sum + c.amount, 0);
 
   const handleYearChange = (delta: number) => {
@@ -143,21 +151,23 @@ export function FinanceCharts({
     color: entityView ? entry.color : entry.category?.color || '#6366f1',
   }));
 
-  // Merged timeline data with both income and expense per day
+  // Merged timeline data with both income and expense per day (paid + pending)
   const mergedTimelineData = (() => {
-    const map = new Map<number, { day: number; label: string; expense: number; income: number }>();
+    const map = new Map<number, { day: number; label: string; expense: number; income: number; pendingExpense: number; pendingIncome: number }>();
     dailyExpenses.forEach(d => {
       const day = new Date(d.date + 'T12:00:00').getDate();
       const label = new Date(d.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-      const existing = map.get(day) || { day, label, expense: 0, income: 0 };
+      const existing = map.get(day) || { day, label, expense: 0, income: 0, pendingExpense: 0, pendingIncome: 0 };
       existing.expense += d.amount;
+      existing.pendingExpense += (d.pending || 0);
       map.set(day, existing);
     });
     dailyIncome.forEach(d => {
       const day = new Date(d.date + 'T12:00:00').getDate();
       const label = new Date(d.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-      const existing = map.get(day) || { day, label, expense: 0, income: 0 };
+      const existing = map.get(day) || { day, label, expense: 0, income: 0, pendingExpense: 0, pendingIncome: 0 };
       existing.income += d.amount;
+      existing.pendingIncome += (d.pending || 0);
       map.set(day, existing);
     });
     return Array.from(map.values()).sort((a, b) => a.day - b.day);
@@ -312,29 +322,44 @@ export function FinanceCharts({
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Total</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Confirmado</p>
                     <p className="text-base font-bold text-foreground tabular-nums">{formatCurrency(displayTotal)}</p>
+                    {pendingTotal > 0 && !drillDownCategory && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        + {formatCurrency(pendingTotal)} <span className="opacity-70">pendente</span>
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 {/* Category List */}
                 <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
-                  {displayData.map((item) => (
-                    <button
-                      key={item.category.id}
-                      onClick={() => handleCategoryClick(item.category)}
-                      disabled={!!entityView}
-                      className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-secondary/30 active:bg-secondary/50 transition-colors text-left"
-                    >
-                      <div
-                        className="w-3.5 h-3.5 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-card"
-                        style={{ backgroundColor: item.category.color, '--tw-ring-color': item.category.color } as React.CSSProperties}
-                      />
-                      <span className="flex-1 text-left font-medium text-sm truncate text-foreground">{item.category.name}</span>
-                      <span className="text-muted-foreground text-xs tabular-nums mr-2">{item.percentage.toFixed(1)}%</span>
-                      <span className="font-semibold text-sm tabular-nums text-foreground">{formatCurrency(item.amount)}</span>
-                    </button>
-                  ))}
+                  {displayData.map((item) => {
+                    const pendingItem = !drillDownCategory
+                      ? pendingCategoryData.find(p => normalizeName(p.category.name) === normalizeName(item.category.name))
+                      : null;
+                    return (
+                      <button
+                        key={item.category.id}
+                        onClick={() => handleCategoryClick(item.category)}
+                        disabled={!!entityView}
+                        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-secondary/30 active:bg-secondary/50 transition-colors text-left"
+                      >
+                        <div
+                          className="w-3.5 h-3.5 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-card"
+                          style={{ backgroundColor: item.category.color, '--tw-ring-color': item.category.color } as React.CSSProperties}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium text-sm truncate text-foreground block">{item.category.name}</span>
+                          {pendingItem && pendingItem.amount > 0 && (
+                            <span className="text-[10px] text-warning">+ {formatCurrency(pendingItem.amount)} pendente</span>
+                          )}
+                        </div>
+                        <span className="text-muted-foreground text-xs tabular-nums mr-2">{item.percentage.toFixed(1)}%</span>
+                        <span className="font-semibold text-sm tabular-nums text-foreground">{formatCurrency(item.amount)}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             ) : (
@@ -441,11 +466,15 @@ export function FinanceCharts({
                         if (!active || !payload?.length) return null;
                         const inc = payload.find(p => p.dataKey === 'income')?.value as number || 0;
                         const exp = payload.find(p => p.dataKey === 'expense')?.value as number || 0;
+                        const pInc = (payload[0]?.payload as any)?.pendingIncome || 0;
+                        const pExp = (payload[0]?.payload as any)?.pendingExpense || 0;
                         return (
                           <div className="rounded-lg border border-border/50 bg-background/95 backdrop-blur-sm px-3 py-2 shadow-xl space-y-0.5">
                             <p className="text-xs font-medium text-foreground">Dia {label}</p>
                             <p className="text-xs" style={{ color: '#22c55e' }}>Receita: {formatCurrency(inc)}</p>
+                            {pInc > 0 && <p className="text-xs text-muted-foreground ml-2">+ {formatCurrency(pInc)} pendente</p>}
                             <p className="text-xs" style={{ color: '#ef4444' }}>Despesa: {formatCurrency(exp)}</p>
+                            {pExp > 0 && <p className="text-xs text-muted-foreground ml-2">+ {formatCurrency(pExp)} pendente</p>}
                           </div>
                         );
                       }}
@@ -462,22 +491,32 @@ export function FinanceCharts({
             )}
 
             {/* Summary stats below chart */}
-            {mergedTimelineData.length > 0 && (
-              <div className="grid grid-cols-2 gap-2">
-                <div className="card-base p-3 text-center">
-                  <p className="text-xs text-muted-foreground mb-0.5">Receita total</p>
-                  <p className="text-sm font-bold tabular-nums" style={{ color: '#22c55e' }}>
-                    {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.income, 0))}
-                  </p>
+            {mergedTimelineData.length > 0 && (() => {
+              const totalPendingInc = mergedTimelineData.reduce((s, d) => s + d.pendingIncome, 0);
+              const totalPendingExp = mergedTimelineData.reduce((s, d) => s + d.pendingExpense, 0);
+              return (
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="card-base p-3 text-center">
+                    <p className="text-xs text-muted-foreground mb-0.5">Receita confirmada</p>
+                    <p className="text-sm font-bold tabular-nums" style={{ color: '#22c55e' }}>
+                      {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.income, 0))}
+                    </p>
+                    {totalPendingInc > 0 && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">+ {formatCurrency(totalPendingInc)} pendente</p>
+                    )}
+                  </div>
+                  <div className="card-base p-3 text-center">
+                    <p className="text-xs text-muted-foreground mb-0.5">Despesa confirmada</p>
+                    <p className="text-sm font-bold tabular-nums" style={{ color: '#ef4444' }}>
+                      {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.expense, 0))}
+                    </p>
+                    {totalPendingExp > 0 && (
+                      <p className="text-[10px] text-muted-foreground mt-0.5">+ {formatCurrency(totalPendingExp)} pendente</p>
+                    )}
+                  </div>
                 </div>
-                <div className="card-base p-3 text-center">
-                  <p className="text-xs text-muted-foreground mb-0.5">Despesa total</p>
-                  <p className="text-sm font-bold tabular-nums" style={{ color: '#ef4444' }}>
-                    {formatCurrency(mergedTimelineData.reduce((s, d) => s + d.expense, 0))}
-                  </p>
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         )}
 

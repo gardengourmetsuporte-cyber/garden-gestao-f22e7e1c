@@ -76,6 +76,7 @@ export default function PersonalFinance() {
 
   const {
     expensesByCategory, incomeByCategory, dailyExpenses, dailyIncome,
+    pendingExpensesByCategory, pendingIncomeByCategory,
     getSubcategoryStats, getSupplierStats, getEmployeeStats
   } = useFinanceStats(transactions, categories);
 
@@ -172,6 +173,8 @@ export default function PersonalFinance() {
             onMonthChange={setSelectedMonth}
             expensesByCategory={expensesByCategory}
             incomeByCategory={incomeByCategory}
+            pendingExpensesByCategory={pendingExpensesByCategory}
+            pendingIncomeByCategory={pendingIncomeByCategory}
             dailyExpenses={dailyExpenses}
             dailyIncome={dailyIncome}
             getSubcategoryStats={getSubcategoryStats}
