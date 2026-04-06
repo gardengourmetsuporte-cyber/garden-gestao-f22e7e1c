@@ -147,21 +147,23 @@ export function FinanceCharts({
     color: entityView ? entry.color : entry.category?.color || '#6366f1',
   }));
 
-  // Merged timeline data with both income and expense per day
+  // Merged timeline data with both income and expense per day (paid + pending)
   const mergedTimelineData = (() => {
-    const map = new Map<number, { day: number; label: string; expense: number; income: number }>();
+    const map = new Map<number, { day: number; label: string; expense: number; income: number; pendingExpense: number; pendingIncome: number }>();
     dailyExpenses.forEach(d => {
       const day = new Date(d.date + 'T12:00:00').getDate();
       const label = new Date(d.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-      const existing = map.get(day) || { day, label, expense: 0, income: 0 };
+      const existing = map.get(day) || { day, label, expense: 0, income: 0, pendingExpense: 0, pendingIncome: 0 };
       existing.expense += d.amount;
+      existing.pendingExpense += (d.pending || 0);
       map.set(day, existing);
     });
     dailyIncome.forEach(d => {
       const day = new Date(d.date + 'T12:00:00').getDate();
       const label = new Date(d.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-      const existing = map.get(day) || { day, label, expense: 0, income: 0 };
+      const existing = map.get(day) || { day, label, expense: 0, income: 0, pendingExpense: 0, pendingIncome: 0 };
       existing.income += d.amount;
+      existing.pendingIncome += (d.pending || 0);
       map.set(day, existing);
     });
     return Array.from(map.values()).sort((a, b) => a.day - b.day);
