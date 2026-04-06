@@ -59,6 +59,8 @@ export function FinanceCharts({
   onMonthChange,
   expensesByCategory,
   incomeByCategory,
+  pendingExpensesByCategory = [],
+  pendingIncomeByCategory = [],
   dailyExpenses,
   dailyIncome,
   getSubcategoryStats,
