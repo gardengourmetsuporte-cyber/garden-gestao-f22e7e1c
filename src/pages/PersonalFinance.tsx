@@ -76,6 +76,7 @@ export default function PersonalFinance() {
 
   const {
     expensesByCategory, incomeByCategory, dailyExpenses, dailyIncome,
+    pendingExpensesByCategory, pendingIncomeByCategory,
     getSubcategoryStats, getSupplierStats, getEmployeeStats
   } = useFinanceStats(transactions, categories);
 
