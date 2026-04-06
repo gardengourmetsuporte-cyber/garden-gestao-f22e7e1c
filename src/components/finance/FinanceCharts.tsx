@@ -332,22 +332,32 @@ export function FinanceCharts({
 
                 {/* Category List */}
                 <div className="card-surface rounded-2xl overflow-hidden divide-y divide-border/40">
-                  {displayData.map((item) => (
-                    <button
-                      key={item.category.id}
-                      onClick={() => handleCategoryClick(item.category)}
-                      disabled={!!entityView}
-                      className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-secondary/30 active:bg-secondary/50 transition-colors text-left"
-                    >
-                      <div
-                        className="w-3.5 h-3.5 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-card"
-                        style={{ backgroundColor: item.category.color, '--tw-ring-color': item.category.color } as React.CSSProperties}
-                      />
-                      <span className="flex-1 text-left font-medium text-sm truncate text-foreground">{item.category.name}</span>
-                      <span className="text-muted-foreground text-xs tabular-nums mr-2">{item.percentage.toFixed(1)}%</span>
-                      <span className="font-semibold text-sm tabular-nums text-foreground">{formatCurrency(item.amount)}</span>
-                    </button>
-                  ))}
+                  {displayData.map((item) => {
+                    const pendingItem = !drillDownCategory
+                      ? pendingCategoryData.find(p => normalizeCategoryName(p.category.name) === normalizeCategoryName(item.category.name))
+                      : null;
+                    return (
+                      <button
+                        key={item.category.id}
+                        onClick={() => handleCategoryClick(item.category)}
+                        disabled={!!entityView}
+                        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-secondary/30 active:bg-secondary/50 transition-colors text-left"
+                      >
+                        <div
+                          className="w-3.5 h-3.5 rounded-full shrink-0 ring-2 ring-offset-2 ring-offset-card"
+                          style={{ backgroundColor: item.category.color, '--tw-ring-color': item.category.color } as React.CSSProperties}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium text-sm truncate text-foreground block">{item.category.name}</span>
+                          {pendingItem && pendingItem.amount > 0 && (
+                            <span className="text-[10px] text-warning">+ {formatCurrency(pendingItem.amount)} pendente</span>
+                          )}
+                        </div>
+                        <span className="text-muted-foreground text-xs tabular-nums mr-2">{item.percentage.toFixed(1)}%</span>
+                        <span className="font-semibold text-sm tabular-nums text-foreground">{formatCurrency(item.amount)}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             ) : (
