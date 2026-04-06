@@ -20,8 +20,10 @@ interface FinanceChartsProps {
   onMonthChange: (date: Date) => void;
   expensesByCategory: CategoryStats[];
   incomeByCategory: CategoryStats[];
-  dailyExpenses: { date: string; amount: number }[];
-  dailyIncome: { date: string; amount: number }[];
+  pendingExpensesByCategory?: CategoryStats[];
+  pendingIncomeByCategory?: CategoryStats[];
+  dailyExpenses: { date: string; amount: number; pending?: number }[];
+  dailyIncome: { date: string; amount: number; pending?: number }[];
   getSubcategoryStats: (parentId: string, type?: 'expense' | 'income') => CategoryStats[];
   getSupplierStats: (categoryId: string) => EntityStats[];
   getEmployeeStats: (categoryId: string) => EntityStats[];
