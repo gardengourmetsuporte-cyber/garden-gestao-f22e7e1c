@@ -466,11 +466,15 @@ export function FinanceCharts({
                         if (!active || !payload?.length) return null;
                         const inc = payload.find(p => p.dataKey === 'income')?.value as number || 0;
                         const exp = payload.find(p => p.dataKey === 'expense')?.value as number || 0;
+                        const pInc = (payload[0]?.payload as any)?.pendingIncome || 0;
+                        const pExp = (payload[0]?.payload as any)?.pendingExpense || 0;
                         return (
                           <div className="rounded-lg border border-border/50 bg-background/95 backdrop-blur-sm px-3 py-2 shadow-xl space-y-0.5">
                             <p className="text-xs font-medium text-foreground">Dia {label}</p>
                             <p className="text-xs" style={{ color: '#22c55e' }}>Receita: {formatCurrency(inc)}</p>
+                            {pInc > 0 && <p className="text-xs text-muted-foreground ml-2">+ {formatCurrency(pInc)} pendente</p>}
                             <p className="text-xs" style={{ color: '#ef4444' }}>Despesa: {formatCurrency(exp)}</p>
+                            {pExp > 0 && <p className="text-xs text-muted-foreground ml-2">+ {formatCurrency(pExp)} pendente</p>}
                           </div>
                         );
                       }}
