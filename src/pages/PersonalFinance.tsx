@@ -173,6 +173,8 @@ export default function PersonalFinance() {
             onMonthChange={setSelectedMonth}
             expensesByCategory={expensesByCategory}
             incomeByCategory={incomeByCategory}
+            pendingExpensesByCategory={pendingExpensesByCategory}
+            pendingIncomeByCategory={pendingIncomeByCategory}
             dailyExpenses={dailyExpenses}
             dailyIncome={dailyIncome}
             getSubcategoryStats={getSubcategoryStats}
