@@ -302,6 +302,8 @@ export default function Finance() {
             onMonthChange={setSelectedMonth}
             expensesByCategory={expensesByCategory}
             incomeByCategory={incomeByCategory}
+            pendingExpensesByCategory={pendingExpensesByCategory}
+            pendingIncomeByCategory={pendingIncomeByCategory}
             dailyExpenses={dailyExpenses}
             dailyIncome={dailyIncome}
             getSubcategoryStats={getSubcategoryStats}
