@@ -150,6 +150,8 @@ export default function Finance() {
     incomeByCategory,
     dailyExpenses,
     dailyIncome,
+    pendingExpensesByCategory,
+    pendingIncomeByCategory,
     getSubcategoryStats,
     getSupplierStats,
     getEmployeeStats
