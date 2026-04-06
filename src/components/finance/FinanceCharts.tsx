@@ -80,8 +80,10 @@ export function FinanceCharts({
   const annualStats = useAnnualFinanceStats(selectedMonth.getFullYear(), categoriesProp, unitId, isPersonal);
 
   const categoryData = dataType === 'expense' ? expensesByCategory : incomeByCategory;
+  const pendingCategoryData = dataType === 'expense' ? pendingExpensesByCategory : pendingIncomeByCategory;
   const subcategoryData = drillDownCategory ? getSubcategoryStats(drillDownCategory.id, dataType) : [];
   const displayData = drillDownCategory ? subcategoryData : categoryData;
+  const pendingTotal = pendingCategoryData.reduce((sum, c) => sum + c.amount, 0);
   const displayTotal = displayData.reduce((sum, c) => sum + c.amount, 0);
 
   const handleYearChange = (delta: number) => {
