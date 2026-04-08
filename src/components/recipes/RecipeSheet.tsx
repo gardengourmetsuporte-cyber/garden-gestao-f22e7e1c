@@ -69,6 +69,7 @@ interface RecipeSheetProps {
   onUpdateItemUnit?: (itemId: string, unitType: string) => Promise<void>;
   onEditSubRecipe?: (recipeId: string) => void;
   onCreateSubRecipe?: () => void;
+  allowNameEdit?: boolean;
 }
 
 export function RecipeSheet({
@@ -87,6 +88,7 @@ export function RecipeSheet({
   onUpdateItemUnit,
   onEditSubRecipe,
   onCreateSubRecipe,
+  allowNameEdit = false,
 }: RecipeSheetProps) {
   const [name, setName] = useState('');
   const [categoryId, setCategoryId] = useState<string>('');
@@ -463,8 +465,25 @@ export function RecipeSheet({
                       </div>
                     );
                   })()}
-                  <div className="min-w-0">
-                    <p className="font-semibold text-foreground truncate">{name || 'Nova Ficha'}</p>
+                  <div className="min-w-0 flex-1">
+                    {allowNameEdit ? (
+                      <>
+                        <Input
+                          id="recipe-name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="Nome da sub-receita"
+                          autoFocus={!recipe}
+                          aria-label="Nome da ficha"
+                          className="h-auto border-0 bg-transparent px-0 text-lg font-semibold shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Defina um nome para localizar essa base rapidamente.
+                        </p>
+                      </>
+                    ) : (
+                      <p className="font-semibold text-foreground truncate">{name || 'Nova Ficha'}</p>
+                    )}
                   </div>
                 </div>
 
