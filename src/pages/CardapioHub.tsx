@@ -507,7 +507,7 @@ export default function CardapioHub() {
         onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
         onEditSubRecipe={handleQuickEditSubRecipe}
         onCreateSubRecipe={handleQuickCreateSubRecipe}
-        allowNameEdit={false}
+        allowNameEdit={!editingRecipe}
       />
 
       <RecipeSheet
