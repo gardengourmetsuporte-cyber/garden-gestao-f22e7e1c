@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -61,7 +60,7 @@ export function IngredientRow({
   onEditSubRecipe,
   kdsStations = [],
 }: IngredientRowProps) {
-  const [editPopoverOpen, setEditPopoverOpen] = useState(false);
+  const [editPanelOpen, setEditPanelOpen] = useState(false);
   const [newPriceValue, setNewPriceValue] = useState('');
   const [newBaseUnit, setNewBaseUnit] = useState<string>('');
   const [showGlobalWarning, setShowGlobalWarning] = useState(false);
@@ -74,7 +73,7 @@ export function IngredientRow({
   const displayName = isSubRecipe ? ingredient.source_recipe_name : ingredient.item_name;
   const displayUnit = baseUnit || 'unidade';
   const hasNoPrice = !isSubRecipe && (ingredient.item_price === null || ingredient.item_price === 0);
-  const canEditInventory = !isSubRecipe && Boolean(onUpdateGlobalPrice || onUpdateItemUnit);
+  const canEditInventory = !isSubRecipe && Boolean(ingredient.item_id && (onUpdateGlobalPrice || onUpdateItemUnit));
   const canEditSubRecipe = isSubRecipe && Boolean(onEditSubRecipe && ingredient.source_recipe_id);
 
   const filteredUnitOptions = UNIT_OPTIONS;
@@ -96,8 +95,17 @@ export function IngredientRow({
   };
 
   const prepareEditValues = () => {
-    setNewPriceValue(String(ingredient.item_price || ''));
+    setNewPriceValue(
+      ingredient.item_price !== null && ingredient.item_price !== undefined
+        ? String(ingredient.item_price).replace('.', ',')
+        : ''
+    );
     setNewBaseUnit(displayUnit);
+  };
+
+  const handleOpenQuickEdit = () => {
+    prepareEditValues();
+    setEditPanelOpen(true);
   };
 
   const handleConfirmEdit = () => {
@@ -107,7 +115,7 @@ export function IngredientRow({
     const priceChanged = Math.abs(newPrice - currentPrice) > 0.0001;
 
     if (!priceChanged && !unitChanged) {
-      setEditPopoverOpen(false);
+      setEditPanelOpen(false);
       return;
     }
 
@@ -116,7 +124,7 @@ export function IngredientRow({
       ...(unitChanged ? { unit: newBaseUnit } : {}),
     });
     setShowGlobalWarning(true);
-    setEditPopoverOpen(false);
+    setEditPanelOpen(false);
   };
 
   const handleSaveGlobalChanges = async () => {
@@ -188,66 +196,15 @@ export function IngredientRow({
                 <AppIcon name="Pencil" className="h-3.5 w-3.5" />
               </Button>
             ) : canEditInventory ? (
-              <Popover modal={true} open={editPopoverOpen} onOpenChange={setEditPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-muted-foreground hover:text-primary"
-                    onClick={prepareEditValues}
-                  >
-                    <AppIcon name="Pencil" className="h-3.5 w-3.5" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-64 p-3" align="end">
-                  <div className="space-y-3">
-                    <p className="text-sm font-medium">Editar item</p>
-
-                    {onUpdateItemUnit && (
-                      <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Unidade base (estoque)</Label>
-                        <Select value={newBaseUnit} onValueChange={setNewBaseUnit}>
-                          <SelectTrigger className="h-8 text-sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {UNIT_OPTIONS.map((unit) => (
-                              <SelectItem key={unit.value} value={unit.value}>{unit.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-
-                    {onUpdateGlobalPrice && (
-                      <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Preço por unidade</Label>
-                        <div className="flex items-center gap-1">
-                          <span className="text-muted-foreground text-sm">R$</span>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={newPriceValue}
-                            onChange={(e) => setNewPriceValue(e.target.value)}
-                            className="h-8 text-sm"
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex gap-2 pt-1">
-                      <Button type="button" variant="ghost" size="sm" className="flex-1 h-8" onClick={() => setEditPopoverOpen(false)}>
-                        Cancelar
-                      </Button>
-                      <Button type="button" size="sm" className="flex-1 h-8" onClick={handleConfirmEdit}>
-                        Salvar
-                      </Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-primary"
+                onClick={handleOpenQuickEdit}
+              >
+                <AppIcon name="Pencil" className="h-3.5 w-3.5" />
+              </Button>
             ) : null}
 
             <Button
@@ -294,6 +251,65 @@ export function IngredientRow({
             {hasNoPrice ? '—' : formatCurrency(ingredient.total_cost)}
           </p>
         </div>
+
+        {canEditInventory && editPanelOpen && (
+          <div className="mt-3 rounded-xl border border-border bg-background/80 p-3 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-foreground">Editar item rapidamente</p>
+                <p className="text-xs text-muted-foreground">Altera a unidade base e o preço deste ingrediente.</p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 shrink-0"
+                onClick={() => setEditPanelOpen(false)}
+              >
+                <AppIcon name="X" className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {onUpdateItemUnit && (
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Unidade base</Label>
+                <Select value={newBaseUnit} onValueChange={setNewBaseUnit}>
+                  <SelectTrigger className="h-9 text-sm bg-background">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {UNIT_OPTIONS.map((unit) => (
+                      <SelectItem key={unit.value} value={unit.value}>{unit.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {onUpdateGlobalPrice && (
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Preço por unidade</Label>
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  value={newPriceValue}
+                  onChange={(e) => setNewPriceValue(e.target.value)}
+                  className="h-9 bg-background text-sm"
+                  placeholder="0,00"
+                />
+              </div>
+            )}
+
+            <div className="flex gap-2 pt-1">
+              <Button type="button" variant="ghost" size="sm" className="flex-1" onClick={() => setEditPanelOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="button" size="sm" className="flex-1" onClick={handleConfirmEdit}>
+                Salvar alterações
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Conversion note — only when units differ */}
         {!hasNoPrice && ingredient.unit_type !== displayUnit && ingredient.quantity > 0 && (
