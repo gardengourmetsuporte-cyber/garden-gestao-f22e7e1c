@@ -110,6 +110,8 @@ export default function Recipes() {
     setQuickSheetOpen(true);
   };
 
+  const isBaseRecipe = (recipe: Recipe | null) => Boolean(recipe && basesCategory && recipe.category_id === basesCategory.id);
+
   useFabAction({ icon: 'Plus', label: 'Nova Ficha', onClick: () => { setSelectedRecipe(null); setPreSelectedCategoryId(null); setSheetOpen(true); } }, []);
 
   const handleSave = async (data: any) => {
@@ -314,6 +316,7 @@ export default function Recipes() {
         onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
         onEditSubRecipe={handleQuickEditSubRecipe}
         onCreateSubRecipe={handleQuickCreateSubRecipe}
+        allowNameEdit={!selectedRecipe || isBaseRecipe(selectedRecipe)}
       />
 
       <RecipeSheet
@@ -337,6 +340,7 @@ export default function Recipes() {
         isSaving={isAddingRecipe || isUpdatingRecipe}
         onUpdateItemPrice={async (itemId, price) => { await updateItemPrice({ itemId, price }); }}
         onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
+        allowNameEdit={!quickSelectedRecipe || isBaseRecipe(quickSelectedRecipe)}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

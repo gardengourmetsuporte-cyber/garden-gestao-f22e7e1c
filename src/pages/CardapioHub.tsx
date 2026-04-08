@@ -507,6 +507,7 @@ export default function CardapioHub() {
         onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
         onEditSubRecipe={handleQuickEditSubRecipe}
         onCreateSubRecipe={handleQuickCreateSubRecipe}
+        allowNameEdit={false}
       />
 
       <RecipeSheet
@@ -530,6 +531,7 @@ export default function CardapioHub() {
         isSaving={isAddingRecipe || isUpdatingRecipe}
         onUpdateItemPrice={async (itemId, price) => { await updateItemPrice({ itemId, price }); }}
         onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
+        allowNameEdit
       />
     </AppLayout>
   );
