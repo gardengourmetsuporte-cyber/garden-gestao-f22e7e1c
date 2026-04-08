@@ -42,12 +42,15 @@ export default function Recipes() {
   const [search, setSearch] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [quickSheetOpen, setQuickSheetOpen] = useState(false);
+  const [quickSelectedRecipe, setQuickSelectedRecipe] = useState<Recipe | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [recipeToDelete, setRecipeToDelete] = useState<string | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState('produtos');
   useScrollToTopOnChange(activeTab);
   const [preSelectedCategoryId, setPreSelectedCategoryId] = useState<string | null>(null);
+  const [quickPreSelectedCategoryId, setQuickPreSelectedCategoryId] = useState<string | null>(null);
 
   const basesCategory = useMemo(() => {
     return categories.find(c => c.name.toLowerCase().includes('bases') || c.name.toLowerCase().includes('preparo'));
@@ -93,6 +96,20 @@ export default function Recipes() {
     setSheetOpen(true);
   };
 
+  const handleQuickCreateSubRecipe = () => {
+    setQuickSelectedRecipe(null);
+    setQuickPreSelectedCategoryId(basesCategory?.id || null);
+    setQuickSheetOpen(true);
+  };
+
+  const handleQuickEditSubRecipe = (recipeId: string) => {
+    const targetRecipe = recipes.find((recipe) => recipe.id === recipeId) || null;
+    if (!targetRecipe) return;
+    setQuickSelectedRecipe(targetRecipe);
+    setQuickPreSelectedCategoryId(targetRecipe.category_id || basesCategory?.id || null);
+    setQuickSheetOpen(true);
+  };
+
   useFabAction({ icon: 'Plus', label: 'Nova Ficha', onClick: () => { setSelectedRecipe(null); setPreSelectedCategoryId(null); setSheetOpen(true); } }, []);
 
   const handleSave = async (data: any) => {
@@ -101,6 +118,15 @@ export default function Recipes() {
     else await addRecipe(payload);
     setSheetOpen(false);
     setSelectedRecipe(null);
+  };
+
+  const handleQuickSave = async (data: any) => {
+    const { _cost_snapshot: _ignoredCostSnapshot, ...payload } = data || {};
+    if (payload.id) await updateRecipe(payload);
+    else await addRecipe(payload);
+    setQuickSheetOpen(false);
+    setQuickSelectedRecipe(null);
+    setQuickPreSelectedCategoryId(null);
   };
 
   const handleDeleteConfirm = () => {
@@ -283,6 +309,31 @@ export default function Recipes() {
           category: r.category ? { id: r.category.id, name: r.category.name, color: r.category.color } : null,
         }))}
         onSave={handleSave}
+        isSaving={isAddingRecipe || isUpdatingRecipe}
+        onUpdateItemPrice={async (itemId, price) => { await updateItemPrice({ itemId, price }); }}
+        onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
+        onEditSubRecipe={handleQuickEditSubRecipe}
+        onCreateSubRecipe={handleQuickCreateSubRecipe}
+      />
+
+      <RecipeSheet
+        open={quickSheetOpen}
+        onOpenChange={(open) => {
+          setQuickSheetOpen(open);
+          if (!open) {
+            setQuickSelectedRecipe(null);
+            setQuickPreSelectedCategoryId(null);
+          }
+        }}
+        recipe={quickSelectedRecipe}
+        categories={categories}
+        inventoryItems={inventoryItems}
+        defaultCategoryId={quickPreSelectedCategoryId}
+        subRecipes={getAvailableSubRecipes(quickSelectedRecipe?.id).map(r => ({
+          id: r.id, name: r.name, yield_unit: r.yield_unit, cost_per_portion: r.cost_per_portion,
+          category: r.category ? { id: r.category.id, name: r.category.name, color: r.category.color } : null,
+        }))}
+        onSave={handleQuickSave}
         isSaving={isAddingRecipe || isUpdatingRecipe}
         onUpdateItemPrice={async (itemId, price) => { await updateItemPrice({ itemId, price }); }}
         onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}

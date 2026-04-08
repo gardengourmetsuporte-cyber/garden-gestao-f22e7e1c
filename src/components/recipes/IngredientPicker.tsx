@@ -1,6 +1,7 @@
  import { useState, useMemo } from 'react';
  import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
  import { Input } from '@/components/ui/input';
+ import { Button } from '@/components/ui/button';
  import { ScrollArea } from '@/components/ui/scroll-area';
  import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -33,6 +34,7 @@ interface SubRecipeItem {
   excludeRecipeIds: string[];
   onSelectItem: (item: InventoryItem) => void;
   onSelectSubRecipe: (recipe: SubRecipeItem) => void;
+  onCreateSubRecipe?: () => void;
  }
  
  export function IngredientPicker({
@@ -44,12 +46,12 @@ interface SubRecipeItem {
   excludeRecipeIds,
   onSelectItem,
   onSelectSubRecipe,
+  onCreateSubRecipe,
  }: IngredientPickerProps) {
    const [search, setSearch] = useState('');
    const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState<'inventory' | 'recipes'>('inventory');
    
-   // Filter and group items by category
    const groupedItems = useMemo(() => {
      const filtered = items.filter(
        (item) =>
@@ -73,7 +75,6 @@ interface SubRecipeItem {
      return Object.entries(groups).sort((a, b) => a[1].name.localeCompare(b[1].name));
    }, [items, excludeIds, search]);
    
-  // Filter and group sub-recipes by category
   const groupedSubRecipes = useMemo(() => {
     const filtered = subRecipes.filter(
       (recipe) =>
@@ -123,6 +124,12 @@ interface SubRecipeItem {
     onSelectSubRecipe(recipe);
     onOpenChange(false);
     setSearch('');
+  };
+
+  const handleCreateSubRecipe = () => {
+    onOpenChange(false);
+    setSearch('');
+    onCreateSubRecipe?.();
   };
   
    return (
@@ -210,12 +217,24 @@ interface SubRecipeItem {
           </TabsContent>
           
           <TabsContent value="recipes" className="flex-1 mt-0">
-            <ScrollArea className="h-[calc(80vh-220px)]">
+            {onCreateSubRecipe && (
+              <Button type="button" variant="outline" size="sm" className="w-full mb-3 gap-2" onClick={handleCreateSubRecipe}>
+                <AppIcon name="Plus" className="h-4 w-4" />
+                Nova sub-receita
+              </Button>
+            )}
+            <ScrollArea className="h-[calc(80vh-268px)]">
               <div className="space-y-2 pb-6">
                 {groupedSubRecipes.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">
-                    Nenhuma sub-receita disponível
-                  </p>
+                  <div className="text-center py-8 space-y-3">
+                    <p className="text-muted-foreground">Nenhuma sub-receita disponível</p>
+                    {onCreateSubRecipe && (
+                      <Button type="button" variant="outline" size="sm" className="gap-2" onClick={handleCreateSubRecipe}>
+                        <AppIcon name="Plus" className="h-4 w-4" />
+                        Criar sub-receita
+                      </Button>
+                    )}
+                  </div>
                 ) : (
                   groupedSubRecipes.map(([categoryId, category]) => (
                     <Collapsible
