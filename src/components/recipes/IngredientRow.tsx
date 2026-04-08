@@ -86,8 +86,20 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
   };
 
   const prepareEditValues = () => {
-    setNewPriceValue(String(ingredient.item_price || ''));
+    setNewPriceValue(String(isSubRecipe ? (ingredient.source_recipe_cost || '') : (ingredient.item_price || '')));
     setNewBaseUnit(displayUnit);
+  };
+
+  const handleConfirmSubRecipeEdit = () => {
+    const newCost = parseLocalizedNumber(newPriceValue);
+    const newUnit = newBaseUnit as RecipeUnitType;
+    const total_cost = calculateSubRecipeCost(newCost, newUnit, ingredient.quantity, ingredient.unit_type);
+    onChange({
+      source_recipe_cost: newCost,
+      source_recipe_unit: newUnit,
+      total_cost,
+    });
+    setEditPopoverOpen(false);
   };
 
   const handleConfirmEdit = () => {
