@@ -67,6 +67,8 @@ interface RecipeSheetProps {
   defaultSellingPrice?: number | null;
   onUpdateItemPrice?: (itemId: string, newPrice: number) => Promise<void>;
   onUpdateItemUnit?: (itemId: string, unitType: string) => Promise<void>;
+  onEditSubRecipe?: (recipeId: string) => void;
+  onCreateSubRecipe?: () => void;
 }
 
 export function RecipeSheet({
@@ -83,6 +85,8 @@ export function RecipeSheet({
   defaultSellingPrice,
   onUpdateItemPrice,
   onUpdateItemUnit,
+  onEditSubRecipe,
+  onCreateSubRecipe,
 }: RecipeSheetProps) {
   const [name, setName] = useState('');
   const [categoryId, setCategoryId] = useState<string>('');
@@ -101,7 +105,6 @@ export function RecipeSheet({
   const { settings, calculateOperationalCosts } = useRecipeCostSettings();
   const { templates: packagingTemplates, getTemplateCost } = usePackagingTemplates();
 
-  // Load KDS stations
   const { data: kdsStations = [] } = useQuery({
     queryKey: ['kds-stations', activeUnit?.id],
     queryFn: async () => {
@@ -117,7 +120,6 @@ export function RecipeSheet({
     enabled: !!activeUnit && open,
   });
 
-  // Reset form when recipe changes
   useEffect(() => {
     const hasDefaultSellingPrice = !!defaultSellingPrice && defaultSellingPrice > 0;
 
@@ -217,17 +219,52 @@ export function RecipeSheet({
   }, [open, inventoryItems]);
 
   useEffect(() => {
+    if (!open || subRecipes.length === 0) return;
+
+    setIngredients((prev) => {
+      let hasChanges = false;
+
+      const next = prev.map((ing) => {
+        if (ing.source_type !== 'recipe' || !ing.source_recipe_id) return ing;
+
+        const latestRecipe = subRecipes.find((item) => item.id === ing.source_recipe_id);
+        if (!latestRecipe) return ing;
+
+        const latestUnit = latestRecipe.yield_unit as RecipeUnitType;
+        const latestCost = Number(latestRecipe.cost_per_portion ?? 0);
+        const recalculatedCost = calculateSubRecipeCost(latestCost, latestUnit, ing.quantity, ing.unit_type);
+
+        const nameChanged = ing.source_recipe_name !== latestRecipe.name;
+        const unitChanged = ing.source_recipe_unit !== latestUnit;
+        const priceChanged = Math.abs((ing.source_recipe_cost ?? 0) - latestCost) > 0.0001;
+        const costChanged = Math.abs((ing.total_cost ?? 0) - recalculatedCost) > 0.0001;
+
+        if (!nameChanged && !unitChanged && !priceChanged && !costChanged) return ing;
+
+        hasChanges = true;
+        return {
+          ...ing,
+          source_recipe_name: latestRecipe.name,
+          source_recipe_unit: latestUnit,
+          source_recipe_cost: latestCost,
+          total_cost: recalculatedCost,
+        };
+      });
+
+      return hasChanges ? next : prev;
+    });
+  }, [open, subRecipes]);
+
+  useEffect(() => {
     if (open && !recipe && defaultCategoryId) {
       setCategoryId(defaultCategoryId);
     }
   }, [open, recipe, defaultCategoryId]);
 
-  // Cost calculations
   const ingredientsCost = ingredients.reduce((sum, ing) => sum + ing.total_cost, 0);
   const portions = parseFloat(yieldQuantity) || 1;
   const costPerPortion = ingredientsCost / portions;
 
-  // Use current typed selling price first; fallback to menu default only when empty
   const parsedSellingPrice = parseFloat(sellingPrice);
   const typedSellingPrice = Number.isFinite(parsedSellingPrice) && parsedSellingPrice > 0
     ? parsedSellingPrice
@@ -247,7 +284,6 @@ export function RecipeSheet({
   const fixedCost = operationalCosts.fixedCostPerProduct;
   const totalCostPerPortion = variableCost + salesCost + fixedCost;
 
-  // Margin calculations
   const suggestedPrice = totalCostPerPortion > 0
     ? totalCostPerPortion / (1 - marginPercent / 100)
     : 0;
@@ -258,7 +294,6 @@ export function RecipeSheet({
     return ((price - totalCostPerPortion) / price) * 100;
   }, [sellingPrice, totalCostPerPortion]);
 
-  // Update selling price when margin changes
   useEffect(() => {
     if (marginMode === 'margin' && totalCostPerPortion > 0) {
       setSellingPrice(suggestedPrice.toFixed(2));
@@ -280,7 +315,6 @@ export function RecipeSheet({
     setMarginPercent(value[0]);
   };
 
-  // Alerts
   const ingredientsWithoutPrice = ingredients.filter(
     i => i.source_type === 'inventory' && (i.item_price === null || i.item_price === 0)
   );
@@ -383,7 +417,6 @@ export function RecipeSheet({
       onOpenChange(false);
     } catch (error) {
       console.error('[RecipeSheet] Save failed:', error);
-      // Toast is already shown by the mutation's onError handler
     }
   };
 
@@ -391,7 +424,6 @@ export function RecipeSheet({
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col h-full max-h-[100dvh] [&>button]:hidden">
-          {/* Fixed Header */}
           <SheetHeader className="p-4 border-b shrink-0">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -412,10 +444,8 @@ export function RecipeSheet({
             </div>
           </SheetHeader>
 
-          {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto min-h-0">
             <div className="p-4 space-y-6 pb-24">
-              {/* Basic Info */}
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border/50">
                   {(() => {
@@ -466,7 +496,6 @@ export function RecipeSheet({
                   </div>
                 </div>
 
-                {/* Min Ready Stock */}
                 <div className="space-y-2">
                   <Label htmlFor="minReadyStock">Estoque mínimo de produção</Label>
                   <div className="flex items-center gap-2">
@@ -490,19 +519,26 @@ export function RecipeSheet({
 
               <Separator />
 
-              {/* Ingredients */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <Label className="text-base font-semibold">Ingredientes</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPickerOpen(true)}
-                  >
-                    <AppIcon name="Plus" className="h-4 w-4 mr-1" />
-                    Adicionar
-                  </Button>
+                  <div className="flex items-center gap-2 ml-auto">
+                    {onCreateSubRecipe && (
+                      <Button type="button" variant="outline" size="sm" onClick={onCreateSubRecipe}>
+                        <AppIcon name="Soup" className="h-4 w-4 mr-1" />
+                        Sub-receita
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPickerOpen(true)}
+                    >
+                      <AppIcon name="Plus" className="h-4 w-4 mr-1" />
+                      Adicionar
+                    </Button>
+                  </div>
                 </div>
 
                 {ingredients.length === 0 ? (
@@ -522,13 +558,13 @@ export function RecipeSheet({
                         onRemove={() => handleRemoveIngredient(index)}
                         onUpdateGlobalPrice={onUpdateItemPrice}
                         onUpdateItemUnit={onUpdateItemUnit}
+                        onEditSubRecipe={onEditSubRecipe}
                         kdsStations={kdsStations}
                       />
                     ))}
                   </div>
                 )}
 
-                {/* Alerts */}
                 {ingredientsWithoutPrice.length > 0 && (
                   <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl text-sm text-amber-700 dark:text-amber-300">
                     <AppIcon name="AlertTriangle" className="h-4 w-4 shrink-0 mt-0.5" />
@@ -541,11 +577,9 @@ export function RecipeSheet({
 
               <Separator />
 
-              {/* ═══ COST BREAKDOWN ═══ */}
               <div className="space-y-4">
                 <Label className="text-base font-semibold">Composição de Custos</Label>
 
-                {/* A) Custos Variáveis */}
                 <div className="rounded-xl border p-4 space-y-2">
                   <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                     <AppIcon name="Package" className="h-4 w-4 text-primary" />
@@ -555,7 +589,6 @@ export function RecipeSheet({
                     <span className="text-muted-foreground">Ingredientes ({ingredients.length})</span>
                     <span className="font-medium">{formatCurrency(costPerPortion)}</span>
                   </div>
-                  {/* Packaging template selector */}
                   <div className="space-y-1.5 pt-1">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Embalagem</span>

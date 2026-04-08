@@ -86,11 +86,19 @@ export default function CardapioHub() {
   const { calculateOperationalCosts } = useRecipeCostSettings();
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+  const [quickRecipeSheetOpen, setQuickRecipeSheetOpen] = useState(false);
+  const [quickEditingRecipe, setQuickEditingRecipe] = useState<Recipe | null>(null);
   const [recipeTargetProductId, setRecipeTargetProductId] = useState<string | null>(null);
 
   const [defaultRecipeName, setDefaultRecipeName] = useState('');
   const [defaultRecipeCategoryId, setDefaultRecipeCategoryId] = useState<string | null>(null);
+  const [quickDefaultRecipeCategoryId, setQuickDefaultRecipeCategoryId] = useState<string | null>(null);
   const [defaultRecipeSellingPrice, setDefaultRecipeSellingPrice] = useState<number | null>(null);
+
+  const baseRecipeCategory = useMemo(
+    () => recipeCategories.find(c => c.name.toLowerCase().includes('bases') || c.name.toLowerCase().includes('preparo')),
+    [recipeCategories]
+  );
 
   const handleEditRecipe = useCallback((product: MenuProduct) => {
     const recipeId = (product as any).recipe_id;
@@ -105,13 +113,26 @@ export default function CardapioHub() {
     } else {
       setEditingRecipe(null);
       setDefaultRecipeName(product.name);
-      // Match menu product category name to recipe category id
       const matchedCat = recipeCategories.find(c => c.name.toLowerCase() === product.category?.toLowerCase());
       setDefaultRecipeCategoryId(matchedCat?.id || null);
     }
 
     setRecipeSheetOpen(true);
   }, [recipes, recipeCategories]);
+
+  const handleQuickCreateSubRecipe = useCallback(() => {
+    setQuickEditingRecipe(null);
+    setQuickDefaultRecipeCategoryId(baseRecipeCategory?.id || null);
+    setQuickRecipeSheetOpen(true);
+  }, [baseRecipeCategory]);
+
+  const handleQuickEditSubRecipe = useCallback((recipeId: string) => {
+    const targetRecipe = recipes.find((recipe) => recipe.id === recipeId) || null;
+    if (!targetRecipe) return;
+    setQuickEditingRecipe(targetRecipe);
+    setQuickDefaultRecipeCategoryId(targetRecipe.category_id || baseRecipeCategory?.id || null);
+    setQuickRecipeSheetOpen(true);
+  }, [recipes, baseRecipeCategory]);
 
   const handleRecipeSave = async (data: any) => {
     const { _cost_snapshot: costSnapshot, ...recipePayload } = data || {};
@@ -186,6 +207,15 @@ export default function CardapioHub() {
 
       await menuAdmin.fetchProducts();
     }
+  };
+
+  const handleQuickSubRecipeSave = async (data: any) => {
+    const { _cost_snapshot: _ignoredCostSnapshot, ...payload } = data || {};
+    if (payload.id) await updateRecipe(payload);
+    else await addRecipe(payload);
+    setQuickRecipeSheetOpen(false);
+    setQuickEditingRecipe(null);
+    setQuickDefaultRecipeCategoryId(null);
   };
 
   // Internal tab for cardápio content
@@ -472,6 +502,31 @@ export default function CardapioHub() {
           category: r.category ? { id: r.category.id, name: r.category.name, color: r.category.color } : null,
         }))}
         onSave={handleRecipeSave}
+        isSaving={isAddingRecipe || isUpdatingRecipe}
+        onUpdateItemPrice={async (itemId, price) => { await updateItemPrice({ itemId, price }); }}
+        onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
+        onEditSubRecipe={handleQuickEditSubRecipe}
+        onCreateSubRecipe={handleQuickCreateSubRecipe}
+      />
+
+      <RecipeSheet
+        open={quickRecipeSheetOpen}
+        onOpenChange={(open) => {
+          setQuickRecipeSheetOpen(open);
+          if (!open) {
+            setQuickEditingRecipe(null);
+            setQuickDefaultRecipeCategoryId(null);
+          }
+        }}
+        recipe={quickEditingRecipe}
+        defaultCategoryId={quickDefaultRecipeCategoryId}
+        categories={recipeCategories}
+        inventoryItems={recipeInventoryItems}
+        subRecipes={getAvailableSubRecipes(quickEditingRecipe?.id).map(r => ({
+          id: r.id, name: r.name, yield_unit: r.yield_unit, cost_per_portion: r.cost_per_portion,
+          category: r.category ? { id: r.category.id, name: r.category.name, color: r.category.color } : null,
+        }))}
+        onSave={handleQuickSubRecipeSave}
         isSaving={isAddingRecipe || isUpdatingRecipe}
         onUpdateItemPrice={async (itemId, price) => { await updateItemPrice({ itemId, price }); }}
         onUpdateItemUnit={async (itemId, unitType) => { await updateItemUnit({ itemId, unitType }); }}
