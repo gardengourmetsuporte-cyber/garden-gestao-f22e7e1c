@@ -400,6 +400,20 @@ export function QuotationDetail({ quotation: initialQ, onBack }: Props) {
                 )}
               </Button>
             )}
+            {isResolved && (
+              <Button
+                onClick={handleResolve}
+                disabled={resolving}
+                variant="outline"
+                className="rounded-xl gap-1.5 w-full h-11"
+              >
+                {resolving ? (
+                  <><AppIcon name="Loader2" size={16} className="animate-spin" /> Gerando pedidos...</>
+                ) : (
+                  <><AppIcon name="RefreshCw" size={16} /> Gerar Pedidos Novamente</>
+                )}
+              </Button>
+            )}
           </div>
         </section>
       )}
