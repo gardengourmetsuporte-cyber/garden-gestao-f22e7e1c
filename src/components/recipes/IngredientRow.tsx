@@ -86,8 +86,20 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
   };
 
   const prepareEditValues = () => {
-    setNewPriceValue(String(ingredient.item_price || ''));
+    setNewPriceValue(String(isSubRecipe ? (ingredient.source_recipe_cost || '') : (ingredient.item_price || '')));
     setNewBaseUnit(displayUnit);
+  };
+
+  const handleConfirmSubRecipeEdit = () => {
+    const newCost = parseLocalizedNumber(newPriceValue);
+    const newUnit = newBaseUnit as RecipeUnitType;
+    const total_cost = calculateSubRecipeCost(newCost, newUnit, ingredient.quantity, ingredient.unit_type);
+    onChange({
+      source_recipe_cost: newCost,
+      source_recipe_unit: newUnit,
+      total_cost,
+    });
+    setEditPopoverOpen(false);
   };
 
   const handleConfirmEdit = () => {
@@ -168,8 +180,8 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
           </div>
 
           <div className="flex items-center gap-0.5 shrink-0">
-            {/* Edit button - only for inventory items */}
-            {!isSubRecipe && (onUpdateGlobalPrice || onUpdateItemUnit) && (
+           {/* Edit button - inventory items: edit price/unit; sub-recipes: edit cost/unit inline */}
+            {(!isSubRecipe && (onUpdateGlobalPrice || onUpdateItemUnit)) || isSubRecipe ? (
               <Popover modal={true} open={editPopoverOpen} onOpenChange={setEditPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -184,9 +196,11 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
                 </PopoverTrigger>
                 <PopoverContent className="w-64 p-3" align="end">
                   <div className="space-y-3">
-                    <p className="text-sm font-medium">Editar item</p>
+                    <p className="text-sm font-medium">
+                      {isSubRecipe ? 'Editar sub-receita' : 'Editar item'}
+                    </p>
 
-                    {onUpdateItemUnit && (
+                    {!isSubRecipe && onUpdateItemUnit && (
                       <div className="space-y-1">
                         <Label className="text-xs text-muted-foreground">Unidade base (estoque)</Label>
                         <Select value={newBaseUnit} onValueChange={setNewBaseUnit}>
@@ -202,35 +216,51 @@ export function IngredientRow({ ingredient, onChange, onRemove, onUpdateGlobalPr
                       </div>
                     )}
 
-                    {onUpdateGlobalPrice && (
+                    {isSubRecipe && (
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">Preço por unidade</Label>
-                        <div className="flex items-center gap-1">
-                          <span className="text-muted-foreground text-sm">R$</span>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={newPriceValue}
-                            onChange={(e) => setNewPriceValue(e.target.value)}
-                            className="h-8 text-sm"
-                          />
-                        </div>
+                        <Label className="text-xs text-muted-foreground">Unidade de rendimento</Label>
+                        <Select value={newBaseUnit} onValueChange={setNewBaseUnit}>
+                          <SelectTrigger className="h-8 text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {UNIT_OPTIONS.map((unit) => (
+                              <SelectItem key={unit.value} value={unit.value}>{unit.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     )}
+
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">
+                        {isSubRecipe ? 'Custo por porção' : 'Preço por unidade'}
+                      </Label>
+                      <div className="flex items-center gap-1">
+                        <span className="text-muted-foreground text-sm">R$</span>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={newPriceValue}
+                          onChange={(e) => setNewPriceValue(e.target.value)}
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                    </div>
 
                     <div className="flex gap-2 pt-1">
                       <Button type="button" variant="ghost" size="sm" className="flex-1 h-8" onClick={() => setEditPopoverOpen(false)}>
                         Cancelar
                       </Button>
-                      <Button type="button" size="sm" className="flex-1 h-8" onClick={handleConfirmEdit}>
+                      <Button type="button" size="sm" className="flex-1 h-8" onClick={isSubRecipe ? handleConfirmSubRecipeEdit : handleConfirmEdit}>
                         Salvar
                       </Button>
                     </div>
                   </div>
                 </PopoverContent>
               </Popover>
-            )}
+            ) : null}
 
             <Button
               type="button"
