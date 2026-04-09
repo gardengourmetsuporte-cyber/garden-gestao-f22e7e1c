@@ -574,6 +574,12 @@ export function RecipeSheet({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Label className="text-base font-semibold">Ingredientes</Label>
                   <div className="flex items-center gap-2 ml-auto">
+                    {allRecipes.length > 0 && (
+                      <Button type="button" variant="outline" size="sm" onClick={() => { setDuplicatePickerOpen(true); setDuplicateSearch(''); }}>
+                        <AppIcon name="Copy" className="h-4 w-4 mr-1" />
+                        Duplicar de...
+                      </Button>
+                    )}
                     {onCreateSubRecipe && (
                       <Button type="button" variant="outline" size="sm" onClick={onCreateSubRecipe}>
                         <AppIcon name="Soup" className="h-4 w-4 mr-1" />
@@ -861,6 +867,60 @@ export function RecipeSheet({
         onSelectItem={handleAddInventoryItem}
         onSelectSubRecipe={handleAddSubRecipe}
       />
+
+      {/* Duplicate from recipe picker */}
+      <Sheet open={duplicatePickerOpen} onOpenChange={setDuplicatePickerOpen}>
+        <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl p-0">
+          <div className="p-4 border-b space-y-3">
+            <SheetHeader>
+              <SheetTitle className="text-base">Duplicar ingredientes de...</SheetTitle>
+            </SheetHeader>
+            <div className="relative">
+              <AppIcon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar receita..."
+                value={duplicateSearch}
+                onChange={(e) => setDuplicateSearch(e.target.value)}
+                className="pl-9 rounded-xl"
+                autoFocus
+              />
+            </div>
+          </div>
+          <ScrollArea className="h-[calc(70vh-120px)]">
+            <div className="p-3 space-y-1">
+              {allRecipes
+                .filter(r => r.id !== recipe?.id && r.ingredients && r.ingredients.length > 0)
+                .filter(r => !duplicateSearch || r.name.toLowerCase().includes(duplicateSearch.toLowerCase()))
+                .map(r => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-accent/50 transition-colors text-left"
+                    onClick={() => handleDuplicateFromRecipe(r)}
+                  >
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: `${r.category?.color || '#6366f1'}15` }}
+                    >
+                      <AppIcon name="ChefHat" className="w-4 h-4" style={{ color: r.category?.color || '#6366f1' }} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{r.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {r.ingredients?.length ?? 0} ingredientes · {formatCurrency(r.total_cost)}
+                      </p>
+                    </div>
+                    <AppIcon name="ArrowRight" className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  </button>
+                ))
+              }
+              {allRecipes.filter(r => r.id !== recipe?.id && r.ingredients && r.ingredients.length > 0).length === 0 && (
+                <p className="text-center py-8 text-muted-foreground text-sm">Nenhuma receita disponível</p>
+              )}
+            </div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
