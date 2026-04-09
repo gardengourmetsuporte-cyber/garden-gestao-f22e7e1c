@@ -574,12 +574,10 @@ export function RecipeSheet({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Label className="text-base font-semibold">Ingredientes</Label>
                   <div className="flex items-center gap-2 ml-auto">
-                    {allRecipes.length > 0 && (
-                      <Button type="button" variant="outline" size="sm" onClick={() => { setDuplicatePickerOpen(true); setDuplicateSearch(''); }}>
-                        <AppIcon name="Copy" className="h-4 w-4 mr-1" />
-                        Duplicar de...
-                      </Button>
-                    )}
+                    <Button type="button" variant="outline" size="sm" onClick={() => { setDuplicatePickerOpen(true); setDuplicateSearch(''); }}>
+                      <AppIcon name="Copy" className="h-4 w-4 mr-1" />
+                      Duplicar de...
+                    </Button>
                     {onCreateSubRecipe && (
                       <Button type="button" variant="outline" size="sm" onClick={onCreateSubRecipe}>
                         <AppIcon name="Soup" className="h-4 w-4 mr-1" />
@@ -889,7 +887,7 @@ export function RecipeSheet({
           <ScrollArea className="h-[calc(70vh-120px)]">
             <div className="p-3 space-y-1">
               {allRecipes
-                .filter(r => r.id !== recipe?.id && r.ingredients && r.ingredients.length > 0)
+                .filter(r => r.id !== recipe?.id)
                 .filter(r => !duplicateSearch || r.name.toLowerCase().includes(duplicateSearch.toLowerCase()))
                 .map(r => (
                   <button
@@ -914,7 +912,7 @@ export function RecipeSheet({
                   </button>
                 ))
               }
-              {allRecipes.filter(r => r.id !== recipe?.id && r.ingredients && r.ingredients.length > 0).length === 0 && (
+              {allRecipes.filter(r => r.id !== recipe?.id).length === 0 && (
                 <p className="text-center py-8 text-muted-foreground text-sm">Nenhuma receita disponível</p>
               )}
             </div>
