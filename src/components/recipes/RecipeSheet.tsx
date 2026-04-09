@@ -102,6 +102,7 @@ export function RecipeSheet({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [duplicatePickerOpen, setDuplicatePickerOpen] = useState(false);
   const [duplicateSearch, setDuplicateSearch] = useState('');
+  const [marginPercent, setMarginPercent] = useState(50);
   const [sellingPrice, setSellingPrice] = useState('');
   const [marginMode, setMarginMode] = useState<'margin' | 'price'>('margin');
   const [packagingTemplateId, setPackagingTemplateId] = useState<string>('');
