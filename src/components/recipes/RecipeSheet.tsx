@@ -60,6 +60,7 @@ interface RecipeSheetProps {
   categories: RecipeCategory[];
   inventoryItems: InventoryItem[];
   subRecipes: SubRecipeItem[];
+  allRecipes?: Recipe[];
   onSave: (data: any) => Promise<void>;
   isSaving: boolean;
   defaultCategoryId?: string | null;
@@ -79,6 +80,7 @@ export function RecipeSheet({
   categories,
   inventoryItems,
   subRecipes,
+  allRecipes = [],
   onSave,
   isSaving,
   defaultCategoryId,
