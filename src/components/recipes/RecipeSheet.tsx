@@ -100,7 +100,8 @@ export function RecipeSheet({
   const [ingredients, setIngredients] = useState<LocalIngredient[]>([]);
   const [minReadyStock, setMinReadyStock] = useState('0');
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [marginPercent, setMarginPercent] = useState(50);
+  const [duplicatePickerOpen, setDuplicatePickerOpen] = useState(false);
+  const [duplicateSearch, setDuplicateSearch] = useState('');
   const [sellingPrice, setSellingPrice] = useState('');
   const [marginMode, setMarginMode] = useState<'margin' | 'price'>('margin');
   const [packagingTemplateId, setPackagingTemplateId] = useState<string>('');
