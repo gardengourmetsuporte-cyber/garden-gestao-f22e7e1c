@@ -377,6 +377,34 @@ export function RecipeSheet({
     ]);
   };
 
+  const handleDuplicateFromRecipe = (sourceRecipe: Recipe) => {
+    if (!sourceRecipe.ingredients || sourceRecipe.ingredients.length === 0) return;
+
+    const newIngredients: LocalIngredient[] = sourceRecipe.ingredients.map((ing) => {
+      const sourceType = (ing.source_type || 'inventory') as IngredientSourceType;
+      return {
+        source_type: sourceType,
+        item_id: ing.item_id || null,
+        item_name: ing.item?.name || null,
+        item_unit: ing.item?.unit_type || null,
+        item_price: sourceType === 'inventory' ? (ing.item?.unit_price ?? ing.unit_cost ?? null) : null,
+        source_recipe_id: ing.source_recipe_id || null,
+        source_recipe_name: ing.source_recipe?.name || null,
+        source_recipe_unit: ing.source_recipe?.yield_unit || null,
+        source_recipe_cost: ing.source_recipe?.cost_per_portion ?? null,
+        quantity: ing.quantity,
+        unit_type: ing.unit_type,
+        total_cost: ing.total_cost,
+        kds_station_id: (ing as any).kds_station_id || null,
+      };
+    });
+
+    setIngredients((prev) => [...prev, ...newIngredients]);
+    setDuplicatePickerOpen(false);
+    setDuplicateSearch('');
+  };
+
+
   const handleIngredientChange = (index: number, updates: Partial<LocalIngredient>) => {
     setIngredients((prev) =>
       prev.map((ing, i) => (i === index ? { ...ing, ...updates } : ing))
