@@ -3,15 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { formatCurrency, type RecipeUnitType, type IngredientSourceType, calculateIngredientCost, calculateSubRecipeCost } from '@/types/recipe';
 import { parseLocalizedNumber } from '@/lib/number';
 import { cn } from '@/lib/utils';
@@ -79,6 +70,11 @@ export function IngredientRow({
   const filteredUnitOptions = UNIT_OPTIONS;
   const unitLabel = UNIT_OPTIONS.find(u => u.value === displayUnit)?.label || displayUnit;
 
+  const resetQuickEditState = () => {
+    setShowGlobalWarning(false);
+    setPendingChanges({});
+  };
+
   const handleQuantityChange = (value: string) => {
     const quantity = parseLocalizedNumber(value);
     const total_cost = isSubRecipe
@@ -105,7 +101,13 @@ export function IngredientRow({
 
   const handleOpenQuickEdit = () => {
     prepareEditValues();
+    resetQuickEditState();
     setEditPanelOpen(true);
+  };
+
+  const handleCloseQuickEdit = () => {
+    resetQuickEditState();
+    setEditPanelOpen(false);
   };
 
   const handleConfirmEdit = () => {
@@ -115,7 +117,7 @@ export function IngredientRow({
     const priceChanged = Math.abs(newPrice - currentPrice) > 0.0001;
 
     if (!priceChanged && !unitChanged) {
-      setEditPanelOpen(false);
+      handleCloseQuickEdit();
       return;
     }
 
@@ -124,42 +126,53 @@ export function IngredientRow({
       ...(unitChanged ? { unit: newBaseUnit } : {}),
     });
     setShowGlobalWarning(true);
-    setEditPanelOpen(false);
   };
 
   const handleSaveGlobalChanges = async () => {
     if (!ingredient.item_id) return;
+
+    const previousPrice = ingredient.item_price;
+    const previousBaseUnit = ingredient.item_unit;
+    const previousUnitType = ingredient.unit_type;
+    const previousTotalCost = ingredient.total_cost;
+
+    const finalPrice = pendingChanges.price ?? ingredient.item_price ?? 0;
+    const finalBaseUnit = pendingChanges.unit ?? displayUnit;
+    const newUnitType = pendingChanges.unit
+      ? (pendingChanges.unit as RecipeUnitType)
+      : ingredient.unit_type;
+    const total_cost = calculateIngredientCost(finalPrice, finalBaseUnit, ingredient.quantity, newUnitType);
+
+    onChange({
+      ...(pendingChanges.price !== undefined ? { item_price: pendingChanges.price } : {}),
+      ...(pendingChanges.unit ? { item_unit: pendingChanges.unit, unit_type: newUnitType } : {}),
+      total_cost,
+    });
+
     setIsSaving(true);
+
     try {
-      // Run global updates sequentially
-      if (pendingChanges.price !== undefined && onUpdateGlobalPrice) {
-        await onUpdateGlobalPrice(ingredient.item_id, pendingChanges.price);
-      }
-      if (pendingChanges.unit && onUpdateItemUnit) {
-        await onUpdateItemUnit(ingredient.item_id, pendingChanges.unit);
-      }
+      await Promise.all([
+        ...(pendingChanges.price !== undefined && onUpdateGlobalPrice
+          ? [onUpdateGlobalPrice(ingredient.item_id, pendingChanges.price)]
+          : []),
+        ...(pendingChanges.unit && onUpdateItemUnit
+          ? [onUpdateItemUnit(ingredient.item_id, pendingChanges.unit)]
+          : []),
+      ]);
 
-      const finalPrice = pendingChanges.price ?? ingredient.item_price ?? 0;
-      const finalBaseUnit = pendingChanges.unit ?? displayUnit;
-      
-      // If unit changed, also update the ingredient's unit_type to match the new base
-      const newUnitType = pendingChanges.unit
-        ? (pendingChanges.unit as RecipeUnitType)
-        : ingredient.unit_type;
-      
-      const total_cost = calculateIngredientCost(finalPrice, finalBaseUnit, ingredient.quantity, newUnitType);
-
-      onChange({
-        ...(pendingChanges.price !== undefined ? { item_price: pendingChanges.price } : {}),
-        ...(pendingChanges.unit ? { item_unit: pendingChanges.unit, unit_type: newUnitType } : {}),
-        total_cost,
-      });
+      handleCloseQuickEdit();
     } catch (err) {
       console.error('Erro ao salvar alterações:', err);
+
+      onChange({
+        item_price: previousPrice,
+        item_unit: previousBaseUnit,
+        unit_type: previousUnitType,
+        total_cost: previousTotalCost,
+      });
     } finally {
       setIsSaving(false);
-      setShowGlobalWarning(false);
-      setPendingChanges({});
     }
   };
 
@@ -271,7 +284,7 @@ export function IngredientRow({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 shrink-0"
-                onClick={() => setEditPanelOpen(false)}
+                onClick={handleCloseQuickEdit}
               >
                 <AppIcon name="X" className="h-4 w-4" />
               </Button>
@@ -281,7 +294,7 @@ export function IngredientRow({
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">Unidade base</Label>
                 <Select value={newBaseUnit} onValueChange={setNewBaseUnit}>
-                  <SelectTrigger className="h-9 text-sm bg-background">
+                  <SelectTrigger className="h-9 text-sm bg-background" disabled={isSaving}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -303,17 +316,67 @@ export function IngredientRow({
                   onChange={(e) => setNewPriceValue(e.target.value)}
                   className="h-9 bg-background text-sm"
                   placeholder="0,00"
+                  disabled={isSaving}
                 />
               </div>
             )}
 
+            {showGlobalWarning && (
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
+                <div className="flex items-start gap-2">
+                  <AppIcon name="AlertTriangle" className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-foreground">
+                      Essa alteração vai atualizar este item em todas as fichas técnicas.
+                    </p>
+                    {pendingChanges.price !== undefined && (
+                      <p className="text-xs text-muted-foreground">
+                        Novo preço: <strong>{formatCurrency(pendingChanges.price)}/{UNIT_OPTIONS.find(u => u.value === (pendingChanges.unit || displayUnit))?.label}</strong>
+                      </p>
+                    )}
+                    {pendingChanges.unit && (
+                      <p className="text-xs text-muted-foreground">
+                        Nova unidade base: <strong>{UNIT_OPTIONS.find(u => u.value === pendingChanges.unit)?.label}</strong>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2 pt-1">
-              <Button type="button" variant="ghost" size="sm" className="flex-1" onClick={() => setEditPanelOpen(false)}>
-                Cancelar
-              </Button>
-              <Button type="button" size="sm" className="flex-1" onClick={handleConfirmEdit}>
-                Salvar alterações
-              </Button>
+              {showGlobalWarning ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setShowGlobalWarning(false)}
+                    disabled={isSaving}
+                  >
+                    Voltar
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="flex-1"
+                    onClick={handleSaveGlobalChanges}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? 'Salvando...' : 'Confirmar alteração'}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button type="button" variant="ghost" size="sm" className="flex-1" onClick={handleCloseQuickEdit} disabled={isSaving}>
+                    Cancelar
+                  </Button>
+                  <Button type="button" size="sm" className="flex-1" onClick={handleConfirmEdit} disabled={isSaving}>
+                    Salvar alterações
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -366,35 +429,6 @@ export function IngredientRow({
           </div>
         )}
       </div>
-
-      {/* Global Warning Dialog */}
-      <AlertDialog open={showGlobalWarning} onOpenChange={setShowGlobalWarning}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Alterar item globalmente</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta alteração atualizará <strong>{displayName}</strong> em{' '}
-              <strong>todas as fichas técnicas</strong> que utilizam este item.
-              {pendingChanges.price !== undefined && (
-                <>
-                  <br />Novo preço: <strong>{formatCurrency(pendingChanges.price)}/{UNIT_OPTIONS.find(u => u.value === (pendingChanges.unit || displayUnit))?.label}</strong>
-                </>
-              )}
-              {pendingChanges.unit && (
-                <>
-                  <br />Nova unidade base: <strong>{UNIT_OPTIONS.find(u => u.value === pendingChanges.unit)?.label}</strong>
-                </>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSaving}>Cancelar</AlertDialogCancel>
-            <Button onClick={handleSaveGlobalChanges} disabled={isSaving}>
-              {isSaving ? 'Salvando...' : 'Confirmar'}
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
