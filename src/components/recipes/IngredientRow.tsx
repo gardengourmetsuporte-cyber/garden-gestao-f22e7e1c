@@ -131,6 +131,7 @@ export function IngredientRow({
     if (!ingredient.item_id) return;
     setIsSaving(true);
     try {
+      // Run global updates sequentially
       if (pendingChanges.price !== undefined && onUpdateGlobalPrice) {
         await onUpdateGlobalPrice(ingredient.item_id, pendingChanges.price);
       }
@@ -140,19 +141,25 @@ export function IngredientRow({
 
       const finalPrice = pendingChanges.price ?? ingredient.item_price ?? 0;
       const finalBaseUnit = pendingChanges.unit ?? displayUnit;
-      const total_cost = calculateIngredientCost(finalPrice, finalBaseUnit, ingredient.quantity, ingredient.unit_type);
+      
+      // If unit changed, also update the ingredient's unit_type to match the new base
+      const newUnitType = pendingChanges.unit
+        ? (pendingChanges.unit as RecipeUnitType)
+        : ingredient.unit_type;
+      
+      const total_cost = calculateIngredientCost(finalPrice, finalBaseUnit, ingredient.quantity, newUnitType);
 
       onChange({
         ...(pendingChanges.price !== undefined ? { item_price: pendingChanges.price } : {}),
-        ...(pendingChanges.unit ? { item_unit: pendingChanges.unit } : {}),
+        ...(pendingChanges.unit ? { item_unit: pendingChanges.unit, unit_type: newUnitType } : {}),
         total_cost,
       });
-
-      setShowGlobalWarning(false);
     } catch (err) {
       console.error('Erro ao salvar alterações:', err);
     } finally {
       setIsSaving(false);
+      setShowGlobalWarning(false);
+      setPendingChanges({});
     }
   };
 
