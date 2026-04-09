@@ -333,6 +333,7 @@ export default function Recipes() {
         categories={categories}
         inventoryItems={inventoryItems}
         defaultCategoryId={quickPreSelectedCategoryId}
+        allRecipes={recipes}
         subRecipes={getAvailableSubRecipes(quickSelectedRecipe?.id).map(r => ({
           id: r.id, name: r.name, yield_unit: r.yield_unit, cost_per_portion: r.cost_per_portion,
           category: r.category ? { id: r.category.id, name: r.category.name, color: r.category.color } : null,
